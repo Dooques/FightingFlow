@@ -1,8 +1,10 @@
 package com.example.fightingflow.data
 
 import com.example.fightingflow.R
+import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.CharacterModel
-import com.example.fightingflow.model.Move
+import com.example.fightingflow.model.ComboDisplay
+import com.example.fightingflow.model.MoveString
 
 object DataSource {
     val menuItems = listOf(
@@ -12,6 +14,7 @@ object DataSource {
         R.string.learn_the_notation
 
     )
+
     val characterData = listOf(
         CharacterModel(R.drawable.kazuya_sprite, R.string.kazuya),
         CharacterModel(R.drawable.reina_sprite, R.string.reina),
@@ -48,116 +51,24 @@ object DataSource {
         CharacterModel(R.drawable.t8_logo, R.string.eddy),
         CharacterModel(R.drawable.t8_logo, R.string.lidia),
         CharacterModel(R.drawable.t8_logo, R.string.heihachi),
+        CharacterModel(R.drawable.t8_logo, R.string.clive)
     )
-    val MoveData = listOf(
-        Move(R.drawable.forward, R.string.forward),
-        Move(R.string.forward_hold, R.string.forward_hold),
-        Move(R.string.back, R.string.back),
-        Move(R.string.back_hold, R.string.back_hold),
-        Move(R.string.forward_down, R.string.forward_down),
-        Move(R.string.down, R.string.down),
-        Move(R.string.back_down, R.string.back_down),
-        Move(R.string.up_left, R.string.up_left),
-        Move(R.string.up_right, R.string.up_right),
-        Move(R.string.neutral, R.string.neutral),
-        Move(R.string.one, R.string.one),
-        Move(R.string.two, R.string.two),
-        Move(R.string.three, R.string.three),
-        Move(R.string.four, R.string.four),
-        Move(R.string.one_plus_two, R.string.one_plus_two),
-        Move(R.string.three_plus_four, R.string.three_plus_four),
-        Move(R.string.one_plus_three, R.string.one_plus_three),
-        Move(R.string.two_plus_four, R.string.two_plus_four),
-        Move(R.string.one_plus_four, R.string.one_plus_four),
-        Move(R.string.two_plus_three, R.string.two_plus_three),
-        Move(R.string.r1, R.string.r1),
-        Move(R.string.rb, R.string.rb),
-        Move(R.string.r2, R.string.r2),
-        Move(R.string.rt, R.string.rt),
-        Move(R.string.r3, R.string.r3),
-        Move(R.string.rs, R.string.rs),
-        Move(R.string.l1, R.string.l1),
-        Move(R.string.lb, R.string.lb),
-        Move(R.string.l2, R.string.l2),
-        Move(R.string.lt, R.string.lt),
-        Move(R.string.l3, R.string.l3),
-        Move(R.string.ls, R.string.ls),
-        Move(R.string.heat, R.string.heat),
-        Move(R.string.back_turned, R.string.back_turned),
-        Move(R.string.hold, R.string.hold),
-        Move(R.string.ewgf, R.string.ewgf),
-        Move(R.string.sentai, R.string.sentai),
-        Move(R.string.heavens_wrath, R.string.heavens_wrath),
-        Move(R.string.zenshin, R.string.zenshin),
-        Move(R.string.destructive_form, R.string.destructive_form),
-        Move(R.string.naniwa_gusto, R.string.naniwa_gusto),
-        Move(R.string.libertador, R.string.libertador),
-        Move(R.string.snake_eyes, R.string.snake_eyes),
-        Move(R.string.slither_step, R.string.slither_step),
-        Move(R.string.starburst, R.string.starburst),
-        Move(R.string.fly, R.string.fly),
-        Move(R.string.mourning_crow, R.string.mourning_crow),
-        Move(R.string.ginga, R.string.ginga),
-        Move(R.string.bananeira, R.string.bananeira),
-        Move(R.string.negativa, R.string.negativa),
-        Move(R.string.mandinga, R.string.mandinga),
-        Move(R.string.dew_glide, R.string.dew_glide),
-        Move(R.string.fiesty_rabbit, R.string.fiesty_rabbit),
-        Move(R.string.wind_gods_kamae, R.string.wind_gods_kamae),
-        Move(R.string.right_stance, R.string.right_stance),
-        Move(R.string.left_stance, R.string.left_stance),
-        Move(R.string.right_flamingo, R.string.right_flamingo),
-        Move(R.string.left_flamingo, R.string.left_flamingo),
-        Move(R.string.gamma_howl, R.string.gamma_howl),
-        Move(R.string.genjitsu, R.string.genjitsu),
-        Move(R.string.izumo, R.string.izumo),
-        Move(R.string.hunting, R.string.hunting),
-        Move(R.string.bear_sit, R.string.bear_sit),
-        Move(R.string.bear_roll, R.string.bear_roll),
-        Move(R.string.dynamic_entry, R.string.dynamic_entry),
-        Move(R.string.silent_entry, R.string.silent_entry),
-        Move(R.string.limited_entry, R.string.limited_entry),
-        Move(R.string.dragon_charge, R.string.dragon_charge),
-        Move(R.string.mist_step, R.string.mist_step),
-        Move(R.string.hitman, R.string.hitman),
-        Move(R.string.jun_ji_du_li, R.string.jun_ji_du_li),
-        Move(R.string.fu_bo, R.string.fu_bo),
-        Move(R.string.jin_bu, R.string.jin_bu),
-        Move(R.string.hermit, R.string.hermit),
-        Move(R.string.horse_stance, R.string.horse_stance),
-        Move(R.string.heaven_and_earth, R.string.cat_stance),
-        Move(R.string.cat_stance, R.string.cat_stance),
-        Move(R.string.wolf_stance, R.string.wolf_stance),
-        Move(R.string.sway, R.string.sway),
-        Move(R.string.soulzone, R.string.soulzone),
-        Move(R.string.shadow_sprint, R.string.shadow_sprint),
-        Move(R.string.stealth_step, R.string.stealth_step),
-        Move(R.string.sneak, R.string.sneak),
-        Move(R.string.flicker_stance, R.string.flicker_stance),
-        Move(R.string.ducking_left, R.string.ducking_left),
-        Move(R.string.ducking_right, R.string.ducking_right),
-        Move(R.string.ducking, R.string.ducking),
-        Move(R.string.quick_spin, R.string.quick_spin),
-        Move(R.string.peekaboo, R.string.peekaboo),
-        Move(R.string.swaying, R.string.swaying),
-        Move(R.string.two_faced, R.string.two_faced),
-        Move(R.string.lion_heart, R.string.lion_heart),
-        Move(R.string.iai_stance, R.string.iai_stance),
-        Move(R.string.perfumer, R.string.perfumer),
-        Move(R.string.pheonix, R.string.pheonix),
-        Move(R.string.kincho, R.string.kincho),
-        Move(R.string.meditation, R.string.meditation),
-        Move(R.string.flea, R.string.flea),
-        Move(R.string.indian_stance_healing, R.string.indian_stance_healing),
-        Move(R.string.manji_spin, R.string.manji_spin),
-        Move(R.string.bad_stomach, R.string.bad_stomach),
-        Move(R.string.mutuo_no_kiwami, R.string.mutuo_no_kiwami),
-        Move(R.string.manji_dragonfly, R.string.manji_dragonfly),
-        Move(R.string.tarantula, R.string.tarantula),
-        Move(R.string.scarecrow, R.string.scarecrow),
-        Move(R.string.mantis, R.string.mantis),
-        Move(R.string.while_standing, R.string.while_standing),
-        Move(R.string.while_crouching, R.string.while_crouching)
+
+    val combo = ComboDisplay(
+        comboId = "",
+        character = "Reina",
+        damage = 50,
+        createdBy = "Sam",
+        moves = listOf(
+            MoveString("ewgf", listOf("ewgf"), false, "Mishima"),
+            MoveString("b2", listOf("back", "two"), false, "input"),
+            MoveString("ff3+4", listOf("forward", "forward", "three_plus_four"), false, "input"),
+            MoveString("df3", listOf("down_forward", "one"), false, "input"),
+            MoveString("f24", listOf("forward", "two", "four"), false, "input"),
+            MoveString("Sentai", listOf("Sentai"), false, "character"),
+            MoveString("1+2", listOf("one_plus_two"), false, "input"),
+            MoveString("4", listOf("four"), false, "input")
+        )
     )
 }
 

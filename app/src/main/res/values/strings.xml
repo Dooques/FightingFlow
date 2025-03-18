@@ -13,6 +13,8 @@
     <string name="menu">Menu</string>
     <string name="char_select">Char Select</string>
     <string name="back_button">Back Button</string>
+    <string name="moves">Moves</string>
+    <string name="sign_up">Sign Up</string>
 
     <!-- Character Names -->
     <string name="kazuya">Kazuya</string>
@@ -51,15 +53,44 @@
     <string name="eddy">Eddy</string>
     <string name="lidia">Lidia</string>
     <string name="heihachi">Heihachi</string>
+    <string name="clive">Clive</string>
 
-    <!-- Movements -->
+    <!-- Console Inputs -->
+
+    <!-- Playstation -->
+    <string name="cross">×</string>
+    <string name="circle">○</string>
+    <string name="triangle">△</string>
+    <string name="square">□</string>
+    <string name="r1">R1</string>
+    <string name="r2">R2</string>
+    <string name="r3">R3</string>
+    <string name="l1">L1</string>
+    <string name="l2">L2</string>
+    <string name="l3">L3</string>
+
+    <!-- Xbox -->
+    <string name="a">A</string>
+    <string name="b">B</string>
+    <string name="x">X</string>
+    <string name="y">Y</string>
+    <string name="rb">RB</string>
+    <string name="rt">RT</string>
+    <string name="rs">RS</string>
+    <string name="lb">LS</string>
+    <string name="lt">LS</string>
+    <string name="ls">LS</string>
+
+    <!-- Inputs -->
+    <string name="move_break">Break</string>
     <string name="forward">Forward</string>
     <string name="forward_hold">Forward hold</string>
+    <string name="heat_dash">Heat Dash</string>
     <string name="back">Back</string>
     <string name="back_hold">Back hold</string>
     <string name="forward_down">Forward down</string>
     <string name="down">Down</string>
-    <string name="back_down">Back down</string>
+    <string name="down_back">Down back</string>
     <string name="up_left">Up left</string>
     <string name="up_right">Up right</string>
     <string name="neutral">Neutral</string>
@@ -68,99 +99,197 @@
     <string name="three">3</string>
     <string name="four">4</string>
     <string name="one_plus_two">1+2</string>
-    <string name="three_plus_four">3+4</string>
     <string name="one_plus_three">1+3</string>
-    <string name="two_plus_four">2+4</string>
     <string name="one_plus_four">1+4</string>
     <string name="two_plus_three">2+3</string>
-    <string name="r1">R1</string>
-    <string name="rb">Rb</string>
-    <string name="r2">R2</string>
-    <string name="rt">Rt</string>
-    <string name="r3">R3</string>
-    <string name="rs">Rs</string>
-    <string name="l1">L1</string>
-    <string name="lb">Lb</string>
-    <string name="l2">L2</string>
-    <string name="lt">Lt</string>
-    <string name="l3">L3</string>
-    <string name="ls">Ls</string>
-    <string name="heat">Heat</string>
-    <string name="back_turned">Back turned</string>
+    <string name="two_plus_four">2+4</string>
+    <string name="three_plus_four">3+4</string>
+    <string name="one_plus_two_plus_three">1+2+3</string>
+    <string name="one_plus_two_plus_four">1+2+4</string>
+    <string name="one_plus_three_plus_four">1+3+4</string>
+    <string name="two_plus_three_plus_four">2+3+4</string>
+    <string name="one_plus_two_plus_three_plus_four">1+2+3+4</string>
+
+    <!-- Common Moves-->
     <string name="hold">Hold</string>
-    <string name="ewgf">Ewgf</string>
-    <string name="sentai">Sentai</string>
-    <string name="heavens_wrath">Heaven\'s wrath</string>
-    <string name="zenshin">Zenshin</string>
-    <string name="destructive_form">Destructive form</string>
-    <string name="naniwa_gusto">Naniwa gusto</string>
+    <string name="hold_max">Hold Max</string>
+    <string name="delay">Delay</string>
+    <string name="just_frame">Just Frame</string>
+    <string name="slide">Slide</string>
+    <string name="side_switch">Side Switch</string>
+    <string name="back_turned">Back Turned</string>
+    <string name="while_standing">While Standing</string>
+    <string name="crouch">Crouch</string>
+    <string name="dash">Dash</string>
+    <string name="sidestep_left">Sidestep Left</string>
+    <string name="sidestep_right">Sidestep Right</string>
+    <string name="low_parry">Low Parry</string>
+    <string name="sway">Sway</string>
+
+    <!-- Mechanics -->
+    <string name="heat_burst">Heat Burst</string>
+    <string name="during_heat">During Heat</string>
+    <string name="rage_art">Rage Art</string>
+
+    <!-- Stage Properties -->
+
+    <string name="wall_splat">Wall Splat</string>
+    <string name="wall_break">Wall Break</string>
+    <string name="wall_blast">Wall Blast</string>
+    <string name="wall_bounce">Wall Bounce</string>
+    <string name="floor_break">Floor Break</string>
+    <string name="floor_blast">Floor Blast</string>
+    <string name="balcony_break">Balcony Break</string>
+
+    <!-- Mishima Moves -->
+    <string name="wgs">Wind God Step</string>
+    <string name="wgf">Wind God Fist</string>
+    <string name="tgf">Thunder God Fist</string>
+    <string name="ewgf">Electric Wind God Step</string>
+    <string name="otgf">Omen Thunder God Fist</string>
+    <string name="etgf">Electric Thunder God Fist</string>
+
+
+
+    <!-- Character Moves -->
+    <!-- Alisa -->
+    <string name="destructive_form">Destructive Form</string>
+    <string name="boot">Boot</string>
+    <string name="dual_boot">Dual Boot</string>
+
+    <!-- Asuka -->
+    <string name="naniwa_gusto">Naniwa Gusto</string>
+    <string name="leg_cutter">Leg Cutter</string>
+
+    <!-- Azucena -->
     <string name="libertador">Libertador</string>
-    <string name="snake_eyes">Snake eyes</string>
-    <string name="slither_step">Slither step</string>
+    <string name="taking_high_attack">Taking High Attack</string>
+    <string name="taking_low_attack">Taking Low Attack</string>
+
+    <!-- Bryan -->
+    <string name="snake_eyes">Snake Eyes</string>
+    <string name="slither_step">Slither Step</string>
+
+    <!-- Claudio -->
     <string name="starburst">Starburst</string>
+
+    <!-- Clive -->
+    <string name="phoenix_shift">Phoenix Shift</string>
+    <string name="wings_of_light">Wings Of Light</string>
+    <string name="updraft">Updraft</string>
+    <string name="zantetsuken">Zantetsuken</string>
+
+    <!-- Devil Jin -->
+    <string name="mourning_crow">Mourning Crow</string>
     <string name="fly">Fly</string>
-    <string name="mourning_crow">Mourning crow</string>
+
+    <!-- Dragunov -->
+    <string name="sneak">Sneak</string>
+
+    <!-- Eddy -->
     <string name="ginga">Ginga</string>
     <string name="bananeira">Bananeira</string>
     <string name="negativa">Negativa</string>
     <string name="mandinga">Mandinga</string>
-    <string name="dew_glide">Dew glide</string>
-    <string name="fiesty_rabbit">Fiesty rabbit</string>
-    <string name="wind_gods_kamae">Wind god\'s kamae</string>
-    <string name="right_stance">Right stance</string>
-    <string name="left_stance">Left stance</string>
-    <string name="right_flamingo">Right flamingo</string>
-    <string name="left_flamingo">Left flamingo</string>
-    <string name="gamma_howl">Gamma howl</string>
-    <string name="genjitsu">Genjitsu</string>
+
+    <!--Feng -->
+    <string name="deceptive_step">Deceptive Step</string>
+    <string name="shifting_clouds">Shifting Clouds</string>
+
+    <!-- Heihachi -->
+    <string name="wind_gods_kamae">Wind God\'s Kamae</string>
+    <string name="thunder_gods_kamae">Thunder God\'s Kamae</string>
+    <string name="warrior_instinct">Warrior Instinct</string>
+
+    <!-- Hwoarang -->
+    <string name="right_stance">Right Stance</string>
+    <string name="left_stance">Left Stance</string>
+    <string name="right_flamingo">Right Flamingo</string>
+    <string name="left_flamingo">Left Flamingo</string>
+
+    <!-- Jack-8 -->
+    <string name="sit_down">Sit Down</string>
+    <string name="gamma_howl">Gamma Howl</string>
+
+    <!-- Jin -->
+    <string name="zenshin">Zenshin</string>
+
+    <!-- Jun -->
     <string name="izumo">Izumo</string>
+    <string name="genjutsu">Genjutsu</string>
+    <string name="miare">Miare</string>
+
+    <!-- Kuma & Panda -->
     <string name="hunting">Hunting</string>
-    <string name="bear_sit">Bear sit</string>
-    <string name="bear_roll">Bear roll</string>
-    <string name="dynamic_entry">Dynamic entry</string>
-    <string name="silent_entry">Silent entry</string>
-    <string name="limited_entry">Limited entry</string>
-    <string name="dragon_charge">Dragon charge</string>
-    <string name="mist_step">Mist step</string>
+    <string name="bear_sit">Bear Sit</string>
+    <string name="bear_roll">Bear Roll</string>
+
+    <!-- Lars -->
+    <string name="dynamic_entry">Dynamic Entry</string>
+    <string name="silent_entry">Silent Entry</string>
+    <string name="limited_entry">Limited Entry</string>
+
+    <!-- Law -->
+    <string name="dragon_charge">Dragon Charge</string>
+
+    <!-- Lee -->
     <string name="hitman">Hitman</string>
-    <string name="jun_ji_du_li">Jun ji du li</string>
-    <string name="fu_bo">Fu bo</string>
-    <string name="jin_bu">Jin bu</string>
+
+    <!-- Leo -->
+    <string name="jin_ji_du_li">Jin Ji Du Li</string>
+    <string name="fo_bu">Fo Bu</string>
+
+    <!-- Leroy -->
     <string name="hermit">Hermit</string>
-    <string name="horse_stance">Horse stance</string>
-    <string name="heaven_and_earth">Heaven and earth</string>
-    <string name="cat_stance">Cat stance</string>
-    <string name="wolf_stance">Wolf stance</string>
-    <string name="sway">Sway</string>
+
+    <!-- Lidia -->
+    <string name="horse_stance">Horse Stance</string>
+    <string name="cat_stance">Cat Stance</string>
+    <string name="heaven_and_earth">Heaven and Earth</string>
+    <string name="stalking_wolf_stance">Stalking Wolf Stance</string>
+
+    <!-- Lili -->
+    <string name="dew_glide">Dew Glide</string>
+
+    <!-- Raven -->
     <string name="soulzone">Soulzone</string>
-    <string name="shadow_sprint">Shadow sprint</string>
-    <string name="stealth_step">Stealth step</string>
-    <string name="sneak">Sneak</string>
-    <string name="flicker_stance">Flicker stance</string>
-    <string name="ducking_left">Ducking left</string>
-    <string name="ducking_right">Ducking right</string>
+
+    <!-- Reina -->
+    <string name="unsoku">Unsoku</string>
+    <string name="sentai">Sentai</string>
+    <string name="heavens_wrath">Heaven\'s Wrath</string>
+
+    <!-- Shaheen -->
+    <string name="stealth_step">Stealth Step</string>
+
+    <!-- Steve -->
+    <string name="quick_spin">Quick Spin</string>
     <string name="ducking">Ducking</string>
-    <string name="quick_spin">Quick spin</string>
     <string name="peekaboo">Peekaboo</string>
+    <string name="ducking_in">Ducking In</string>
+    <string name="ducking_left">Ducking Left</string>
+    <string name="ducking_right">Ducking Right</string>
+    <string name="flicker_stance">Flicker Stance</string>
     <string name="swaying">Swaying</string>
-    <string name="two_faced">Two faced</string>
-    <string name="lion_heart">Lion heart</string>
-    <string name="iai_stance">Iai stance</string>
+    <string name="lion_heart">Lion Heart</string>
+
+    <!-- Victor -->
+    <string name="iai">Iai</string>
     <string name="perfumer">Perfumer</string>
-    <string name="pheonix">Pheonix</string>
+
+    <!-- Xiaoyu -->
+    <string name="phoenix">Phoenix</string>
+    <string name="hypnotist">Hypnotist</string>
+
+    <!-- Yoshimitsu -->
     <string name="kincho">Kincho</string>
-    <string name="meditation">Meditation</string>
+    <string name="mutou_no_kiwami">Mutou No Kiwami</string>
+    <string name="manji_dragonfly">Manji Dragonfly</string>
     <string name="flea">Flea</string>
-    <string name="indian_stance_healing">Indian stance healing</string>
-    <string name="manji_spin">Manji spin</string>
-    <string name="bad_stomach">Bad stomach</string>
-    <string name="mutuo_no_kiwami">Mutuo no kiwami</string>
-    <string name="manji_dragonfly">Manji dragonfly</string>
+    <string name="indian_stance">Indian Stance</string>
+
+    <!-- Zafina -->
     <string name="tarantula">Tarantula</string>
     <string name="scarecrow">Scarecrow</string>
     <string name="mantis">Mantis</string>
-    <string name="while_standing">While standing</string>
-    <string name="while_crouching">While crouching</string>
-    <string name="moves">Moves</string>
-    <string name="sign_up">Sign Up</string>
 </resources>

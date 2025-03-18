@@ -1,6 +1,7 @@
 package com.example.fightingflow.ui
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -27,9 +28,13 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.fightingflow.FightingFlowApp
 import com.example.fightingflow.R
-import com.example.fightingflow.ui.CharacterScreen.CharacterScreen
-import com.example.fightingflow.ui.UserInputForms.SignUpScreen
+import com.example.fightingflow.ui.characterScreen.CharacterScreen
+import com.example.fightingflow.ui.comboScreen.ComboScreen
+import com.example.fightingflow.ui.comboScreen.ComboViewModel
 import com.example.fightingflow.ui.theme.FightingFlowTheme
+import com.example.fightingflow.ui.userInputForms.InputViewModel
+import com.example.fightingflow.ui.userInputForms.SignupScreen
+import org.koin.compose.koinInject
 
 
 enum class FlowScreen(@StringRes val title: Int) {
@@ -80,9 +85,11 @@ fun FightingFlowHomeScreen(
     navController: NavHostController = rememberNavController(),
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
-    val currentScreen = FlowScreen.valueOf(
-        backStackEntry?.destination?.route ?: FlowScreen.Start.name
-    )
+    val currentScreen =
+        FlowScreen.valueOf(backStackEntry?.destination?.route ?: FlowScreen.Start.name)
+
+    val comboViewModel = koinInject<ComboViewModel>()
+    val inputViewModel = koinInject<InputViewModel>()
 
     Scaffold(
         topBar = {
@@ -94,23 +101,30 @@ fun FightingFlowHomeScreen(
                 )
             }
         }
-    ) {innerPadding ->
+    ) { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = FlowScreen.Start.name,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(innerPadding).background(Color.Black)
         ) {
             composable(route = FlowScreen.Start.name) {
                 TitleScreen(
-                    onLogin = {navController.navigate(FlowScreen.PickChar.name)},
-                    onSignUp = {navController.navigate(FlowScreen.Signup.name)}
+                    onLogin = { navController.navigate(FlowScreen.PickChar.name) },
+                    onSignUp = { navController.navigate(FlowScreen.Signup.name) },
+                )
+            }
+            composable(route = FlowScreen.Signup.name) {
+                SignupScreen(
+                    navigateBack = {navController.navigate(FlowScreen.Start.name)}
                 )
             }
             composable(route = FlowScreen.PickChar.name) {
-                CharacterScreen()
+                CharacterScreen(
+                    onClick = { navController.navigate(FlowScreen.Combos.name) }
+                )
             }
-            composable(route = FlowScreen.Signup.name,) {
-                SignUpScreen({ navController.navigate(FlowScreen.PickChar.name) })
+            composable(route = FlowScreen.Combos.name) {
+                ComboScreen()
             }
         }
     }
