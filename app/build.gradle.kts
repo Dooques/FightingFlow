@@ -64,6 +64,8 @@ dependencies {
     implementation(libs.androidx.ui.text.google.fonts)
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.material3.window.size.class1)
+
 
     // Room
     implementation(libs.androidx.room.runtime)

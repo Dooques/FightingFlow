@@ -22,11 +22,11 @@ data class ComboEntry (
 )
 
 data class ComboDisplay(
-    val comboId: String,
+    val comboId: String?,
     val character: String,
     val damage: Int,
     val createdBy: String,
-    val moves: List<MoveString>
+    val moves: MutableList<MoveEntry>
 )
 
 class CharacterConverter {

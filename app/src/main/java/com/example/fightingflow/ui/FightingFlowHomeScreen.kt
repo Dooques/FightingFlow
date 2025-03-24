@@ -1,37 +1,26 @@
 package com.example.fightingflow.ui
 
+import android.annotation.SuppressLint
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.fightingflow.FightingFlowApp
 import com.example.fightingflow.R
 import com.example.fightingflow.ui.characterScreen.CharacterScreen
+import com.example.fightingflow.ui.comboScreen.AddComboScreen
 import com.example.fightingflow.ui.comboScreen.ComboScreen
 import com.example.fightingflow.ui.comboScreen.ComboViewModel
-import com.example.fightingflow.ui.theme.FightingFlowTheme
 import com.example.fightingflow.ui.userInputForms.InputViewModel
 import com.example.fightingflow.ui.userInputForms.SignupScreen
 import org.koin.compose.koinInject
@@ -42,47 +31,15 @@ enum class FlowScreen(@StringRes val title: Int) {
     Signup(title = R.string.sign_up),
     Menu(title = R.string.menu),
     PickChar(title = R.string.char_select),
-    Combos(title = R.string.combos)
+    Combos(title = R.string.combos),
+    AddCombo(title = R.string.add_combo)
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun FlowAppBar(
-    currentScreen: FlowScreen,
-    canNavigateBack: Boolean,
-    navigateUp: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    TopAppBar(
-        title = {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = stringResource(id = R.string.app_name),
-                    color = Color.White
-                )
-            }
-                },
-        colors = TopAppBarDefaults.mediumTopAppBarColors(
-            containerColor = Color.DarkGray
-        ),
-        modifier = modifier,
-        navigationIcon = {
-            if (canNavigateBack) IconButton(onClick = navigateUp) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(R.string.back_button)
-                )
-            }
-        }
-    )
-}
-
+@SuppressLint("SourceLockedOrientationActivity")
 @Composable
 fun FightingFlowHomeScreen(
     navController: NavHostController = rememberNavController(),
+    deviceType: WindowSizeClass
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen =
@@ -91,49 +48,47 @@ fun FightingFlowHomeScreen(
     val comboViewModel = koinInject<ComboViewModel>()
     val inputViewModel = koinInject<InputViewModel>()
 
-    Scaffold(
-        topBar = {
-            if (currentScreen != FlowScreen.Start) {
-                FlowAppBar(
-                    currentScreen = currentScreen,
-                    canNavigateBack = navController.previousBackStackEntry != null,
-                    navigateUp = { navController.navigateUp() }
-                )
-            }
-        }
-    ) { innerPadding ->
+    Scaffold { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = FlowScreen.Start.name,
-            modifier = Modifier.padding(innerPadding).background(Color.Black)
+            modifier = Modifier
+                .padding(innerPadding)
+                .background(Color.Black)
         ) {
             composable(route = FlowScreen.Start.name) {
                 TitleScreen(
                     onLogin = { navController.navigate(FlowScreen.PickChar.name) },
                     onSignUp = { navController.navigate(FlowScreen.Signup.name) },
+                    deviceType = deviceType
                 )
             }
             composable(route = FlowScreen.Signup.name) {
                 SignupScreen(
-                    navigateBack = {navController.navigate(FlowScreen.Start.name)}
+                    navigateBack = {navController.navigateUp()}
                 )
             }
             composable(route = FlowScreen.PickChar.name) {
                 CharacterScreen(
-                    onClick = { navController.navigate(FlowScreen.Combos.name) }
+                    comboViewModel = comboViewModel,
+                    onClick = { navController.navigate(FlowScreen.Combos.name) },
                 )
             }
             composable(route = FlowScreen.Combos.name) {
-                ComboScreen()
+                ComboScreen(
+                    comboViewModel = comboViewModel,
+                    deviceType = deviceType,
+                    onAddCombo = { navController.navigate(FlowScreen.AddCombo.name) },
+                    navigateBack = { navController.navigateUp() }
+                )
+            }
+            composable(route = FlowScreen.AddCombo.name) {
+                AddComboScreen(
+                    comboViewModel = comboViewModel,
+                    onConfirm = { navController.navigate(FlowScreen.Combos.name) },
+                    navigateBack = { navController.navigateUp() }
+                )
             }
         }
-    }
-}
-
-@Preview
-@Composable
-fun FightingFlowPreview() {
-    FightingFlowTheme {
-        FightingFlowApp()
     }
 }
