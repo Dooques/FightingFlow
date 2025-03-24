@@ -13,12 +13,14 @@ interface TekkenDataRepository {
     // Character
     fun getCharacter(name: String): Flow<CharacterEntry>
     fun getAllCharacters(): Flow<List<CharacterEntry>>
+    suspend fun updateCharacter(character: CharacterEntry)
 
     // Combo
     fun getCombo(comboId: String): Flow<ComboEntry>
     fun getAllCombos(): Flow<List<ComboEntry>>
     fun getAllCombosByCharacter(characterEntry: CharacterEntry): Flow<List<ComboEntry>>
     fun getAllCombosByUser(userEntry: UserEntry): Flow<List<ComboEntry>>
+    suspend fun updateCombo(combo: ComboEntry)
 
     // Move
     fun getMove(name: String): Flow<MoveEntry>
@@ -35,12 +37,15 @@ class OfflineTekkenDataRepository(
     private val comboDao: ComboDao,
     private val moveDao: MoveDao
 ): TekkenDataRepository {
+
+    // Get Character
     override fun getCharacter(name: String): Flow<CharacterEntry> =
         characterDao.getCharacter(name)
 
     override fun getAllCharacters(): Flow<List<CharacterEntry>> =
         characterDao.getAllCharacters()
 
+    // Get Combo
     override fun getCombo(comboId: String): Flow<ComboEntry> =
         comboDao.getCombo(comboId)
 
@@ -53,6 +58,7 @@ class OfflineTekkenDataRepository(
     override fun getAllCombosByUser(userEntry: UserEntry): Flow<List<ComboEntry>> =
         comboDao.getAllCombosByUser(userEntry.username)
 
+    // Get Moves
     override fun getMove(name: String): Flow<MoveEntry> =
         moveDao.getMove(name)
 
@@ -62,9 +68,17 @@ class OfflineTekkenDataRepository(
     override suspend fun insertAllCharacters(characterList: List<CharacterEntry>) =
         characterDao.insertAll(characterList)
 
+    // Insert
     override suspend fun insertMoves(moveList: List<MoveEntry>) =
         moveDao.insertAll(moveList)
 
     override suspend fun insertCombo(combo: ComboEntry) =
         comboDao.insert(combo)
+
+    // Update
+    override suspend fun updateCharacter(character: CharacterEntry) =
+        characterDao.update(character)
+
+    override suspend fun updateCombo(combo: ComboEntry) =
+        comboDao.update(combo)
 }

@@ -50,13 +50,14 @@ class ComboViewModel(private val tekkenDataRepository: TekkenDataRepository): Vi
         associatedCharacter = ""
     )
 
-    val allCharacters: StateFlow<List<CharacterEntry>> = getAllCharacterEntries()
 
     val allMoves: StateFlow<List<MoveEntry>> = getAllMovesEntries()
+    val allCharacters: StateFlow<List<CharacterEntry>> = getAllCharacterEntries()
 
     private val _characterState = MutableStateFlow<CharacterEntry>(emptyCharacter)
     val characterState: StateFlow<CharacterEntry> = _characterState
 
+    val combosByCharacter = MutableStateFlow<List<ComboDisplay>>(listOf())
 
     private val _comboState = MutableStateFlow<ComboDisplay>(emptyCombo)
     val comboState: StateFlow<ComboDisplay> = _comboState
@@ -66,6 +67,8 @@ class ComboViewModel(private val tekkenDataRepository: TekkenDataRepository): Vi
     init {
         getAllCharacterEntries()
     }
+
+    // Update State
 
     fun processComboAsString(): String {
         val comboIterator = comboState.value.moves.iterator()
@@ -86,27 +89,39 @@ class ComboViewModel(private val tekkenDataRepository: TekkenDataRepository): Vi
 
     fun updateComboData(comboDisplay: ComboDisplay) {
         _comboState.update { comboDisplay }
+        comboAsStringState.value = processComboAsString()
     }
 
     fun updateMoveList(moveName: String) {
-        val moveList = comboState.value.moves
-        val moveToAdd = allMoves.value.first {it.moveName == moveName}
-        moveList.add(moveToAdd)
-        _comboState.update { currentState -> currentState.copy(moves = moveList) }
-        comboAsStringState.value = processComboAsString()
-        moveList.forEach { Log.d("", it.toString() + "\n") }
+        val moveToAdd = allMoves.value.first { it.moveName == moveName }
+        val updatedCombo = _comboState.value.copy( moves = _comboState.value.moves + moveToAdd)
+        updateComboData(updatedCombo)
     }
 
-    fun saveComboToDb() {
-        viewModelScope.launch {
-            tekkenDataRepository.insertCombo(comboState.value.toEntry())
-        }
+    fun deleteLastMove() {
+        val currentMoves: MutableList<MoveEntry> = _comboState.value.moves.toMutableList()
+        currentMoves.removeAt(currentMoves.size - 1)
+        val updatedCombo = _comboState.value.copy(moves = currentMoves.toList())
+        updateComboData(updatedCombo)
     }
 
     fun clearMoveList() {
         _comboState.value= comboState.value.copy(moves = mutableListOf<MoveEntry>())
         comboAsStringState.value = ""
     }
+
+    fun saveComboToDb() {
+        viewModelScope.launch {
+            val comboEntry = comboState.value.toEntry()
+            tekkenDataRepository.insertCombo(comboEntry)
+            _characterState.update { currentState ->
+                currentState.copy(combosById = currentState.combosById + "${comboEntry.comboId}, ")
+            }
+            tekkenDataRepository.updateCharacter(characterState.value)
+        }
+    }
+
+    // Repository Functions
 
     fun getAllMovesEntries() =
         tekkenDataRepository.getAllMoves()
@@ -117,22 +132,25 @@ class ComboViewModel(private val tekkenDataRepository: TekkenDataRepository): Vi
                 initialValue = listOf()
             )
 
-    fun getCombosByCharacter(): List<ComboDisplay> {
-        val comboEntriesByCharacter =
-            tekkenDataRepository.getAllCombosByCharacter(characterState.value)
-            .mapNotNull { it }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5_000L),
-                initialValue = listOf<ComboEntry>()
-            )
-        val comboDisplayByCharacter = comboEntriesByCharacter.value.map { it.toDisplay() }
-        return comboDisplayByCharacter
+    fun getCombosByCharacter() {
+        viewModelScope.launch {
+            val comboEntriesByCharacter =
+                tekkenDataRepository.getAllCombosByCharacter(characterState.value)
+                    .mapNotNull { it }
+                    .stateIn(
+                        scope = viewModelScope,
+                        started = SharingStarted.WhileSubscribed(5_000L),
+                        initialValue = listOf<ComboEntry>()
+                    )
+            val comboDisplayByCharacter = comboEntriesByCharacter.value.map { it.toDisplay() }
+            combosByCharacter.update { comboDisplayByCharacter }
+        }
     }
 
     fun getCharacterEntry(name: String) {
         _characterState.value = allCharacters.value.first {it.name == name}
         Log.d("", characterState.value.toString())
+        getCombosByCharacter()
     }
 
     fun getAllCharacterEntries() =
@@ -143,7 +161,10 @@ class ComboViewModel(private val tekkenDataRepository: TekkenDataRepository): Vi
                 started = SharingStarted.WhileSubscribed(5_000L),
                 initialValue = listOf()
             )
-    fun processMoveList(moves: String): MutableList<MoveEntry> {
+
+    // Object Conversion
+
+    fun processMoveList(moves: String): List<MoveEntry> {
         val movesList = moves.split(",")
         val moveEntryList = movesList.map {
             tekkenDataRepository.getMove(it)
@@ -154,8 +175,9 @@ class ComboViewModel(private val tekkenDataRepository: TekkenDataRepository): Vi
                 initialValue = emptyMove
             ).value
         }
-        return moveEntryList as MutableList<MoveEntry>
+        return moveEntryList
     }
+
 
     fun ComboEntry.toDisplay(): ComboDisplay =
         ComboDisplay(

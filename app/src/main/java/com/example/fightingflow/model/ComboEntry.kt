@@ -26,7 +26,7 @@ data class ComboDisplay(
     val character: String,
     val damage: Int,
     val createdBy: String,
-    val moves: MutableList<MoveEntry>
+    val moves: List<MoveEntry>
 )
 
 class CharacterConverter {

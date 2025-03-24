@@ -53,8 +53,8 @@ fun ComboScreen(
     modifier: Modifier = Modifier,
 ) {
     val character by comboViewModel.characterState.collectAsState()
-    val combosByCharacter = comboViewModel.getCombosByCharacter()
-    Log.d("", character.toString())
+    val combosByCharacter by comboViewModel.combosByCharacter.collectAsState()
+    combosByCharacter.forEach { Log.d("", it.toString()) }
 
     val context = LocalContext.current
     val fontColor = MaterialTheme.colorScheme.onBackground
@@ -91,7 +91,6 @@ fun Header(
     onAddCombo: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Log.d("", "${character.name} ${character.imageId}")
     Box(
         modifier = modifier.fillMaxWidth()
     ) {

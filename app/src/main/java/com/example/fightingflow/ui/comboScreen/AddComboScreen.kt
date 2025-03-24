@@ -67,7 +67,7 @@ fun AddComboScreen(
         modifier = modifier.fillMaxSize()
     ) {
         Header(character, navigateBack)
-        ComboForm(comboViewModel, character, combo, comboAsString, moveList)
+        ComboForm(comboViewModel, character, combo, comboAsString, moveList, onConfirm)
     }
 }
 
@@ -95,6 +95,7 @@ fun ComboForm(
     combo: ComboDisplay,
     comboAsString: String,
     moveList: List<MoveEntry>,
+    onConfirm: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -102,7 +103,7 @@ fun ComboForm(
         if (combo.moves.isNotEmpty()) {
             ComboDisplay(context, comboViewModel, combo)
         }
-        InputSelector(context, character, combo, comboViewModel, comboAsString, moveList)
+        InputSelector(context, character, combo, comboViewModel, comboAsString, onConfirm, moveList,)
     }
 }
 
@@ -134,6 +135,7 @@ fun InputSelector(
     combo: ComboDisplay,
     comboViewModel: ComboViewModel,
     comboAsString: String,
+    onConfirm: () -> Unit,
     moveList: List<MoveEntry>,
     modifier: Modifier = Modifier
 ) {
@@ -151,7 +153,7 @@ fun InputSelector(
                 "Movement" -> IconMoves(moveType, moveList,comboViewModel, context)
                 "Input" -> IconMoves(moveType, moveList, comboViewModel, context)
                 "Common", "Mishima", "Character", "Mechanics Input", "Stage" -> TextMoves(moveType, moveList, character, comboViewModel)
-                "Buttons" -> ConfirmAndClear(comboViewModel)
+                "Buttons" -> ConfirmAndClear(comboViewModel, onConfirm)
                 "Divider" -> InputDivider()
                 "Stances", "Mechanics", "${character.name}'s Stances" -> StanceAndMechanicsTitle(moveType)
             }
@@ -355,11 +357,23 @@ fun TextMoves(
 }
 
 @Composable
-fun ConfirmAndClear(comboViewModel: ComboViewModel, modifier: Modifier = Modifier) {
+fun ConfirmAndClear(
+    comboViewModel: ComboViewModel,
+    onConfirm: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = modifier.fillMaxWidth().padding(vertical = 4.dp).padding(bottom = 8.dp)) {
         OutlinedButton(
-            onClick = { comboViewModel.saveComboToDb() },
+            onClick = {
+                comboViewModel.saveComboToDb()
+                onConfirm()
+                      },
             content = { Text("Confirm", color = MaterialTheme.colorScheme.onBackground) }
+        )
+        OutlinedButton(
+            onClick = { comboViewModel.deleteLastMove() },
+            content = {
+                Text("Delete Last", color = MaterialTheme.colorScheme.onBackground) }
         )
         OutlinedButton(
             onClick = { comboViewModel.clearMoveList() },
