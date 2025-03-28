@@ -40,8 +40,9 @@ fun TitleScreen(
     deviceType: WindowSizeClass,
     modifier: Modifier = Modifier
 ) {
-    val orientation = LocalConfiguration.current.orientation
-    val uiScale = if (orientation == ORIENTATION_LANDSCAPE && deviceType.heightSizeClass == WindowHeightSizeClass.Compact) 2 else 1
+    val uiScale =
+        if (deviceType.heightSizeClass == WindowHeightSizeClass.Compact) 2 else 1
+
     Column(
         verticalArrangement = Arrangement.SpaceAround,
         horizontalAlignment = Alignment.CenterHorizontally,

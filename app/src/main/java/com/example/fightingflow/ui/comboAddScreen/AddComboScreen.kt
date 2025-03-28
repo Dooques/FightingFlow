@@ -1,4 +1,4 @@
-package com.example.fightingflow.ui.comboScreen
+package com.example.fightingflow.ui.comboAddScreen
 
 import android.content.Context
 import androidx.compose.foundation.Image
@@ -18,7 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -49,25 +49,26 @@ import com.example.fightingflow.R
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.MoveEntry
+import com.example.fightingflow.ui.comboViewScreen.ComboItem
 
 @Composable
 fun AddComboScreen(
-    comboViewModel: ComboViewModel,
+    addComboViewModel: AddComboViewModel,
     onConfirm: () -> Unit,
     navigateBack: () -> Unit,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
-    val character by comboViewModel.characterState.collectAsState()
-    val combo by comboViewModel.comboState.collectAsState()
-    val comboAsString by comboViewModel.comboAsStringState.collectAsState()
-    val moveList by comboViewModel.allMoves.collectAsState()
+    val character by addComboViewModel.characterState.collectAsState()
+    val combo by addComboViewModel.comboState.collectAsState()
+    val comboAsString by addComboViewModel.comboAsStringState.collectAsState()
+    val moveList by addComboViewModel.allMoves.collectAsState()
 
     Column(
         verticalArrangement = Arrangement.Top,
         modifier = modifier.fillMaxSize()
     ) {
         Header(character, navigateBack)
-        ComboForm(comboViewModel, character, combo, comboAsString, moveList, onConfirm)
+        ComboForm(addComboViewModel, character, combo, comboAsString, moveList, onConfirm)
     }
 }
 
@@ -82,7 +83,7 @@ fun Header(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(onClick = navigateBack) { Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null, Modifier.size(50.dp)) }
+        IconButton(onClick = navigateBack) { Icon(imageVector = Icons.Default.Close, contentDescription = null, Modifier.size(50.dp)) }
         Text(text = character.name, style = MaterialTheme.typography.displayLarge)
         Image(painter = painterResource(character.imageId), contentDescription = null, modifier.size(50.dp))
     }
@@ -90,7 +91,7 @@ fun Header(
 
 @Composable
 fun ComboForm(
-    comboViewModel: ComboViewModel,
+    addComboViewModel: AddComboViewModel,
     character: CharacterEntry,
     combo: ComboDisplay,
     comboAsString: String,
@@ -101,16 +102,15 @@ fun ComboForm(
     val context = LocalContext.current
     Column {
         if (combo.moves.isNotEmpty()) {
-            ComboDisplay(context, comboViewModel, combo)
+            ComboDisplay(context, combo)
         }
-        InputSelector(context, character, combo, comboViewModel, comboAsString, onConfirm, moveList,)
+        InputSelector(context, character, combo, addComboViewModel, comboAsString, onConfirm, moveList)
     }
 }
 
 @Composable
 fun ComboDisplay(
     context: Context,
-    comboViewModel: ComboViewModel,
     combo: ComboDisplay,
     modifier: Modifier = Modifier
 ) {
@@ -118,13 +118,14 @@ fun ComboDisplay(
     val containerColor = MaterialTheme.colorScheme.surfaceDim
     val uiScale = 1f
 
-    ComboUI(
+    ComboItem(
         context = context,
         combo = combo,
         fontColor = fontColor,
         containerColor = containerColor,
         uiScale = uiScale,
-        modifier = modifier.padding(vertical = 4.dp))
+        modifier = modifier.padding(vertical = 4.dp)
+    )
 }
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -133,7 +134,7 @@ fun InputSelector(
     context: Context,
     character: CharacterEntry,
     combo: ComboDisplay,
-    comboViewModel: ComboViewModel,
+    addComboViewModel: AddComboViewModel,
     comboAsString: String,
     onConfirm: () -> Unit,
     moveList: List<MoveEntry>,
@@ -148,12 +149,12 @@ fun InputSelector(
         items(items = selectorLayout) { moveType ->
             when (moveType) {
                 "Text Combo" -> ComboTextEntry(comboAsString)
-                "Radio Buttons" -> RadioButtons(combo, comboViewModel)
-                "Damage" -> DamageBreak(combo, comboViewModel)
-                "Movement" -> IconMoves(moveType, moveList,comboViewModel, context)
-                "Input" -> IconMoves(moveType, moveList, comboViewModel, context)
-                "Common", "Mishima", "Character", "Mechanics Input", "Stage" -> TextMoves(moveType, moveList, character, comboViewModel)
-                "Buttons" -> ConfirmAndClear(comboViewModel, onConfirm)
+                "Radio Buttons" -> RadioButtons(combo, addComboViewModel)
+                "Damage" -> DamageBreak(combo, addComboViewModel)
+                "Movement" -> IconMoves(moveType, moveList, addComboViewModel, context)
+                "Input" -> IconMoves(moveType, moveList, addComboViewModel, context)
+                "Common", "Mishima", "Character", "Mechanics Input", "Stage" -> TextMoves(moveType, moveList, character, addComboViewModel)
+                "Buttons" -> ConfirmAndClear(addComboViewModel, onConfirm)
                 "Divider" -> InputDivider()
                 "Stances", "Mechanics", "${character.name}'s Stances" -> StanceAndMechanicsTitle(moveType)
             }
@@ -188,7 +189,7 @@ fun ComboTextEntry(comboAsString: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun RadioButtons(combo: ComboDisplay, comboViewModel: ComboViewModel, modifier: Modifier = Modifier) {
+fun RadioButtons(combo: ComboDisplay, comboViewModel: AddComboViewModel, modifier: Modifier = Modifier) {
     var counterHit by remember {mutableStateOf(false)}
     var hold by remember {mutableStateOf(false)}
     var justFrame by remember {mutableStateOf(false)}
@@ -224,7 +225,7 @@ fun RadioButtons(combo: ComboDisplay, comboViewModel: ComboViewModel, modifier: 
 }
 
 @Composable
-fun DamageBreak(combo: ComboDisplay, comboViewModel: ComboViewModel, modifier: Modifier = Modifier) {
+fun DamageBreak(combo: ComboDisplay, comboViewModel: AddComboViewModel, modifier: Modifier = Modifier) {
     var damageValue by remember { mutableIntStateOf(combo.damage) }
     Row(verticalAlignment = Alignment.CenterVertically) {
         OutlinedTextField(
@@ -261,7 +262,7 @@ fun DamageBreak(combo: ComboDisplay, comboViewModel: ComboViewModel, modifier: M
 fun IconMoves(
     moveType: String,
     moveList: List<MoveEntry>,
-    comboViewModel: ComboViewModel,
+    comboViewModel: AddComboViewModel,
     context: Context,
     modifier: Modifier = Modifier
 ) {
@@ -298,7 +299,7 @@ fun TextMoves(
     moveType: String,
     moveList: List<MoveEntry>,
     character: CharacterEntry,
-    comboViewModel: ComboViewModel,
+    comboViewModel: AddComboViewModel,
     modifier: Modifier = Modifier
 ) {
     FlowRow(
@@ -312,22 +313,15 @@ fun TextMoves(
             when (moveType) {
                 "Mishima" -> {
                     color = Color.Blue
-                    booleanStatement = booleanStatement && (
-                            character.fightingStyle.contains("Mishima") ||
-                            character.fightingStyle.contains("Devil")
-                            )
+                    booleanStatement = booleanStatement && (character.fightingStyle.contains("Mishima") || character.name.contains("Devil"))
                 }
                 "Character" -> {
                     color = Color.Red
                     booleanStatement = booleanStatement && (character.uniqueMoves.contains(move.moveName))
                 }
-                "Common" -> {
-                    color = Color.Gray
-                }
-                "Stage" -> {
-                    color = Color.Green
-                }
-                else -> {}
+                "Mechanics Input" -> { color = Color.Yellow }
+                "Common" -> { color = Color.Gray }
+                "Stage" -> { color = Color.Green }
             }
 
             if (booleanStatement) {
@@ -340,7 +334,7 @@ fun TextMoves(
                     ) {
                         Text(
                             move.moveName,
-                            color = if (color == Color.White || color == Color.Green) Color.Black else Color.White,
+                            color = if (color == Color.White || color == Color.Green || color == Color.Yellow) Color.Black else Color.White,
                             fontSize = (14.sp),
                             modifier = modifier.padding(1.dp).clickable(
                                 enabled = true,
@@ -358,14 +352,14 @@ fun TextMoves(
 
 @Composable
 fun ConfirmAndClear(
-    comboViewModel: ComboViewModel,
+    comboViewModel: AddComboViewModel,
     onConfirm: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = modifier.fillMaxWidth().padding(vertical = 4.dp).padding(bottom = 8.dp)) {
         OutlinedButton(
             onClick = {
-                comboViewModel.saveComboToDb()
+                comboViewModel.saveCombo()
                 onConfirm()
                       },
             content = { Text("Confirm", color = MaterialTheme.colorScheme.onBackground) }

@@ -12,7 +12,8 @@ import com.example.fightingflow.data.database.UserDataRepository
 import com.example.fightingflow.data.database.dao.CharacterDao
 import com.example.fightingflow.data.database.dao.ComboDao
 import com.example.fightingflow.data.database.dao.MoveDao
-import com.example.fightingflow.ui.comboScreen.ComboViewModel
+import com.example.fightingflow.ui.comboAddScreen.AddComboViewModel
+import com.example.fightingflow.ui.comboViewScreen.ComboViewModel
 import com.example.fightingflow.ui.userInputForms.InputViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -49,4 +50,5 @@ val viewModelModule = module {
     viewModel { InputViewModel(get()) }
     viewModel { InitViewModel(get()) }
     viewModel { ComboViewModel(get()) }
+    viewModel { AddComboViewModel(get()) }
 }

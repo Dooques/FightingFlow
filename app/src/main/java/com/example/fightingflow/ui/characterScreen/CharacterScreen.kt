@@ -1,6 +1,5 @@
 package com.example.fightingflow.ui.characterScreen
 
-import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,30 +17,26 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.fightingflow.R
-import com.example.fightingflow.data.DataSource.characterData
 import com.example.fightingflow.model.CharacterEntry
-import com.example.fightingflow.model.CharacterModel
-import com.example.fightingflow.ui.comboScreen.ComboViewModel
-import com.example.fightingflow.ui.theme.FightingFlowTheme
+import com.example.fightingflow.ui.comboViewScreen.ComboViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun CharacterScreen(
     comboViewModel: ComboViewModel,
+    updateCharacterState: (String) -> Unit,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val characterList = comboViewModel.allCharacters.collectAsState()
+    val characterList by comboViewModel.allCharacters.collectAsState()
     LazyVerticalGrid(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalArrangement = Arrangement.spacedBy(32.dp),
@@ -50,11 +45,11 @@ fun CharacterScreen(
             .background(Color.Black)
             .padding(16.dp)
     ) {
-        items(items = characterList.value.sortedBy { it.name }) { character ->
+        items(items = characterList.sortedBy { it.name }) { character ->
             CharacterCard(
+                updateCharacterState = updateCharacterState,
                 onClick = onClick,
                 character = character,
-                comboViewModel = comboViewModel,
                 modifier = modifier
             )
         }
@@ -63,11 +58,12 @@ fun CharacterScreen(
 
 @Composable
 fun CharacterCard(
+    updateCharacterState: (String) -> Unit,
     onClick: () -> Unit,
-    comboViewModel: ComboViewModel,
     character: CharacterEntry,
     modifier: Modifier = Modifier
 ) {
+    val scope = rememberCoroutineScope()
     Card(
         colors = CardDefaults.cardColors(
             containerColor = when (character.name) {
@@ -81,7 +77,7 @@ fun CharacterCard(
         modifier = modifier
             .clickable(
                 onClick = {
-                    comboViewModel.getCharacterEntry(character.name)
+                    updateCharacterState(character.name)
                     onClick()
                 }
             )

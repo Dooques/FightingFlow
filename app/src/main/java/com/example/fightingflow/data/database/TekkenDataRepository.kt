@@ -11,7 +11,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface TekkenDataRepository {
     // Character
-    fun getCharacter(name: String): Flow<CharacterEntry>
+    fun getCharacterFlow(name: String): Flow<CharacterEntry>
+    suspend fun getCharacter(name: String): CharacterEntry
     fun getAllCharacters(): Flow<List<CharacterEntry>>
     suspend fun updateCharacter(character: CharacterEntry)
 
@@ -21,6 +22,7 @@ interface TekkenDataRepository {
     fun getAllCombosByCharacter(characterEntry: CharacterEntry): Flow<List<ComboEntry>>
     fun getAllCombosByUser(userEntry: UserEntry): Flow<List<ComboEntry>>
     suspend fun updateCombo(combo: ComboEntry)
+    suspend fun deleteCombo(combo: ComboEntry)
 
     // Move
     fun getMove(name: String): Flow<MoveEntry>
@@ -39,7 +41,10 @@ class OfflineTekkenDataRepository(
 ): TekkenDataRepository {
 
     // Get Character
-    override fun getCharacter(name: String): Flow<CharacterEntry> =
+    override fun getCharacterFlow(name: String): Flow<CharacterEntry> =
+        characterDao.getCharacterFlow(name)
+
+    override suspend fun getCharacter(name: String): CharacterEntry =
         characterDao.getCharacter(name)
 
     override fun getAllCharacters(): Flow<List<CharacterEntry>> =
@@ -81,4 +86,8 @@ class OfflineTekkenDataRepository(
 
     override suspend fun updateCombo(combo: ComboEntry) =
         comboDao.update(combo)
+
+    // Delete
+    override suspend fun deleteCombo(combo: ComboEntry) =
+        comboDao.delete(combo)
 }
