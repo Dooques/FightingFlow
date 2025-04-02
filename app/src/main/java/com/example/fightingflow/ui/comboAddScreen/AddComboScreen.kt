@@ -1,6 +1,11 @@
 package com.example.fightingflow.ui.comboAddScreen
 
+import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
+import android.content.pm.ActivityInfo
+import android.util.Log
+import android.view.ViewGroup
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -50,31 +55,103 @@ import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.MoveEntry
 import com.example.fightingflow.ui.comboViewScreen.ComboItem
+import com.example.fightingflow.ui.comboViewScreen.ComboViewModel
+import com.example.fightingflow.util.ComboDisplayUiState
+import com.example.fightingflow.util.MoveListUiState
+import kotlinx.coroutines.flow.first
 
+const val SCREEN_TAG = "AddComboScreen"
+
+@SuppressLint("SourceLockedOrientationActivity")
 @Composable
 fun AddComboScreen(
     addComboViewModel: AddComboViewModel,
+    comboViewModel: ComboViewModel,
+    updateCharacterState: (String) -> Unit,
+    saveComboDetailsToDs: (ComboDisplayUiState) -> Unit,
+    getComboDetailsFromDs: (MoveListUiState) -> Unit,
+    updateComboData: (ComboDisplayUiState) -> Unit,
+    updateMoveList: (String, MoveListUiState) -> Unit,
+    saveCombo: () -> Unit,
+    deleteLastMove: () -> Unit,
+    clearMoveList: () -> Unit,
     onConfirm: () -> Unit,
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val character by addComboViewModel.characterState.collectAsState()
-    val combo by addComboViewModel.comboState.collectAsState()
+    Log.d(SCREEN_TAG, "")
+    Log.d(SCREEN_TAG, "Opening Add Combo Screen...")
+
+    Log.d(SCREEN_TAG, "Locking orientation until solution for lost combo data is found.")
+    val context = LocalContext.current
+    (context as? Activity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+
+    // ComboViewModel
+    val characterState by comboViewModel.characterState.collectAsState()
+    val characterListState by comboViewModel.characterEntryListState.collectAsState()
+    val moveListState by comboViewModel.moveEntryListState.collectAsState()
+
+    // AddComboViewModel
+    val comboDisplayState by addComboViewModel.comboState.collectAsState()
     val comboAsString by addComboViewModel.comboAsStringState.collectAsState()
-    val moveList by addComboViewModel.allMoves.collectAsState()
+
+    // Datastore Flows
+    val characterNameState by comboViewModel.characterNameState.collectAsState()
+    val characterImageState by comboViewModel.characterImageState.collectAsState()
+    Log.d(SCREEN_TAG, "Flows Collected: " +
+            "\nCharacter: ${characterState.character}" +
+            "\n\nCharacter Details (Ds): " +
+            "\nName: ${characterNameState.name} " +
+            "\nImage: ${characterImageState.image}" +
+            "\nCombo Display: ${comboDisplayState.comboDisplay}" +
+            "\nMove List: ${moveListState.moveList}"
+    )
+
+    Log.d(SCREEN_TAG, "Updating Character State")
+    if (characterListState.characterList.isNotEmpty() && characterNameState.name.isNotEmpty()) {
+        updateCharacterState(characterNameState.name)
+    }
+    Log.d(SCREEN_TAG, "${characterState.character.name} is loaded.")
+
+//    if (comboDisplayState != ComboDisplayUiState()) {
+//        Log.d(SCREEN_TAG, "Loading combo from datastore")
+//        getComboDetailsFromDs(moveListState)
+//    }
 
     Column(
         verticalArrangement = Arrangement.Top,
         modifier = modifier.fillMaxSize()
     ) {
-        Header(character, navigateBack)
-        ComboForm(addComboViewModel, character, combo, comboAsString, moveList, onConfirm)
+        Log.d(SCREEN_TAG, "")
+        Log.d(SCREEN_TAG, "Loading Header...")
+        if (characterImageState.image != 0) {
+            Header(
+                characterNameState.name,
+                characterImageState.image,
+                navigateBack
+            )
+        }
+        ComboForm(
+            addComboViewModel,
+            updateComboData,
+            updateMoveList,
+            characterState.character,
+            characterNameState.name,
+            comboDisplayState.comboDisplay,
+            comboAsString,
+            moveListState,
+            saveCombo,
+            deleteLastMove,
+            clearMoveList,
+            onConfirm
+        )
     }
 }
 
 @Composable
 fun Header(
-    character: CharacterEntry,
+    characterName: String,
+    characterImage: Int,
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -83,28 +160,56 @@ fun Header(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
+        Log.d(SCREEN_TAG, "Loading Back Icon.")
         IconButton(onClick = navigateBack) { Icon(imageVector = Icons.Default.Close, contentDescription = null, Modifier.size(50.dp)) }
-        Text(text = character.name, style = MaterialTheme.typography.displayLarge)
-        Image(painter = painterResource(character.imageId), contentDescription = null, modifier.size(50.dp))
+        Log.d(SCREEN_TAG, "Loading Character Name")
+        Text(text = characterName, style = MaterialTheme.typography.displayLarge)
+        Log.d(SCREEN_TAG, "Loading Character Icon")
+        Image(painter = painterResource(characterImage), contentDescription = null, modifier.size(50.dp))
     }
 }
 
 @Composable
 fun ComboForm(
     addComboViewModel: AddComboViewModel,
+    updateComboData: (ComboDisplayUiState) -> Unit,
+    updateMoveList: (String, MoveListUiState) -> Unit,
     character: CharacterEntry,
+    characterName: String,
     combo: ComboDisplay,
     comboAsString: String,
-    moveList: List<MoveEntry>,
+    moveList: MoveListUiState,
+    saveCombo: () -> Unit,
+    deleteLastMove: () -> Unit,
+    clearMoveList: () -> Unit,
     onConfirm: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    Log.d(SCREEN_TAG, "")
     val context = LocalContext.current
     Column {
+        Log.d(SCREEN_TAG, "Loading Combo Form")
         if (combo.moves.isNotEmpty()) {
+            Log.d(SCREEN_TAG,"Combo Move List exists, populating with moves...")
             ComboDisplay(context, combo)
         }
-        InputSelector(context, character, combo, addComboViewModel, comboAsString, onConfirm, moveList)
+        if (moveList.moveList.isNotEmpty()) {
+            Log.d(SCREEN_TAG, "Move Entry List exists, populating Input Selector Column...")
+            InputSelector(
+                context,
+                character,
+                characterName,
+                combo,
+                updateComboData,
+                updateMoveList,
+                comboAsString,
+                saveCombo,
+                deleteLastMove,
+                clearMoveList,
+                onConfirm,
+                moveList
+            )
+        }
     }
 }
 
@@ -117,7 +222,7 @@ fun ComboDisplay(
     val fontColor = MaterialTheme.colorScheme.onBackground
     val containerColor = MaterialTheme.colorScheme.surfaceDim
     val uiScale = 1f
-
+    Log.d(SCREEN_TAG, "Getting combo display composable from Combo Screen")
     ComboItem(
         context = context,
         combo = combo,
@@ -133,31 +238,53 @@ fun ComboDisplay(
 fun InputSelector(
     context: Context,
     character: CharacterEntry,
+    characterName: String,
     combo: ComboDisplay,
-    addComboViewModel: AddComboViewModel,
+    updateComboData: (ComboDisplayUiState) -> Unit,
+    updateMoveList: (String, MoveListUiState) -> Unit,
     comboAsString: String,
+    saveCombo: () -> Unit,
+    deleteLastMove: () -> Unit,
+    clearMoveList: () -> Unit,
     onConfirm: () -> Unit,
-    moveList: List<MoveEntry>,
+    moveList: MoveListUiState,
     modifier: Modifier = Modifier
 ) {
-    val selectorLayout = listOf(
-         "Text Combo", "Buttons", "Divider", "Radio Buttons", "Damage", "Movement", "Input", "Divider",
-        "Stances", "Common", "Mishima", "Divider", "${character.name}'s Stances", "Character",
+    Log.d(SCREEN_TAG, "Loading Input Selector")
+    val mishima = listOf("Reina", "Heihachi", "Jin", "Kazuya", "Devil Jin")
+
+    val mishimaSelectorLayout = listOf(
+         "Text Combo", "Buttons", "Divider", "Radio Buttons", "Damage", "Divider", "Inputs Title", "Movement", "Input", "Divider",
+        "Stances", "Common", "Divider", "Mishima Moves", "Mishima", "Divider", "${characterName}'s Stances", "Character",
         "Divider", "Mechanics", "Mechanics Input", "Stage",
     )
+
+    val selectorLayout = listOf(
+         "Text Combo", "Buttons", "Divider", "Radio Buttons", "Damage", "Divider", "Inputs", "Movement", "Input", "Divider",
+        "Stances", "Common", "Divider", "${characterName}'s Stances", "Character",
+        "Divider", "Mechanics", "Mechanics Input", "Stage",
+    )
+
     LazyColumn {
-        items(items = selectorLayout) { moveType ->
+        val mishimaChar = characterName in mishima
+        if (mishimaChar) {
+            Log.d(SCREEN_TAG,"Using mishima layout")
+        } else {
+            Log.d(SCREEN_TAG, "Using normal character layout")
+        }
+        items(items = if (mishimaChar) mishimaSelectorLayout else selectorLayout) { moveType ->
             when (moveType) {
                 "Text Combo" -> ComboTextEntry(comboAsString)
-                "Radio Buttons" -> RadioButtons(combo, addComboViewModel)
-                "Damage" -> DamageBreak(combo, addComboViewModel)
-                "Movement" -> IconMoves(moveType, moveList, addComboViewModel, context)
-                "Input" -> IconMoves(moveType, moveList, addComboViewModel, context)
-                "Common", "Mishima", "Character", "Mechanics Input", "Stage" -> TextMoves(moveType, moveList, character, addComboViewModel)
-                "Buttons" -> ConfirmAndClear(addComboViewModel, onConfirm)
+                "Radio Buttons" -> RadioButtons()
+                "Damage" -> DamageAndBreak(combo, updateComboData, updateMoveList, moveList)
+                "Movement" -> IconMoves(moveType, moveList, updateMoveList, context)
+                "Input" -> IconMoves(moveType, moveList, updateMoveList, context)
+                "Common", "Mishima", "Character", "Mechanics Input", "Stage" -> TextMoves(moveType, moveList, character, updateMoveList)
+                "Buttons" -> ConfirmAndClear(saveCombo, deleteLastMove, clearMoveList, onConfirm)
                 "Divider" -> InputDivider()
-                "Stances", "Mechanics", "${character.name}'s Stances" -> StanceAndMechanicsTitle(moveType)
+                "Stances", "Mechanics", "${character.name}'s Stances", "Inputs", "Mishima Moves" -> StanceAndMechanicsTitle(moveType)
             }
+            Log.d(SCREEN_TAG, "$moveType loaded.")
         }
     }
 }
@@ -173,7 +300,10 @@ fun StanceAndMechanicsTitle(title: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun ComboTextEntry(comboAsString: String, modifier: Modifier = Modifier) {
+fun ComboTextEntry(
+    comboAsString: String,
+    modifier: Modifier = Modifier
+) {
     Column {
         OutlinedTextField(
             value = comboAsString,
@@ -189,11 +319,12 @@ fun ComboTextEntry(comboAsString: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun RadioButtons(combo: ComboDisplay, comboViewModel: AddComboViewModel, modifier: Modifier = Modifier) {
+fun RadioButtons(modifier: Modifier = Modifier) {
     var counterHit by remember {mutableStateOf(false)}
     var hold by remember {mutableStateOf(false)}
     var justFrame by remember {mutableStateOf(false)}
     Column(modifier.padding(horizontal = 16.dp)) {
+        Log.d(SCREEN_TAG, "Loading Radio Buttons")
         Text("Move Modifiers")
         Row(
             horizontalArrangement = Arrangement.SpaceEvenly,
@@ -203,21 +334,30 @@ fun RadioButtons(combo: ComboDisplay, comboViewModel: AddComboViewModel, modifie
                 Text("Counter Hit")
                 RadioButton(
                     selected = counterHit,
-                    onClick = { counterHit = !counterHit },
+                    onClick = {
+                        counterHit = !counterHit
+                        Log.d(SCREEN_TAG, "Setting counter hit to $counterHit")
+                              },
                 )
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("Hold")
                 RadioButton(
                     selected = hold,
-                    onClick = { hold = !hold },
+                    onClick = {
+                        hold = !hold
+                        Log.d(SCREEN_TAG, "Setting hold to $hold")
+                              },
                 )
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("Just Frame")
                 RadioButton(
                     selected = justFrame,
-                    onClick = { justFrame = !justFrame },
+                    onClick = {
+                        justFrame = !justFrame
+                        Log.d(SCREEN_TAG, "Setting just frame to $justFrame")
+                              },
                 )
             }
         }
@@ -225,21 +365,35 @@ fun RadioButtons(combo: ComboDisplay, comboViewModel: AddComboViewModel, modifie
 }
 
 @Composable
-fun DamageBreak(combo: ComboDisplay, comboViewModel: AddComboViewModel, modifier: Modifier = Modifier) {
+fun DamageAndBreak(
+    combo: ComboDisplay,
+    updateComboData: (ComboDisplayUiState) -> Unit,
+    updateMoveList: (String, MoveListUiState) -> Unit,
+    moveList: MoveListUiState,
+    modifier: Modifier = Modifier
+) {
     var damageValue by remember { mutableIntStateOf(combo.damage) }
     Row(verticalAlignment = Alignment.CenterVertically) {
+        Log.d(SCREEN_TAG, "Loading Damage and Break Row")
+        // Damage Input
         OutlinedTextField(
             value = damageValue.toString(),
             onValueChange = {
                 damageValue = it.toIntOrNull() ?: 0
-                comboViewModel.updateComboData(combo.copy(damage = damageValue))
+                updateComboData(ComboDisplayUiState(combo.copy(damage = damageValue)))
+                Log.d(SCREEN_TAG, "damage: $damageValue")
             },
             maxLines = 1,
             label = { Text("Damage") },
             modifier = modifier.fillMaxWidth(0.5f).padding(horizontal = 4.dp)
         )
+
+        // Add Break
         Button(
-            onClick = { comboViewModel.updateMoveList(moveName = "break") },
+            onClick = {
+                updateMoveList("break", moveList)
+                Log.d(SCREEN_TAG, "Adding break to combo move list.")
+                      },
             colors = ButtonDefaults.buttonColors().copy(containerColor = Color(0xffed1664), contentColor = Color.White),
             modifier = modifier.fillMaxWidth().padding(horizontal = 4.dp)
         ) {
@@ -261,8 +415,8 @@ fun DamageBreak(combo: ComboDisplay, comboViewModel: AddComboViewModel, modifier
 @Composable
 fun IconMoves(
     moveType: String,
-    moveList: List<MoveEntry>,
-    comboViewModel: AddComboViewModel,
+    moveList: MoveListUiState,
+    updateMoveList: (String, MoveListUiState) -> Unit,
     context: Context,
     modifier: Modifier = Modifier
 ) {
@@ -270,7 +424,8 @@ fun IconMoves(
         horizontalArrangement = Arrangement.SpaceEvenly,
         modifier = modifier.fillMaxWidth().padding(4.dp)
     ) {
-        moveList.forEach { move ->
+        Log.d(SCREEN_TAG, "Loading Input Icons")
+        moveList.moveList.forEach { move ->
             if (move.moveType == moveType) {
                 val moveId = remember(move) { context.resources.getIdentifier(move.moveName, "drawable", context.packageName) }
                 Box(modifier.padding(vertical = 4.dp).clip(RoundedCornerShape(10.dp))) {
@@ -283,7 +438,9 @@ fun IconMoves(
                             .clickable(
                                 enabled = true,
                                 onClick = {
-                                    comboViewModel.updateMoveList(move.moveName)
+                                    Log.d(VM_TAG, "${move.moveName} selected, preparing to add combo to list...")
+                                    updateMoveList(move.moveName, moveList)
+                                    Log.d(SCREEN_TAG, "Added ${move.moveName} to combo move list.")
                                 }
                             )
                     )
@@ -297,16 +454,17 @@ fun IconMoves(
 @Composable
 fun TextMoves(
     moveType: String,
-    moveList: List<MoveEntry>,
+    moveList: MoveListUiState,
     character: CharacterEntry,
-    comboViewModel: AddComboViewModel,
+    updateMoveList: (String, MoveListUiState) -> Unit,
     modifier: Modifier = Modifier
 ) {
     FlowRow(
         horizontalArrangement = Arrangement.SpaceEvenly,
         modifier = modifier.fillMaxWidth().padding(vertical = 4.dp)
     ) {
-        moveList.forEach { move ->
+        Log.d(SCREEN_TAG, "Loading $moveType text moves")
+        moveList.moveList.forEach { move ->
             var color = Color.White
             var booleanStatement = move.moveType == moveType && move.moveName != "move_break"
 
@@ -339,7 +497,9 @@ fun TextMoves(
                             modifier = modifier.padding(1.dp).clickable(
                                 enabled = true,
                                 onClick = {
-                                    comboViewModel.updateMoveList(move.moveName)
+                                    Log.d(VM_TAG, "${move.moveName} selected, preparing to add combo to list...")
+                                    updateMoveList(move.moveName, moveList)
+                                    Log.d(SCREEN_TAG, "Added ${move.moveName} to combo move list.")
                                 }
                             )
                         )
@@ -352,25 +512,35 @@ fun TextMoves(
 
 @Composable
 fun ConfirmAndClear(
-    comboViewModel: AddComboViewModel,
+    saveCombo: () -> Unit,
+    deleteLastMove: () -> Unit,
+    clearMoveList: () -> Unit,
     onConfirm: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    Log.d(SCREEN_TAG, "Loading confirm and clear buttons")
     Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = modifier.fillMaxWidth().padding(vertical = 4.dp).padding(bottom = 8.dp)) {
         OutlinedButton(
             onClick = {
-                comboViewModel.saveCombo()
+                saveCombo()
+                Log.d(SCREEN_TAG, "Combo saved, returning to Combo Screen")
                 onConfirm()
                       },
             content = { Text("Confirm", color = MaterialTheme.colorScheme.onBackground) }
         )
         OutlinedButton(
-            onClick = { comboViewModel.deleteLastMove() },
+            onClick = {
+                deleteLastMove()
+                Log.d(SCREEN_TAG, "Last move deleted.")
+                      },
             content = {
                 Text("Delete Last", color = MaterialTheme.colorScheme.onBackground) }
         )
         OutlinedButton(
-            onClick = { comboViewModel.clearMoveList() },
+            onClick = {
+                clearMoveList()
+                Log.d(SCREEN_TAG, "Combo move list cleared.")
+                      },
             content = { Text("Clear", color = MaterialTheme.colorScheme.onBackground) }
         )
     }

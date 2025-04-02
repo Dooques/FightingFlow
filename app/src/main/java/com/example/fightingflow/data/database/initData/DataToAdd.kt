@@ -4,21 +4,19 @@ import com.example.fightingflow.R
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.MoveEntry
 
-class DataToAdd(
-
-) {
+class DataToAdd() {
     val tekkenCharacterEntries:List<CharacterEntry> = listOf(
         CharacterEntry(0, "Alisa", R.drawable.alisa_sprite, "Thruster-Based High-Mobility Fighting Style",  listOf("Clockwork", "Destructive Form", "Boot", "Dual Boot", "Backup").toString()),
         CharacterEntry(0, "Asuka", R.drawable.asuka_sprite, "Kazama Style Traditional Martial Arts", listOf("Naniwa Gusto").toString()),
-        CharacterEntry(0, "Azucena", R.drawable.azucena_sprite, "Mixed Martial Arts (Striker)",listOf("Back Turned", "Libertador", "Nuevo Libertador").toString()), // Placeholder stance
-        CharacterEntry(0, "Bryan", R.drawable.bryan_sprite, "Kickboxing", listOf("Slither Step", "Snake Eyes", "Sway").toString()), // Placeholder stance
+        CharacterEntry(0, "Azucena", R.drawable.azucena_sprite, "Mixed Martial Arts (Striker)",listOf("Back Turned", "Libertador", "Nuevo Libertador").toString()),
+        CharacterEntry(0, "Bryan", R.drawable.bryan_sprite, "Kickboxing", listOf("Slither Step", "Snake Eyes", "Sway").toString()),
         CharacterEntry(0, "Claudio", R.drawable.claudio_sprite, "Sirius Exorcist Arts", listOf("Starburst").toString()),
-        CharacterEntry(0, "Clive", R.drawable.t8_logo, "Dominant", listOf("Stance1", "Stance2").toString()), // Placeholder stances
+        CharacterEntry(0, "Clive", R.drawable.t8_logo, "Dominant", listOf("Stance1", "Stance2").toString()),
         CharacterEntry(0, "Devil Jin",  R.drawable.jin_sprite,"Unknown", listOf("Mishima Crouch Dash (Wind God Step)", "Fly", "Mourning Crow").toString()),
-        CharacterEntry(0, "Dragunov", R.drawable.dragunov_sprite, "White Reaper", listOf("Sneak").toString()), // Placeholder stance
+        CharacterEntry(0, "Dragunov", R.drawable.dragunov_sprite, "White Reaper", listOf("Sneak").toString()),
         CharacterEntry(0, "Eddy", R.drawable.t8_logo, "Capoeira", listOf("Ginga", "Bananeira", "Negativa", "Mandinga").toString()),
-        CharacterEntry(0, "Feng", R.drawable.feng_sprite, "Taijiquan", listOf("Back Turned", "Lingering Shadow", "Shifting Clouds", "Deceptive Step").toString()), // Placeholder stance
-        CharacterEntry(0, "Heihachi", R.drawable.t8_logo, "Mishima Style Fighting Karate", listOf("Raijin Stance").toString()), // Placeholder stance
+        CharacterEntry(0, "Feng", R.drawable.feng_sprite, "Taijiquan", listOf("Back Turned", "Lingering Shadow", "Shifting Clouds", "Deceptive Step").toString()),
+        CharacterEntry(0, "Heihachi", R.drawable.t8_logo, "Mishima Style Fighting Karate", listOf("Raijin Stance").toString()),
         CharacterEntry(0, "Hwoarang", R.drawable.hwoarang_sprite,"Taekwondo", listOf("Crouch Step", "Back Turned", "Right Stance", "Left Stance", "Right Flamingo", "Left Flamingo").toString()),
         CharacterEntry(0, "Jack-8", R.drawable.jack8_sprite, "High Tech Annihilator", listOf("Gamma Howl", "Gamma Charge", "Sit Down").toString()), // Placeholder stance
         CharacterEntry(0, "Jin", R.drawable.jin_sprite, "Karate based on Kyokushin style infused with Devil Gene", listOf("Awakened Power Stance", "Zenshin and Zanshin", "Breaking Step").toString()),

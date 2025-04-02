@@ -13,4 +13,5 @@ data class UserEntry(
     val dob: String,
     val tos: Boolean,
     val marketing: Boolean,
+    val loggedIn: Boolean
 )

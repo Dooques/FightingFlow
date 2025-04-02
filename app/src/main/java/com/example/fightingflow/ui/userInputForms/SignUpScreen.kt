@@ -18,6 +18,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,11 +37,12 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun SignupScreen(
     modifier: Modifier = Modifier,
-    inputViewModel: InputViewModel = koinViewModel(),
+    inputViewModel: UserViewModel,
     navigateBack: () -> Unit,
+    onSaveUser: () -> Unit,
+    updateCurrentUser: (UserEntry) -> Unit,
+    user: UserEntry
 ) {
-    val user by inputViewModel.userState
-
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = "Sign up for an account",
@@ -50,7 +52,7 @@ fun SignupScreen(
         )
         SignUpForm(
             inputViewModel = inputViewModel,
-            onUpdateUser = { inputViewModel.updateCurrentUser(it) },
+            updateCurrentUser = updateCurrentUser,
             user = user,
             onConfirm = {
                 inputViewModel.saveUserData()
@@ -62,8 +64,8 @@ fun SignupScreen(
 
 @Composable
 fun SignUpForm(
-    inputViewModel: InputViewModel,
-    onUpdateUser: (UserEntry) -> Unit,
+    inputViewModel: UserViewModel,
+    updateCurrentUser: (UserEntry) -> Unit,
     user: UserEntry,
     onConfirm: () -> Unit,
     modifier: Modifier = Modifier
@@ -71,16 +73,16 @@ fun SignUpForm(
     Column(modifier.fillMaxHeight(), verticalArrangement = Arrangement.SpaceBetween) {
         Spacer(modifier.size(height = 40.dp, width = 0.dp))
         TextInputField("username",
-            { username -> onUpdateUser(user.copy(username = username)) }
+            { username -> updateCurrentUser(user.copy(username = username)) }
         )
         TextInputField("email",
-            {email -> onUpdateUser(user.copy(email = email))}
+            {email -> updateCurrentUser(user.copy(email = email))}
         )
         TextInputField("password",
-            {password -> onUpdateUser(user.copy(password = password))}
+            {password -> updateCurrentUser(user.copy(password = password))}
         )
         DobField(
-            onValueChange = {dob -> onUpdateUser(user.copy(dob = dob))},
+            onValueChange = {dob -> updateCurrentUser(user.copy(dob = dob))},
         )
         Spacer(modifier.size(height = 40.dp, width = 0.dp))
         ConfirmMarketingAndTOS(
@@ -163,7 +165,7 @@ fun DobField(
 
 @Composable
 fun ConfirmMarketingAndTOS(
-    inputViewModel: InputViewModel,
+    inputViewModel: UserViewModel,
     tosSelected: Boolean,
     marketingSelected: Boolean,
     modifier: Modifier = Modifier
@@ -200,19 +202,4 @@ fun ConfirmMarketingAndTOS(
 @Composable
 fun DatePicker() {
 
-}
-
-
-@Preview
-@Composable
-fun LoginScreenPreview() {
-    FightingFlowTheme {
-        Surface(color = Color.Black, modifier = Modifier.fillMaxSize()) {
-            SignupScreen(
-                modifier = TODO(),
-                inputViewModel = TODO(),
-                navigateBack = TODO()
-            )
-        }
-    }
 }

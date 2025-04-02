@@ -1,5 +1,6 @@
 package com.example.fightingflow.util
 
+import com.example.fightingflow.R
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.ComboEntry
@@ -8,13 +9,13 @@ import com.example.fightingflow.model.MoveEntry
 val emptyCharacter = CharacterEntry(
     id = 0,
     name = "",
-    imageId = 0,
+    imageId = R.drawable.t8_logo,
     fightingStyle = "",
     uniqueMoves = "",
-    combosById = ""
+    combosById = "",
 )
 
-val emptyCombo = ComboDisplay(
+val emptyComboDisplay = ComboDisplay(
     id = 0,
     comboId = "",
     character = "",

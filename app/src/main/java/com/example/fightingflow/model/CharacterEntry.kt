@@ -17,8 +17,3 @@ data class CharacterEntry(
     val uniqueMoves: String,
     val combosById: String = ""
 )
-
-data class CharacterModel(
-    val imageId: Int,
-    @StringRes val name: Int,
-)
