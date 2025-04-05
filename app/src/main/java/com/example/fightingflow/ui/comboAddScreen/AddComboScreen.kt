@@ -5,7 +5,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.pm.ActivityInfo
 import android.util.Log
-import android.view.ViewGroup
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -53,12 +52,10 @@ import androidx.compose.ui.unit.sp
 import com.example.fightingflow.R
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
-import com.example.fightingflow.model.MoveEntry
-import com.example.fightingflow.ui.comboViewScreen.ComboItem
-import com.example.fightingflow.ui.comboViewScreen.ComboViewModel
+import com.example.fightingflow.ui.comboScreen.ComboItem
+import com.example.fightingflow.ui.comboScreen.ComboViewModel
 import com.example.fightingflow.util.ComboDisplayUiState
 import com.example.fightingflow.util.MoveListUiState
-import kotlinx.coroutines.flow.first
 
 const val SCREEN_TAG = "AddComboScreen"
 

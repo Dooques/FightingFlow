@@ -26,8 +26,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.fightingflow.model.CharacterEntry
-import com.example.fightingflow.ui.comboViewScreen.ComboViewModel
-import com.example.fightingflow.util.CharacterListUiState
+import com.example.fightingflow.ui.comboScreen.ComboViewModel
 import com.example.fightingflow.util.CharacterUiState
 
 const val TAG = "CharacterScreen"

@@ -3,25 +3,24 @@ package com.example.fightingflow.data.datastore
 import android.content.Context
 import android.util.Log
 import androidx.datastore.core.DataStore
-import androidx.datastore.dataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.example.fightingflow.data.datastore.ComboRepository.Companion.TAG
-import com.example.fightingflow.data.datastore.ComboRepository.Companion.character
-import com.example.fightingflow.data.datastore.ComboRepository.Companion.comboId
-import com.example.fightingflow.data.datastore.ComboRepository.Companion.createdBy
-import com.example.fightingflow.data.datastore.ComboRepository.Companion.damage
-import com.example.fightingflow.data.datastore.ComboRepository.Companion.moveList
+import com.example.fightingflow.data.datastore.ComboDsRepository.Companion.TAG
+import com.example.fightingflow.data.datastore.ComboDsRepository.Companion.character
+import com.example.fightingflow.data.datastore.ComboDsRepository.Companion.comboId
+import com.example.fightingflow.data.datastore.ComboDsRepository.Companion.createdBy
+import com.example.fightingflow.data.datastore.ComboDsRepository.Companion.damage
+import com.example.fightingflow.data.datastore.ComboDsRepository.Companion.moveList
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.ui.comboAddScreen.VM_TAG
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 
-interface ComboRepository {
+interface ComboDsRepository {
     suspend fun setCombo(comboDisplay: ComboDisplay, comboAsString: String)
 
     fun getComboId(): Flow<String>
@@ -41,7 +40,7 @@ interface ComboRepository {
     }
 }
 
-class ComboDataRepository(private val dataStore: DataStore<Preferences>): ComboRepository {
+class ComboDatastoreRepository(private val dataStore: DataStore<Preferences>): ComboDsRepository {
     val Context.dataStore: DataStore<Preferences> by preferencesDataStore("combo_data")
 
 

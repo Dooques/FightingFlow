@@ -1,17 +1,18 @@
-package com.example.fightingflow.data.database.initData
+package com.example.fightingflow.ui
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fightingflow.TAG
-import com.example.fightingflow.data.database.TekkenDataRepository
+import com.example.fightingflow.data.database.TekkenDbRepository
+import com.example.fightingflow.util.CharacterAndMoveData
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class InitViewModel(
-    private val tekkenDataRepository: TekkenDataRepository
+    private val tekkenDataRepository: TekkenDbRepository
 ): ViewModel() {
-    private val dataFile = DataToAdd()
+    private val dataFile = CharacterAndMoveData()
     private val charactersToAdd = dataFile.tekkenCharacterEntries
     private val movesToAdd = dataFile.moveEntries
 

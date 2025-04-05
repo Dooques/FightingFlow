@@ -4,8 +4,8 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.fightingflow.data.database.TekkenDataRepository
-import com.example.fightingflow.data.datastore.ComboRepository
+import com.example.fightingflow.data.database.TekkenDbRepository
+import com.example.fightingflow.data.datastore.ComboDsRepository
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.MoveEntry
 import com.example.fightingflow.model.moveEntryToMoveList
@@ -25,12 +25,12 @@ import kotlinx.coroutines.launch
 const val VM_TAG = "AddComboViewModel"
 
 class AddComboViewModel(
-    private val tekkenDataRepository: TekkenDataRepository,
-    private val comboRepository: ComboRepository,
+    private val tekkenDataRepository: TekkenDbRepository,
+    private val comboRepository: ComboDsRepository,
 ): ViewModel() {
 
     companion object {
-        const val TIME_MILLIS = 3_000L
+        const val TIME_MILLIS = 2_000L
     }
 
     val characterState = MutableStateFlow(CharacterUiState())

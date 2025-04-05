@@ -1,10 +1,10 @@
-package com.example.fightingflow.data.database.initData
+package com.example.fightingflow.util
 
 import com.example.fightingflow.R
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.MoveEntry
 
-class DataToAdd() {
+class CharacterAndMoveData() {
     val tekkenCharacterEntries:List<CharacterEntry> = listOf(
         CharacterEntry(0, "Alisa", R.drawable.alisa_sprite, "Thruster-Based High-Mobility Fighting Style",  listOf("Clockwork", "Destructive Form", "Boot", "Dual Boot", "Backup").toString()),
         CharacterEntry(0, "Asuka", R.drawable.asuka_sprite, "Kazama Style Traditional Martial Arts", listOf("Naniwa Gusto").toString()),

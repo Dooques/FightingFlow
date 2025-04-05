@@ -7,14 +7,14 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.example.fightingflow.data.datastore.SelectedCharacterRepository.Companion.characterName
-import com.example.fightingflow.data.datastore.SelectedCharacterRepository.Companion.imageId
+import com.example.fightingflow.data.datastore.SelectedCharacterDsRepository.Companion.characterName
+import com.example.fightingflow.data.datastore.SelectedCharacterDsRepository.Companion.imageId
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.util.emptyCharacter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-interface SelectedCharacterRepository {
+interface SelectedCharacterDsRepository {
     suspend fun getCharacter(character: CharacterEntry)
 
     fun getName(): Flow<String>
@@ -27,7 +27,7 @@ interface SelectedCharacterRepository {
     }
 }
 
-class SelectedCharacterDataRepository( private val dataStore: DataStore<Preferences>): SelectedCharacterRepository {
+class SelectedCharacterDatastoreRepository(private val dataStore: DataStore<Preferences>): SelectedCharacterDsRepository {
     val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "character_data")
 
     override suspend fun getCharacter(character: CharacterEntry) {

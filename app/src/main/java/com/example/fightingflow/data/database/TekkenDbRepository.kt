@@ -6,13 +6,12 @@ import com.example.fightingflow.data.database.dao.MoveDao
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboEntry
 import com.example.fightingflow.model.MoveEntry
-import com.example.fightingflow.model.UserEntry
+import com.example.fightingflow.model.ProfileEntry
 import kotlinx.coroutines.flow.Flow
 
-interface TekkenDataRepository {
+interface TekkenDbRepository {
     // Character
-    fun getCharacterFlow(name: String): Flow<CharacterEntry>
-    suspend fun getCharacter(name: String): CharacterEntry
+    fun getCharacter(name: String): Flow<CharacterEntry>
     fun getAllCharacters(): Flow<List<CharacterEntry>>
     suspend fun updateCharacter(character: CharacterEntry)
 
@@ -20,7 +19,7 @@ interface TekkenDataRepository {
     fun getCombo(comboId: String): Flow<ComboEntry>
     fun getAllCombos(): Flow<List<ComboEntry>>
     fun getAllCombosByCharacter(characterEntry: CharacterEntry): Flow<List<ComboEntry>>
-    fun getAllCombosByUser(userEntry: UserEntry): Flow<List<ComboEntry>>
+    fun getAllCombosByProfile(username: String): Flow<List<ComboEntry>>
     suspend fun updateCombo(combo: ComboEntry)
     suspend fun deleteCombo(combo: ComboEntry)
 
@@ -34,17 +33,14 @@ interface TekkenDataRepository {
     suspend fun insertCombo(combo: ComboEntry)
 }
 
-class OfflineTekkenDataRepository(
+class TekkenDatabaseRepository(
     private val characterDao: CharacterDao,
     private val comboDao: ComboDao,
     private val moveDao: MoveDao
-): TekkenDataRepository {
+): TekkenDbRepository {
 
     // Get Character
-    override fun getCharacterFlow(name: String): Flow<CharacterEntry> =
-        characterDao.getCharacterFlow(name)
-
-    override suspend fun getCharacter(name: String): CharacterEntry =
+    override fun getCharacter(name: String): Flow<CharacterEntry> =
         characterDao.getCharacter(name)
 
     override fun getAllCharacters(): Flow<List<CharacterEntry>> =
@@ -60,8 +56,8 @@ class OfflineTekkenDataRepository(
     override fun getAllCombosByCharacter(characterEntry: CharacterEntry): Flow<List<ComboEntry>> =
         comboDao.getAllCombosByCharacter(characterEntry)
 
-    override fun getAllCombosByUser(userEntry: UserEntry): Flow<List<ComboEntry>> =
-        comboDao.getAllCombosByUser(userEntry.username)
+    override fun getAllCombosByProfile(username: String): Flow<List<ComboEntry>> =
+        comboDao.getAllCombosByProfile(username)
 
     // Get Moves
     override fun getMove(name: String): Flow<MoveEntry> =

@@ -4,31 +4,31 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
-import com.example.fightingflow.util.CharacterUiState
 import com.example.fightingflow.util.emptyMove
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import java.util.UUID
+import kotlin.String
 
 @Entity(tableName = "combo_table")
 data class ComboEntry (
     @PrimaryKey(autoGenerate = true)
     val id: Int,
     @ColumnInfo(name = "combo_id")
-    val comboId: String = UUID.randomUUID().toString(),
+    val comboId: kotlin.String = UUID.randomUUID().toString(),
     val character: CharacterEntry,
     val damage: Int,
     @ColumnInfo(name = "created_by")
-    val createdBy: String,
+    val createdBy: kotlin.String,
     val moves: String
 )
 
 data class ComboDisplay(
     val id: Int,
-    val comboId: String,
-    val character: String,
+    val comboId: kotlin.String,
+    val character: kotlin.String,
     val damage: Int,
-    val createdBy: String,
+    val createdBy: kotlin.String,
     val areOptionsRevealed: Boolean = false,
     val moves: List<MoveEntry>
 )
@@ -54,13 +54,13 @@ fun ComboDisplay.toEntry(character: CharacterEntry): ComboEntry =
         moves = moveEntryToMoveList(moves)
     )
 
-fun moveListToMoveEntry(moveList: String): List<MoveEntry> {
+fun moveListToMoveEntry(moveList: kotlin.String): List<MoveEntry> {
     val moveEntryList = mutableListOf<MoveEntry>()
     moveList.split(",").map { it.trimIndent() }.forEach { moveEntryList.add(emptyMove.copy(moveName = it)) }
     return moveEntryList
 }
 
-fun moveEntryToMoveList(moveList: List<MoveEntry>): String {
+fun moveEntryToMoveList(moveList: List<MoveEntry>): kotlin.String {
     var moveString = ""
     val listIterator = moveList.iterator()
     while (listIterator.hasNext()) {
@@ -84,6 +84,6 @@ class CharacterConverter {
         character?.let { jsonAdapter.toJson(it) } ?: ""
 
     @TypeConverter
-    fun stringToCharacter(json: String?) =
+    fun stringToCharacter(json: kotlin.String?) =
         json?.let { jsonAdapter.fromJson(json) }
 }

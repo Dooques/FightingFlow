@@ -1,11 +1,11 @@
-package com.example.fightingflow.ui.comboViewScreen
+package com.example.fightingflow.ui.comboScreen
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.fightingflow.data.database.TekkenDataRepository
-import com.example.fightingflow.data.database.initData.DataToAdd
-import com.example.fightingflow.data.datastore.SelectedCharacterRepository
+import com.example.fightingflow.data.database.TekkenDbRepository
+import com.example.fightingflow.util.CharacterAndMoveData
+import com.example.fightingflow.data.datastore.SelectedCharacterDsRepository
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.ComboEntry
@@ -22,6 +22,7 @@ import com.example.fightingflow.util.MoveListUiState
 import com.example.fightingflow.util.emptyComboDisplay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.stateIn
@@ -29,16 +30,17 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ComboViewModel(
-    private val tekkenDataRepository: TekkenDataRepository,
-    private val selectedCharacterRepository: SelectedCharacterRepository
+    private val tekkenDataRepository: TekkenDbRepository,
+    private val selectedCharacterRepository: SelectedCharacterDsRepository
 ): ViewModel() {
 
     companion object {
         const val TAG = "ComboViewModel"
-        const val TIME_MILLIS = 3_000L
+        const val TIME_MILLIS = 2_000L
     }
 
-    val moveEntriesFromInitData = DataToAdd().moveEntries
+
+    val moveEntriesFromInitData = CharacterAndMoveData().moveEntries
     val moveEntryListState = getAllMovesEntries()
     val characterEntryListState = getAllCharacterEntries()
 
@@ -50,6 +52,15 @@ class ComboViewModel(
 
     val characterNameState = getCharacterNameFromDS()
     val characterImageState = getCharacterImageFromDS()
+
+    val charFromDb: StateFlow<CharacterUiState> =
+        tekkenDataRepository.getCharacter(characterNameState.value.name)
+            .map { CharacterUiState(it) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(),
+                initialValue = CharacterUiState()
+            )
 
 
     // Datastore

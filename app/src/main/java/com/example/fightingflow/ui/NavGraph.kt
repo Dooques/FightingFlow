@@ -21,11 +21,11 @@ import com.example.fightingflow.R
 import com.example.fightingflow.ui.characterScreen.CharacterScreen
 import com.example.fightingflow.ui.comboAddScreen.AddComboScreen
 import com.example.fightingflow.ui.comboAddScreen.AddComboViewModel
-import com.example.fightingflow.ui.comboViewScreen.ComboScreen
-import com.example.fightingflow.ui.comboViewScreen.ComboViewModel
-import com.example.fightingflow.ui.comboViewScreen.TAG
-import com.example.fightingflow.ui.userInputForms.UserViewModel
-import com.example.fightingflow.ui.userInputForms.SignupScreen
+import com.example.fightingflow.ui.comboScreen.ComboScreen
+import com.example.fightingflow.ui.comboScreen.ComboViewModel
+import com.example.fightingflow.ui.comboScreen.TAG
+import com.example.fightingflow.ui.profileScreen.ProfileScreen
+import com.example.fightingflow.ui.profileScreen.ProfileViewModel
 import kotlinx.coroutines.flow.update
 import org.koin.compose.koinInject
 
@@ -42,7 +42,7 @@ enum class FlowScreen(@StringRes val title: Int) {
 
 @SuppressLint("SourceLockedOrientationActivity")
 @Composable
-fun FightingFlowHomeScreen(
+fun NavGraph(
     navController: NavHostController = rememberNavController(),
     deviceType: WindowSizeClass
 ) {
@@ -54,7 +54,7 @@ fun FightingFlowHomeScreen(
     Log.d(TAG, "Initializing ViewModels")
     val comboViewModel = koinInject<ComboViewModel>()
     val addComboViewModel = koinInject<AddComboViewModel>()
-    val userViewModel = koinInject<UserViewModel>()
+    val profileViewModel = koinInject<ProfileViewModel>()
 
     // ComboViewModel Collection
     val characterState by comboViewModel.characterState.collectAsState()
@@ -66,8 +66,9 @@ fun FightingFlowHomeScreen(
     val comboEntryListStateAddCombo by addComboViewModel.comboEntryListState.collectAsState()
 
     // UserViewModel collection
-    val isUserLoggedIn by userViewModel.loggedInState.collectAsState()
-    val userData by userViewModel.userState.collectAsState()
+    val isUserLoggedIn by profileViewModel.loggedInState.collectAsState()
+    val profile by profileViewModel.profileState.collectAsState()
+
     Log.d(TAG, "Flows collected" +
             "\nCharacter: ${characterState.character}" +
             "\n\nCombo Entry List: ${comboEntryListState.comboEntryList}" +
@@ -93,12 +94,10 @@ fun FightingFlowHomeScreen(
 
             // Sign Up / Log In Screen
             composable(route = FlowScreen.Signup.name) {
-                SignupScreen(
-                    inputViewModel = userViewModel,
+                ProfileScreen(
+                    profileViewModel = profileViewModel,
                     navigateBack = navController::navigateUp,
-                    onSaveUser = userViewModel::saveUserData,
-                    updateCurrentUser = userViewModel::updateCurrentUser,
-                    user = userData
+                    updateCurrentUser = profileViewModel::updateProfileCreation,
                 )
             }
 
@@ -127,23 +126,23 @@ fun FightingFlowHomeScreen(
                         addComboViewModel.editingState.value = false
                         navController.navigate(FlowScreen.AddCombo.name)
                     },
-                    onEditCombo = {
-                        Log.d(TAG, "")
-                        Log.d(TAG, "Preparing to edit selected combo")
-                        Log.d(TAG, "Saving selected combo to AddComboViewModel...")
-                        addComboViewModel.comboState.update { it }
-                        Log.d(TAG, "AddComboViewModel Combo state: ${comboStateAddCombo.comboDisplay}")
-
-                        Log.d(TAG, "Updating character state of AddComboViewModel")
-                        addComboViewModel.characterState.update { characterState }
-
-                        Log.d(TAG, "Updating Combo List of AddComboViewModel")
-                        addComboViewModel.comboEntryListState.update { comboEntryListState }
-                        Log.d(TAG, "Updated Combo List: ${comboEntryListStateAddCombo.comboEntryList}")
-                        addComboViewModel.editingState.value = true
-                        navController.navigate(FlowScreen.AddCombo.name)
-                    },
-                    navigateBack = navController::navigateUp,
+//                    onEditCombo = {
+//                        Log.d(TAG, "")
+//                        Log.d(TAG, "Preparing to edit selected combo")
+//                        Log.d(TAG, "Saving selected combo to AddComboViewModel...")
+//                        addComboViewModel.comboState.update { it }
+//                        Log.d(TAG, "AddComboViewModel Combo state: ${comboStateAddCombo.comboDisplay}")
+//
+//                        Log.d(TAG, "Updating character state of AddComboViewModel")
+//                        addComboViewModel.characterState.update { characterState }
+//
+//                        Log.d(TAG, "Updating Combo List of AddComboViewModel")
+//                        addComboViewModel.comboEntryListState.update { comboEntryListState }
+//                        Log.d(TAG, "Updated Combo List: ${comboEntryListStateAddCombo.comboEntryList}")
+//                        addComboViewModel.editingState.value = true
+//                        navController.navigate(FlowScreen.AddCombo.name)
+//                    },
+                    navigateBack = {navController.navigate(FlowScreen.PickChar.name) }
                 )
             }
 

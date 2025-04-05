@@ -9,10 +9,8 @@ import kotlinx.coroutines.flow.Flow
 interface CharacterDao: BaseDao<CharacterEntry> {
 
     @Query("select * from character_table where name = :name")
-    fun getCharacterFlow(name: String): Flow<CharacterEntry>
+    fun getCharacter(name: String): Flow<CharacterEntry>
 
-    @Query("select * from character_table where name = :name")
-    suspend fun getCharacter(name: String): CharacterEntry
 
     @Query("select * from character_table")
     fun getAllCharacters(): Flow<List<CharacterEntry>>

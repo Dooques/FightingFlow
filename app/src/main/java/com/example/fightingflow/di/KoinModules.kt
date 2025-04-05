@@ -6,24 +6,24 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
 import com.example.fightingflow.data.database.FlowDatabase
-import com.example.fightingflow.data.database.OfflineTekkenDataRepository
-import com.example.fightingflow.data.database.OfflineUserDataRepository
-import com.example.fightingflow.data.database.TekkenDataRepository
-import com.example.fightingflow.data.database.UserDataRepository
+import com.example.fightingflow.data.database.TekkenDatabaseRepository
+import com.example.fightingflow.data.database.ProfileDatabaseRepository
+import com.example.fightingflow.data.database.TekkenDbRepository
+import com.example.fightingflow.data.database.ProfileDbRepository
 import com.example.fightingflow.data.database.dao.CharacterDao
 import com.example.fightingflow.data.database.dao.ComboDao
 import com.example.fightingflow.data.database.dao.MoveDao
-import com.example.fightingflow.data.database.dao.UserDao
-import com.example.fightingflow.data.database.initData.InitViewModel
-import com.example.fightingflow.data.datastore.ComboDataRepository
-import com.example.fightingflow.data.datastore.ComboRepository
-import com.example.fightingflow.data.datastore.FlowPreferencesRepository
-import com.example.fightingflow.data.datastore.PreferencesRepository
-import com.example.fightingflow.data.datastore.SelectedCharacterDataRepository
-import com.example.fightingflow.data.datastore.SelectedCharacterRepository
+import com.example.fightingflow.data.database.dao.ProfileDao
+import com.example.fightingflow.ui.InitViewModel
+import com.example.fightingflow.data.datastore.ComboDatastoreRepository
+import com.example.fightingflow.data.datastore.ComboDsRepository
+import com.example.fightingflow.data.datastore.ProfileDatastoreRepository
+import com.example.fightingflow.data.datastore.ProfileDsRepository
+import com.example.fightingflow.data.datastore.SelectedCharacterDatastoreRepository
+import com.example.fightingflow.data.datastore.SelectedCharacterDsRepository
 import com.example.fightingflow.ui.comboAddScreen.AddComboViewModel
-import com.example.fightingflow.ui.comboViewScreen.ComboViewModel
-import com.example.fightingflow.ui.userInputForms.UserViewModel
+import com.example.fightingflow.ui.comboScreen.ComboViewModel
+import com.example.fightingflow.ui.profileScreen.ProfileViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -32,7 +32,7 @@ import org.koin.dsl.module
 private const val USER_SETTINGS = "settings"
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = USER_SETTINGS)
 
-fun provideUserDao(flowDatabase: FlowDatabase): UserDao = flowDatabase.getUserDao()
+fun provideUserDao(flowDatabase: FlowDatabase): ProfileDao = flowDatabase.getUserDao()
 fun provideCharacterDao(flowDatabase: FlowDatabase): CharacterDao = flowDatabase.getCharacterDao()
 fun provideMoveDao(flowDatabase: FlowDatabase): MoveDao = flowDatabase.getMoveDao()
 fun provideComboDao(flowDatabase: FlowDatabase): ComboDao = flowDatabase.getComboDao()
@@ -57,17 +57,17 @@ val databaseModule = module {
 
 val repositoryModule = module {
     // Database
-    single<UserDataRepository> { OfflineUserDataRepository(get()) }
-    single<TekkenDataRepository> { OfflineTekkenDataRepository(get(), get(), get()) }
+    single<ProfileDbRepository> { ProfileDatabaseRepository(get()) }
+    single<TekkenDbRepository> { TekkenDatabaseRepository(get(), get(), get()) }
 
     // DataStore
-    single<PreferencesRepository> { FlowPreferencesRepository(androidContext().dataStore) }
-    single<SelectedCharacterRepository> { SelectedCharacterDataRepository(androidContext().dataStore) }
-    single<ComboRepository> { ComboDataRepository(androidContext().dataStore) }
+    single<ProfileDsRepository> { ProfileDatastoreRepository(androidContext().dataStore) }
+    single<SelectedCharacterDsRepository> { SelectedCharacterDatastoreRepository(androidContext().dataStore) }
+    single<ComboDsRepository> { ComboDatastoreRepository(androidContext().dataStore) }
 }
 
 val viewModelModule = module {
-    viewModel { UserViewModel(get(), get()) }
+    viewModel { ProfileViewModel(get(), get()) }
     viewModel { InitViewModel(get()) }
     viewModel { ComboViewModel(get(), get()) }
     viewModel { AddComboViewModel(get(), get()) }

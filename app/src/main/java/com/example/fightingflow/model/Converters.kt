@@ -15,7 +15,7 @@ class ComboConverter {
         combo?.let { jsonAdapter.toJson(it) } ?: ""
 
     @TypeConverter
-    fun stringToCombo(json: String?) =
+    fun stringToCombo(json: kotlin.String?) =
         json?.let { jsonAdapter.fromJson(json) }
 }
 
@@ -30,7 +30,7 @@ class ListConverter {
         combo?.let { jsonAdapter.toJson(it) } ?: ""
 
     @TypeConverter
-    fun stringToCombo(json: String?) =
+    fun stringToCombo(json: kotlin.String?) =
         json?.let { jsonAdapter.fromJson(json) }
 }
 
@@ -38,13 +38,13 @@ class UserConverter {
     private val jsonAdapter = Moshi.Builder()
         .addLast(KotlinJsonAdapterFactory())
         .build()
-        .adapter(UserEntry::class.java)
+        .adapter(ProfileEntry::class.java)
 
     @TypeConverter
-    fun userToString(user: UserEntry?) =
+    fun userToString(user: ProfileEntry?) =
         user?.let { jsonAdapter.toJson(it) } ?: ""
 
     @TypeConverter
-    fun stringToUser(json: String?) =
+    fun stringToUser(json: kotlin.String?) =
         json?.let { jsonAdapter.fromJson(json) }
 }

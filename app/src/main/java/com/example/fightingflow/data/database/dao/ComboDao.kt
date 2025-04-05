@@ -4,7 +4,6 @@ import androidx.room.Dao
 import androidx.room.Query
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboEntry
-import com.example.fightingflow.model.UserEntry
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -19,5 +18,5 @@ interface ComboDao: BaseDao<ComboEntry> {
     fun getAllCombosByCharacter(characterEntry: CharacterEntry): Flow<List<ComboEntry>>
 
     @Query("select * from combo_table where created_by = :userName")
-    fun getAllCombosByUser(userName: String): Flow<List<ComboEntry>>
+    fun getAllCombosByProfile(userName: String): Flow<List<ComboEntry>>
 }

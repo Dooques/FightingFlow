@@ -1,10 +1,13 @@
-package com.example.fightingflow.ui.comboViewScreen
+package com.example.fightingflow.ui.comboScreen
 
+import android.app.Activity
 import android.content.Context
+import android.content.pm.ActivityInfo
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,7 +23,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Icon
@@ -48,10 +51,7 @@ import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.MoveEntry
 import com.example.fightingflow.util.ActionIcon
-import com.example.fightingflow.util.CharacterUiState
-import com.example.fightingflow.util.ComboDisplayUiState
 import com.example.fightingflow.util.SwipeableItem
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 const val TAG = "ComboScreen"
@@ -63,12 +63,15 @@ fun ComboScreen(
     updateCharacterState: (String) -> Unit,
     getMoveEntryData: (List<MoveEntry>, ComboDisplay) -> ComboDisplay,
     onAddCombo: () -> Unit,
-    onEditCombo: (ComboDisplayUiState) -> Unit,
+//    onEditCombo: (ComboDisplayUiState) -> Unit,
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Log.d(TAG, "")
     Log.d(TAG, "\nOpening Combo Screen...")
+
+    val context = LocalContext.current
+    (context as? Activity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
 
     // Room Flows
     val characterState by comboViewModel.characterState.collectAsState()
@@ -91,14 +94,12 @@ fun ComboScreen(
     Log.d(TAG, "Updating character data")
     Log.d(TAG, "Character List: ${characterListState.characterList}")
     if (characterListState.characterList.isNotEmpty() && characterNameState.name.isNotEmpty()) {
-
         try { updateCharacterState(characterNameState.name) }
         catch(e: NoSuchElementException) {
             Log.d(TAG, "Character Error, no element found in character list.")
         }
     }
 
-    val context = LocalContext.current
     val fontColor = MaterialTheme.colorScheme.onBackground
     val containerColor = MaterialTheme.colorScheme.surfaceDim
     val scope = rememberCoroutineScope()
@@ -132,6 +133,7 @@ fun ComboScreen(
                 character = characterState.character,
                 characterName = characterNameState.name,
                 characterImage = characterImageState.image,
+                navigateBack = navigateBack,
                 onAddCombo = onAddCombo
             )
         }
@@ -141,6 +143,7 @@ fun ComboScreen(
             Log.d(TAG, "")
             Log.d(TAG, "Getting display combos as lazy column with swipeable actions.")
              itemsIndexed(items = combosByCharacter) { index, combo ->
+
                  val isOptionRevealed by remember { mutableStateOf(false) }
                  SwipeableItem(
                      isRevealed = isOptionRevealed,
@@ -213,32 +216,44 @@ fun Header(
     characterImage: Int,
     fontColor: Color,
     onAddCombo: () -> Unit,
+    navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(
-        modifier = modifier.fillMaxWidth()
+    Row(
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+            .fillMaxWidth()
+
     ) {
         Log.d(TAG, "")
-        Log.d(TAG, "Loading Character Image ${characterImage}...")
-        Image(
-            painter = painterResource(characterImage),
-            contentDescription = characterName,
-            modifier = Modifier
-                .size(75.dp)
-                .align(Alignment.CenterStart)
+        Log.d(TAG, "Loading Home Button")
+        Icon(
+            imageVector = Icons.Default.Home,
+            contentDescription = "Return to Character Select",
+            modifier
+                .size(65.dp)
+                .clickable(onClick = navigateBack)
+
         )
         Log.d(TAG, "Loading Character Name: ${characterName}...")
         Text(
             text = characterName,
             color = fontColor,
-            fontSize = if (character.name.length > 9) 60.sp else 80.sp,
+            fontSize = if (character.name.length > 9) 50.sp else 70.sp,
             style = MaterialTheme.typography.displayMedium,
-            modifier = modifier.align(Alignment.Center)
+            modifier = modifier
+        )
+        Log.d(TAG, "Loading Character Image ${characterImage}...")
+        Image(
+            painter = painterResource(characterImage),
+            contentDescription = characterName,
+            modifier = Modifier
+                .size(60.dp)
         )
         Log.d(TAG, "Loading Icon image")
         IconButton(
             modifier = modifier
-                .align(Alignment.CenterEnd)
                 .size(75.dp),
             onClick = onAddCombo,
             content = {

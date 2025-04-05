@@ -1,17 +1,17 @@
 package com.example.fightingflow.model
 
-import androidx.annotation.StringRes
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlin.String
 
 @Entity("move_table")
 data class MoveEntry(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     @ColumnInfo(name = "move_name")
-    val moveName: String,
-    val notation: String,
+    val moveName: kotlin.String,
+    val notation: kotlin.String,
     @ColumnInfo(name = "move_type")
     val moveType: String,
     @ColumnInfo(name = "counter_hit")
@@ -20,12 +20,12 @@ data class MoveEntry(
     @ColumnInfo(name = "just_frame")
     val justFrame: Boolean = false,
     @ColumnInfo(name = "associated_character")
-    val associatedCharacter: String
+    val associatedCharacter: kotlin.String
 )
 
 data class MoveString(
-    val name: String,
-    val moveString: List<String>,
+    val name: kotlin.String,
+    val moveString: List<kotlin.String>,
     val counterHit: Boolean = false,
-    val moveType: String
+    val moveType: kotlin.String
 )
