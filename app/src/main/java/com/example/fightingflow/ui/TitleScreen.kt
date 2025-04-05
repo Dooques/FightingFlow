@@ -68,12 +68,12 @@ fun TitleScreen(
                 onClick = onLogin,
                 modifier = modifier
             )
-            Spacer(modifier = modifier.size(16.dp))
-            AccessButton(
-                buttonText = stringResource(R.string.profiles),
-                onClick = onSignUp,
-                modifier = modifier
-            )
+//            Spacer(modifier = modifier.size(16.dp))
+//            AccessButton(
+//                buttonText = stringResource(R.string.profiles),
+//                onClick = onSignUp,
+//                modifier = modifier
+//            )
         }
     }
 }
