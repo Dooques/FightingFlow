@@ -28,7 +28,7 @@ fun ProfileScreen(
             "\nloggedInState: $loggedInState" +
             "\nprofileCreation: ${profileCreation.profileCreation}" +
             "\ncurrentProfile: ${currentProfile.profile}" +
-            "\ncomosByProfile: ${combosByProfile.comboDisplayList}")
+            "\ncombosByProfile: ${combosByProfile.comboDisplayList}")
 
     Log.d(PROFILE_SCREEN_TAG, "Checking if valid profile exists...")
     if (currentProfile.profile != emptyProfile) {

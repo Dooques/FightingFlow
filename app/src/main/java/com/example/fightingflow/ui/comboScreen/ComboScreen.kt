@@ -22,6 +22,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.PlayArrow
@@ -229,7 +230,7 @@ fun Header(
         Log.d(TAG, "")
         Log.d(TAG, "Loading Home Button")
         Icon(
-            imageVector = Icons.Default.Home,
+            imageVector = Icons.Default.ArrowBack,
             contentDescription = "Return to Character Select",
             modifier
                 .size(65.dp)
