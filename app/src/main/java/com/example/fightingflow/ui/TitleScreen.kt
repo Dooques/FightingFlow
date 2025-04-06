@@ -43,24 +43,19 @@ fun TitleScreen(
         if (deviceType.heightSizeClass == WindowHeightSizeClass.Compact) 2 else 1
 
     Column(
-        verticalArrangement = Arrangement.SpaceAround,
+        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxSize()
             .background(Color.Black)
     ) {
-        Log.d(TITLE_TAG, "Loading Header...")
-        Text(
-            text = "Fighting Flow",
-            style = MaterialTheme.typography.displayLarge,
-            color = Color.White
-        )
         Log.d(TITLE_TAG, "Loading logo...")
         Image(
-            painter = painterResource(R.drawable.t8_logo),
+            painter = painterResource(R.drawable.fighting_flow_title_logo),
             contentDescription = "Tekken 8 Logo",
             modifier = Modifier.size(if (uiScale == 2) 100.dp else 400.dp)
         )
+        Spacer(modifier.size(height = 80.dp, width = 0.dp))
         Column {
             Log.d(TITLE_TAG, "Loading buttons...")
             AccessButton(
@@ -68,12 +63,12 @@ fun TitleScreen(
                 onClick = onLogin,
                 modifier = modifier
             )
-            Spacer(modifier = modifier.size(16.dp))
-            AccessButton(
-                buttonText = stringResource(R.string.profiles),
-                onClick = onSignUp,
-                modifier = modifier
-            )
+//            Spacer(modifier = modifier.size(16.dp))
+//            AccessButton(
+//                buttonText = stringResource(R.string.profiles),
+//                onClick = onSignUp,
+//                modifier = modifier
+//            )
         }
     }
 }

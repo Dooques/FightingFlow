@@ -155,18 +155,18 @@ fun ComboScreen(
                      },
                      actions = {
                          // Share Combo
-                         ActionIcon(
-                             onclick = {
-                                 Log.d(TAG,"Sharing Combo")
-                                 Toast.makeText(
-                                     context,
-                                     "Combo ${combo.comboId} was shared.",
-                                     Toast.LENGTH_SHORT).show()
-                                       },
-                             tint = Color.Blue,
-                             icon = Icons.Default.Share,
-                             modifier = modifier.fillMaxHeight()
-                         )
+//                         ActionIcon(
+//                             onclick = {
+//                                 Log.d(TAG,"Sharing Combo")
+//                                 Toast.makeText(
+//                                     context,
+//                                     "Combo ${combo.comboId} was shared.",
+//                                     Toast.LENGTH_SHORT).show()
+//                                       },
+//                             tint = Color.Blue,
+//                             icon = Icons.Default.Share,
+//                             modifier = modifier.fillMaxHeight()
+//                         )
                          // Edit Combo
 //                         ActionIcon(
 //                             onclick = {
