@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -26,7 +27,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.fightingflow.util.PROFILE_SCREEN_TAG
-import com.example.fightingflow.util.PROFILE_VM_TAG
 import com.example.fightingflow.util.ProfileCreationUiState
 import kotlinx.coroutines.launch
 
@@ -34,6 +34,7 @@ import kotlinx.coroutines.launch
 fun ProfileCreationUi(
     modifier: Modifier = Modifier,
     profileViewModel: ProfileViewModel,
+    snackBarHostState: SnackbarHostState,
     updateCurrentUser: (ProfileCreationUiState) -> Unit,
     navigateBack: () -> Unit,
     profile: ProfileCreationUiState
@@ -57,13 +58,20 @@ fun ProfileCreationUi(
                 scope.launch {
                     Log.d(PROFILE_SCREEN_TAG, "")
                     Log.d(PROFILE_SCREEN_TAG, "Preparing to save ${profile.profileCreation.username}'s profile to datastore...")
-                    profileViewModel.updateCurrentUserInDs()
-                    Log.d(PROFILE_SCREEN_TAG, "Profile saved.")
-                    Log.d(PROFILE_SCREEN_TAG, "Logging in profile...")
-                    profileViewModel.loginProfile()
-                    Log.d(PROFILE_SCREEN_TAG, "Profile logged in.")
-                    Log.d(PROFILE_SCREEN_TAG, "Returning to title screen...")
-                    navigateBack()
+                    val saveProfileSuccess = profileViewModel.updateCurrentUserInDs()
+                    Log.d(PROFILE_SCREEN_TAG, "Profile saved to Ds.")
+                    if (saveProfileSuccess == "Success") {
+                        Log.d(PROFILE_SCREEN_TAG, "Saving Profile to database...")
+                        profileViewModel.saveProfileToDb()
+                        Log.d(PROFILE_SCREEN_TAG, "Profile saved to Db.")
+                        Log.d(PROFILE_SCREEN_TAG, "Logging in profile...")
+                        profileViewModel.loginProfile()
+                        Log.d(PROFILE_SCREEN_TAG, "Profile logged in.")
+                        Log.d(PROFILE_SCREEN_TAG, "Returning to title screen...")
+                        navigateBack()
+                    } else {
+                        snackBarHostState.showSnackbar("Passwords do not match, please try again")
+                    }
                 }
             }
         )
@@ -84,14 +92,17 @@ fun ProfileCreationForm(
         TextInputField("username",
             { username -> updateCurrentProfile(ProfileCreationUiState(profile.profileCreation.copy(username = username))) }
         )
+
         Log.d(PROFILE_SCREEN_TAG, "Loading password field...")
         TextInputField("password",
             { password -> updateCurrentProfile(ProfileCreationUiState(profile.profileCreation.copy(password = password))) }
         )
+
         Log.d(PROFILE_SCREEN_TAG, "Loading confirm password field...")
         TextInputField("Confirm\nPassword",
             { confirmPassword -> updateCurrentProfile(ProfileCreationUiState(profile.profileCreation.copy(confirmPassword = confirmPassword))) }
         )
+
         Spacer(modifier.size(height = 40.dp, width = 0.dp))
         Log.d(PROFILE_SCREEN_TAG, "Loading confirm button...")
         OutlinedButton(

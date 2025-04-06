@@ -6,10 +6,14 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
@@ -23,13 +27,13 @@ import com.example.fightingflow.ui.comboAddScreen.AddComboScreen
 import com.example.fightingflow.ui.comboAddScreen.AddComboViewModel
 import com.example.fightingflow.ui.comboScreen.ComboScreen
 import com.example.fightingflow.ui.comboScreen.ComboViewModel
-import com.example.fightingflow.ui.comboScreen.TAG
 import com.example.fightingflow.ui.profileScreen.ProfileScreen
 import com.example.fightingflow.ui.profileScreen.ProfileViewModel
+import com.example.fightingflow.util.NAV_TAG
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
-const val TAG = "Navigation Map"
 
 enum class FlowScreen(@StringRes val title: Int) {
     Start(title = R.string.app_name),
@@ -46,12 +50,12 @@ fun NavGraph(
     navController: NavHostController = rememberNavController(),
     deviceType: WindowSizeClass
 ) {
-    Log.d(TAG, "")
-    Log.d(TAG, "Initializing NavController")
+    Log.d(NAV_TAG, "")
+    Log.d(NAV_TAG, "Initializing NavController")
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = FlowScreen.valueOf(backStackEntry?.destination?.route ?: FlowScreen.Start.name)
 
-    Log.d(TAG, "Initializing ViewModels")
+    Log.d(NAV_TAG, "Initializing ViewModels")
     val comboViewModel = koinInject<ComboViewModel>()
     val addComboViewModel = koinInject<AddComboViewModel>()
     val profileViewModel = koinInject<ProfileViewModel>()
@@ -67,15 +71,20 @@ fun NavGraph(
 
     // UserViewModel collection
     val isUserLoggedIn by profileViewModel.loggedInState.collectAsState()
-    val profile by profileViewModel.profileState.collectAsState()
+    val profile by profileViewModel.currentProfile.collectAsState()
 
-    Log.d(TAG, "Flows collected" +
+    val scope = rememberCoroutineScope()
+    val snackBarHostState = remember { SnackbarHostState() }
+
+    Log.d(NAV_TAG, "Flows collected" +
             "\nCharacter: ${characterState.character}" +
             "\n\nCombo Entry List: ${comboEntryListState.comboEntryList}" +
             "\n\nCombo Display: ${comboStateAddCombo.comboDisplay}"
     )
 
-    Scaffold { innerPadding ->
+    Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
+    ) { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = FlowScreen.Start.name,
@@ -86,9 +95,14 @@ fun NavGraph(
             // Title Screen
             composable(route = FlowScreen.Start.name) {
                 TitleScreen(
-                    onLogin = { navController.navigate(FlowScreen.PickChar.name) },
+                    deviceType = deviceType,
+                    isLoggedIn = isUserLoggedIn,
+                    username = profile.profile.username,
+                    onCharSelect = {
+                        scope.launch { snackBarHostState.showSnackbar("Moving to character select Screen") }
+                        navController.navigate(FlowScreen.PickChar.name)
+                                   },
                     onSignUp = { navController.navigate(FlowScreen.Signup.name) },
-                    deviceType = deviceType
                 )
             }
 
@@ -96,6 +110,7 @@ fun NavGraph(
             composable(route = FlowScreen.Signup.name) {
                 ProfileScreen(
                     profileViewModel = profileViewModel,
+                    snackbarHostState = snackBarHostState,
                     navigateBack = navController::navigateUp,
                     updateCurrentUser = profileViewModel::updateProfileCreation,
                 )
@@ -108,6 +123,7 @@ fun NavGraph(
                     updateCharacterState = comboViewModel::updateCharacterState,
                     setCharacterToDS = comboViewModel::setCharacterToDS,
                     onClick = { navController.navigate(FlowScreen.Combos.name) },
+                    navigateBack = { navController.navigate(FlowScreen.Start.name)}
                 )
             }
 
@@ -119,26 +135,28 @@ fun NavGraph(
                     updateCharacterState = comboViewModel::updateCharacterState,
                     getMoveEntryData = comboViewModel::getMoveEntryData,
                     onAddCombo = {
-                        Log.d(TAG, "")
-                        Log.d(TAG, "Preparing to create new combo...")
+                        Log.d(NAV_TAG, "")
+                        Log.d(NAV_TAG, "Preparing to create new combo...")
                         addComboViewModel.characterState.update { characterState }
-                        Log.d(TAG, "$characterState's data added to AddComboViewModel")
+                        Log.d(NAV_TAG, "$characterState's data added to AddComboViewModel")
+                        Log.d(NAV_TAG, "Setting edit state to false...")
                         addComboViewModel.editingState.value = false
+                        Log.d(NAV_TAG, "Moving to AddComboScreen")
                         navController.navigate(FlowScreen.AddCombo.name)
                     },
 //                    onEditCombo = {
-//                        Log.d(TAG, "")
-//                        Log.d(TAG, "Preparing to edit selected combo")
-//                        Log.d(TAG, "Saving selected combo to AddComboViewModel...")
+//                        Log.d(NAV_TAG, "")
+//                        Log.d(NAV_TAG, "Preparing to edit selected combo")
+//                        Log.d(NAV_TAG, "Saving selected combo to AddComboViewModel...")
 //                        addComboViewModel.comboState.update { it }
-//                        Log.d(TAG, "AddComboViewModel Combo state: ${comboStateAddCombo.comboDisplay}")
+//                        Log.d(NAV_TAG, "AddComboViewModel Combo state: ${comboStateAddCombo.comboDisplay}")
 //
-//                        Log.d(TAG, "Updating character state of AddComboViewModel")
+//                        Log.d(NAV_TAG, "Updating character state of AddComboViewModel")
 //                        addComboViewModel.characterState.update { characterState }
 //
-//                        Log.d(TAG, "Updating Combo List of AddComboViewModel")
+//                        Log.d(NAV_TAG, "Updating Combo List of AddComboViewModel")
 //                        addComboViewModel.comboEntryListState.update { comboEntryListState }
-//                        Log.d(TAG, "Updated Combo List: ${comboEntryListStateAddCombo.comboEntryList}")
+//                        Log.d(NAV_TAG, "Updated Combo List: ${comboEntryListStateAddCombo.comboEntryList}")
 //                        addComboViewModel.editingState.value = true
 //                        navController.navigate(FlowScreen.AddCombo.name)
 //                    },

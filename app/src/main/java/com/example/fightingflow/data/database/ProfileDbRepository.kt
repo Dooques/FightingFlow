@@ -6,7 +6,9 @@ import kotlinx.coroutines.flow.Flow
 
 interface ProfileDbRepository {
 
-    fun getAllProfiles(): Flow<ProfileEntry>
+    fun getProfile(username: String): Flow<ProfileEntry>
+
+    fun getAllProfiles(): Flow<List<ProfileEntry>>
 
     suspend fun insert(profile: ProfileEntry)
 
@@ -16,8 +18,12 @@ interface ProfileDbRepository {
 }
 
 class ProfileDatabaseRepository(private val profileDao: ProfileDao): ProfileDbRepository {
-    override fun getAllProfiles(): Flow<ProfileEntry> =
-        profileDao.getProfile()
+    override fun getProfile(username: String): Flow<ProfileEntry> =
+        profileDao.getProfile(username)
+
+    override fun getAllProfiles(): Flow<List<ProfileEntry>> =
+        profileDao.getAllProfiles()
+
 
     override suspend fun insert(profile: ProfileEntry) =
         profileDao.insert(profile)

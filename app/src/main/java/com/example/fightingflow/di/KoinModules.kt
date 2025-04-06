@@ -67,7 +67,7 @@ val repositoryModule = module {
 }
 
 val viewModelModule = module {
-    viewModel { ProfileViewModel(get(), get()) }
+    viewModel { ProfileViewModel(get(), get(), get()) }
     viewModel { InitViewModel(get()) }
     viewModel { ComboViewModel(get(), get()) }
     viewModel { AddComboViewModel(get(), get()) }

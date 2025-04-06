@@ -1,5 +1,7 @@
 package com.example.fightingflow.util
 
+const val NAV_TAG = "NavMap"
+
 const val TITLE_TAG = "TitleScreen"
 
 const val PROFILE_SCREEN_TAG = "ProfileScreen"

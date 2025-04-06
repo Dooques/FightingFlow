@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
@@ -225,17 +226,15 @@ fun Header(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .fillMaxWidth()
-
     ) {
         Log.d(TAG, "")
         Log.d(TAG, "Loading Home Button")
         Icon(
-            imageVector = Icons.Default.ArrowBack,
+            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
             contentDescription = "Return to Character Select",
             modifier
                 .size(65.dp)
                 .clickable(onClick = navigateBack)
-
         )
         Log.d(TAG, "Loading Character Name: ${characterName}...")
         Text(

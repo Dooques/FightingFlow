@@ -5,15 +5,24 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,10 +33,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.fightingflow.R
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.ui.comboScreen.ComboViewModel
+import com.example.fightingflow.ui.comboScreen.TAG
 import com.example.fightingflow.util.CharacterUiState
+import com.example.fightingflow.util.PROFILE_SCREEN_TAG
 
 const val TAG = "CharacterScreen"
 
@@ -37,6 +51,7 @@ fun CharacterScreen(
     updateCharacterState: (String) -> Unit,
     setCharacterToDS: (CharacterEntry) -> Unit,
     onClick: () -> Unit,
+    navigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Log.d(TAG, "")
@@ -46,25 +61,31 @@ fun CharacterScreen(
     Log.d(TAG, "Flows Collected")
     Log.d(TAG, "Character List: ${characterListState.characterList}")
 
-    LazyVerticalGrid(
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(32.dp),
-        columns = GridCells.Fixed(3),
-        modifier = modifier
-            .background(Color.Black)
-            .padding(16.dp)
-    ) {
-        Log.d(TAG, "Loading Character Grid...")
-        items(items = characterListState.characterList.sortedBy { it.name }) { character ->
-            CharacterCard(
-                updateCharacterState = updateCharacterState,
-                setCharacterToDS = setCharacterToDS,
-                onClick = onClick,
-                characterState = CharacterUiState(character),
-                modifier = modifier
-            )
+    Column {
+        Header(
+            navigateBack = navigateBack,
+        )
+        Spacer(modifier.size(16.dp))
+        LazyVerticalGrid(
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(32.dp),
+            columns = GridCells.Fixed(3),
+            modifier = modifier
+                .background(Color.Black)
+                .padding(16.dp)
+        ) {
+            Log.d(TAG, "Loading Character Grid...")
+            items(items = characterListState.characterList.sortedBy { it.name }) { character ->
+                CharacterCard(
+                    updateCharacterState = updateCharacterState,
+                    setCharacterToDS = setCharacterToDS,
+                    onClick = onClick,
+                    characterState = CharacterUiState(character),
+                    modifier = modifier
+                )
+            }
+            Log.d(TAG, "Character Grid Finished.")
         }
-        Log.d(TAG, "Character Grid Finished.")
     }
 }
 
@@ -122,6 +143,39 @@ fun CharacterCard(
                     "Clive" -> Color.White
                     else -> Color.Black
                 }
+            )
+        }
+    }
+}
+
+@Composable
+fun Header(
+    navigateBack: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Box(modifier.fillMaxWidth()) {
+        Log.d(TAG, "Loading Home Button")
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+            contentDescription = "Return to Character Select",
+            modifier
+                .size(60.dp)
+                .clickable(onClick = navigateBack)
+                .align(Alignment.CenterStart)
+                .padding(start= 16.dp)
+        )
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.Bottom,
+            modifier = modifier.fillMaxWidth()
+        ) {
+            Log.d(TAG, "")
+            Log.d(PROFILE_SCREEN_TAG, "")
+            Text(
+                text = "Character Select",
+                fontSize = 45.sp,
+                style = MaterialTheme.typography.displayMedium,
+                modifier = modifier
             )
         }
     }
