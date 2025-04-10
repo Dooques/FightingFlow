@@ -10,10 +10,8 @@ import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.fightingflow.data.datastore.ProfileDsRepository.Companion.IS_USER_LOGGED_IN
-import com.example.fightingflow.data.datastore.ProfileDsRepository.Companion.PASSWORD
-import com.example.fightingflow.data.datastore.ProfileDsRepository.Companion.PROFILE_PIC
-import com.example.fightingflow.data.datastore.ProfileDsRepository.Companion.TAG
 import com.example.fightingflow.data.datastore.ProfileDsRepository.Companion.USERNAME
+import com.example.fightingflow.util.PROFILE_DS_REPO
 import com.example.fightingflow.util.ProfileUiState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -22,72 +20,61 @@ import java.io.IOException
 
 interface ProfileDsRepository {
 
-    fun isProfileLoggedIn(): Flow<Boolean>
+    fun profileLoggedInState(): Flow<Boolean>
     fun getUsername(): Flow<String>
-    fun getPassword(): Flow<String>
-    fun getProfilePic(): Flow<String>
 
     suspend fun updateLoggedInState(isUserLoggedIn: Boolean)
-    suspend fun setProfileDetails(profileUiState: ProfileUiState)
+    suspend fun setUsername(username: String)
 
     companion object {
-        const val TAG = "FlowPreferencesRepo"
         val IS_USER_LOGGED_IN = booleanPreferencesKey("is_user_logged_in")
         val USERNAME = stringPreferencesKey("username")
-        val PASSWORD = stringPreferencesKey("password")
-        val PROFILE_PIC = stringPreferencesKey("profile_pic")
     }
-
 }
 
 class ProfileDatastoreRepository(private val dataStore: DataStore<Preferences>): ProfileDsRepository {
-
     val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
-    override fun isProfileLoggedIn(): Flow<Boolean> = dataStore.data
+    override fun profileLoggedInState(): Flow<Boolean> = dataStore.data
         .catch {
             if (it is IOException) {
-                Log.e(TAG, "Error reading preferences", it)
+                Log.e(PROFILE_DS_REPO, "Error reading preferences", it)
                 emit(emptyPreferences())
             } else {
                 throw it
             }
         }
         .map { preferences ->
-            preferences[IS_USER_LOGGED_IN] != false
+            preferences[IS_USER_LOGGED_IN] == true
         }
 
-    override fun getUsername(): Flow<String> = dataStore.data.map { preference ->
-        preference[USERNAME] ?: "Invalid User"
+    override fun getUsername(): Flow<String> = dataStore.data
+        .catch {
+            if (it is IOException) {
+                Log.e(PROFILE_DS_REPO, "Error reading preferences", it)
+            } else {
+                throw it
+            }
+        }
+        .map { preference ->
+            Log.d(PROFILE_DS_REPO, "")
+            Log.d(PROFILE_DS_REPO, "Returning username from datastore...")
+            Log.d(PROFILE_DS_REPO, "Username: ${preference[USERNAME]}")
+            preference[USERNAME] ?: "Invalid User"
     }
 
-    override fun getPassword(): Flow<String> = dataStore.data.map { preference ->
-        preference[PASSWORD] ?: "Invalid Password"
-    }
-
-    override fun getProfilePic(): Flow<String> = dataStore.data.map { preference ->
-        preference[PROFILE_PIC] ?: "Invalid Profile Pic"
-    }
-
-    override suspend fun setProfileDetails(profileUiState: ProfileUiState) {
-        Log.d(TAG, "")
-        Log.d(TAG, "Preparing to save data to the datastore...")
-        Log.d(TAG, "Saving username: ${profileUiState.profile.username}")
+    override suspend fun setUsername(username: String) {
+        Log.d(PROFILE_DS_REPO, "")
+        Log.d(PROFILE_DS_REPO, "Saving username: $username")
         dataStore.edit { preference ->
-            preference[USERNAME] = profileUiState.profile.username
+            preference[USERNAME] = username
         }
-        Log.d(TAG, "Saving password: ${profileUiState.profile.password}")
-        dataStore.edit { preference ->
-            preference[PASSWORD] = profileUiState.profile.password
-        }
-        Log.d(TAG, "Saving profile image: ${profileUiState.profile.profilePic}")
-        dataStore.edit { preference ->
-            preference[PROFILE_PIC] = profileUiState.profile.profilePic
-        }
-        Log.d(TAG, "Profile stored in datastore.")
+        Log.d(PROFILE_DS_REPO, "Username stored in datastore.")
     }
 
     override suspend fun updateLoggedInState (isUserLoggedIn: Boolean) {
+        Log.d(PROFILE_DS_REPO, "")
+        Log.d(PROFILE_DS_REPO, "Updating logged in state from datastore...")
         dataStore.edit { preferences ->
             preferences[IS_USER_LOGGED_IN] = isUserLoggedIn
         }

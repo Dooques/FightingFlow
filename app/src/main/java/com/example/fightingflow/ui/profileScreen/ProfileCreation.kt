@@ -15,6 +15,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.fightingflow.util.PROFILE_SCREEN_TAG
@@ -37,11 +39,12 @@ fun ProfileCreationUi(
     snackBarHostState: SnackbarHostState,
     updateCurrentUser: (ProfileCreationUiState) -> Unit,
     navigateBack: () -> Unit,
-    profile: ProfileCreationUiState
 ) {
     Log.d(PROFILE_SCREEN_TAG, "")
     Log.d(PROFILE_SCREEN_TAG, "Loading ProfileCreationUi...")
+    val profileCreation by profileViewModel.profileState.collectAsState()
     val scope = rememberCoroutineScope()
+
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Log.d(PROFILE_SCREEN_TAG, "Loading Title...")
         Text(
@@ -49,17 +52,19 @@ fun ProfileCreationUi(
             color = Color.White,
             fontSize = 32.sp,
             modifier = modifier.padding(vertical = 16.dp)
+                .padding(top = 32.dp)
         )
         Log.d(PROFILE_SCREEN_TAG, "Loading ProfileCreationForm...")
         ProfileCreationForm(
             updateCurrentProfile = updateCurrentUser,
-            profile = profile,
+            profile = profileCreation,
             onConfirm = {
                 scope.launch {
                     Log.d(PROFILE_SCREEN_TAG, "")
-                    Log.d(PROFILE_SCREEN_TAG, "Preparing to save ${profile.profileCreation.username}'s profile to datastore...")
-                    val saveProfileSuccess = profileViewModel.updateCurrentUserInDs()
+                    Log.d(PROFILE_SCREEN_TAG, "Preparing to save ${profileCreation.profileCreation.username}'s profile to datastore...")
+                    val saveProfileSuccess = profileViewModel.saveProfileData()
                     Log.d(PROFILE_SCREEN_TAG, "Profile saved to Ds.")
+
                     if (saveProfileSuccess == "Success") {
                         Log.d(PROFILE_SCREEN_TAG, "Saving Profile to database...")
                         profileViewModel.saveProfileToDb()
@@ -86,16 +91,26 @@ fun ProfileCreationForm(
     modifier: Modifier = Modifier
 ) {
     Log.d(PROFILE_SCREEN_TAG, "")
+    Log.d(PROFILE_SCREEN_TAG, "Loading profile creation form...")
+
+    val password by remember { mutableStateOf("") }
+    val confirmPassword by remember { mutableStateOf("") }
+
+    val passwordHidden by remember { mutableStateOf(password.map {"*"}) }
+    val passwordConfirmHidden by remember { mutableStateOf(passwordHidden.map {"*"}) }
+
     Column(modifier.fillMaxHeight(), verticalArrangement = Arrangement.SpaceBetween) {
         Spacer(modifier.size(height = 40.dp, width = 0.dp))
         Log.d(PROFILE_SCREEN_TAG, "Loading username field...")
         TextInputField("username",
-            { username -> updateCurrentProfile(ProfileCreationUiState(profile.profileCreation.copy(username = username))) }
+            { username ->
+                updateCurrentProfile(ProfileCreationUiState(profile.profileCreation.copy(username = username))) }
         )
 
         Log.d(PROFILE_SCREEN_TAG, "Loading password field...")
         TextInputField("password",
-            { password -> updateCurrentProfile(ProfileCreationUiState(profile.profileCreation.copy(password = password))) }
+            { password ->
+                updateCurrentProfile(ProfileCreationUiState(profile.profileCreation.copy(password = password))) }
         )
 
         Log.d(PROFILE_SCREEN_TAG, "Loading confirm password field...")
@@ -124,6 +139,7 @@ fun TextInputField(
 ) {
     val typeCap = type.replaceFirstChar { it.uppercaseChar() }
     var inputText by remember { mutableStateOf("") }
+    val isItPassword = (type == "password" || type == "Confirm\nPassword")
 
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -136,14 +152,27 @@ fun TextInputField(
             text = typeCap,
             color = Color.White
         )
-        OutlinedTextField(
-            value = inputText,
-            onValueChange = {
-                inputText = it
-                onValueChange(inputText)
-            },
-            maxLines = 1,
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
-        )
+        if (isItPassword) {
+            OutlinedTextField(
+                value = inputText,
+                onValueChange = {
+                    inputText = it
+                    onValueChange(inputText)
+                },
+                visualTransformation = PasswordVisualTransformation(),
+                maxLines = 1,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+            )
+        } else {
+            OutlinedTextField(
+                value = inputText,
+                onValueChange = {
+                    inputText = it
+                    onValueChange(inputText)
+                },
+                maxLines = 1,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+            )
+        }
     }
 }

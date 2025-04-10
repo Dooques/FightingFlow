@@ -25,7 +25,7 @@ data class CharNameUiState(val name: String = "")
 
 data class CharImageUiState(val image: Int = 0)
 
-data class ProfileUiState(val profile: ProfileEntry = emptyProfile )
+data class ProfileUiState(val profile: ProfileEntry = emptyProfile)
 
 data class ProfileListUiState(val profileList: List<ProfileEntry> = listOf())
 

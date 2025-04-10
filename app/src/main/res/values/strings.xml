@@ -14,7 +14,7 @@
     <string name="char_select">Char Select</string>
     <string name="back_button">Back Button</string>
     <string name="moves">Moves</string>
-    <string name="sign_up">Sign Up</string>
+    <string name="profile_select">Profile Select</string>
 
     <!-- Character Names -->
     <string name="kazuya">Kazuya</string>
@@ -295,4 +295,6 @@
     <string name="add_combo">Add Combo</string>
     <string name="profiles">Profiles</string>
     <string name="logout">Logout</string>
+    <string name="create_profile">Create Profile</string>
+    <string name="profile_details">Profile Details</string>
 </resources>

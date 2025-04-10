@@ -5,12 +5,13 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -19,33 +20,38 @@ import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSiz
 import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.fightingflow.R
+import com.example.fightingflow.model.ProfileEntry
+import com.example.fightingflow.ui.profileScreen.ProfileViewModel
+import com.example.fightingflow.util.ProfileUiState
 import com.example.fightingflow.util.TITLE_TAG
-import java.util.Locale
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 fun TitleScreen(
+    profileViewModel: ProfileViewModel,
     deviceType: WindowSizeClass,
     isLoggedIn: Boolean,
     username: String,
     onCharSelect: () -> Unit,
-    onSignUp: () -> Unit,
+    onProfileSelect: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Log.d(TITLE_TAG, "")
     Log.d(TITLE_TAG, "Loading title screen...")
-    val uiScale =
-        if (deviceType.heightSizeClass == WindowHeightSizeClass.Compact) 2 else 1
+
+    val uiScale = if (deviceType.heightSizeClass == WindowHeightSizeClass.Compact) 2 else 1
+
 
     Column(
         verticalArrangement = Arrangement.Center,
@@ -59,33 +65,31 @@ fun TitleScreen(
             painter = painterResource(R.drawable.fighting_flow_title_logo),
             contentDescription = "Fighting Flow Logo",
             modifier = Modifier
-                .size(if (uiScale == 2) 100.dp else 400.dp)
-                .padding(end = 20.dp)
+                .size(if (uiScale == 2) 150.dp else 400.dp)
+                .padding(end = if (uiScale != 2) 10.dp else 0.dp)
         )
+
         Log.d(TITLE_TAG, "Checking if user is logged in...")
         if (isLoggedIn) {
             Log.d(TITLE_TAG, "User is logged in.")
             Log.d(TITLE_TAG, "Loading greeting...")
             Text(
                 text = "Welcome ${username.replaceFirstChar { it.uppercase() }}",
-                style = MaterialTheme.typography.displayLarge,
-                color = Color.White
+                style = MaterialTheme.typography.bodyLarge,
+                fontSize = if (uiScale == 2) 25.sp else 30.sp,
+                color = Color.White,
+                modifier = modifier.padding(bottom = if (uiScale != 2) 20.dp else 0.dp)
             )
         }
-        Spacer(modifier.size(height = 80.dp, width = 0.dp))
-        Column {
+        LazyColumn {
             Log.d(TITLE_TAG, "Loading buttons...")
-            AccessButton(
-                buttonText = stringResource(R.string.char_select),
-                onClick = onCharSelect,
-                modifier = modifier
-            )
-            Spacer(modifier = modifier.size(16.dp))
-            AccessButton(
-                buttonText = stringResource(R.string.profiles),
-                onClick = onSignUp,
-                modifier = modifier
-            )
+            items (items = listOf(R.string.char_select, R.string.profiles)) {
+                AccessButton(
+                    buttonText = stringResource(it),
+                    onClick = if (it == R.string.char_select) onCharSelect else onProfileSelect,
+                    modifier = modifier.padding(8.dp)
+                )
+            }
         }
     }
 }
