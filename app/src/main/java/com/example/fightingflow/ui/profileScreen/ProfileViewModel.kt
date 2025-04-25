@@ -73,7 +73,7 @@ class ProfileViewModel(
             )
 
     suspend fun updateUsernameInDs(username: String) {
-        profileDsRepository.setUsername(username)
+        profileDsRepository.updateUsername(username)
     }
 
     suspend fun loginProfile() {
@@ -96,7 +96,7 @@ class ProfileViewModel(
             )
 
     val currentProfile = profileDbRepository.getProfile(username.value)
-        .mapNotNull { ProfileUiState(it?: emptyProfile) }
+        .mapNotNull { ProfileUiState(it ?: emptyProfile) }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(TIME_MILLIS),

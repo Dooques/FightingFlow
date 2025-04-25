@@ -12,7 +12,6 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.example.fightingflow.data.datastore.ProfileDsRepository.Companion.IS_USER_LOGGED_IN
 import com.example.fightingflow.data.datastore.ProfileDsRepository.Companion.USERNAME
 import com.example.fightingflow.util.PROFILE_DS_REPO
-import com.example.fightingflow.util.ProfileUiState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -24,7 +23,7 @@ interface ProfileDsRepository {
     fun getUsername(): Flow<String>
 
     suspend fun updateLoggedInState(isUserLoggedIn: Boolean)
-    suspend fun setUsername(username: String)
+    suspend fun updateUsername(username: String)
 
     companion object {
         val IS_USER_LOGGED_IN = booleanPreferencesKey("is_user_logged_in")
@@ -63,7 +62,7 @@ class ProfileDatastoreRepository(private val dataStore: DataStore<Preferences>):
             preference[USERNAME] ?: "Invalid User"
     }
 
-    override suspend fun setUsername(username: String) {
+    override suspend fun updateUsername(username: String) {
         Log.d(PROFILE_DS_REPO, "")
         Log.d(PROFILE_DS_REPO, "Saving username: $username")
         dataStore.edit { preference ->

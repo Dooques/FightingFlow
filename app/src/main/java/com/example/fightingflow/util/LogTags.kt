@@ -17,3 +17,13 @@ const val COMBO_VM_TAG = "AddComboViewModel"
 const val ADD_COMBO_TAG = "AddComboScreen"
 
 const val ADD_COMBO_VM_TAG = "AddComboViewModel"
+
+const val PROFILE_DS_REPO = "ProfileDsRepository"
+
+const val COMBO_DS_REPO = "ComboDsRepository"
+
+const val CHARACTER_DS_REPO = "CharacterDsRepository"
+
+const val PROFILE_DB_REPO = "ProfileDbRepository"
+
+const val TEKKEN_DB_REPO = "TekkenDbRepository"

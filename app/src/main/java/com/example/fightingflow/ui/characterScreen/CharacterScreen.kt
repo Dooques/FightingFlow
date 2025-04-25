@@ -39,7 +39,6 @@ import androidx.compose.ui.unit.sp
 import com.example.fightingflow.R
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.ui.comboScreen.ComboViewModel
-import com.example.fightingflow.ui.comboScreen.TAG
 import com.example.fightingflow.util.CharacterUiState
 import com.example.fightingflow.util.PROFILE_SCREEN_TAG
 

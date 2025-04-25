@@ -19,8 +19,8 @@ import com.example.fightingflow.data.datastore.ComboDatastoreRepository
 import com.example.fightingflow.data.datastore.ComboDsRepository
 import com.example.fightingflow.data.datastore.ProfileDatastoreRepository
 import com.example.fightingflow.data.datastore.ProfileDsRepository
-import com.example.fightingflow.data.datastore.SelectedCharacterDatastoreRepository
-import com.example.fightingflow.data.datastore.SelectedCharacterDsRepository
+import com.example.fightingflow.data.datastore.CharacterDatastoreRepository
+import com.example.fightingflow.data.datastore.CharacterDsRepository
 import com.example.fightingflow.ui.comboAddScreen.AddComboViewModel
 import com.example.fightingflow.ui.comboScreen.ComboViewModel
 import com.example.fightingflow.ui.profileScreen.ProfileViewModel
@@ -62,13 +62,13 @@ val repositoryModule = module {
 
     // DataStore
     single<ProfileDsRepository> { ProfileDatastoreRepository(androidContext().dataStore) }
-    single<SelectedCharacterDsRepository> { SelectedCharacterDatastoreRepository(androidContext().dataStore) }
+    single<CharacterDsRepository> { CharacterDatastoreRepository(androidContext().dataStore) }
     single<ComboDsRepository> { ComboDatastoreRepository(androidContext().dataStore) }
 }
 
 val viewModelModule = module {
     viewModel { ProfileViewModel(get(), get(), get()) }
     viewModel { InitViewModel(get()) }
-    viewModel { ComboViewModel(get(), get()) }
-    viewModel { AddComboViewModel(get(), get()) }
+    viewModel { ComboViewModel(get(), get(), get()) }
+    viewModel { AddComboViewModel(get(), get(), get()) }
 }

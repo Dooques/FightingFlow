@@ -19,8 +19,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.fightingflow.R
-import com.example.fightingflow.ui.comboScreen.TAG
 import com.example.fightingflow.util.ComboDisplayListUiState
+import com.example.fightingflow.util.PROFILE_SCREEN_TAG
 import com.example.fightingflow.util.ProfileUiState
 
 @Composable
@@ -50,8 +50,8 @@ fun Header(
             .fillMaxWidth()
 
     ) {
-        Log.d(TAG, "")
-        Log.d(TAG, "Loading Home Button")
+        Log.d(PROFILE_SCREEN_TAG, "")
+        Log.d(PROFILE_SCREEN_TAG, "Loading Home Button")
         Icon(
             imageVector = Icons.Default.Home,
             contentDescription = "Return to Character Select",
@@ -60,20 +60,20 @@ fun Header(
                 .clickable(onClick = navigateBack)
 
         )
-        Log.d(TAG, "Loading Character Name: ${existingProfile.profile.username}...")
+        Log.d(PROFILE_SCREEN_TAG, "Loading Character Name: ${existingProfile.profile.username}...")
         Text(
             text = existingProfile.profile.username,
             fontSize = if (existingProfile.profile.username.length > 9) 50.sp else 70.sp,
             style = MaterialTheme.typography.displayMedium,
             modifier = modifier
         )
-        Log.d(TAG, "Loading Character Image ${existingProfile.profile.profilePic}...")
+        Log.d(PROFILE_SCREEN_TAG, "Loading Character Image ${existingProfile.profile.profilePic}...")
         Image(
             painter = painterResource(R.drawable.t8_logo),
             contentDescription = "profile pic",
             modifier = Modifier
                 .size(60.dp)
         )
-        Log.d(TAG, "Loading Icon image")
+        Log.d(PROFILE_SCREEN_TAG, "Loading Icon image")
     }
 }

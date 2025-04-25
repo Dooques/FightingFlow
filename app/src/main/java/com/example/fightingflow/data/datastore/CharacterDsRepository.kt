@@ -7,15 +7,15 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.example.fightingflow.data.datastore.SelectedCharacterDsRepository.Companion.characterName
-import com.example.fightingflow.data.datastore.SelectedCharacterDsRepository.Companion.imageId
+import com.example.fightingflow.data.datastore.CharacterDsRepository.Companion.characterName
+import com.example.fightingflow.data.datastore.CharacterDsRepository.Companion.imageId
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.util.emptyCharacter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-interface SelectedCharacterDsRepository {
-    suspend fun getCharacter(character: CharacterEntry)
+interface CharacterDsRepository {
+    suspend fun updateCharacter(character: CharacterEntry)
 
     fun getName(): Flow<String>
     fun getImage(): Flow<Int>
@@ -27,10 +27,10 @@ interface SelectedCharacterDsRepository {
     }
 }
 
-class SelectedCharacterDatastoreRepository(private val dataStore: DataStore<Preferences>): SelectedCharacterDsRepository {
+class CharacterDatastoreRepository(private val dataStore: DataStore<Preferences>): CharacterDsRepository {
     val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "character_data")
 
-    override suspend fun getCharacter(character: CharacterEntry) {
+    override suspend fun updateCharacter(character: CharacterEntry) {
         dataStore.edit { preference ->
             preference[characterName] = character.name
             preference[imageId] = character.imageId

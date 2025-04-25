@@ -25,6 +25,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Share
@@ -53,10 +54,10 @@ import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.MoveEntry
 import com.example.fightingflow.util.ActionIcon
+import com.example.fightingflow.util.COMBO_TAG
+import com.example.fightingflow.util.ComboDisplayUiState
 import com.example.fightingflow.util.SwipeableItem
 import kotlinx.coroutines.launch
-
-const val TAG = "ComboScreen"
 
 @Composable
 fun ComboScreen(
@@ -65,19 +66,18 @@ fun ComboScreen(
     updateCharacterState: (String) -> Unit,
     getMoveEntryData: (List<MoveEntry>, ComboDisplay) -> ComboDisplay,
     onAddCombo: () -> Unit,
-//    onEditCombo: (ComboDisplayUiState) -> Unit,
+    onEditCombo: () -> Unit,
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Log.d(TAG, "")
-    Log.d(TAG, "\nOpening Combo Screen...")
+    Log.d(COMBO_TAG, "")
+    Log.d(COMBO_TAG, "\nOpening Combo Screen...")
 
     val context = LocalContext.current
     (context as? Activity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
 
     // Room Flows
     val characterState by comboViewModel.characterState.collectAsState()
-    val comboState by comboViewModel.comboDisplayState.collectAsState()
     val characterListState by comboViewModel.characterEntryListState.collectAsState()
     val comboDisplayListState by comboViewModel.comboDisplayListState.collectAsState()
     val comboEntryListState by comboViewModel.comboEntryListSate.collectAsState()
@@ -86,19 +86,19 @@ fun ComboScreen(
     // Datastore Flows
     val characterNameState by comboViewModel.characterNameState.collectAsState()
     val characterImageState by comboViewModel.characterImageState.collectAsState()
-    Log.d(TAG, "Flows Collected")
+    Log.d(COMBO_TAG, "Flows Collected")
 
-    Log.d(TAG, "Character: ${characterState.character}")
-    Log.d(TAG, "Character Details: \n${characterNameState.name} \n${characterImageState.image}")
-    Log.d(TAG, "Combo Display List: ${comboDisplayListState.comboDisplayList}")
-    Log.d(TAG, "Combo Entry List: ${comboEntryListState.comboEntryList}")
+    Log.d(COMBO_TAG, "Character: ${characterState.character}")
+    Log.d(COMBO_TAG, "Character Details: \n${characterNameState.name} \n${characterImageState.image}")
+    Log.d(COMBO_TAG, "Combo Display List: ${comboDisplayListState.comboDisplayList}")
+    Log.d(COMBO_TAG, "Combo Entry List: ${comboEntryListState.comboEntryList}")
 
-    Log.d(TAG, "Updating character data")
-    Log.d(TAG, "Character List: ${characterListState.characterList}")
+    Log.d(COMBO_TAG, "Updating character data")
+    Log.d(COMBO_TAG, "Character List: ${characterListState.characterList}")
     if (characterListState.characterList.isNotEmpty() && characterNameState.name.isNotEmpty()) {
         try { updateCharacterState(characterNameState.name) }
         catch(e: NoSuchElementException) {
-            Log.d(TAG, "Character Error, no element found in character list.")
+            Log.d(COMBO_TAG, "Character Error, no element found in character list.")
         }
     }
 
@@ -112,7 +112,7 @@ fun ComboScreen(
         comboDisplayListState.comboDisplayList.map { combo ->
             getMoveEntryData(moveListState.moveList, combo)
         }
-    Log.d(TAG, "Updated Combo list: $updatedCombos")
+    Log.d(COMBO_TAG, "Updated Combo list: $updatedCombos")
 
     val combosByCharacter =
         updatedCombos
@@ -120,16 +120,16 @@ fun ComboScreen(
                 if (it.character == characterState.character.name) it else null
             }
             .toMutableList()
-    Log.d(TAG, "Combos reduced to ${characterState.character.name}'s: $combosByCharacter")
+    Log.d(COMBO_TAG, "Combos reduced to ${characterState.character.name}'s: $combosByCharacter")
 
     Column {
-        Log.d(TAG, "Character Details \n Name: ${characterNameState.name} \n Image: ${characterImageState.image}")
-        Log.d(TAG, "Checking details valid...")
+        Log.d(COMBO_TAG, "Character Details \n Name: ${characterNameState.name} \n Image: ${characterImageState.image}")
+        Log.d(COMBO_TAG, "Checking details valid...")
 
         if (characterImageState.image != 0) {
-            Log.d(TAG, "")
-            Log.d(TAG, "Loading header...")
-            Log.d(TAG, "Character details valid, loading header.")
+            Log.d(COMBO_TAG, "")
+            Log.d(COMBO_TAG, "Loading header...")
+            Log.d(COMBO_TAG, "Character details valid, loading header.")
             Header(
                 fontColor = fontColor,
                 character = characterState.character,
@@ -139,11 +139,11 @@ fun ComboScreen(
                 onAddCombo = onAddCombo
             )
         }
-        Log.d(TAG, "Header loaded.")
+        Log.d(COMBO_TAG, "Header loaded.")
 
         LazyColumn {
-            Log.d(TAG, "")
-            Log.d(TAG, "Getting display combos as lazy column with swipeable actions.")
+            Log.d(COMBO_TAG, "")
+            Log.d(COMBO_TAG, "Getting display combos as lazy column with swipeable actions.")
              itemsIndexed(items = combosByCharacter) { index, combo ->
 
                  val isOptionRevealed by remember { mutableStateOf(false) }
@@ -159,7 +159,7 @@ fun ComboScreen(
                          // Share Combo
                          ActionIcon(
                              onclick = {
-                                 Log.d(TAG,"Sharing Combo")
+                                 Log.d(COMBO_TAG,"Sharing Combo")
                                  Toast.makeText(
                                      context,
                                      "Combo ${combo.comboId} was shared.",
@@ -170,17 +170,20 @@ fun ComboScreen(
                              modifier = modifier.fillMaxHeight()
                          )
                          // Edit Combo
-//                         ActionIcon(
-//                             onclick = {
-//                                 Log.d(TAG, "Preparing to edit combo")
-//                                 Log.d(TAG, "")
-//                                 onEditCombo(ComboDisplayUiState(combo))
-//                                 Toast.makeText(context, "Combo ${combo.comboId} is being sent to the editor.", Toast.LENGTH_SHORT).show()
-//                                       },
-//                             tint = Color.Green,
-//                             icon = Icons.Default.Edit,
-//                             modifier = modifier.fillMaxHeight()
-//                         )
+                         ActionIcon(
+                             onclick = {
+                                 Log.d(COMBO_TAG, "Preparing to edit combo")
+                                 Log.d(COMBO_TAG, "")
+                                 scope.launch {
+                                     comboViewModel.saveComboIdToDs(combo)
+                                 }
+                                 onEditCombo()
+                                 Toast.makeText(context, "Combo ${combo.comboId} is being sent to the editor.", Toast.LENGTH_SHORT).show()
+                                       },
+                             tint = Color.Green,
+                             icon = Icons.Default.Edit,
+                             modifier = modifier.fillMaxHeight()
+                         )
                          // Delete Combo
                          ActionIcon(
                              onclick = {
@@ -227,8 +230,8 @@ fun Header(
         modifier = modifier
             .fillMaxWidth()
     ) {
-        Log.d(TAG, "")
-        Log.d(TAG, "Loading Home Button")
+        Log.d(COMBO_TAG, "")
+        Log.d(COMBO_TAG, "Loading Home Button")
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
             contentDescription = "Return to Character Select",
@@ -236,7 +239,7 @@ fun Header(
                 .size(65.dp)
                 .clickable(onClick = navigateBack)
         )
-        Log.d(TAG, "Loading Character Name: ${characterName}...")
+        Log.d(COMBO_TAG, "Loading Character Name: ${characterName}...")
         Text(
             text = characterName,
             color = fontColor,
@@ -244,14 +247,14 @@ fun Header(
             style = MaterialTheme.typography.displayMedium,
             modifier = modifier
         )
-        Log.d(TAG, "Loading Character Image ${characterImage}...")
+        Log.d(COMBO_TAG, "Loading Character Image ${characterImage}...")
         Image(
             painter = painterResource(characterImage),
             contentDescription = characterName,
             modifier = Modifier
                 .size(60.dp)
         )
-        Log.d(TAG, "Loading Icon image")
+        Log.d(COMBO_TAG, "Loading Icon image")
         IconButton(
             modifier = modifier
                 .size(75.dp),
@@ -277,7 +280,10 @@ fun ComboItem(
     fontColor: Color,
     modifier: Modifier = Modifier,
 ) {
+    Log.d(COMBO_TAG, "")
+    Log.d(COMBO_TAG, "Loading Combo Moves Composable...")
     Column {
+        Log.d(COMBO_TAG, "Loading flow row...")
         FlowRow(
             verticalArrangement = Arrangement.Center,
             horizontalArrangement = Arrangement.Start,
@@ -286,7 +292,9 @@ fun ComboItem(
                 .background(containerColor)
                 .padding(horizontal = 4.dp, vertical = 4.dp)
         ) {
+            Log.d(COMBO_TAG, "Loading moves from combo...")
             combo.moves.forEach { move ->
+                Log.d(COMBO_TAG, move.moveName)
                 when (move.moveType) {
                     "Break" -> MoveBreak(modifier.align(Alignment.CenterVertically))
                     "Input", "Movement" -> {
@@ -320,7 +328,7 @@ fun ComboItem(
                         )
                     }
 
-                    "Stage" -> {
+                    "SCOMBO_TAGe" -> {
                         TextMove(
                             move,
                             Color.Green,

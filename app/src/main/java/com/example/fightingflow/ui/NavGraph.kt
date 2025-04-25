@@ -68,7 +68,7 @@ fun NavGraph(
     val comboState by comboViewModel.comboDisplayState.collectAsState()
 
     // AddComboViewModel Collection
-    val comboStateAddCombo by addComboViewModel.existingComboDisplayState.collectAsState()
+    val comboStateAddCombo by addComboViewModel.comboDisplayState.collectAsState()
     val comboEntryListStateAddCombo by addComboViewModel.comboEntryListState.collectAsState()
 
     // UserViewModel collection
@@ -80,6 +80,7 @@ fun NavGraph(
     val snackBarHostState = remember { SnackbarHostState() }
 
     Log.d(NAV_TAG, "Flows collected" +
+
             "\nComboViewModel Flows" +
             "\nCharacter: ${characterState.character}" +
             "\nCombo Entry List: ${comboEntryListState.comboEntryList}" +
@@ -184,17 +185,17 @@ fun NavGraph(
                     onEditCombo = {
                         Log.d(NAV_TAG, "")
                         Log.d(NAV_TAG, "Preparing to edit selected combo")
-//                        Log.d(NAV_TAG, "Saving selected combo to AddComboViewModel...")
-//                        addComboViewModel.comboState.update { it }
-//                        Log.d(NAV_TAG, "AddComboViewModel Combo state: ${comboStateAddCombo.comboDisplay}")
+                        Log.d(NAV_TAG, "Saving selected combo to AddComboViewModel...")
+                        addComboViewModel.comboDisplayState.update { it }
+                        Log.d(NAV_TAG, "AddComboViewModel Combo state: ${comboStateAddCombo.comboDisplay}")
 //
 //                        Log.d(NAV_TAG, "Updating character state of AddComboViewModel")
 //                        addComboViewModel.characterState.update { characterState }
 //
-//                        Log.d(NAV_TAG, "Updating Combo List of AddComboViewModel")
-//                        addComboViewModel.comboEntryListState.update { comboEntryListState }
-//                        Log.d(NAV_TAG, "Updated Combo List: ${comboEntryListStateAddCombo.comboEntryList}")
-//                        addComboViewModel.editingState.value = true
+                        Log.d(NAV_TAG, "Updating Combo List of AddComboViewModel")
+                        addComboViewModel.comboEntryListState.update { comboEntryListState }
+                        Log.d(NAV_TAG, "Updated Combo List: ${comboEntryListStateAddCombo.comboEntryList}")
+                        addComboViewModel.editingState.value = true
                         navController.navigate(FlowScreen.AddCombo.name)
                     },
                     navigateBack = {navController.navigate(FlowScreen.PickChar.name) }
@@ -206,7 +207,6 @@ fun NavGraph(
                 AddComboScreen(
                     addComboViewModel = addComboViewModel,
                     comboViewModel = comboViewModel,
-                    updateCharacterState = comboViewModel::updateCharacterState,
                     saveComboDetailsToDs = addComboViewModel::saveComboDetailsToDs,
                     updateComboData = addComboViewModel::updateComboDetails,
                     updateMoveList = addComboViewModel::updateMoveList,

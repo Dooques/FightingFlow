@@ -54,13 +54,13 @@ fun ComboDisplay.toEntry(character: CharacterEntry): ComboEntry =
         moves = moveEntryToMoveList(moves)
     )
 
-fun moveListToMoveEntry(moveList: kotlin.String): List<MoveEntry> {
+fun moveListToMoveEntry(moveList: String): List<MoveEntry> {
     val moveEntryList = mutableListOf<MoveEntry>()
     moveList.split(",").map { it.trimIndent() }.forEach { moveEntryList.add(emptyMove.copy(moveName = it)) }
     return moveEntryList
 }
 
-fun moveEntryToMoveList(moveList: List<MoveEntry>): kotlin.String {
+fun moveEntryToMoveList(moveList: List<MoveEntry>): String {
     var moveString = ""
     val listIterator = moveList.iterator()
     while (listIterator.hasNext()) {
