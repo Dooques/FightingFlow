@@ -24,11 +24,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.fightingflow.util.PROFILE_SCREEN_TAG
+import com.example.fightingflow.util.ProfileCreationUiState
 import com.example.fightingflow.util.ProfileUiState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -40,16 +45,18 @@ fun ProfileList(
     loggedInState: Boolean,
     snackbarHostState: SnackbarHostState,
     scope: CoroutineScope,
-    onCreateProfile: () -> Unit,
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Log.d(PROFILE_SCREEN_TAG, "")
     Log.d(PROFILE_SCREEN_TAG, "Loading profile list...")
 
-    val profileList by profileViewModel.allExistingProfiles.collectAsState()
+    val profileList by profileViewModel.allExistingProfiles.collectAsStateWithLifecycle()
+    val profileCreation by profileViewModel.profileState.collectAsStateWithLifecycle()
     Log.d(PROFILE_SCREEN_TAG, "Flows Collected:" +
             "\nprofileList: ${profileList.profileList}")
+
+    var showCreationForm by remember { mutableStateOf(false) }
 
     Column(
         modifier.fillMaxSize()
@@ -129,8 +136,43 @@ fun ProfileList(
                 .fillMaxWidth()
                 .padding(vertical = 8.dp)
         ) {
-            OutlinedButton(onClick = onCreateProfile) { Text("Create A New Profile", color = Color.White) }
-        }
+            if (showCreationForm) {
+                ProfileCreationForm(
+                    updateCurrentProfile = {profileViewModel.updateProfileCreation(it)},
+                    profile = profileCreation,
+                    onConfirm = {
+                        scope.launch {
+                            Log.d(PROFILE_SCREEN_TAG, "")
+                            Log.d(
+                                PROFILE_SCREEN_TAG,
+                                "Preparing to save ${profileCreation.profileCreation.username}'s profile to datastore..."
+                            )
+                            val saveProfileSuccess = profileViewModel.saveProfileData()
+                            Log.d(PROFILE_SCREEN_TAG, "Profile saved to Ds.")
 
+                            if (saveProfileSuccess == "Success") {
+                                Log.d(PROFILE_SCREEN_TAG, "Saving Profile to database...")
+                                profileViewModel.saveProfileToDb()
+                                Log.d(PROFILE_SCREEN_TAG, "Profile saved to Db.")
+                                Log.d(PROFILE_SCREEN_TAG, "Logging in profile...")
+                                profileViewModel.loginProfile()
+                                Log.d(PROFILE_SCREEN_TAG, "Profile logged in.")
+                                Log.d(PROFILE_SCREEN_TAG, "Returning to title screen...")
+                            } else {
+                                snackbarHostState.showSnackbar("Passwords do not match, please try again")
+                            }
+                            showCreationForm = false
+                        }
+                    }
+                )
+            } else {
+                OutlinedButton(onClick = { showCreationForm = true }) {
+                    Text(
+                        "Create A New Profile",
+                        color = Color.White
+                    )
+                }
+            }
+        }
     }
 }

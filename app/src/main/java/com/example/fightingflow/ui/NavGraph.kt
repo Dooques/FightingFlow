@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -27,7 +28,6 @@ import com.example.fightingflow.ui.comboAddScreen.AddComboScreen
 import com.example.fightingflow.ui.comboAddScreen.AddComboViewModel
 import com.example.fightingflow.ui.comboScreen.ComboScreen
 import com.example.fightingflow.ui.comboScreen.ComboViewModel
-import com.example.fightingflow.ui.profileScreen.ProfileCreationUi
 import com.example.fightingflow.ui.profileScreen.ProfileList
 import com.example.fightingflow.ui.profileScreen.ProfileViewModel
 import com.example.fightingflow.util.NAV_TAG
@@ -62,19 +62,17 @@ fun NavGraph(
     val addComboViewModel = koinInject<AddComboViewModel>()
     val profileViewModel = koinInject<ProfileViewModel>()
 
-    // ComboViewModel Collection
-    val characterState by comboViewModel.characterState.collectAsState()
-    val comboEntryListState by comboViewModel.comboEntryListSate.collectAsState()
-    val comboState by comboViewModel.comboDisplayState.collectAsState()
+    // ComboViewModel Flows
+    val characterState by comboViewModel.characterState.collectAsStateWithLifecycle()
+    val comboEntryListState by comboViewModel.comboEntryListSate.collectAsStateWithLifecycle()
 
-    // AddComboViewModel Collection
-    val comboStateAddCombo by addComboViewModel.comboDisplayState.collectAsState()
-    val comboEntryListStateAddCombo by addComboViewModel.comboEntryListState.collectAsState()
+    // AddComboViewModel Flows
+    val comboStateAddCombo by addComboViewModel.comboDisplayState.collectAsStateWithLifecycle()
+    val comboEntryListStateAddCombo by addComboViewModel.comboEntryListState.collectAsStateWithLifecycle()
 
-    // UserViewModel collection
-    val loggedInState by profileViewModel.loggedInState.collectAsState()
-    val username by profileViewModel.username.collectAsState()
-    val existingProfiles by profileViewModel.allExistingProfiles.collectAsState()
+    // ProfileViewModel Flows
+    val loggedInState by profileViewModel.loggedInState.collectAsStateWithLifecycle()
+    val username by profileViewModel.username.collectAsStateWithLifecycle()
 
     val scope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
@@ -92,8 +90,7 @@ fun NavGraph(
 
             "\n\nProfileViewModel Flows" +
             "\nIsUserLoggedIn: $loggedInState" +
-            "\nUsername: $username" +
-            "\nexistingProfiles: $existingProfiles"
+            "\nUsername: $username"
     )
 
     Scaffold(
@@ -115,19 +112,12 @@ fun NavGraph(
                 Log.d(NAV_TAG, "Loading Title Screen...")
                 TitleScreen(
                     profileViewModel = profileViewModel,
+                    snackbarHostState = snackBarHostState,
                     deviceType = deviceType,
                     username = username,
                     isLoggedIn = loggedInState,
-                    onCharSelect = {
-                        navController.navigate(FlowScreen.PickChar.name)
-                                   },
-                    onProfileSelect = {
-                        if (existingProfiles.profileList.isEmpty()) {
-                            navController.navigate(FlowScreen.CreateProfile.name)
-                        } else {
-                            navController.navigate(FlowScreen.ProfileList.name)
-                        }
-                                      },
+                    onCharSelect = { navController.navigate(FlowScreen.PickChar.name) },
+                    onProfileSelect = { navController.navigate(FlowScreen.ProfileList.name) },
                 )
             }
 
@@ -139,20 +129,7 @@ fun NavGraph(
                     loggedInState = loggedInState,
                     snackbarHostState = snackBarHostState,
                     scope = scope,
-                    onCreateProfile = {
-                        navController.navigate(FlowScreen.CreateProfile.name)
-                                    },
-                    navigateBack = navController::navigateUp,
-                )
-            }
-
-            // Profile Creation Screen
-            composable(route = FlowScreen.CreateProfile.name) {
-                ProfileCreationUi(
-                    profileViewModel = profileViewModel,
-                    snackBarHostState = snackBarHostState,
-                    updateCurrentUser = profileViewModel::updateProfileCreation,
-                    navigateBack = navController::navigateUp,
+                    navigateBack = { navController::navigateUp },
                 )
             }
 

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -29,10 +30,14 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
@@ -59,6 +64,7 @@ import com.example.fightingflow.util.ComboDisplayUiState
 import com.example.fightingflow.util.SwipeableItem
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ComboScreen(
     deviceType: WindowSizeClass,
@@ -89,15 +95,19 @@ fun ComboScreen(
     Log.d(COMBO_TAG, "Flows Collected")
 
     Log.d(COMBO_TAG, "Character: ${characterState.character}")
-    Log.d(COMBO_TAG, "Character Details: \n${characterNameState.name} \n${characterImageState.image}")
+    Log.d(
+        COMBO_TAG,
+        "Character Details: \n${characterNameState.name} \n${characterImageState.image}"
+    )
     Log.d(COMBO_TAG, "Combo Display List: ${comboDisplayListState.comboDisplayList}")
     Log.d(COMBO_TAG, "Combo Entry List: ${comboEntryListState.comboEntryList}")
 
     Log.d(COMBO_TAG, "Updating character data")
     Log.d(COMBO_TAG, "Character List: ${characterListState.characterList}")
     if (characterListState.characterList.isNotEmpty() && characterNameState.name.isNotEmpty()) {
-        try { updateCharacterState(characterNameState.name) }
-        catch(e: NoSuchElementException) {
+        try {
+            updateCharacterState(characterNameState.name)
+        } catch (e: NoSuchElementException) {
             Log.d(COMBO_TAG, "Character Error, no element found in character list.")
         }
     }
@@ -122,151 +132,124 @@ fun ComboScreen(
             .toMutableList()
     Log.d(COMBO_TAG, "Combos reduced to ${characterState.character.name}'s: $combosByCharacter")
 
-    Column {
-        Log.d(COMBO_TAG, "Character Details \n Name: ${characterNameState.name} \n Image: ${characterImageState.image}")
-        Log.d(COMBO_TAG, "Checking details valid...")
-
-        if (characterImageState.image != 0) {
-            Log.d(COMBO_TAG, "")
-            Log.d(COMBO_TAG, "Loading header...")
-            Log.d(COMBO_TAG, "Character details valid, loading header.")
-            Header(
-                fontColor = fontColor,
-                character = characterState.character,
-                characterName = characterNameState.name,
-                characterImage = characterImageState.image,
-                navigateBack = navigateBack,
-                onAddCombo = onAddCombo
-            )
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = characterState.character.name,
+                            style = MaterialTheme.typography.displayMedium,
+                            modifier = modifier.padding(start = 16.dp)
+                        )
+                    } },
+                actions = {
+                    Image(
+                        painter = painterResource(characterState.character.imageId),
+                        contentDescription = "",
+                        modifier = modifier.size(60.dp)
+                    )
+                    IconButton(onClick = onAddCombo) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Add Combo",
+                            modifier = modifier.size(80.dp)
+                        )
+                } },
+                windowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp)
+        )
         }
-        Log.d(COMBO_TAG, "Header loaded.")
+    ) { contentPadding ->
+        Column(Modifier.padding(contentPadding)) {
+            Log.d(
+                COMBO_TAG,
+                "Character Details \n Name: ${characterNameState.name} \n Image: ${characterImageState.image}"
+            )
+            Log.d(COMBO_TAG, "Checking details valid...")
 
-        LazyColumn {
-            Log.d(COMBO_TAG, "")
-            Log.d(COMBO_TAG, "Getting display combos as lazy column with swipeable actions.")
-             itemsIndexed(items = combosByCharacter) { index, combo ->
+            LazyColumn {
+                Log.d(COMBO_TAG, "")
+                Log.d(COMBO_TAG, "Getting display combos as lazy column with swipeable actions.")
+                itemsIndexed(items = combosByCharacter) { index, combo ->
 
-                 val isOptionRevealed by remember { mutableStateOf(false) }
-                 SwipeableItem(
-                     isRevealed = isOptionRevealed,
-                     onExpanded = {
-                         combosByCharacter[index] = combo.copy(areOptionsRevealed = true)
-                     },
-                     onCollapsed = {
-                         combosByCharacter[index] = combo.copy(areOptionsRevealed = false)
-                     },
-                     actions = {
-                         // Share Combo
-                         ActionIcon(
-                             onclick = {
-                                 Log.d(COMBO_TAG,"Sharing Combo")
-                                 Toast.makeText(
-                                     context,
-                                     "Combo ${combo.comboId} was shared.",
-                                     Toast.LENGTH_SHORT).show()
-                                       },
-                             tint = Color.Blue,
-                             icon = Icons.Default.Share,
-                             modifier = modifier.fillMaxHeight()
-                         )
-                         // Edit Combo
-                         ActionIcon(
-                             onclick = {
-                                 Log.d(COMBO_TAG, "Preparing to edit combo")
-                                 Log.d(COMBO_TAG, "")
-                                 scope.launch {
-                                     comboViewModel.saveComboIdToDs(combo)
-                                 }
-                                 onEditCombo()
-                                 Toast.makeText(context, "Combo ${combo.comboId} is being sent to the editor.", Toast.LENGTH_SHORT).show()
-                                       },
-                             tint = Color.Green,
-                             icon = Icons.Default.Edit,
-                             modifier = modifier.fillMaxHeight()
-                         )
-                         // Delete Combo
-                         ActionIcon(
-                             onclick = {
-                                 scope.launch {
-                                     comboViewModel.deleteCombo(combo, comboEntryListState.comboEntryList)
-                                     Log.d("", "UI deleted: $combo")
-                                 }
-                                 Toast.makeText(context, "Combo ${combo.comboId} was deleted.", Toast.LENGTH_SHORT).show()
-                                       },
-                             tint = Color.Red,
-                             icon = Icons.Default.Delete,
-                             modifier = modifier.fillMaxHeight()
-                         )
-                     },
-                     modifier = modifier,
-                 ) {
-                     ComboItem(
-                         context = context,
-                         fontColor = fontColor,
-                         combo = combo,
-                         containerColor = containerColor,
-                         uiScale = uiScale,
-                         modifier = modifier.padding(vertical = 4.dp, horizontal = 0.dp)
-                     )
+                    val isOptionRevealed by remember { mutableStateOf(false) }
+                    SwipeableItem(
+                        isRevealed = isOptionRevealed,
+                        onExpanded = {
+                            combosByCharacter[index] = combo.copy(areOptionsRevealed = true)
+                        },
+                        onCollapsed = {
+                            combosByCharacter[index] = combo.copy(areOptionsRevealed = false)
+                        },
+                        actions = {
+                            // Share Combo
+                            ActionIcon(
+                                onclick = {
+                                    Log.d(COMBO_TAG, "Sharing Combo")
+                                    Toast.makeText(
+                                        context,
+                                        "Combo ${combo.comboId} was shared.",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                },
+                                tint = Color.Blue,
+                                icon = Icons.Default.Share,
+                                modifier = modifier.fillMaxHeight()
+                            )
+                            // Edit Combo
+                            ActionIcon(
+                                onclick = {
+                                    Log.d(COMBO_TAG, "Preparing to edit combo")
+                                    Log.d(COMBO_TAG, "")
+                                    scope.launch {
+                                        comboViewModel.saveComboIdToDs(combo)
+                                    }
+                                    onEditCombo()
+                                    Toast.makeText(
+                                        context,
+                                        "Combo ${combo.comboId} is being sent to the editor.",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                },
+                                tint = Color.Green,
+                                icon = Icons.Default.Edit,
+                                modifier = modifier.fillMaxHeight()
+                            )
+                            // Delete Combo
+                            ActionIcon(
+                                onclick = {
+                                    scope.launch {
+                                        comboViewModel.deleteCombo(
+                                            combo,
+                                            comboEntryListState.comboEntryList
+                                        )
+                                        Log.d("", "UI deleted: $combo")
+                                    }
+                                    Toast.makeText(
+                                        context,
+                                        "Combo ${combo.comboId} was deleted.",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                },
+                                tint = Color.Red,
+                                icon = Icons.Default.Delete,
+                                modifier = modifier.fillMaxHeight()
+                            )
+                        },
+                        modifier = modifier,
+                    ) {
+                        ComboItem(
+                            context = context,
+                            fontColor = fontColor,
+                            combo = combo,
+                            containerColor = containerColor,
+                            uiScale = uiScale,
+                            modifier = modifier.padding(vertical = 4.dp, horizontal = 0.dp)
+                        )
+                    }
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Header(
-    character: CharacterEntry,
-    characterName: String,
-    characterImage: Int,
-    fontColor: Color,
-    onAddCombo: () -> Unit,
-    navigateBack: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
-            .fillMaxWidth()
-    ) {
-        Log.d(COMBO_TAG, "")
-        Log.d(COMBO_TAG, "Loading Home Button")
-        Icon(
-            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-            contentDescription = "Return to Character Select",
-            modifier
-                .size(65.dp)
-                .clickable(onClick = navigateBack)
-        )
-        Log.d(COMBO_TAG, "Loading Character Name: ${characterName}...")
-        Text(
-            text = characterName,
-            color = fontColor,
-            fontSize = if (character.name.length > 9) 50.sp else 70.sp,
-            style = MaterialTheme.typography.displayMedium,
-            modifier = modifier
-        )
-        Log.d(COMBO_TAG, "Loading Character Image ${characterImage}...")
-        Image(
-            painter = painterResource(characterImage),
-            contentDescription = characterName,
-            modifier = Modifier
-                .size(60.dp)
-        )
-        Log.d(COMBO_TAG, "Loading Icon image")
-        IconButton(
-            modifier = modifier
-                .size(75.dp),
-            onClick = onAddCombo,
-            content = {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = stringResource(R.string.add_combo),
-                    modifier.size(75.dp)
-                )
-            }
-        )
     }
 }
 

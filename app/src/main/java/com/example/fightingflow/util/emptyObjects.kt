@@ -15,6 +15,8 @@ val emptyCharacter = CharacterEntry(
     fightingStyle = "",
     uniqueMoves = "",
     combosById = "",
+    gameFranchise = "",
+    gameEntry = "",
 )
 
 val emptyComboDisplay = ComboDisplay(

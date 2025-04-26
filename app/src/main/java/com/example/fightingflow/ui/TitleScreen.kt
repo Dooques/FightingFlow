@@ -2,26 +2,26 @@ package com.example.fightingflow.ui
 
 import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,16 +30,19 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.fightingflow.R
-import com.example.fightingflow.model.ProfileEntry
+import com.example.fightingflow.ui.profileScreen.ProfileCreationForm
 import com.example.fightingflow.ui.profileScreen.ProfileViewModel
-import com.example.fightingflow.util.ProfileUiState
+import com.example.fightingflow.util.ProfileCreationUiState
 import com.example.fightingflow.util.TITLE_TAG
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 fun TitleScreen(
     profileViewModel: ProfileViewModel,
+    snackbarHostState: SnackbarHostState,
     deviceType: WindowSizeClass,
     isLoggedIn: Boolean,
     username: String,
@@ -50,15 +53,19 @@ fun TitleScreen(
     Log.d(TITLE_TAG, "")
     Log.d(TITLE_TAG, "Loading title screen...")
 
-    val uiScale = if (deviceType.heightSizeClass == WindowHeightSizeClass.Compact) 2 else 1
+    val profilesList by profileViewModel.allExistingProfiles.collectAsStateWithLifecycle()
+    val profileCreation by profileViewModel.profileState.collectAsStateWithLifecycle()
 
+    Log.d(TITLE_TAG, "Profile List: ${profilesList.profileList}")
+
+    val uiScale = if (deviceType.heightSizeClass == WindowHeightSizeClass.Compact) 2 else 1
+    val scope = rememberCoroutineScope()
 
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxSize()
-            .background(Color.Black)
     ) {
         Log.d(TITLE_TAG, "Loading logo...")
         Image(
@@ -83,12 +90,54 @@ fun TitleScreen(
         }
         LazyColumn {
             Log.d(TITLE_TAG, "Loading buttons...")
-            items (items = listOf(R.string.char_select, R.string.profiles)) {
-                AccessButton(
-                    buttonText = stringResource(it),
-                    onClick = if (it == R.string.char_select) onCharSelect else onProfileSelect,
-                    modifier = modifier.padding(8.dp)
-                )
+             item {
+                 if (profilesList.profileList.isEmpty()) {
+                     Row(Modifier.fillMaxWidth()) {
+                         Text(
+                             text = "Welcome to Fighting Flow, please create a profile so we can start creating some combos!",
+                             modifier = modifier.padding(horizontal = 16.dp)
+                         )
+                     }
+                     ProfileCreationForm(
+                         updateCurrentProfile = { profileViewModel.updateProfileCreation(profileCreation) },
+                         profile = profileCreation,
+                         onConfirm = {
+                             scope.launch {
+                                 Log.d(TITLE_TAG, "")
+                                 Log.d(
+                                     TITLE_TAG,
+                                     "Preparing to save ${profileCreation.profileCreation.username}'s profile to datastore..."
+                                 )
+                                 val saveProfileSuccess = profileViewModel.saveProfileData()
+                                 Log.d(TITLE_TAG, "Profile saved to Ds.")
+
+                                 if (saveProfileSuccess == "Success") {
+                                     Log.d(TITLE_TAG, "Saving Profile to database...")
+                                     profileViewModel.saveProfileToDb()
+                                     Log.d(TITLE_TAG, "Profile saved to Db.")
+
+                                     Log.d(TITLE_TAG, "Logging in profile...")
+                                     profileViewModel.loginProfile()
+                                     Log.d(TITLE_TAG, "Profile logged in.")
+                                     Log.d(TITLE_TAG, "Returning to title screen...")
+                                 } else {
+                                     snackbarHostState.showSnackbar("Passwords do not match, please try again")
+                                 }
+                             }
+                         }
+                     )
+                 } else {
+                     AccessButton(
+                         buttonText = stringResource(R.string.char_select),
+                         onClick = onCharSelect,
+                         modifier = modifier.padding(8.dp)
+                     )
+                     AccessButton(
+                         buttonText = stringResource(R.string.profile_select),
+                         onClick = onProfileSelect,
+                         modifier = modifier.padding(8.dp)
+                     )
+                 }
             }
         }
     }

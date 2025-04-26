@@ -6,44 +6,341 @@ import com.example.fightingflow.model.MoveEntry
 
 class CharacterAndMoveData() {
     val tekkenCharacterEntries:List<CharacterEntry> = listOf(
-        CharacterEntry(0, "Alisa", R.drawable.alisa_sprite, "Thruster-Based High-Mobility Fighting Style",  listOf("Clockwork", "Destructive Form", "Boot", "Dual Boot", "Backup").toString()),
-        CharacterEntry(0, "Asuka", R.drawable.asuka_sprite, "Kazama Style Traditional Martial Arts", listOf("Naniwa Gusto").toString()),
-        CharacterEntry(0, "Azucena", R.drawable.azucena_sprite, "Mixed Martial Arts (Striker)",listOf("Back Turned", "Libertador", "Nuevo Libertador").toString()),
-        CharacterEntry(0, "Bryan", R.drawable.bryan_sprite, "Kickboxing", listOf("Slither Step", "Snake Eyes", "Sway").toString()),
-        CharacterEntry(0, "Claudio", R.drawable.claudio_sprite, "Sirius Exorcist Arts", listOf("Starburst").toString()),
-        CharacterEntry(0, "Clive", R.drawable.t8_logo, "Dominant", listOf("Stance1", "Stance2").toString()),
-        CharacterEntry(0, "Devil Jin",  R.drawable.jin_sprite,"Unknown", listOf("Mishima Crouch Dash (Wind God Step)", "Fly", "Mourning Crow").toString()),
-        CharacterEntry(0, "Dragunov", R.drawable.dragunov_sprite, "White Reaper", listOf("Sneak").toString()),
-        CharacterEntry(0, "Eddy", R.drawable.t8_logo, "Capoeira", listOf("Ginga", "Bananeira", "Negativa", "Mandinga").toString()),
-        CharacterEntry(0, "Feng", R.drawable.feng_sprite, "Taijiquan", listOf("Back Turned", "Lingering Shadow", "Shifting Clouds", "Deceptive Step").toString()),
-        CharacterEntry(0, "Heihachi", R.drawable.t8_logo, "Mishima Style Fighting Karate", listOf("Raijin Stance").toString()),
-        CharacterEntry(0, "Hwoarang", R.drawable.hwoarang_sprite,"Taekwondo", listOf("Crouch Step", "Back Turned", "Right Stance", "Left Stance", "Right Flamingo", "Left Flamingo").toString()),
-        CharacterEntry(0, "Jack-8", R.drawable.jack8_sprite, "High Tech Annihilator", listOf("Gamma Howl", "Gamma Charge", "Sit Down").toString()), // Placeholder stance
-        CharacterEntry(0, "Jin", R.drawable.jin_sprite, "Karate based on Kyokushin style infused with Devil Gene", listOf("Awakened Power Stance", "Zenshin and Zanshin", "Breaking Step").toString()),
-        CharacterEntry(0, "Jun", R.drawable.jun_sprite, "Kazama Style Traditional Martial Arts", listOf("Izumo", "Genjutsu", "Miare").toString()),
-        CharacterEntry(0, "Kazuya", R.drawable.kazuya_sprite, "Mishima Style Fighting Karate", listOf("Devil Form", "Wind God Step").toString()),
-        CharacterEntry(0, "King", R.drawable.king_sprite, "Pro Wrestling", listOf("Beast Step", "Back Turned", "Jaguar Step", "Jaguar Sprint").toString()), // Placeholder stance
-        CharacterEntry(0, "Kuma", R.drawable.kuma_sprite, "Heihachi-style Improved Kuma Shinken", listOf("Hunting", "Bear Sit", "Bear Roll").toString()),
-        CharacterEntry(0, "Lars", R.drawable.lars_sprite, "Tekken Forces Martial Arts", listOf("Avalanche Flip","Dynamic Entry", "Silent Entry", "Limited Entry").toString()),
-        CharacterEntry(0, "Law", R.drawable.law_sprite, "Martial Arts", listOf("Back Turned", "Dragon Charge").toString()),
-        CharacterEntry(0, "Lee", R.drawable.lee_sprite, "Martial Arts", listOf("Mist Step", "Hitman").toString()),
-        CharacterEntry(0, "Leo", R.drawable.leo_sprite, "Baji Quan", listOf("Lightning Glare", "Jin Bu", "Jin Ji Du Li", "Fo Bu").toString()),
-        CharacterEntry(0, "Leroy", R.drawable.leroy_sprite, "Wing Chun", listOf("Hermit").toString()),
-        CharacterEntry(0, "Lidia", R.drawable.t8_logo, "Traditional Karate", listOf("Horse Stance", "Cat Stance", "Heaven and Earth", "Stalking Wolf Stance").toString()), // Placeholder stance
-        CharacterEntry(0, "Lili", R.drawable.lili_sprite, "Self-Taught Style", listOf("Feisty Rabbit", "Powered Up Feisty Rabbit", "Back Turned", "Dew Glide").toString()),
-        CharacterEntry(0, "Nina", R.drawable.nina_sprite, "Assassination Arts", listOf("Ducking Step", "Sway").toString()), // Placeholder stance
-        CharacterEntry(0, "Panda", R.drawable.panda_sprite, "Heihachi-style Improved Kuma Shinken", listOf("Hunting", "Bear Sit", "Bear Roll").toString()),
-        CharacterEntry(0, "Paul", R.drawable.paul_sprite, "Integrated Martial Arts", listOf("Cormorant Step", "Deep Dive", "Sway").toString()),
-        CharacterEntry(0, "Raven", R.drawable.raven_sprite, "Ninjutsu", listOf("Soulzone", "Shadow Sprint", "Back Turned").toString()),
-        CharacterEntry(0, "Reina", R.drawable.reina_sprite,"Taido and Mishima-Style Karate", listOf("Senshin", "Unsoku", "Sentai", "Heaven's Wrath").toString()),
-        CharacterEntry(0, "Shaheen", R.drawable.shaheen_sprite, "Close Quarters Combat", listOf("Stealth Step").toString()), // Placeholder stance
-        CharacterEntry(0, "Steve", R.drawable.steve_sprite, "Boxing", listOf("Peekaboo", "Flicker Stance", "Swaying", "Ducking", "Ducking Left", "Ducking Right",
-            "Two Faced", "Quick Spin", "Cyclone", "Ducking In", "Lion Heart").toString()),
-        CharacterEntry(0, "Victor", R.drawable.victor_sprite, "Super Spy CQB", listOf("Iai", "Perfumer").toString()), // Placeholder stances
-        CharacterEntry(0, "Xiaoyu", R.drawable.xiaoyu_sprite, "Chinese Martial Arts", listOf("Phoenix", "Hypnotist", "Rain Dance").toString()),
-        CharacterEntry(0, "Yoshimitsu", R.drawable.yoshimitsu_sprite, "Advanced Manji Ninjutsu", listOf(
-            "Bad Stomach", "Mutou No Kiwami", "Death Copter", "Back Turned", "Kincho", "Meditation", "Flea", "Flea Step", "Indian Stance", "Healing", "Manji Dragonfly").toString()),
-        CharacterEntry(0, "Zafina", R.drawable.zafina_sprite, "Ancient Assassination Arts", listOf("Tarantula", "Scarecrow", "Mantis").toString()),
+        CharacterEntry(
+            id = 0,
+            name = "Alisa",
+             imageId = R.drawable.alisa_sprite,
+            fightingStyle = "Thruster-Based High-Mobility Fighting Style",
+            uniqueMoves = listOf("Clockwork", "Destructive Form", "Boot", "Dual Boot", "Backup").toString(),
+            gameFranchise = "Tekken",
+            gameEntry = "8"
+        ),
+        CharacterEntry(
+            id = 0,
+            name = "Anna",
+            imageId = R.drawable.anna_sprite,
+            fightingStyle = "Aikido based techniques and Koppojutsu based Assassination Arts",
+            uniqueMoves = listOf("Backhand Slap", "Hammer Chance", "Chaos Judgement").toString(),
+            gameFranchise = "Tekken",
+            gameEntry = "8"
+        ),
+        CharacterEntry(
+            id = 0,
+            name = "Asuka",
+            imageId = R.drawable.asuka_sprite,
+            fightingStyle = "Kazama Style Traditional Martial Arts",
+            uniqueMoves = listOf("Naniwa Gusto").toString(),
+            gameFranchise = "Tekken",
+            gameEntry = "8"
+        ),
+        CharacterEntry(
+            id = 0,
+            name = "Azucena",
+            imageId = R.drawable.azucena_sprite,
+            fightingStyle = "Mixed Martial Arts (Striker)",
+            uniqueMoves = listOf("Back Turned", "Libertador", "Nuevo Libertador").toString(),
+            gameFranchise = "Tekken",
+            gameEntry = "8"
+        ),
+        CharacterEntry(
+            id = 0,
+            name = "Bryan",
+            imageId = R.drawable.bryan_sprite,
+            fightingStyle = "Kickboxing",
+            uniqueMoves = listOf("Slither Step", "Snake Eyes", "Sway").toString(),
+            gameFranchise = "Tekken",
+            gameEntry = "8"
+        ),
+        CharacterEntry(
+            id = 0,
+            name = "Claudio",
+            imageId = R.drawable.claudio_sprite,
+            fightingStyle = "Sirius Exorcist Arts",
+            uniqueMoves = listOf("Starburst").toString(),
+            gameFranchise = "Tekken",
+            gameEntry = "8"
+        ),
+        CharacterEntry(
+            id = 0,
+            name = "Clive",
+            imageId = R.drawable.clive_sprite,
+            fightingStyle = "Dominant",
+            uniqueMoves = listOf("Stance1", "Stance2").toString(),
+            gameFranchise = "Tekken",
+            gameEntry = "8"
+        ),
+        CharacterEntry(
+            id = 0,
+            name = "Devil Jin",
+            imageId = R.drawable.jin_sprite,
+            fightingStyle = "Unknown",
+            uniqueMoves = listOf("Mishima Crouch Dash (Wind God Step)", "Fly", "Mourning Crow").toString(),
+            gameFranchise = "Tekken",
+            gameEntry = "8"
+        ),
+        CharacterEntry(
+            id = 0,
+            name = "Dragunov",
+            imageId = R.drawable.dragunov_sprite,
+            fightingStyle = "White Reaper",
+            uniqueMoves = listOf("Sneak").toString(),
+            gameFranchise = "Tekken",
+            gameEntry = "8"
+        ),
+        CharacterEntry(
+            id = 0,
+            name = "Eddy",
+            imageId = R.drawable.eddy_sprite,
+            fightingStyle = "Capoeira",
+            uniqueMoves = listOf("Ginga", "Bananeira", "Negativa", "Mandinga").toString(),
+            gameFranchise = "Tekken",
+            gameEntry = "8"
+        ),
+        CharacterEntry(
+            id = 0,
+            name = "Feng",
+            imageId = R.drawable.feng_sprite,
+            fightingStyle = "Taijiquan",
+            uniqueMoves = listOf("Back Turned", "Lingering Shadow", "Shifting Clouds", "Deceptive Step").toString(),
+            gameFranchise = "Tekken",
+            gameEntry = "8"
+        ),
+        CharacterEntry(
+            id = 0,
+            name = "Heihachi",
+            imageId = R.drawable.heihachi_sprite,
+            fightingStyle = "Mishima Style Fighting Karate",
+            uniqueMoves = listOf("Raijin Stance").toString(),
+            gameFranchise = "Tekken",
+            gameEntry = "8"
+        ),
+        CharacterEntry(
+            id = 0,
+            name = "Hwoarang",
+            imageId = R.drawable.hwoarang_sprite,
+            fightingStyle = "Taekwondo",
+            uniqueMoves = listOf("Crouch Step", "Back Turned", "Right Stance", "Left Stance", "Right Flamingo", "Left Flamingo").toString(),
+            gameFranchise = "Tekken",
+            gameEntry = "8"
+        ),
+        CharacterEntry(
+            id = 0,
+            name = "Jack-8",
+            imageId = R.drawable.jack8_sprite,
+            fightingStyle = "High Tech Annihilator",
+            uniqueMoves = listOf("Gamma Howl", "Gamma Charge", "Sit Down").toString(),
+            gameFranchise = "Tekken",
+            gameEntry = "8"
+        ),
+        CharacterEntry(
+            id = 0,
+            name = "Jin",
+            imageId = R.drawable.jin_sprite,
+            fightingStyle = "Karate based on Kyokushin style infused with Devil Gene",
+            uniqueMoves = listOf("Awakened Power Stance", "Zenshin and Zanshin", "Breaking Step").toString(),
+            gameFranchise = "Tekken",
+            gameEntry = "8"
+        ),
+        CharacterEntry(
+            id = 0,
+            name = "Jun",
+            imageId = R.drawable.jun_sprite,
+            fightingStyle = "Kazama Style Traditional Martial Arts",
+            uniqueMoves = listOf("Izumo", "Genjutsu", "Miare").toString(),
+            gameFranchise = "Tekken",
+            gameEntry = "8"
+        ),
+        CharacterEntry(
+            id = 0,
+            name = "Kazuya",
+            imageId = R.drawable.kazuya_sprite,
+            fightingStyle = "Mishima Style Fighting Karate",
+            uniqueMoves = listOf("Devil Form", "Wind God Step").toString(),
+            gameFranchise = "Tekken",
+            gameEntry = "8"
+        ),
+        CharacterEntry(
+            id = 0,
+            name = "King",
+            imageId = R.drawable.king_sprite,
+            fightingStyle = "Pro Wrestling",
+            uniqueMoves = listOf("Beast Step", "Back Turned", "Jaguar Step", "Jaguar Sprint").toString(),
+            gameFranchise = "Tekken",
+            gameEntry = "8"
+        ),
+        CharacterEntry(
+            id = 0,
+            name = "Kuma",
+            imageId = R.drawable.kuma_sprite,
+            fightingStyle = "Heihachi-style Improved Kuma Shinken",
+            uniqueMoves = listOf("Hunting", "Bear Sit", "Bear Roll").toString(),
+            gameFranchise = "Tekken",
+            gameEntry = "8"
+        ),
+        CharacterEntry(
+            id = 0,
+            name = "Lars", imageId = R.drawable.lars_sprite,
+            fightingStyle = "Tekken Forces Martial Arts",
+            uniqueMoves = listOf("Avalanche Flip","Dynamic Entry", "Silent Entry", "Limited Entry").toString(),
+            gameFranchise = "Tekken",
+            gameEntry = "8"
+        ),
+        CharacterEntry(
+            id = 0,
+            name = "Law",
+            imageId =  R.drawable.law_sprite,
+            fightingStyle = "Martial Arts",
+            uniqueMoves = listOf("Back Turned", "Dragon Charge").toString(),
+            gameFranchise = "Tekken",
+            gameEntry = "8"
+        ),
+        CharacterEntry(
+            id = 0,
+            name = "Lee",
+            imageId = R.drawable.lee_sprite,
+            fightingStyle = "Martial Arts",
+            uniqueMoves = listOf("Mist Step", "Hitman").toString(),
+            gameFranchise = "Tekken",
+            gameEntry = "8"
+        ),
+        CharacterEntry(
+            id = 0,
+            name = "Leo",
+            imageId = R.drawable.leo_sprite,
+            fightingStyle = "Baji Quan",
+            uniqueMoves = listOf("Lightning Glare", "Jin Bu", "Jin Ji Du Li", "Fo Bu").toString(),
+            gameFranchise = "Tekken",
+            gameEntry = "8"
+        ),
+        CharacterEntry(
+            id = 0,
+            name = "Leroy",
+            imageId = R.drawable.leroy_sprite,
+            fightingStyle = "Wing Chun",
+            uniqueMoves = listOf("Hermit").toString(),
+            gameFranchise = "Tekken",
+            gameEntry = "8"
+        ),
+        CharacterEntry(
+            id = 0,
+            name = "Lidia",
+            imageId = R.drawable.lidia_sprite,
+            fightingStyle = "Traditional Karate",
+            uniqueMoves = listOf("Horse Stance", "Cat Stance", "Heaven and Earth", "Stalking Wolf Stance").toString(),
+            gameFranchise = "Tekken",
+            gameEntry = "8"
+        ),
+        CharacterEntry(
+            id = 0,
+            name = "Lili",
+            imageId = R.drawable.lili_sprite,
+            fightingStyle = "Self-Taught Style",
+            uniqueMoves = listOf("Feisty Rabbit", "Powered Up Feisty Rabbit", "Back Turned", "Dew Glide").toString(),
+            gameFranchise = "Tekken",
+            gameEntry = "8"
+        ),
+        CharacterEntry(
+            id = 0,
+            name = "Nina",
+            imageId = R.drawable.nina_sprite,
+            fightingStyle = "Assassination Arts",
+            uniqueMoves = listOf("Ducking Step", "Sway").toString(),
+            gameFranchise = "Tekken",
+            gameEntry = "8"
+        ),
+        CharacterEntry(
+            id = 0,
+            name = "Panda",
+            imageId = R.drawable.panda_sprite,
+            fightingStyle = "Heihachi-style Improved Kuma Shinken",
+            uniqueMoves = listOf("Hunting", "Bear Sit", "Bear Roll").toString(),
+            gameFranchise = "Tekken",
+            gameEntry = "8"
+        ),
+        CharacterEntry(
+            id = 0,
+            name = "Paul",
+            imageId = R.drawable.paul_sprite,
+            fightingStyle = "Integrated Martial Arts",
+            uniqueMoves = listOf("Cormorant Step", "Deep Dive", "Sway").toString(),
+            gameFranchise = "Tekken",
+            gameEntry = "8"
+        ),
+        CharacterEntry(
+            id = 0,
+            name = "Raven",
+            imageId = R.drawable.raven_sprite,
+            fightingStyle = "Ninjutsu",
+            uniqueMoves = listOf("Soulzone", "Shadow Sprint", "Back Turned").toString(),
+            gameFranchise = "Tekken",
+            gameEntry = "8"
+        ),
+        CharacterEntry(
+            id = 0,
+            name = "Reina",
+            imageId = R.drawable.reina_sprite,
+            fightingStyle = "Taido and Mishima-Style Karate",
+            uniqueMoves = listOf("Senshin", "Unsoku", "Sentai", "Heaven's Wrath").toString(),
+            gameFranchise = "Tekken",
+            gameEntry = "8"
+        ),
+        CharacterEntry(
+            id = 0,
+            name = "Shaheen",
+            imageId = R.drawable.shaheen_sprite,
+            fightingStyle = "Close Quarters Combat",
+            uniqueMoves = listOf("Stealth Step").toString(),
+            gameFranchise = "Tekken",
+            gameEntry = "8"
+        ),
+        CharacterEntry(
+            id = 0,
+            name = "Steve",
+            imageId = R.drawable.steve_sprite,
+            fightingStyle = "Boxing",
+            uniqueMoves = listOf("Peekaboo", "Flicker Stance", "Swaying", "Ducking", "Ducking Left", "Ducking Right",
+            "Two Faced", "Quick Spin", "Cyclone", "Ducking In", "Lion Heart").toString(),
+            gameFranchise = "Tekken",
+            gameEntry = "8"
+        ),
+        CharacterEntry(
+            id = 0,
+            name = "Victor",
+            imageId = R.drawable.victor_sprite,
+            fightingStyle = "Super Spy CQB",
+            uniqueMoves = listOf("Iai", "Perfumer").toString(),
+            gameFranchise = "Tekken",
+            gameEntry = "8"
+        ),
+        CharacterEntry(
+            id = 0,
+            name = "Xiaoyu",
+            imageId = R.drawable.xiaoyu_sprite,
+            fightingStyle = "Chinese Martial Arts",
+            uniqueMoves = listOf("Phoenix", "Hypnotist", "Rain Dance").toString(),
+            gameFranchise = "Tekken",
+            gameEntry = "8"
+        ),
+        CharacterEntry(
+            id = 0,
+            name = "Yoshimitsu",
+            imageId = R.drawable.yoshimitsu_sprite,
+            fightingStyle = "Advanced Manji Ninjutsu",
+            uniqueMoves = listOf("Bad Stomach", "Mutou No Kiwami", "Death Copter", "Back Turned",
+                "Kincho", "Meditation", "Flea", "Flea Step", "Indian Stance", "Healing",
+                "Manji Dragonfly").toString(),
+            gameFranchise = "Tekken",
+            gameEntry = "8"
+        ),
+        CharacterEntry(
+            id = 0,
+            name = "Zafina",
+            imageId = R.drawable.zafina_sprite,
+            fightingStyle = "Ancient Assassination Arts",
+            uniqueMoves = listOf("Tarantula", "Scarecrow", "Mantis").toString(),
+            gameFranchise = "Tekken",
+            gameEntry = "8"
+        ),
     )
 
     val moveEntries = listOf(

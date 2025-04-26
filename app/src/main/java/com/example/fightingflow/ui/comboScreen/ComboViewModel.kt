@@ -22,6 +22,7 @@ import com.example.fightingflow.util.MoveListUiState
 import com.example.fightingflow.util.emptyComboDisplay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.stateIn
@@ -48,6 +49,7 @@ class ComboViewModel(
                 started = SharingStarted.WhileSubscribed(TIME_MILLIS),
                 initialValue = MoveListUiState()
             )
+
     val characterEntryListState =
         tekkenDataRepository.getAllCharacters()
             .map { CharacterListUiState(it) }

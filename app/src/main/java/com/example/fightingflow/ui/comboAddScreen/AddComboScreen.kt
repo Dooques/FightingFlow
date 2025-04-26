@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -22,9 +23,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,7 +37,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -59,6 +66,7 @@ import com.example.fightingflow.util.ComboDisplayUiState
 import com.example.fightingflow.util.MoveListUiState
 import kotlinx.coroutines.flow.update
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("SourceLockedOrientationActivity")
 @Composable
 fun AddComboScreen(
@@ -98,18 +106,21 @@ fun AddComboScreen(
     val characterImageState by comboViewModel.characterImageState.collectAsState()
     val comboIdState by addComboViewModel.comboIdFromDs.collectAsState()
 
-    Log.d(ADD_COMBO_TAG, "Flows Collected: " +
-            "\nCharacter Details (Ds): " +
-            "\nName: ${characterNameState.name} " +
-            "\nImage: ${characterImageState.image}" +
-            "\nMove List: ${moveListState.moveList}" )
+    Log.d(
+        ADD_COMBO_TAG, "Flows Collected: " +
+                "\nCharacter Details (Ds): " +
+                "\nName: ${characterNameState.name} " +
+                "\nImage: ${characterImageState.image}" +
+                "\nMove List: ${moveListState.moveList}"
+    )
     Log.d(ADD_COMBO_TAG, "")
-    Log.d(ADD_COMBO_TAG,
-            "\nCharacter: ${characterFromAddCombo.character}" +
-            "\nComboDisplayState: ${comboDisplayState.comboDisplay}" +
-            "\nComboString: $comboAsString" +
-            "\nComboId from DS: $comboIdState" +
-            "\nExistingComboList: $existingComboList"
+    Log.d(
+        ADD_COMBO_TAG,
+        "\nCharacter: ${characterFromAddCombo.character}" +
+                "\nComboDisplayState: ${comboDisplayState.comboDisplay}" +
+                "\nComboString: $comboAsString" +
+                "\nComboId from DS: $comboIdState" +
+                "\nExistingComboList: $existingComboList"
     )
 
     Log.d(ADD_COMBO_TAG, "Updating Character State")
@@ -120,40 +131,72 @@ fun AddComboScreen(
 
     Log.d(ADD_COMBO_TAG, "Checking if in editing state & existing combo list contains data...")
     if (editingState && existingComboList.comboEntryList.isNotEmpty()) {
-        Log.d(ADD_COMBO_TAG, "Existing combos contains data, preparing to add combo to ComboDisplayState...")
+        Log.d(
+            ADD_COMBO_TAG,
+            "Existing combos contains data, preparing to add combo to ComboDisplayState..."
+        )
         addComboViewModel.getExistingComboFromList()
     }
 
     Log.d(ADD_COMBO_TAG, "")
-    Log.d(ADD_COMBO_TAG, "Combo: ${comboDisplayState.comboDisplay}" +
-            "\nComboMoves: ${comboDisplayState.comboDisplay.moves}")
-
-    Column(
-        verticalArrangement = Arrangement.Top,
-        modifier = modifier.fillMaxSize()
-    ) {
-        Log.d(ADD_COMBO_TAG, "")
-        Log.d(ADD_COMBO_TAG, "Loading Header...")
-        if (characterImageState.image != 0) {
-            Header(
-                characterNameState.name,
-                characterImageState.image,
-                navigateBack
+    Log.d(
+        ADD_COMBO_TAG, "Combo: ${comboDisplayState.comboDisplay}" +
+                "\nComboMoves: ${comboDisplayState.comboDisplay.moves}"
+    )
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = characterState.character.name,
+                            style = MaterialTheme.typography.displayMedium,
+                            modifier = modifier.padding(start = 16.dp)
+                        )
+                    }
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navigateBack() }) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Return to Combo screen",
+                            modifier.size(80.dp)
+                        )
+                    }
+                },
+                actions = {
+                    Image(
+                        painter = painterResource(characterState.character.imageId),
+                        contentDescription = "",
+                        modifier = modifier.size(60.dp)
+                    )
+                },
+                windowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp)
             )
         }
-        ComboForm(
-            updateComboData,
-            updateMoveList,
-            characterState.character,
-            characterNameState.name,
-            comboDisplayState.comboDisplay,
-            comboAsString,
-            moveListState,
-            saveCombo,
-            deleteLastMove,
-            clearMoveList,
-            onConfirm
-        )
+    ) { contentPadding ->
+        Column(
+            verticalArrangement = Arrangement.Top,
+            modifier = modifier
+                .fillMaxSize()
+                .padding(contentPadding)
+        ) {
+            Log.d(ADD_COMBO_TAG, "")
+            Log.d(ADD_COMBO_TAG, "Loading Header...")
+            ComboForm(
+                updateComboData = updateComboData,
+                updateMoveList = updateMoveList,
+                character = characterState.character,
+                characterName = characterNameState.name,
+                combo = comboDisplayState.comboDisplay,
+                comboAsString = comboAsString,
+                moveList = moveListState,
+                saveCombo = saveCombo,
+                deleteLastMove = deleteLastMove,
+                clearMoveList = clearMoveList,
+                onConfirm = onConfirm
+            )
+        }
     }
 }
 
@@ -204,18 +247,18 @@ fun ComboForm(
         if (moveList.moveList.isNotEmpty()) {
             Log.d(ADD_COMBO_TAG, "Move Entry List exists, populating Input Selector Column...")
             InputSelector(
-                context,
-                character,
-                characterName,
-                combo,
-                updateComboData,
-                updateMoveList,
-                comboAsString,
-                saveCombo,
-                deleteLastMove,
-                clearMoveList,
-                onConfirm,
-                moveList
+                context = context,
+                character = character,
+                characterName = characterName,
+                combo = combo,
+                updateComboData = updateComboData,
+                updateMoveList = updateMoveList,
+                comboAsString = comboAsString,
+                saveCombo = saveCombo,
+                deleteLastMove = deleteLastMove,
+                clearMoveList = clearMoveList,
+                onConfirm = onConfirm,
+                moveList = moveList
             )
         }
     }
@@ -407,10 +450,10 @@ fun DamageAndBreak(
         ) {
             Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = modifier.fillMaxWidth()) {
                 Text("Add Break")
-                Image(
-                    painter = painterResource(R.drawable.move_divider),
+                Icon(
+                    imageVector = Icons.Default.PlayArrow,
                     contentDescription = null,
-                    colorFilter = ColorFilter.tint(Color.White),
+                    tint = Color.White,
                     modifier = modifier
                         .size(20.dp)
                 )

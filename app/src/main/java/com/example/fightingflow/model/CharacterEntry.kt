@@ -8,9 +8,11 @@ import kotlin.String
 data class CharacterEntry(
     @PrimaryKey(autoGenerate = true)
     val id: Int,
-    val name: kotlin.String,
+    val name: String,
     val imageId: Int,
-    val fightingStyle: kotlin.String,
-    val uniqueMoves: kotlin.String,
-    val combosById: String = ""
+    val fightingStyle: String,
+    val uniqueMoves: String,
+    val combosById: String = "",
+    val gameFranchise: String,
+    val gameEntry: String
 )

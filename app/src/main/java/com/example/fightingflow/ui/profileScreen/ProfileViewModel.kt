@@ -35,6 +35,7 @@ class ProfileViewModel(
 
     fun updateProfileCreation(profile: ProfileCreationUiState) {
         profileState.update { ProfileCreationUiState(profile.profileCreation) }
+        Log.d(PROFILE_VM_TAG, "Profile Updated: ${profileState.value.profileCreation}")
     }
 
     suspend fun saveProfileData(): String {
@@ -52,7 +53,6 @@ class ProfileViewModel(
             return ""
         }
     }
-
 
     // Datastore Functions
     val username = profileDsRepository.getUsername()

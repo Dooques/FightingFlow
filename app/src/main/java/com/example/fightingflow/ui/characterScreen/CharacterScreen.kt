@@ -4,36 +4,53 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.fightingflow.R
@@ -44,6 +61,7 @@ import com.example.fightingflow.util.PROFILE_SCREEN_TAG
 
 const val TAG = "CharacterScreen"
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CharacterScreen(
     comboViewModel: ComboViewModel,
@@ -54,36 +72,69 @@ fun CharacterScreen(
     modifier: Modifier = Modifier
 ) {
     Log.d(TAG, "")
-    Log.d(TAG,"\nLoading Character Screen")
+    Log.d(TAG, "\nLoading Character Screen")
 
     val characterListState by comboViewModel.characterEntryListState.collectAsState()
     Log.d(TAG, "Flows Collected")
     Log.d(TAG, "Character List: ${characterListState.characterList}")
 
-    Column {
-        Header(
-            navigateBack = navigateBack,
-        )
-        Spacer(modifier.size(16.dp))
-        LazyVerticalGrid(
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(32.dp),
-            columns = GridCells.Fixed(3),
-            modifier = modifier
-                .background(Color.Black)
-                .padding(16.dp)
-        ) {
-            Log.d(TAG, "Loading Character Grid...")
-            items(items = characterListState.characterList.sortedBy { it.name }) { character ->
-                CharacterCard(
-                    updateCharacterState = updateCharacterState,
-                    setCharacterToDS = setCharacterToDS,
-                    onClick = onClick,
-                    characterState = CharacterUiState(character),
-                    modifier = modifier
-                )
+    var menuExpanded by remember { mutableStateOf(false) }
+    var gameSelected by remember { mutableStateOf("Tekken 8") }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Characters", style = MaterialTheme.typography.displaySmall) },
+                actions = {
+                    IconButton(onClick = {menuExpanded = !menuExpanded}) {
+                        Icon(
+                            imageVector = Icons.Default.Menu,
+                            contentDescription = stringResource(R.string.open_menu),
+                            modifier = Modifier.size(80.dp)
+                        )
+                    }
+                    DropdownMenu(expanded = menuExpanded,
+                        onDismissRequest = { menuExpanded = false}) {
+                        DropdownMenuItem(
+                            text = { Text("Tekken 8") },
+                            onClick = { gameSelected = "Tekken 8" }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Street Fighter 6") },
+                            onClick = { gameSelected = "Street Fighter 6"}
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Mortal Kombat 1") },
+                            onClick = { gameSelected = "Mortal Kombat 1" }
+                        )
+                    }
+                },
+                windowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp),
+            )
+        },
+    ) { contentPadding ->
+        Column(Modifier.padding(contentPadding)) {
+            GameSelectedHeader(gameSelected)
+            Spacer(modifier.size(16.dp))
+            LazyVerticalGrid(
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(32.dp),
+                columns = GridCells.Fixed(3),
+                modifier = modifier
+                    .padding(16.dp)
+            ) {
+                Log.d(TAG, "Loading Character Grid...")
+                items(items = characterListState.characterList.sortedBy { it.name }) { character ->
+                    CharacterCard(
+                        updateCharacterState = updateCharacterState,
+                        setCharacterToDS = setCharacterToDS,
+                        onClick = onClick,
+                        characterState = CharacterUiState(character),
+                        modifier = modifier
+                    )
+                }
+                Log.d(TAG, "Character Grid Finished.")
             }
-            Log.d(TAG, "Character Grid Finished.")
         }
     }
 }
@@ -98,15 +149,7 @@ fun CharacterCard(
 ) {
     Log.d(TAG, "Loading Card: ${characterState.character.name}")
     Card(
-        colors = CardDefaults.cardColors(
-            containerColor = when (characterState.character.name) {
-                "Heihachi" -> Color.DarkGray
-                "Lidia" -> Color.DarkGray
-                "Eddy" -> Color.DarkGray
-                "Clive" -> Color.DarkGray
-                else -> Color.White
-            }
-        ),
+        colors = CardDefaults.cardColors(Color.White),
         modifier = modifier
             .clickable(
                 onClick = {
@@ -135,47 +178,37 @@ fun CharacterCard(
             Text(
                 text = characterState.character.name,
                 style = MaterialTheme.typography.labelLarge,
-                color = when (characterState.character.name) {
-                    "Heihachi" -> Color.White
-                    "Lidia" -> Color.White
-                    "Eddy" -> Color.White
-                    "Clive" -> Color.White
-                    else -> Color.Black
-                }
+                color = Color.Black
             )
         }
     }
 }
 
 @Composable
-fun Header(
-    navigateBack: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Box(modifier.fillMaxWidth()) {
-        Log.d(TAG, "Loading Home Button")
-        Icon(
-            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-            contentDescription = "Return to Character Select",
-            modifier
-                .size(60.dp)
-                .clickable(onClick = navigateBack)
-                .align(Alignment.CenterStart)
-                .padding(start= 16.dp)
-        )
-        Row(
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.Bottom,
-            modifier = modifier.fillMaxWidth()
-        ) {
-            Log.d(TAG, "")
-            Log.d(PROFILE_SCREEN_TAG, "")
-            Text(
-                text = "Character Select",
-                fontSize = 45.sp,
-                style = MaterialTheme.typography.displayMedium,
-                modifier = modifier
-            )
+fun GameSelectedHeader(gameSelected: String, modifier: Modifier = Modifier) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        val gameColor = when (gameSelected) {
+            "Tekken 8" -> Color(color = 0xFFed1664)
+            "Street Fighter 6" -> Color(color = 0xFFff914d)
+            "Mortal Kombat 1" -> Color(color = 0xFF38b6ff)
+            else -> Color.Green
         }
+        Text(
+            text ="Game Selected: ",
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = modifier.padding(start = 16.dp)
+        )
+        Text(
+            text = gameSelected,
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Bold,
+            modifier = modifier
+                .clip(shape = RoundedCornerShape(100.dp))
+                .background(gameColor)
+                .padding(horizontal = 8.dp, vertical = 4.dp)
+        )
     }
 }

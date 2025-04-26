@@ -10,7 +10,9 @@ val characterEntry = CharacterEntry(
     imageId = R.drawable.reina_sprite,
     fightingStyle = "Mishima",
     uniqueMoves = CharacterAndMoveData().tekkenCharacterEntries.first { it.name == "Reina" }.toString(),
-    combosById = ""
+    combosById = "",
+    gameFranchise = "Tekken",
+    gameEntry = "8"
 )
 
 
