@@ -10,8 +10,8 @@ data class MoveEntry(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     @ColumnInfo(name = "move_name")
-    val moveName: kotlin.String,
-    val notation: kotlin.String,
+    val moveName: String,
+    val notation: String,
     @ColumnInfo(name = "move_type")
     val moveType: String,
     @ColumnInfo(name = "counter_hit")
@@ -20,12 +20,12 @@ data class MoveEntry(
     @ColumnInfo(name = "just_frame")
     val justFrame: Boolean = false,
     @ColumnInfo(name = "associated_character")
-    val associatedCharacter: kotlin.String
+    val associatedCharacter: String
 )
 
 data class MoveString(
-    val name: kotlin.String,
-    val moveString: List<kotlin.String>,
+    val name: String,
+    val moveString: List<String>,
     val counterHit: Boolean = false,
-    val moveType: kotlin.String
+    val moveType: String
 )

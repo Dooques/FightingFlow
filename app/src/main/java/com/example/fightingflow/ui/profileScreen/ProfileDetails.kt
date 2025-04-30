@@ -22,6 +22,7 @@ import com.example.fightingflow.R
 import com.example.fightingflow.util.ComboDisplayListUiState
 import com.example.fightingflow.util.PROFILE_SCREEN_TAG
 import com.example.fightingflow.util.ProfileUiState
+import timber.log.Timber
 
 @Composable
 fun ProfileDetailsUi(
@@ -50,8 +51,8 @@ fun Header(
             .fillMaxWidth()
 
     ) {
-        Log.d(PROFILE_SCREEN_TAG, "")
-        Log.d(PROFILE_SCREEN_TAG, "Loading Home Button")
+        Timber.d("")
+        Timber.d("Loading Home Button")
         Icon(
             imageVector = Icons.Default.Home,
             contentDescription = "Return to Character Select",
@@ -60,20 +61,20 @@ fun Header(
                 .clickable(onClick = navigateBack)
 
         )
-        Log.d(PROFILE_SCREEN_TAG, "Loading Character Name: ${existingProfile.profile.username}...")
+        Timber.d("Loading Character Name: ${existingProfile.profile.username}...")
         Text(
             text = existingProfile.profile.username,
             fontSize = if (existingProfile.profile.username.length > 9) 50.sp else 70.sp,
             style = MaterialTheme.typography.displayMedium,
             modifier = modifier
         )
-        Log.d(PROFILE_SCREEN_TAG, "Loading Character Image ${existingProfile.profile.profilePic}...")
+        Timber.d("Loading Character Image ${existingProfile.profile.profilePic}...")
         Image(
             painter = painterResource(R.drawable.t8_logo),
             contentDescription = "profile pic",
             modifier = Modifier
                 .size(60.dp)
         )
-        Log.d(PROFILE_SCREEN_TAG, "Loading Icon image")
+        Timber.d("Loading Icon image")
     }
 }

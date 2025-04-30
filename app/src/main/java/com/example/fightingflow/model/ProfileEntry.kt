@@ -7,17 +7,17 @@ import androidx.room.PrimaryKey
 data class ProfileEntry(
     @PrimaryKey(autoGenerate = true)
     val id: Int,
-    val username: kotlin.String,
-    val profilePic: kotlin.String,
-    val password: kotlin.String,
+    val username: String,
+    val profilePic: String,
+    val password: String,
     val loggedIn: Boolean
 )
 
 data class ProfileCreation(
-    val username: kotlin.String,
-    val profilePic: kotlin.String,
-    val password: kotlin.String,
-    val confirmPassword: kotlin.String
+    val username: String,
+    val profilePic: String,
+    val password: String,
+    val confirmPassword: String
 )
 
 fun ProfileCreation.toEntry(): ProfileEntry =

@@ -1,9 +1,11 @@
 package com.example.fightingflow.model
 
+import androidx.compose.runtime.Immutable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
+import com.example.fightingflow.util.ImmutableList
 import com.example.fightingflow.util.emptyMove
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -15,22 +17,23 @@ data class ComboEntry (
     @PrimaryKey(autoGenerate = true)
     val id: Int,
     @ColumnInfo(name = "combo_id")
-    val comboId: kotlin.String = UUID.randomUUID().toString(),
+    val comboId: String = UUID.randomUUID().toString(),
     val character: CharacterEntry,
     val damage: Int,
     @ColumnInfo(name = "created_by")
-    val createdBy: kotlin.String,
+    val createdBy: String,
     val moves: String
 )
 
+@Immutable
 data class ComboDisplay(
     val id: Int,
-    val comboId: kotlin.String,
-    val character: kotlin.String,
+    val comboId: String,
+    val character: String,
     val damage: Int,
-    val createdBy: kotlin.String,
+    val createdBy: String,
     val areOptionsRevealed: Boolean = false,
-    val moves: List<MoveEntry>
+    val moves: ImmutableList<MoveEntry>
 )
 
 fun ComboEntry.toDisplay(): ComboDisplay =
@@ -41,7 +44,7 @@ fun ComboEntry.toDisplay(): ComboDisplay =
         damage = damage,
         createdBy = createdBy,
         areOptionsRevealed = false,
-        moves = moveListToMoveEntry(moves)
+        moves = ImmutableList(moveListStringToMoveEntryList(moves))
     )
 
 fun ComboDisplay.toEntry(character: CharacterEntry): ComboEntry =
@@ -54,7 +57,7 @@ fun ComboDisplay.toEntry(character: CharacterEntry): ComboEntry =
         moves = moveEntryToMoveList(moves)
     )
 
-fun moveListToMoveEntry(moveList: String): List<MoveEntry> {
+fun moveListStringToMoveEntryList(moveList: String): List<MoveEntry> {
     val moveEntryList = mutableListOf<MoveEntry>()
     moveList.split(",").map { it.trimIndent() }.forEach { moveEntryList.add(emptyMove.copy(moveName = it)) }
     return moveEntryList

@@ -1,29 +1,21 @@
 package com.example.fightingflow.ui.characterScreen
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -36,7 +28,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -52,31 +43,30 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.fightingflow.R
 import com.example.fightingflow.model.CharacterEntry
-import com.example.fightingflow.ui.comboScreen.ComboViewModel
+import com.example.fightingflow.ui.comboScreen.ComboDisplayViewModel
 import com.example.fightingflow.util.CharacterUiState
-import com.example.fightingflow.util.PROFILE_SCREEN_TAG
+import timber.log.Timber
 
 const val TAG = "CharacterScreen"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CharacterScreen(
-    comboViewModel: ComboViewModel,
+    comboViewModel: ComboDisplayViewModel,
     updateCharacterState: (String) -> Unit,
     setCharacterToDS: (CharacterEntry) -> Unit,
     onClick: () -> Unit,
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Log.d(TAG, "")
-    Log.d(TAG, "\nLoading Character Screen")
+    Timber.d("")
+    Timber.d("\nLoading Character Screen")
 
     val characterListState by comboViewModel.characterEntryListState.collectAsState()
-    Log.d(TAG, "Flows Collected")
-    Log.d(TAG, "Character List: ${characterListState.characterList}")
+    Timber.d("Flows Collected")
+    Timber.d("Character List: ${characterListState.characterList}")
 
     var menuExpanded by remember { mutableStateOf(false) }
     var gameSelected by remember { mutableStateOf("Tekken 8") }
@@ -123,7 +113,7 @@ fun CharacterScreen(
                 modifier = modifier
                     .padding(16.dp)
             ) {
-                Log.d(TAG, "Loading Character Grid...")
+                Timber.d("Loading Character Grid...")
                 items(items = characterListState.characterList.sortedBy { it.name }) { character ->
                     CharacterCard(
                         updateCharacterState = updateCharacterState,
@@ -133,7 +123,7 @@ fun CharacterScreen(
                         modifier = modifier
                     )
                 }
-                Log.d(TAG, "Character Grid Finished.")
+                Timber.d("Character Grid Finished.")
             }
         }
     }
@@ -147,19 +137,19 @@ fun CharacterCard(
     characterState: CharacterUiState,
     modifier: Modifier = Modifier
 ) {
-    Log.d(TAG, "Loading Card: ${characterState.character.name}")
+    Timber.d("Loading Card: ${characterState.character.name}")
     Card(
         colors = CardDefaults.cardColors(Color.White),
         modifier = modifier
             .clickable(
                 onClick = {
-                    Log.d(TAG, "")
-                    Log.d(TAG, "Preparing to open Combo Screen...")
+                    Timber.d("")
+                    Timber.d("Preparing to open Combo Screen...")
                     updateCharacterState(characterState.character.name)
-                    Log.d(TAG, "Updated Character State in Combo View Model")
-                    Log.d(TAG, "Preparing to add ${characterState.character.name} to datastore")
+                    Timber.d("Updated Character State in Combo View Model")
+                    Timber.d("Preparing to add ${characterState.character.name} to datastore")
                     setCharacterToDS(characterState.character)
-                    Log.d(TAG, "Opening Combo Screen")
+                    Timber.d("Opening Combo Screen")
                     onClick()
                 }
             )

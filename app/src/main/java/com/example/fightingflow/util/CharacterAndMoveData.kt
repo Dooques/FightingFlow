@@ -1,9 +1,11 @@
 package com.example.fightingflow.util
 
+import androidx.compose.runtime.Immutable
 import com.example.fightingflow.R
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.MoveEntry
 
+@Immutable
 class CharacterAndMoveData() {
     val tekkenCharacterEntries:List<CharacterEntry> = listOf(
         CharacterEntry(

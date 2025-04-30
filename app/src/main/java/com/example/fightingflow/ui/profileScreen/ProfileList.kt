@@ -37,6 +37,7 @@ import com.example.fightingflow.util.ProfileCreationUiState
 import com.example.fightingflow.util.ProfileUiState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @Composable
 fun ProfileList(
@@ -48,27 +49,29 @@ fun ProfileList(
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Log.d(PROFILE_SCREEN_TAG, "")
-    Log.d(PROFILE_SCREEN_TAG, "Loading profile list...")
+    Timber.d("")
+    Timber.d("Loading profile list...")
 
     val profileList by profileViewModel.allExistingProfiles.collectAsStateWithLifecycle()
     val profileCreation by profileViewModel.profileState.collectAsStateWithLifecycle()
-    Log.d(PROFILE_SCREEN_TAG, "Flows Collected:" +
-            "\nprofileList: ${profileList.profileList}")
+    Timber.d(
+        "Flows Collected:" +
+                "\nprofileList: ${profileList.profileList}"
+    )
 
     var showCreationForm by remember { mutableStateOf(false) }
 
     Column(
         modifier.fillMaxSize()
     ) {
-        Log.d(PROFILE_SCREEN_TAG, "Loading Home Button")
+        Timber.d("Loading Home Button")
         Box {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "Return to Character Select",
                 modifier
                     .size(60.dp)
-                    .clickable(onClick = navigateBack)
+                    .clickable(onClick = { navigateBack() })
                     .align(Alignment.CenterStart)
                     .padding(start = 16.dp)
             )
@@ -142,22 +145,19 @@ fun ProfileList(
                     profile = profileCreation,
                     onConfirm = {
                         scope.launch {
-                            Log.d(PROFILE_SCREEN_TAG, "")
-                            Log.d(
-                                PROFILE_SCREEN_TAG,
-                                "Preparing to save ${profileCreation.profileCreation.username}'s profile to datastore..."
-                            )
+                            Timber.d("")
+                            Timber.d("Preparing to save ${profileCreation.profileCreation.username}'s profile to datastore...")
                             val saveProfileSuccess = profileViewModel.saveProfileData()
-                            Log.d(PROFILE_SCREEN_TAG, "Profile saved to Ds.")
+                            Timber.d("Profile saved to Ds.")
 
                             if (saveProfileSuccess == "Success") {
-                                Log.d(PROFILE_SCREEN_TAG, "Saving Profile to database...")
+                                Timber.d("Saving Profile to database...")
                                 profileViewModel.saveProfileToDb()
-                                Log.d(PROFILE_SCREEN_TAG, "Profile saved to Db.")
-                                Log.d(PROFILE_SCREEN_TAG, "Logging in profile...")
+                                Timber.d("Profile saved to Db.")
+                                Timber.d("Logging in profile...")
                                 profileViewModel.loginProfile()
-                                Log.d(PROFILE_SCREEN_TAG, "Profile logged in.")
-                                Log.d(PROFILE_SCREEN_TAG, "Returning to title screen...")
+                                Timber.d("Profile logged in.")
+                                Timber.d("Returning to title screen...")
                             } else {
                                 snackbarHostState.showSnackbar("Passwords do not match, please try again")
                             }

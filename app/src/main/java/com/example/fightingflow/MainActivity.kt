@@ -15,6 +15,7 @@ import com.example.fightingflow.ui.theme.FightingFlowTheme
 import org.koin.androidx.compose.KoinAndroidContext
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
+import timber.log.Timber
 
 const val TAG = "Main Activity"
 
@@ -39,7 +40,7 @@ fun FightingFlowApp(
     initViewModel: InitViewModel = koinViewModel<InitViewModel>(),
     deviceType: WindowSizeClass
 ) {
-    Log.d(TAG, "Starting Application")
+    Timber.d("Starting Application")
     initViewModel.addDataToDb()
     NavGraph(deviceType = deviceType)
 }

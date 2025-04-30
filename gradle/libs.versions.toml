@@ -15,6 +15,7 @@ composeBom = "2025.04.00"
 mockk = "1.13.0"
 mockkAgent = "1.13.0"
 mockkAndroid = "1.13.0"
+timber = "5.0.1"
 uiTextGoogleFonts = "1.7.8"
 navigationRuntimeKtx = "2.8.9"
 navigationCompose = "2.8.9"
@@ -61,6 +62,7 @@ mockk-agent = { module = "io.mockk:mockk-agent", version.ref = "mockkAgent" }
 mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockkAndroid" }
 moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
 moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshiKotlin" }
+timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 
 
 [plugins]

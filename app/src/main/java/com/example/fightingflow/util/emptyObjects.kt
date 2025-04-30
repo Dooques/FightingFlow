@@ -25,7 +25,7 @@ val emptyComboDisplay = ComboDisplay(
     character = "",
     damage = 0,
     createdBy = "",
-    moves = mutableListOf()
+    moves = ImmutableList(emptyList())
 )
 
 val emptyComboEntry = ComboEntry(

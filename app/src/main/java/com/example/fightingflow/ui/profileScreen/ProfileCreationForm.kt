@@ -26,6 +26,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.fightingflow.util.PROFILE_SCREEN_TAG
 import com.example.fightingflow.util.ProfileCreationUiState
+import timber.log.Timber
 
 @Composable
 fun ProfileCreationForm(
@@ -34,11 +35,11 @@ fun ProfileCreationForm(
     onConfirm: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Log.d(PROFILE_SCREEN_TAG, "")
-    Log.d(PROFILE_SCREEN_TAG, "Loading profile creation form...")
+    Timber.d("")
+    Timber.d("Loading profile creation form...")
 
     Column(modifier.fillMaxHeight()) {
-        Log.d(PROFILE_SCREEN_TAG, "Loading username field...")
+        Timber.d("Loading username field...")
         TextInputField(
             type = "username",
             updateProfileState = { username ->
@@ -48,7 +49,7 @@ fun ProfileCreationForm(
                     )) },
             modifier = modifier.padding(4.dp))
 
-        Log.d(PROFILE_SCREEN_TAG, "Loading password field...")
+        Timber.d("Loading password field...")
         TextInputField(
             type = "password",
             updateProfileState = { password ->
@@ -59,7 +60,7 @@ fun ProfileCreationForm(
             modifier.padding(4.dp)
         )
 
-        Log.d(PROFILE_SCREEN_TAG, "Loading confirm password field...")
+        Timber.d("Loading confirm password field...")
         TextInputField(
             type = "Confirm\nPassword",
             updateProfileState = { confirmPassword ->
@@ -70,7 +71,7 @@ fun ProfileCreationForm(
         )
 
         Spacer(modifier.size(height = 20.dp, width = 0.dp))
-        Log.d(PROFILE_SCREEN_TAG, "Loading confirm button...")
+        Timber.d("Loading confirm button...")
         OutlinedButton(
             onClick = onConfirm,
             modifier = modifier
@@ -78,7 +79,7 @@ fun ProfileCreationForm(
                 .padding(horizontal = 32.dp)
         ) { Text("Confirm", color = Color.White) }
         Spacer(modifier.size(height = 50.dp, width = 0.dp))
-        Log.d(PROFILE_SCREEN_TAG, "Form Loaded.")
+        Timber.d("Form Loaded.")
     }
 }
 

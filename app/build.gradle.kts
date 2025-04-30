@@ -88,6 +88,10 @@ dependencies {
     // Coil
     implementation(libs.coil.compose)
 
+    // Timber
+    implementation(libs.timber)
+
+
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.core)
