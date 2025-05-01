@@ -77,20 +77,20 @@ fun ComboDisplayScreen(
     val characterListState by comboViewModel.characterEntryListState.collectAsState()
     val comboDisplayListState by comboViewModel.comboDisplayListState.collectAsState()
     val comboEntryListState by comboViewModel.comboEntryListSate.collectAsState()
-    val moveListState by comboViewModel.moveEntryListState.collectAsState()
+    val moveListState by comboViewModel.moveEntryListUiState.collectAsState()
 
     // Datastore Flows
     val characterNameState by comboViewModel.characterNameState.collectAsState()
     val characterImageState by comboViewModel.characterImageState.collectAsState()
-    Timber.d("Flows Collected")
 
+    Timber.d("Flows Collected")
     Timber.d("Character: ${characterState.character}")
-    Timber.d("Character Details: \n${characterNameState.name} \n${characterImageState.image}")
+    Timber.d("Character Details: ${characterNameState.name} ${characterImageState.image}")
     Timber.d("Combo Display List: ${comboDisplayListState.comboDisplayList}")
     Timber.d("Combo Entry List: ${comboEntryListState.comboEntryList}")
-
     Timber.d("Updating character data")
     Timber.d("Character List: ${characterListState.characterList}")
+
     if (characterListState.characterList.isNotEmpty() && characterNameState.name.isNotEmpty()) {
         try {
             updateCharacterState(characterNameState.name)

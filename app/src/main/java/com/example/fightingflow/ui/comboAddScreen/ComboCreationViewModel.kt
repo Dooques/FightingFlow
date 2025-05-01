@@ -14,7 +14,7 @@ import com.example.fightingflow.util.CharacterUiState
 import com.example.fightingflow.util.ComboDisplayUiState
 import com.example.fightingflow.util.ComboEntryListUiState
 import com.example.fightingflow.util.ImmutableList
-import com.example.fightingflow.util.MoveListUiState
+import com.example.fightingflow.util.MoveEntryListUiState
 import com.example.fightingflow.util.emptyComboDisplay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -109,7 +109,7 @@ class ComboCreationViewModel(
         saveComboDetailsToDs(comboDisplayState.value)
     }
 
-    fun updateMoveList(moveName: String, moveListUiState: MoveListUiState) {
+    fun updateMoveList(moveName: String, moveListUiState: MoveEntryListUiState) {
         Timber.d("")
         Timber.d("Adding $moveName to combo...")
         Timber.d("Move List: ${moveListUiState.moveList.size} moves")

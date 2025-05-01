@@ -12,16 +12,17 @@ import com.example.fightingflow.model.MoveEntry
 import com.example.fightingflow.model.toDisplay
 import com.example.fightingflow.util.CharImageUiState
 import com.example.fightingflow.util.CharNameUiState
-import com.example.fightingflow.util.CharacterListUiState
+import com.example.fightingflow.util.CharacterEntryListUiState
 import com.example.fightingflow.util.CharacterUiState
 import com.example.fightingflow.util.ComboDisplayListUiState
 import com.example.fightingflow.util.ComboDisplayUiState
 import com.example.fightingflow.util.ComboEntryListUiState
 import com.example.fightingflow.util.ImmutableList
-import com.example.fightingflow.util.MoveListUiState
+import com.example.fightingflow.util.MoveEntryListUiState
 import com.example.fightingflow.util.emptyComboDisplay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.stateIn
@@ -36,31 +37,24 @@ class ComboDisplayViewModel(
 ): ViewModel() {
 
     companion object {
-        const val TAG = "ComboViewModel"
         const val TIME_MILLIS = 5_000L
     }
 
     // Flows
-    val moveEntryListState =
-        tekkenDataRepository.getAllMoves()
-            .map { MoveListUiState(it) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIME_MILLIS),
-                initialValue = MoveListUiState()
-            )
+    private val _moveEntryListState = MutableStateFlow(MoveEntryListUiState())
+    val moveEntryListUiState: StateFlow<MoveEntryListUiState> = _moveEntryListState
 
-    val characterEntryListState =
-        tekkenDataRepository.getAllCharacters()
-            .map { CharacterListUiState(it) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIME_MILLIS),
-                initialValue = CharacterListUiState()
-            )
+    private val _characterEntryListState = MutableStateFlow(CharacterEntryListUiState())
+    val characterEntryListState: StateFlow<CharacterEntryListUiState> = _characterEntryListState
 
-    val comboEntryListSate =
-        tekkenDataRepository.getAllCombos()
+    init {
+        getCharacterEntryList()
+        getAllMoveEntries()
+    }
+
+    val characterState = MutableStateFlow(CharacterUiState())
+
+    val comboEntryListSate = tekkenDataRepository.getAllCombos()
             .mapNotNull { ComboEntryListUiState(it) }
             .stateIn(
                 scope = viewModelScope,
@@ -68,8 +62,7 @@ class ComboDisplayViewModel(
                 initialValue = ComboEntryListUiState()
             )
 
-    val comboDisplayListState =
-        tekkenDataRepository.getAllCombos()
+    val comboDisplayListState = tekkenDataRepository.getAllCombos()
             .mapNotNull { ComboDisplayListUiState(it.map { it.toDisplay() }) }
             .stateIn(
                 scope = viewModelScope,
@@ -77,12 +70,21 @@ class ComboDisplayViewModel(
                 initialValue = ComboDisplayListUiState()
             )
 
-    val comboDisplayState = MutableStateFlow(ComboDisplayUiState(emptyComboDisplay))
-    val characterState = MutableStateFlow(CharacterUiState())
+    val characterNameState = selectedCharacterRepository.getName()
+            .map { CharNameUiState(it) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(TIME_MILLIS),
+                initialValue = CharNameUiState()
+            )
 
-    val characterNameState = getCharacterNameFromDS()
-    val characterImageState = getCharacterImageFromDS()
-
+    val characterImageState = selectedCharacterRepository.getImage()
+            .map { CharImageUiState(it) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(TIME_MILLIS),
+                initialValue = CharImageUiState()
+            )
 
     // Datastore
     fun updateCharacterState(name: String) {
@@ -91,25 +93,6 @@ class ComboDisplayViewModel(
         characterState.update { CharacterUiState(character) }
         Timber.d("Found $character and updated CharacterState")
     }
-
-    private fun getCharacterNameFromDS() =
-        selectedCharacterRepository.getName()
-            .map { CharNameUiState(it) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIME_MILLIS),
-                initialValue = CharNameUiState()
-            )
-
-    private fun getCharacterImageFromDS() =
-        selectedCharacterRepository.getImage()
-            .map { CharImageUiState(it) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIME_MILLIS),
-                initialValue = CharImageUiState()
-            )
-
 
     fun setCharacterToDS(character: CharacterEntry) {
         viewModelScope.launch {
@@ -122,10 +105,26 @@ class ComboDisplayViewModel(
         comboDsRepository.setCombo(comboDisplay)
     }
 
+    // Database Functions
+    private fun getAllMoveEntries() = tekkenDataRepository.getAllMoves()
+        .map { MoveEntryListUiState(it) }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(TIME_MILLIS),
+            initialValue = MoveEntryListUiState()
+        )
 
-    // Repository Functions
+    private fun getCharacterEntryList() =
+        tekkenDataRepository.getAllCharacters()
+            .map { CharacterEntryListUiState(it) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(TIME_MILLIS),
+                initialValue = CharacterEntryListUiState()
+            )
+
     suspend fun deleteCombo(combo: ComboDisplay, comboEntries: List<ComboEntry>) {
-        Timber.d("Starting Delete process.")
+        Timber.d("Starting delete process...")
         Timber.d("Existing combo list: $comboEntries")
         val comboToDelete = comboEntries.first {it.comboId == combo.comboId}
         Timber.d("Deleting: $comboToDelete")
@@ -134,7 +133,6 @@ class ComboDisplayViewModel(
     }
 
     // Object Conversion
-
     fun getMoveEntryData(moveData: List<MoveEntry>, combo: ComboDisplay): ComboDisplay {
         Timber.d("Processing moveList for ${combo.comboId}")
         val updatedCombo = combo.copy(

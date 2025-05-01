@@ -11,12 +11,12 @@ import kotlinx.coroutines.flow.Flow
 
 interface TekkenDbRepository {
     // Character
-    fun getCharacter(name: String): Flow<CharacterEntry>
+    fun getCharacter(name: String): Flow<CharacterEntry?>
     fun getAllCharacters(): Flow<List<CharacterEntry>>
     suspend fun updateCharacter(character: CharacterEntry)
 
     // Combo
-    fun getCombo(comboId: String): Flow<ComboEntry>
+    fun getCombo(comboId: String): Flow<ComboEntry?>
     fun getAllCombos(): Flow<List<ComboEntry>>
     fun getAllCombosByCharacter(characterEntry: CharacterEntry): Flow<List<ComboEntry>>
     fun getAllCombosByProfile(username: String): Flow<List<ComboEntry>>
@@ -24,7 +24,7 @@ interface TekkenDbRepository {
     suspend fun deleteCombo(combo: ComboEntry)
 
     // Move
-    fun getMove(name: String): Flow<MoveEntry>
+    fun getMove(name: String): Flow<MoveEntry?>
     fun getAllMoves(): Flow<List<MoveEntry>>
 
     // InsertData
@@ -40,14 +40,14 @@ class TekkenDatabaseRepository(
 ): TekkenDbRepository {
 
     // Get Character
-    override fun getCharacter(name: String): Flow<CharacterEntry> =
+    override fun getCharacter(name: String): Flow<CharacterEntry?> =
         characterDao.getCharacter(name)
 
     override fun getAllCharacters(): Flow<List<CharacterEntry>> =
         characterDao.getAllCharacters()
 
     // Get Combo
-    override fun getCombo(comboId: String): Flow<ComboEntry> =
+    override fun getCombo(comboId: String): Flow<ComboEntry?> =
         comboDao.getCombo(comboId)
 
     override fun getAllCombos(): Flow<List<ComboEntry>> =
@@ -60,7 +60,7 @@ class TekkenDatabaseRepository(
         comboDao.getAllCombosByProfile(username)
 
     // Get Moves
-    override fun getMove(name: String): Flow<MoveEntry> =
+    override fun getMove(name: String): Flow<MoveEntry?> =
         moveDao.getMove(name)
 
     override fun getAllMoves(): Flow<List<MoveEntry>> =

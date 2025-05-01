@@ -56,17 +56,17 @@ fun NavGraph(
     val currentScreen = FlowScreen.valueOf(backStackEntry?.destination?.route ?: FlowScreen.Start.name)
 
     Timber.d("Initializing ViewModels")
-    val comboViewModel = koinInject<ComboDisplayViewModel>()
-    val addComboViewModel = koinInject<ComboCreationViewModel>()
+    val comboDisplayViewModel = koinInject<ComboDisplayViewModel>()
+    val comboCreationViewModel = koinInject<ComboCreationViewModel>()
     val profileViewModel = koinInject<ProfileViewModel>()
 
     // ComboViewModel Flows
-    val characterState by comboViewModel.characterState.collectAsStateWithLifecycle()
-    val comboEntryListState by comboViewModel.comboEntryListSate.collectAsStateWithLifecycle()
+    val characterState by comboDisplayViewModel.characterState.collectAsStateWithLifecycle()
+    val comboEntryListState by comboDisplayViewModel.comboEntryListSate.collectAsStateWithLifecycle()
 
     // AddComboViewModel Flows
-    val comboStateAddCombo by addComboViewModel.comboDisplayState.collectAsStateWithLifecycle()
-    val comboEntryListStateAddCombo by addComboViewModel.comboEntryListState.collectAsStateWithLifecycle()
+    val comboStateAddCombo by comboCreationViewModel.comboDisplayState.collectAsStateWithLifecycle()
+    val comboEntryListStateAddCombo by comboCreationViewModel.comboEntryListState.collectAsStateWithLifecycle()
 
     // ProfileViewModel Flows
     val loggedInState by profileViewModel.loggedInState.collectAsStateWithLifecycle()
@@ -135,9 +135,9 @@ fun NavGraph(
             // Character Screen
             composable(route = FlowScreen.PickChar.name) {
                 CharacterScreen(
-                    comboViewModel = comboViewModel,
-                    updateCharacterState = comboViewModel::updateCharacterState,
-                    setCharacterToDS = comboViewModel::setCharacterToDS,
+                    comboViewModel = comboDisplayViewModel,
+                    updateCharacterState = comboDisplayViewModel::updateCharacterState,
+                    setCharacterToDS = comboDisplayViewModel::setCharacterToDS,
                     onClick = { navController.navigate(FlowScreen.Combos.name) },
                     navigateBack = { navController.navigate(FlowScreen.Start.name)}
                 )
@@ -147,14 +147,14 @@ fun NavGraph(
             composable(route = FlowScreen.Combos.name) {
                 ComboDisplayScreen(
                     deviceType = deviceType,
-                    comboViewModel = comboViewModel,
-                    updateCharacterState = comboViewModel::updateCharacterState,
-                    getMoveEntryData = comboViewModel::getMoveEntryData,
+                    comboViewModel = comboDisplayViewModel,
+                    updateCharacterState = comboDisplayViewModel::updateCharacterState,
+                    getMoveEntryData = comboDisplayViewModel::getMoveEntryData,
                     onAddCombo = {
                         Timber.d("")
                         Timber.d("Preparing to create new combo...")
                         Timber.d("Setting edit state to false...")
-                        addComboViewModel.editingState.value = false
+                        comboCreationViewModel.editingState.value = false
                         Timber.d("Moving to AddComboScreen")
                         navController.navigate(FlowScreen.AddCombo.name)
                     },
@@ -162,16 +162,16 @@ fun NavGraph(
                         Timber.d("")
                         Timber.d("Preparing to edit selected combo")
                         Timber.d("Saving selected combo to AddComboViewModel...")
-                        addComboViewModel.comboDisplayState.update { it }
+                        comboCreationViewModel.comboDisplayState.update { it }
                         Timber.d("AddComboViewModel Combo state: ${comboStateAddCombo.comboDisplay}")
 //
 //                        Log.d(NAV_TAG, "Updating character state of AddComboViewModel")
 //                        addComboViewModel.characterState.update { characterState }
 //
                         Timber.d("Updating Combo List of AddComboViewModel")
-                        addComboViewModel.comboEntryListState.update { comboEntryListState }
+                        comboCreationViewModel.comboEntryListState.update { comboEntryListState }
                         Timber.d("Updated Combo List: ${comboEntryListStateAddCombo.comboEntryList}")
-                        addComboViewModel.editingState.value = true
+                        comboCreationViewModel.editingState.value = true
                         navController.navigate(FlowScreen.AddCombo.name)
                     },
                     navigateBack = {navController.navigate(FlowScreen.PickChar.name) }
@@ -181,14 +181,14 @@ fun NavGraph(
             // Add Combo Screen
             composable(route = FlowScreen.AddCombo.name) {
                 ComboCreationScreen(
-                    addComboViewModel = addComboViewModel,
-                    comboViewModel = comboViewModel,
-                    saveComboDetailsToDs = addComboViewModel::saveComboDetailsToDs,
-                    updateComboData = addComboViewModel::updateComboDetails,
-                    updateMoveList = addComboViewModel::updateMoveList,
-                    saveCombo = addComboViewModel::saveCombo,
-                    deleteLastMove = addComboViewModel::deleteLastMove,
-                    clearMoveList = addComboViewModel::clearMoveList,
+                    comboCreationViewModel = comboCreationViewModel,
+                    comboDisplayViewModel = comboDisplayViewModel,
+                    saveComboDetailsToDs = comboCreationViewModel::saveComboDetailsToDs,
+                    updateComboData = comboCreationViewModel::updateComboDetails,
+                    updateMoveList = comboCreationViewModel::updateMoveList,
+                    saveCombo = comboCreationViewModel::saveCombo,
+                    deleteLastMove = comboCreationViewModel::deleteLastMove,
+                    clearMoveList = comboCreationViewModel::clearMoveList,
                     onConfirm = { navController.navigate(FlowScreen.Combos.name) },
                     navigateBack = navController::navigateUp
                 )

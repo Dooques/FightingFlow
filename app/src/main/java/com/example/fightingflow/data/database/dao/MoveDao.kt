@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface MoveDao: BaseDao<MoveEntry> {
     @Query("select * from move_table where move_name = :name")
-    fun getMove(name: String): Flow<MoveEntry>
+    fun getMove(name: String): Flow<MoveEntry?>
 
     @Query("select * from move_table")
     fun getAllMoves(): Flow<List<MoveEntry>>

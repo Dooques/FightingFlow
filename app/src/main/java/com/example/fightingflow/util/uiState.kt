@@ -9,9 +9,9 @@ import com.example.fightingflow.model.ProfileEntry
 
 data class CharacterUiState(val character: CharacterEntry = emptyCharacter)
 
-data class CharacterListUiState(val characterList: List<CharacterEntry> = listOf())
+data class CharacterEntryListUiState(val characterList: List<CharacterEntry> = listOf())
 
-data class MoveListUiState(val moveList: List<MoveEntry> = listOf())
+data class MoveEntryListUiState(val moveList: List<MoveEntry> = listOf())
 
 data class ComboEntryListUiState(val comboEntryList: List<ComboEntry> = listOf())
 

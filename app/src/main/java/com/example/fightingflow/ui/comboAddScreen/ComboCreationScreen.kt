@@ -57,7 +57,7 @@ import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.ui.comboScreen.ComboItem
 import com.example.fightingflow.ui.comboScreen.ComboDisplayViewModel
 import com.example.fightingflow.util.ComboDisplayUiState
-import com.example.fightingflow.util.MoveListUiState
+import com.example.fightingflow.util.MoveEntryListUiState
 import kotlinx.coroutines.flow.update
 import timber.log.Timber
 
@@ -65,11 +65,11 @@ import timber.log.Timber
 @SuppressLint("SourceLockedOrientationActivity")
 @Composable
 fun ComboCreationScreen(
-    addComboViewModel: ComboCreationViewModel,
-    comboViewModel: ComboDisplayViewModel,
+    comboCreationViewModel: ComboCreationViewModel,
+    comboDisplayViewModel: ComboDisplayViewModel,
     saveComboDetailsToDs: (ComboDisplayUiState) -> Unit,
     updateComboData: (ComboDisplayUiState) -> Unit,
-    updateMoveList: (String, MoveListUiState) -> Unit,
+    updateMoveList: (String, MoveEntryListUiState) -> Unit,
     saveCombo: () -> Unit,
     deleteLastMove: () -> Unit,
     clearMoveList: () -> Unit,
@@ -85,21 +85,21 @@ fun ComboCreationScreen(
     (context as? Activity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
     // ComboViewModel
-    val characterState by comboViewModel.characterState.collectAsState()
-    val characterListState by comboViewModel.characterEntryListState.collectAsState()
-    val moveListState by comboViewModel.moveEntryListState.collectAsState()
+    val characterState by comboDisplayViewModel.characterState.collectAsState()
+    val characterListState by comboDisplayViewModel.characterEntryListState.collectAsState()
+    val moveListState by comboDisplayViewModel.moveEntryListUiState.collectAsState()
 
     // AddComboViewModel
-    val characterFromAddCombo by addComboViewModel.characterState.collectAsState()
-    val comboDisplayState by addComboViewModel.comboDisplayState.collectAsState()
-    val comboAsString by addComboViewModel.comboAsStringState.collectAsState()
-    val existingComboList by addComboViewModel.existingCombos.collectAsState()
-    val editingState by addComboViewModel.editingState
+    val characterFromAddCombo by comboCreationViewModel.characterState.collectAsState()
+    val comboDisplayState by comboCreationViewModel.comboDisplayState.collectAsState()
+    val comboAsString by comboCreationViewModel.comboAsStringState.collectAsState()
+    val existingComboList by comboCreationViewModel.existingCombos.collectAsState()
+    val editingState by comboCreationViewModel.editingState
 
     // Datastore Flows
-    val characterNameState by comboViewModel.characterNameState.collectAsState()
-    val characterImageState by comboViewModel.characterImageState.collectAsState()
-    val comboIdState by addComboViewModel.comboIdFromDs.collectAsState()
+    val characterNameState by comboDisplayViewModel.characterNameState.collectAsState()
+    val characterImageState by comboDisplayViewModel.characterImageState.collectAsState()
+    val comboIdState by comboCreationViewModel.comboIdFromDs.collectAsState()
 
     Timber.d(
         "Flows Collected: " +
@@ -118,14 +118,14 @@ fun ComboCreationScreen(
 
     Timber.d("Updating Character State")
     if (characterListState.characterList.isNotEmpty() && characterNameState.name.isNotEmpty()) {
-        addComboViewModel.characterState.update { characterState }
+        comboCreationViewModel.characterState.update { characterState }
     }
     Timber.d("${characterState.character.name} is loaded.")
 
     Timber.d("Checking if in editing state & existing combo list contains data...")
     if (editingState && existingComboList.comboEntryList.isNotEmpty()) {
         Timber.d("Existing combos contains data, preparing to add combo to ComboDisplayState...")
-        addComboViewModel.getExistingComboFromList()
+        comboCreationViewModel.getExistingComboFromList()
     }
 
     Timber.d("")
@@ -213,12 +213,12 @@ fun Header(
 @Composable
 fun ComboForm(
     updateComboData: (ComboDisplayUiState) -> Unit,
-    updateMoveList: (String, MoveListUiState) -> Unit,
+    updateMoveList: (String, MoveEntryListUiState) -> Unit,
     character: CharacterEntry,
     characterName: String,
     combo: ComboDisplay,
     comboAsString: String,
-    moveList: MoveListUiState,
+    moveList: MoveEntryListUiState,
     saveCombo: () -> Unit,
     deleteLastMove: () -> Unit,
     clearMoveList: () -> Unit,
@@ -281,13 +281,13 @@ fun InputSelector(
     characterName: String,
     combo: ComboDisplay,
     updateComboData: (ComboDisplayUiState) -> Unit,
-    updateMoveList: (String, MoveListUiState) -> Unit,
+    updateMoveList: (String, MoveEntryListUiState) -> Unit,
     comboAsString: String,
     saveCombo: () -> Unit,
     deleteLastMove: () -> Unit,
     clearMoveList: () -> Unit,
     onConfirm: () -> Unit,
-    moveList: MoveListUiState,
+    moveList: MoveEntryListUiState,
     modifier: Modifier = Modifier
 ) {
     Timber.d("Loading Input Selector")
@@ -408,8 +408,8 @@ fun RadioButtons(modifier: Modifier = Modifier) {
 fun DamageAndBreak(
     combo: ComboDisplay,
     updateComboData: (ComboDisplayUiState) -> Unit,
-    updateMoveList: (String, MoveListUiState) -> Unit,
-    moveList: MoveListUiState,
+    updateMoveList: (String, MoveEntryListUiState) -> Unit,
+    moveList: MoveEntryListUiState,
     modifier: Modifier = Modifier
 ) {
     var damageValue by remember { mutableIntStateOf(combo.damage) }
@@ -455,8 +455,8 @@ fun DamageAndBreak(
 @Composable
 fun IconMoves(
     moveType: String,
-    moveList: MoveListUiState,
-    updateMoveList: (String, MoveListUiState) -> Unit,
+    moveList: MoveEntryListUiState,
+    updateMoveList: (String, MoveEntryListUiState) -> Unit,
     context: Context,
     modifier: Modifier = Modifier
 ) {
@@ -494,9 +494,9 @@ fun IconMoves(
 @Composable
 fun TextMoves(
     moveType: String,
-    moveList: MoveListUiState,
+    moveList: MoveEntryListUiState,
     character: CharacterEntry,
-    updateMoveList: (String, MoveListUiState) -> Unit,
+    updateMoveList: (String, MoveEntryListUiState) -> Unit,
     modifier: Modifier = Modifier
 ) {
     FlowRow(

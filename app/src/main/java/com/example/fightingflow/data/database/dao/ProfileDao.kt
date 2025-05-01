@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ProfileDao:BaseDao<ProfileEntry> {
     @Query("SELECT * FROM profile where username = :username")
-    fun getProfile(username: String): Flow<ProfileEntry>
+    fun getProfile(username: String): Flow<ProfileEntry?>
 
     @Query("select * from profile")
     fun getAllProfiles(): Flow<List<ProfileEntry>>
