@@ -6,10 +6,9 @@ import com.example.fightingflow.data.database.dao.MoveDao
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboEntry
 import com.example.fightingflow.model.MoveEntry
-import com.example.fightingflow.model.ProfileEntry
 import kotlinx.coroutines.flow.Flow
 
-interface TekkenDbRepository {
+interface FlowRepository {
     // Character
     fun getCharacter(name: String): Flow<CharacterEntry?>
     fun getAllCharacters(): Flow<List<CharacterEntry>>
@@ -33,11 +32,11 @@ interface TekkenDbRepository {
     suspend fun insertCombo(combo: ComboEntry)
 }
 
-class TekkenDatabaseRepository(
+class FlowDataRepository(
     private val characterDao: CharacterDao,
     private val comboDao: ComboDao,
     private val moveDao: MoveDao
-): TekkenDbRepository {
+): FlowRepository {
 
     // Get Character
     override fun getCharacter(name: String): Flow<CharacterEntry?> =

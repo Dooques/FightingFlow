@@ -101,20 +101,18 @@ fun ComboCreationScreen(
     val characterImageState by comboDisplayViewModel.characterImageState.collectAsState()
     val comboIdState by comboCreationViewModel.comboIdFromDs.collectAsState()
 
-    Timber.d(
-        "Flows Collected: " +
-                "\nCharacter Details (Ds): " +
-                "\nName: ${characterNameState.name} " +
-                "\nImage: ${characterImageState.image}" +
-                "\nMove List: ${moveListState.moveList}"
-    )
     Timber.d("")
-    Timber.d("\nCharacter: ${characterFromAddCombo.character}" +
-            "\nComboDisplayState: ${comboDisplayState.comboDisplay}" +
-            "\nComboString: $comboAsString" +
-            "\nComboId from DS: $comboIdState" +
-            "\nExistingComboList: $existingComboList"
-    )
+    Timber.d("Flows Collected: ")
+    Timber.d("Character Details (Ds): ")
+    Timber.d("Name: ${characterNameState.name} ")
+    Timber.d("Image: ${characterImageState.image}")
+
+    Timber.d("")
+    Timber.d("Character: ${characterFromAddCombo.character}")
+    Timber.d("ComboDisplayState: ${comboDisplayState.comboDisplay}")
+    Timber.d("ComboString: $comboAsString")
+    Timber.d("ComboId from DS: $comboIdState")
+    Timber.d("ExistingComboList: $existingComboList")
 
     Timber.d("Updating Character State")
     if (characterListState.characterList.isNotEmpty() && characterNameState.name.isNotEmpty()) {
@@ -125,13 +123,14 @@ fun ComboCreationScreen(
     Timber.d("Checking if in editing state & existing combo list contains data...")
     if (editingState && existingComboList.comboEntryList.isNotEmpty()) {
         Timber.d("Existing combos contains data, preparing to add combo to ComboDisplayState...")
-        comboCreationViewModel.getExistingComboFromList()
+        comboCreationViewModel.getExistingCombo()
     }
 
     Timber.d("")
     Timber.d("Combo: ${comboDisplayState.comboDisplay}" +
             "\nComboMoves: ${comboDisplayState.comboDisplay.moves}"
     )
+
     Scaffold(
         topBar = {
             TopAppBar(

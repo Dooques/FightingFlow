@@ -30,6 +30,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
@@ -58,6 +60,7 @@ import timber.log.Timber
 @Composable
 fun ComboDisplayScreen(
     deviceType: WindowSizeClass,
+    snackbarHostState: SnackbarHostState,
     comboViewModel: ComboDisplayViewModel,
     updateCharacterState: (String) -> Unit,
     getMoveEntryData: (List<MoveEntry>, ComboDisplay) -> ComboDisplay,
@@ -67,7 +70,7 @@ fun ComboDisplayScreen(
     modifier: Modifier = Modifier,
 ) {
     Timber.d("")
-    Timber.d("\nOpening Combo Screen...")
+    Timber.d("Opening Combo Screen...")
 
     val context = LocalContext.current
     (context as? Activity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
@@ -76,13 +79,14 @@ fun ComboDisplayScreen(
     val characterState by comboViewModel.characterState.collectAsState()
     val characterListState by comboViewModel.characterEntryListState.collectAsState()
     val comboDisplayListState by comboViewModel.comboDisplayListState.collectAsState()
-    val comboEntryListState by comboViewModel.comboEntryListSate.collectAsState()
+    val comboEntryListState by comboViewModel.comboEntryListState.collectAsState()
     val moveListState by comboViewModel.moveEntryListUiState.collectAsState()
 
     // Datastore Flows
     val characterNameState by comboViewModel.characterNameState.collectAsState()
     val characterImageState by comboViewModel.characterImageState.collectAsState()
 
+    Timber.d("")
     Timber.d("Flows Collected")
     Timber.d("Character: ${characterState.character}")
     Timber.d("Character Details: ${characterNameState.name} ${characterImageState.image}")
@@ -95,7 +99,7 @@ fun ComboDisplayScreen(
         try {
             updateCharacterState(characterNameState.name)
         } catch (e: NoSuchElementException) {
-            Timber.d("Character Error, no element found in character list.")
+            Timber.e(e, "Character Error, no element found in character list.")
         }
     }
 
@@ -105,18 +109,19 @@ fun ComboDisplayScreen(
 
     val uiScale = if (deviceType.widthSizeClass != WindowWidthSizeClass.Compact) 2f else 1f
 
-    val updatedCombos =
-        comboDisplayListState.comboDisplayList.map { combo ->
-            getMoveEntryData(moveListState.moveList, combo)
-        }
-    Timber.d("Updated Combo list: $updatedCombos")
-
+    Timber.d("Checking combos for ${characterNameState.name}")
     val combosByCharacter =
-        updatedCombos
-            .mapNotNull {
-                if (it.character == characterState.character.name) it else null
-            }
-            .toMutableList()
+        if (comboDisplayListState.comboDisplayList.isNotEmpty()) {
+            Timber.d("Combos found.")
+            comboDisplayListState.comboDisplayList
+                .mapNotNull {
+                    if (it.character == characterState.character.name) it else null
+                }
+                .toMutableList()
+        } else {
+            Timber.d("No combos found.")
+            emptyList<ComboDisplay>().toMutableList()
+        }
     Timber.d("Combos reduced to ${characterState.character.name}'s: $combosByCharacter")
 
     Scaffold(
@@ -185,13 +190,12 @@ fun ComboDisplayScreen(
                                     Timber.d("Preparing to edit combo")
                                     scope.launch {
                                         comboViewModel.saveComboIdToDs(combo)
+                                        onEditCombo()
+                                        snackbarHostState.showSnackbar(
+                                            message = "Combo ${combo.comboId} is being sent to the editor.",
+                                            duration = SnackbarDuration.Short
+                                            )
                                     }
-                                    onEditCombo()
-                                    Toast.makeText(
-                                        context,
-                                        "Combo ${combo.comboId} is being sent to the editor.",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
                                 },
                                 tint = Color.Green,
                                 icon = Icons.Default.Edit,

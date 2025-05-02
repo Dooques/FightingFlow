@@ -3,7 +3,7 @@ package com.example.fightingflow.ui.comboCreationScreen
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.fightingflow.data.database.TekkenDbRepository
+import com.example.fightingflow.data.database.FlowRepository
 import com.example.fightingflow.data.datastore.ComboDsRepository
 import com.example.fightingflow.data.datastore.CharacterDsRepository
 import com.example.fightingflow.model.MoveEntry
@@ -18,6 +18,8 @@ import com.example.fightingflow.util.MoveEntryListUiState
 import com.example.fightingflow.util.emptyComboDisplay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -26,7 +28,7 @@ import timber.log.Timber
 
 
 class ComboCreationViewModel(
-    private val tekkenDataRepository: TekkenDbRepository,
+    private val flowRepository: FlowRepository,
     private val comboDsRepository: ComboDsRepository,
     private val characterDsRepository: CharacterDsRepository
 ): ViewModel() {
@@ -36,8 +38,13 @@ class ComboCreationViewModel(
     }
 
     val editingState = mutableStateOf(false)
-
     val characterState = MutableStateFlow(CharacterUiState())
+    val comboDisplayState = MutableStateFlow(ComboDisplayUiState())
+    val comboAsStringState = MutableStateFlow(processComboAsString())
+
+    private val _comboEntryListState = MutableStateFlow(ComboEntryListUiState())
+    val comboEntryListState: StateFlow<ComboEntryListUiState> = _comboEntryListState
+
 
     val comboIdFromDs = comboDsRepository.getComboId()
         .map { it }
@@ -47,7 +54,7 @@ class ComboCreationViewModel(
             initialValue = ""
         )
 
-    val existingCombos = tekkenDataRepository.getAllCombos()
+    val existingCombos = flowRepository.getAllCombos()
         .map { ComboEntryListUiState(it) }
         .stateIn(
             scope = viewModelScope,
@@ -55,20 +62,12 @@ class ComboCreationViewModel(
             initialValue = ComboEntryListUiState()
         )
 
-    val comboDisplayState = MutableStateFlow(ComboDisplayUiState())
-
-    val comboAsStringState = MutableStateFlow(processComboAsString())
-
-    val comboEntryListState = MutableStateFlow<ComboEntryListUiState>(ComboEntryListUiState())
-
     // Combo Processing Functions
-    fun processComboAsString(): String {
+    private fun processComboAsString(): String {
         Timber.d("")
         Timber.d("Processing combo as string...")
-        Timber.d("Getting iterator...")
         val comboIterator = comboDisplayState.value.comboDisplay.moves.iterator()
         var moveAsString = ""
-        Timber.d("Starting while loop to process combo")
         while (comboIterator.hasNext()) {
             val move = comboIterator.next().notation
             if (move == "Break") {
@@ -86,8 +85,8 @@ class ComboCreationViewModel(
     fun updateComboDetails(comboDisplay: ComboDisplayUiState) {
         Timber.d("")
         Timber.d("Updating combo details...")
-        val comboDisplayWithCharacterData =
-            comboDisplay.comboDisplay.copy(character = characterState.value.character.name)
+        val comboDisplayWithCharacterData = comboDisplay.comboDisplay.copy(
+                character = characterState.value.character.name)
 
         Timber.d("Combo Display with Character: $comboDisplayWithCharacterData")
         comboDisplayState.update { ComboDisplayUiState(comboDisplayWithCharacterData) }
@@ -96,15 +95,13 @@ class ComboCreationViewModel(
         comboAsStringState.update { processComboAsString() }
 
         Timber.d("")
-        Timber.d("Updating combo details for ${characterState.value.character.name}")
-        Timber.d(
-            "Updated Combo Details: " +
-                    "\nComboId: ${comboDisplayState.value.comboDisplay.comboId}" +
-                    "\nCharacter: ${comboDisplayState.value.comboDisplay.character}" +
-                    "\nDamage: ${comboDisplayState.value.comboDisplay.damage}" +
-                    "\nCreated by: ${comboDisplayState.value.comboDisplay.createdBy}" +
-                    "\nmoves: ${comboAsStringState.value}"
-        )
+//        Timber.d("Updating combo details for ${characterState.value.character.name}")
+//        Timber.d("Updated Combo Details: ")
+//        Timber.d("ComboId: ${comboDisplayState.value.comboDisplay.comboId}")
+//        Timber.d("Character: ${comboDisplayState.value.comboDisplay.character}")
+//        Timber.d("Damage: ${comboDisplayState.value.comboDisplay.damage}")
+//        Timber.d("Created by: ${comboDisplayState.value.comboDisplay.createdBy}")
+//        Timber.d("Moves: ${comboAsStringState.value}")
         Timber.d("Saving updated combo to datastore...")
         saveComboDetailsToDs(comboDisplayState.value)
     }
@@ -161,15 +158,13 @@ class ComboCreationViewModel(
         }
     }
 
-    fun getExistingComboFromList() {
-        Timber.d("")
-        Timber.d("Getting Combo from existing combo list...")
-        val combo = ComboDisplayUiState(
-                existingCombos.value.comboEntryList.first {it.comboId == comboIdFromDs.value}.toDisplay()
-            )
-        Timber.d("Combo found: ${combo.comboDisplay}")
-        comboDisplayState.update { combo }
-        Timber.d("ComboDisplayState updated.")
+    fun getExistingCombo() {
+        viewModelScope.launch {
+            _comboEntryListState.update { ComboEntryListUiState(flowRepository.getAllCombos().first()) }
+            comboDisplayState.update {
+                ComboDisplayUiState(comboEntryListState.value.comboEntryList.first {combo -> combo.comboId == comboIdFromDs.value }.toDisplay())
+            }
+        }
     }
 
     // Datastore Functions
@@ -195,9 +190,9 @@ class ComboCreationViewModel(
         viewModelScope.launch {
             Timber.d("")
             val comboEntry = comboDisplayState.value.comboDisplay.toEntry(characterState.value.character)
-            tekkenDataRepository.insertCombo(comboEntry)
+            flowRepository.insertCombo(comboEntry)
             Timber.d("Combo added to Db.")
-
+            Timber.d("Clearing move list...")
             clearMoveList()
             Timber.d("Move list cleared.")
         }
@@ -206,10 +201,12 @@ class ComboCreationViewModel(
      private fun updateComboInDb() {
          viewModelScope.launch {
              Timber.d("")
-             val existingCombo = comboEntryListState.value.comboEntryList.first {it.comboId == comboDisplayState.value.comboDisplay.comboId}
+             val existingCombo = comboEntryListState.value.comboEntryList.first { combo ->
+                 combo.comboId == comboDisplayState.value.comboDisplay.comboId
+             }
              val newCombo = comboDisplayState.value.comboDisplay
 
-             tekkenDataRepository.updateCombo(
+             flowRepository.updateCombo(
                  existingCombo.copy(
                      id = newCombo.id,
                      comboId = newCombo.comboId,

@@ -11,10 +11,10 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.fightingflow.data.datastore.ProfileDsRepository.Companion.IS_USER_LOGGED_IN
 import com.example.fightingflow.data.datastore.ProfileDsRepository.Companion.USERNAME
-import com.example.fightingflow.util.PROFILE_DS_REPO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
+import timber.log.Timber
 import java.io.IOException
 
 interface ProfileDsRepository {
@@ -35,12 +35,12 @@ class ProfileDatastoreRepository(private val dataStore: DataStore<Preferences>):
     val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
     override fun profileLoggedInState(): Flow<Boolean> = dataStore.data
-        .catch {
-            if (it is IOException) {
-                Log.e(PROFILE_DS_REPO, "Error reading preferences", it)
+        .catch { e ->
+            if (e is IOException) {
+                Timber.e(e, "Error reading preferences")
                 emit(emptyPreferences())
             } else {
-                throw it
+                throw e
             }
         }
         .map { preferences ->
@@ -50,30 +50,30 @@ class ProfileDatastoreRepository(private val dataStore: DataStore<Preferences>):
     override fun getUsername(): Flow<String> = dataStore.data
         .catch {
             if (it is IOException) {
-                Log.e(PROFILE_DS_REPO, "Error reading preferences", it)
+                Timber.e(it, "Error reading preferences")
             } else {
                 throw it
             }
         }
         .map { preference ->
-            Log.d(PROFILE_DS_REPO, "")
-            Log.d(PROFILE_DS_REPO, "Returning username from datastore...")
-            Log.d(PROFILE_DS_REPO, "Username: ${preference[USERNAME]}")
+            Timber.d("")
+            Timber.d("Returning username from datastore...")
+            Timber.d("Username: ${preference[USERNAME]}")
             preference[USERNAME] ?: "Invalid User"
     }
 
     override suspend fun updateUsername(username: String) {
-        Log.d(PROFILE_DS_REPO, "")
-        Log.d(PROFILE_DS_REPO, "Saving username: $username")
+        Timber.d("")
+        Timber.d( "Saving username: $username")
         dataStore.edit { preference ->
             preference[USERNAME] = username
         }
-        Log.d(PROFILE_DS_REPO, "Username stored in datastore.")
+        Timber.d("Username stored in datastore.")
     }
 
     override suspend fun updateLoggedInState (isUserLoggedIn: Boolean) {
-        Log.d(PROFILE_DS_REPO, "")
-        Log.d(PROFILE_DS_REPO, "Updating logged in state from datastore...")
+        Timber.d( "")
+        Timber.d("Updating logged in state from datastore...")
         dataStore.edit { preferences ->
             preferences[IS_USER_LOGGED_IN] = isUserLoggedIn
         }

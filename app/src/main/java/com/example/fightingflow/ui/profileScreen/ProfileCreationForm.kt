@@ -24,7 +24,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import com.example.fightingflow.util.PROFILE_SCREEN_TAG
 import com.example.fightingflow.util.ProfileCreationUiState
 import timber.log.Timber
 

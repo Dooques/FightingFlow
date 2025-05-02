@@ -29,6 +29,7 @@ import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayViewModel
 import com.example.fightingflow.ui.profileScreen.ProfileList
 import com.example.fightingflow.ui.profileScreen.ProfileViewModel
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import timber.log.Timber
 
@@ -60,11 +61,10 @@ fun NavGraph(
     val comboCreationViewModel = koinInject<ComboCreationViewModel>()
     val profileViewModel = koinInject<ProfileViewModel>()
 
-    // ComboViewModel Flows
-    val characterState by comboDisplayViewModel.characterState.collectAsStateWithLifecycle()
-    val comboEntryListState by comboDisplayViewModel.comboEntryListSate.collectAsStateWithLifecycle()
+    // ComboDisplayViewModel Flows
+    val comboEntryListState by comboDisplayViewModel.comboEntryListState.collectAsStateWithLifecycle()
 
-    // AddComboViewModel Flows
+    // Combo Creation Flows
     val comboStateAddCombo by comboCreationViewModel.comboDisplayState.collectAsStateWithLifecycle()
     val comboEntryListStateAddCombo by comboCreationViewModel.comboEntryListState.collectAsStateWithLifecycle()
 
@@ -75,20 +75,20 @@ fun NavGraph(
     val scope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
 
-    Timber.d("")
-    Timber.d("Flows collected")
-    Timber.d("ComboViewModel Flows")
-    Timber.d("Character: ${characterState.character}")
-    Timber.d("Combo Entry List: ${comboEntryListState.comboEntryList}")
-    Timber.d("Combo Display: ${comboStateAddCombo.comboDisplay}")
-    Timber.d("")
-    Timber.d("AddComboViewModel Flows")
-    Timber.d("ComboStateAddCombo: ${comboStateAddCombo.comboDisplay}")
-    Timber.d("comboEntryListStateAddCombo: ${comboEntryListStateAddCombo.comboEntryList}")
-    Timber.d("")
-    Timber.d("ProfileViewModel Flows")
-    Timber.d("IsUserLoggedIn: $loggedInState")
-    Timber.d("Username: $username")
+//    Timber.d("")
+//    Timber.d("Flows collected")
+//    Timber.d("ComboViewModel Flows")
+//    Timber.d("Character: ${characterState.character}")
+//    Timber.d("Combo Entry List: ${comboEntryListState.comboEntryList}")
+//    Timber.d("Character Entry List: ${characterEntryList.characterList}")
+//    Timber.d("")
+//    Timber.d("AddComboViewModel Flows")
+//    Timber.d("ComboStateAddCombo: ${comboStateAddCombo.comboDisplay}")
+//    Timber.d("comboEntryListStateAddCombo: ${comboEntryListStateAddCombo.comboEntryList}")
+//    Timber.d("")
+//    Timber.d("ProfileViewModel Flows")
+//    Timber.d("IsUserLoggedIn: $loggedInState")
+//    Timber.d("Username: $username")
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
@@ -135,17 +135,18 @@ fun NavGraph(
                 CharacterScreen(
                     comboViewModel = comboDisplayViewModel,
                     updateCharacterState = comboDisplayViewModel::updateCharacterState,
-                    setCharacterToDS = comboDisplayViewModel::setCharacterToDS,
+                    setCharacterToDS = comboDisplayViewModel::updateCharacterInDS,
                     onClick = { navController.navigate(FlowScreen.Combos.name) },
                     navigateBack = { navController.navigate(FlowScreen.Start.name)}
                 )
             }
 
-            // Combo Screen
+            // Combo Display Screen
             composable(route = FlowScreen.Combos.name) {
                 ComboDisplayScreen(
                     deviceType = deviceType,
                     comboViewModel = comboDisplayViewModel,
+                    snackbarHostState = snackBarHostState,
                     updateCharacterState = comboDisplayViewModel::updateCharacterState,
                     getMoveEntryData = comboDisplayViewModel::getMoveEntryData,
                     onAddCombo = {
@@ -157,20 +158,16 @@ fun NavGraph(
                         navController.navigate(FlowScreen.AddCombo.name)
                     },
                     onEditCombo = {
-                        Timber.d("")
-                        Timber.d("Preparing to edit selected combo")
-                        Timber.d("Saving selected combo to AddComboViewModel...")
-                        comboCreationViewModel.comboDisplayState.update { it }
-                        Timber.d("AddComboViewModel Combo state: ${comboStateAddCombo.comboDisplay}")
-//
-//                        Log.d(NAV_TAG, "Updating character state of AddComboViewModel")
-//                        addComboViewModel.characterState.update { characterState }
-//
-                        Timber.d("Updating Combo List of AddComboViewModel")
-                        comboCreationViewModel.comboEntryListState.update { comboEntryListState }
-                        Timber.d("Updated Combo List: ${comboEntryListStateAddCombo.comboEntryList}")
-                        comboCreationViewModel.editingState.value = true
-                        navController.navigate(FlowScreen.AddCombo.name)
+                        scope.launch {
+                            Timber.d("")
+                            Timber.d("Preparing to edit selected combo")
+                            Timber.d("Saving selected combo to AddComboViewModel...")
+                            comboCreationViewModel.comboDisplayState.update { it }
+                            Timber.d("AddComboViewModel Combo state: ${comboStateAddCombo.comboDisplay}")
+                            Timber.d("Updated Combo List: ${comboEntryListStateAddCombo.comboEntryList}")
+                            comboCreationViewModel.editingState.value = true
+                            navController.navigate(FlowScreen.AddCombo.name)
+                        }
                     },
                     navigateBack = {navController.navigate(FlowScreen.PickChar.name) }
                 )

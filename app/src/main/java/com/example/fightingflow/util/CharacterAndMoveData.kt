@@ -6,14 +6,20 @@ import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.MoveEntry
 
 @Immutable
-class CharacterAndMoveData() {
-    val tekkenCharacterEntries:List<CharacterEntry> = listOf(
+class CharacterAndMoveData {
+    val tekkenCharacterEntries: List<CharacterEntry> = listOf(
         CharacterEntry(
             id = 0,
             name = "Alisa",
-             imageId = R.drawable.alisa_sprite,
+            imageId = R.drawable.alisa_sprite,
             fightingStyle = "Thruster-Based High-Mobility Fighting Style",
-            uniqueMoves = listOf("Clockwork", "Destructive Form", "Boot", "Dual Boot", "Backup").toString(),
+            uniqueMoves = listOf(
+                "Clockwork",
+                "Destructive Form",
+                "Boot",
+                "Dual Boot",
+                "Backup"
+            ).toString(),
             gameFranchise = "Tekken",
             gameEntry = "8"
         ),
@@ -76,7 +82,11 @@ class CharacterAndMoveData() {
             name = "Devil Jin",
             imageId = R.drawable.jin_sprite,
             fightingStyle = "Unknown",
-            uniqueMoves = listOf("Mishima Crouch Dash (Wind God Step)", "Fly", "Mourning Crow").toString(),
+            uniqueMoves = listOf(
+                "Mishima Crouch Dash (Wind God Step)",
+                "Fly",
+                "Mourning Crow"
+            ).toString(),
             gameFranchise = "Tekken",
             gameEntry = "8"
         ),
@@ -103,7 +113,12 @@ class CharacterAndMoveData() {
             name = "Feng",
             imageId = R.drawable.feng_sprite,
             fightingStyle = "Taijiquan",
-            uniqueMoves = listOf("Back Turned", "Lingering Shadow", "Shifting Clouds", "Deceptive Step").toString(),
+            uniqueMoves = listOf(
+                "Back Turned",
+                "Lingering Shadow",
+                "Shifting Clouds",
+                "Deceptive Step"
+            ).toString(),
             gameFranchise = "Tekken",
             gameEntry = "8"
         ),
@@ -121,7 +136,14 @@ class CharacterAndMoveData() {
             name = "Hwoarang",
             imageId = R.drawable.hwoarang_sprite,
             fightingStyle = "Taekwondo",
-            uniqueMoves = listOf("Crouch Step", "Back Turned", "Right Stance", "Left Stance", "Right Flamingo", "Left Flamingo").toString(),
+            uniqueMoves = listOf(
+                "Crouch Step",
+                "Back Turned",
+                "Right Stance",
+                "Left Stance",
+                "Right Flamingo",
+                "Left Flamingo"
+            ).toString(),
             gameFranchise = "Tekken",
             gameEntry = "8"
         ),
@@ -139,7 +161,11 @@ class CharacterAndMoveData() {
             name = "Jin",
             imageId = R.drawable.jin_sprite,
             fightingStyle = "Karate based on Kyokushin style infused with Devil Gene",
-            uniqueMoves = listOf("Awakened Power Stance", "Zenshin and Zanshin", "Breaking Step").toString(),
+            uniqueMoves = listOf(
+                "Awakened Power Stance",
+                "Zenshin and Zanshin",
+                "Breaking Step"
+            ).toString(),
             gameFranchise = "Tekken",
             gameEntry = "8"
         ),
@@ -166,7 +192,12 @@ class CharacterAndMoveData() {
             name = "King",
             imageId = R.drawable.king_sprite,
             fightingStyle = "Pro Wrestling",
-            uniqueMoves = listOf("Beast Step", "Back Turned", "Jaguar Step", "Jaguar Sprint").toString(),
+            uniqueMoves = listOf(
+                "Beast Step",
+                "Back Turned",
+                "Jaguar Step",
+                "Jaguar Sprint"
+            ).toString(),
             gameFranchise = "Tekken",
             gameEntry = "8"
         ),
@@ -183,14 +214,19 @@ class CharacterAndMoveData() {
             id = 0,
             name = "Lars", imageId = R.drawable.lars_sprite,
             fightingStyle = "Tekken Forces Martial Arts",
-            uniqueMoves = listOf("Avalanche Flip","Dynamic Entry", "Silent Entry", "Limited Entry").toString(),
+            uniqueMoves = listOf(
+                "Avalanche Flip",
+                "Dynamic Entry",
+                "Silent Entry",
+                "Limited Entry"
+            ).toString(),
             gameFranchise = "Tekken",
             gameEntry = "8"
         ),
         CharacterEntry(
             id = 0,
             name = "Law",
-            imageId =  R.drawable.law_sprite,
+            imageId = R.drawable.law_sprite,
             fightingStyle = "Martial Arts",
             uniqueMoves = listOf("Back Turned", "Dragon Charge").toString(),
             gameFranchise = "Tekken",
@@ -228,7 +264,12 @@ class CharacterAndMoveData() {
             name = "Lidia",
             imageId = R.drawable.lidia_sprite,
             fightingStyle = "Traditional Karate",
-            uniqueMoves = listOf("Horse Stance", "Cat Stance", "Heaven and Earth", "Stalking Wolf Stance").toString(),
+            uniqueMoves = listOf(
+                "Horse Stance",
+                "Cat Stance",
+                "Heaven and Earth",
+                "Stalking Wolf Stance"
+            ).toString(),
             gameFranchise = "Tekken",
             gameEntry = "8"
         ),
@@ -237,7 +278,12 @@ class CharacterAndMoveData() {
             name = "Lili",
             imageId = R.drawable.lili_sprite,
             fightingStyle = "Self-Taught Style",
-            uniqueMoves = listOf("Feisty Rabbit", "Powered Up Feisty Rabbit", "Back Turned", "Dew Glide").toString(),
+            uniqueMoves = listOf(
+                "Feisty Rabbit",
+                "Powered Up Feisty Rabbit",
+                "Back Turned",
+                "Dew Glide"
+            ).toString(),
             gameFranchise = "Tekken",
             gameEntry = "8"
         ),
@@ -300,8 +346,10 @@ class CharacterAndMoveData() {
             name = "Steve",
             imageId = R.drawable.steve_sprite,
             fightingStyle = "Boxing",
-            uniqueMoves = listOf("Peekaboo", "Flicker Stance", "Swaying", "Ducking", "Ducking Left", "Ducking Right",
-            "Two Faced", "Quick Spin", "Cyclone", "Ducking In", "Lion Heart").toString(),
+            uniqueMoves = listOf(
+                "Peekaboo", "Flicker Stance", "Swaying", "Ducking", "Ducking Left", "Ducking Right",
+                "Two Faced", "Quick Spin", "Cyclone", "Ducking In", "Lion Heart"
+            ).toString(),
             gameFranchise = "Tekken",
             gameEntry = "8"
         ),
@@ -328,9 +376,11 @@ class CharacterAndMoveData() {
             name = "Yoshimitsu",
             imageId = R.drawable.yoshimitsu_sprite,
             fightingStyle = "Advanced Manji Ninjutsu",
-            uniqueMoves = listOf("Bad Stomach", "Mutou No Kiwami", "Death Copter", "Back Turned",
+            uniqueMoves = listOf(
+                "Bad Stomach", "Mutou No Kiwami", "Death Copter", "Back Turned",
                 "Kincho", "Meditation", "Flea", "Flea Step", "Indian Stance", "Healing",
-                "Manji Dragonfly").toString(),
+                "Manji Dragonfly"
+            ).toString(),
             gameFranchise = "Tekken",
             gameEntry = "8"
         ),
@@ -345,143 +395,1357 @@ class CharacterAndMoveData() {
         ),
     )
 
-    val moveEntries = listOf(
-        MoveEntry(0, "break", "►", "Break", false, false, false, "Generic"),
-        MoveEntry(0, "forward", "f", "Movement", false, false, false, "Generic"),
-        MoveEntry(0, "forward_dash", "F", "Movement", false, false, false, "Generic"),
-        MoveEntry(0, "down_forward", "d/f", "Movement", false, false, false, "Generic"),
-        MoveEntry(0, "down", "d", "Movement", false, false, false, "Generic"),
-        MoveEntry(0, "down_back", "d/b", "Movement", false, false, false, "Generic"),
-        MoveEntry(0, "back", "b", "Movement", false, false, false, "Generic"),
-        MoveEntry(0, "up_back", "u/b", "Movement", false, false, false, "Generic"),
-        MoveEntry(0, "up", "u", "Movement", false, false, false, "Generic"),
-        MoveEntry(0, "up_forward", "u/f", "Movement", false, false, false, "Generic"),
-        MoveEntry(0, "neutral", "n", "Movement", false, false, false, "Generic"),
-        MoveEntry(0, "one", "1", "Input", false, false, false,  "Generic"),
-        MoveEntry(0, "two", "2", "Input", false, false, false,  "Generic"),
-        MoveEntry(0, "three", "3", "Input", false, false, false,  "Generic"),
-        MoveEntry(0, "four", "4", "Input", false, false, false,  "Generic"),
-        MoveEntry(0, "one_plus_two", "1+2", "Input", false, false, false,  "Generic"),
-        MoveEntry(0, "three_plus_four", "3+4", "Input", false, false, false,  "Generic"),
-        MoveEntry(0, "one_plus_three", "1+3", "Input", false, false, false,  "Generic"),
-        MoveEntry(0, "two_plus_four", "2+4", "Input", false, false, false,  "Generic"),
-        MoveEntry(0, "one_plus_four", "1+4", "Input", false, false, false,  "Generic"),
-        MoveEntry(0, "two_plus_three", "2+3", "Input", false, false, false,  "Generic"),
-        MoveEntry(0, "one_plus_two_plus_three", "1+2+3", "Input", false, false, false, "Generic"),
-        MoveEntry(0, "one_plus_two_plus_four", "1+2+4", "Input",  false, false, false,  "Generic"),
-        MoveEntry(0, "one_plus_three_plus_four", "1+3+4", "Input", false, false, false,  "Generic"),
-        MoveEntry(0, "two_plus_three_plus_four", "2+3+4", "Input", false, false, false,  "Generic"),
-        MoveEntry(0, "one_plus_two_plus_three_plus_four", "1+2+3+4", "Input", false, false, false,  "Generic"),
-        MoveEntry(0, "Hold", "h", "Common", false, false, false,  "Generic"),
-        MoveEntry(0, "Hold Max", "H", "Common", false, false, false,  "Generic"),
-        MoveEntry(0, "Delay", "delay", "Common", false, false, false,  "Generic"),
-        MoveEntry(0, "Just Frame", "j/f", "Common", false, false, false,  "Generic"),
-        MoveEntry(0, "Slide", "(s)", "Common", false, false, false,  "Generic"),
-        MoveEntry(0, "Side Switch", "s/s", "Common", false, false, false,  "Generic"),
-        MoveEntry(0, "Back Turned", "b/t", "Common", false, false, false,  "Generic"),
-        MoveEntry(0, "While Standing", "w/s", "Common", false, false, false,  "Generic"),
-        MoveEntry(0, "Crouch", "crouch", "Common", false, false, false,  "Generic"),
-        MoveEntry(0, "Dash", "dash", "Common", false, false, false,  "Generic"),
-        MoveEntry(0, "Sidestep Left", "s/l", "Common", false, false, false,  "Generic"),
-        MoveEntry(0, "Sidestep Right", "s/r", "Common", false, false, false,  "Generic"),
-        MoveEntry(0, "Low Parry", "l/p", "Common", false, false, false,  "Generic"),
-        MoveEntry(0, "Heat Burst", "h/burst", "Mechanics Input", false, false, false,  "Generic"),
-        MoveEntry(0, "Heat Dash", "h/dash", "Mechanic Input", false, false, false,  "Generic"),
-        MoveEntry(0, "During Heat", "in heat", "Mechanics Input", false, false, false,  "Generic"),
-        MoveEntry(0, "Rage Art", "rage", "Mechanics Input", false, false, false,  "Generic"),
-        MoveEntry(0, "Wall Splat", "w/splat", "Stage", false, false, false,  "Generic"),
-        MoveEntry(0, "Wall Break", "w/break", "Stage", false, false, false,  "Generic"),
-        MoveEntry(0, "Wall Blast", "w/blast", "Stage", false, false, false,  "Generic"),
-        MoveEntry(0, "Wall Bounce", "w/bounce", "Stage", false, false, false,  "Generic"),
-        MoveEntry(0, "Floor Break", "f/break", "Stage", false, false, false,  "Generic"),
-        MoveEntry(0, "Floor Blast", "f/blast", "Stage", false, false, false,  "Generic"),
-        MoveEntry(0, "Balcony Break", "b/break", "Stage", false, false, false,  "Generic"),
-        MoveEntry(0, "Wind God Step", "WGS", "Mishima", false, false, false,  "Mishima"),
-        MoveEntry(0, "Wind God Fist", "WGF", "Mishima", false, false, false,  "Mishima"),
-        MoveEntry(0, "Thunder God Fist", "TGF", "Mishima", false, false, false,  "Mishima"),
-        MoveEntry(0, "Electric Wind God Fist", "EWGF", "Mishima", false, false, false,  "Mishima"),
-        MoveEntry(0, "Omen Thunder God Fist", "OTGF", "Mishima", false, false, false,  "Mishima"),
-        MoveEntry(0, "Electric Thunder God Fist", "ETGF", "Mishima", false, false, false,  "Mishima"),
-        MoveEntry(0, "Destructive Form", "Destructive Form", "Character", false, false, false,  "Alisa"),
-        MoveEntry(0, "Boot", "Boot", "Character", false, false, false,  "Alisa"),
-        MoveEntry(0, "Dual Boot", "Dual Boot", "Character", false, false, false,  "Alisa"),
-        MoveEntry(0, "Naniwa Gusto", "Naniwa Gusto", "Character", false, false, false,  "Asuka"),
-        MoveEntry(0, "Leg Cutter", "Leg Cutter", "Character", false, false, false,  "Asuka"),
-        MoveEntry(0, "Libertador", "Libertador", "Character", false, false, false,  "Azucena"),
-        MoveEntry(0, "Taking High Attack", "Taking High Attack", "Character", false, false, false,  "Azucena"),
-        MoveEntry(0, "Taking Low Attack", "Taking Low Attack", "Character", false, false, false,  "Azucena"),
-        MoveEntry(0, "Snake Eyes", "Snake Eyes", "Character", false, false, false,  "Bryan"),
-        MoveEntry(0, "Slither Step", "Slither Step", "Character", false, false, false,  "Bryan"),
-        MoveEntry(0, "Starburst", "Starburst", "Character", false, false, false,  "Claudio"),
-        MoveEntry(0, "Phoenix Shift", "Phoenix Shift", "Character", false, false, false,  "Clive"),
-        MoveEntry(0, "Wings Of Light", "Wings Of Light", "Character", false, false, false,  "Clive"),
-        MoveEntry(0, "Updraft", "Updraft", "Character", false, false, false,  "Clive"),
-        MoveEntry(0, "Zantetsuken", "Zantetsuken", "Character", false, false, false,  "Clive"),
-        MoveEntry(0, "Mourning Crow", "Mourning Crow", "Character", false, false, false,  "Devil Jin"),
-        MoveEntry(0, "Fly", "Fly", "Character", false, false, false,  "Devil Jin"),
-        MoveEntry(0, "Sneak", "Sneak", "Character", false, false, false,  "Dragunov"),
-        MoveEntry(0, "Ginga", "Ginga", "Character", false, false, false,  "Eddy"),
-        MoveEntry(0, "Bananeira", "Bananeira", "Character", false, false, false,  "Eddy"),
-        MoveEntry(0, "Negativa", "Negativa", "Character", false, false, false,  "Eddy"),
-        MoveEntry(0, "Mandinga", "Mandinga", "Character", false, false, false,  "Eddy"),
-        MoveEntry(0, "Deceptive Step", "Deceptive Step", "Character", false, false, false,  "Feng"),
-        MoveEntry(0, "Shifting Clouds", "Shifting Clouds", "Character", false, false, false,  "Feng"),
-        MoveEntry(0, "Wind God's Kamae", "Wind God's Kamae", "Character", false, false, false,  "Heihachi"),
-        MoveEntry(0, "Thunder God's Kamae", "Thunder God's Kamae", "Character", false, false, false,  "Heihachi"),
-        MoveEntry(0, "Warrior Instinct", "Warrior Instinct", "Character", false, false, false,  "Heihachi"),
-        MoveEntry(0, "Right Stance", "Right Stance", "Character", false, false, false,  "Hwoarang"),
-        MoveEntry(0, "Left Stance", "Left Stance", "Character", false, false, false,  "Hwoarang"),
-        MoveEntry(0, "Right Flamingo", "Right Flamingo", "Character", false, false, false,  "Hwoarang"),
-        MoveEntry(0, "Left Flamingo", "Left Flamingo", "Character", false, false, false,  "Hwoarang"),
-        MoveEntry(0, "Sit Down", "Sit Down", "Character", false, false, false,  "Jack-8"),
-        MoveEntry(0, "Gamma Howl", "Gamma Howl", "Character", false, false, false,  "Jack-8"),
-        MoveEntry(0, "Zenshin", "Zenshin", "Character", false, false, false,  "Jin"),
-        MoveEntry(0, "Izumo", "Izumo", "Character", false, false, false,  "Jun"),
-        MoveEntry(0, "Genjutsu", "Genjutsu", "Character", false, false, false,  "Jun"),
-        MoveEntry(0, "Miare", "Miare", "Character", false, false, false,  "Jun"),
-        MoveEntry(0, "Hunting", "Hunting", "Character", false, false, false,  "Kuma & Panda"),
-        MoveEntry(0, "Bear Sit", "Bear Sit", "Character", false, false, false,  "Kuma & Panda"),
-        MoveEntry(0, "Bear Roll", "Bear Roll", "Character", false, false, false,  "Kuma & Panda"),
-        MoveEntry(0, "Dynamic Entry", "Dynamic Entry", "Character", false, false, false,  "Lars"),
-        MoveEntry(0, "Silent Entry", "Silent Entry", "Character", false, false, false,  "Lars"),
-        MoveEntry(0, "Limited Entry", "Limited Entry", "Character", false, false, false,  "Lars"),
-        MoveEntry(0, "Dragon Charge", "Dragon Charge", "Character", false, false, false,  "Law"),
-        MoveEntry(0, "Hitman", "Hitman", "Character", false, false, false,  "Lee"),
-        MoveEntry(0, "Jin Ji Du Li", "Jin Ji Du Li", "Character", false, false, false,  "Leo"),
-        MoveEntry(0, "Fo Bu", "Fo Bu", "Character", false, false, false,  "Leo"),
-        MoveEntry(0, "Hermit", "Hermit", "Character", false, false, false,  "Leroy"),
-        MoveEntry(0, "Horse Stance", "Horse Stance", "Character", false, false, false,  "Lidia"),
-        MoveEntry(0, "Cat Stance", "Cat Stance", "Character", false, false, false,  "Lidia"),
-        MoveEntry(0, "Heaven and Earth", "Heaven and Earth", "Character", false, false, false,  "Lidia"),
-        MoveEntry(0, "Stalking Wolf Stance", "Stalking Wolf Stance", "Character", false, false, false,  "Lidia"),
-        MoveEntry(0, "Dew Glide", "Dew Glide", "Character", false, false, false,  "Lili"),
-        MoveEntry(0, "Soulzone", "Soulzone", "Character", false, false, false,  "Raven"),
-        MoveEntry(0, "Unsoku", "Unsoku", "Character", false, false, false,  "Reina"),
-        MoveEntry(0, "Sentai", "Sentai", "Character", false, false, false,  "Reina"),
-        MoveEntry(0, "Heaven's Wrath", "Heaven's Wrath", "Character", false, false, false,  "Reina"),
-        MoveEntry(0, "Stealth Step", "Stealth Step", "Character", false, false, false,  "Shaheen"),
-        MoveEntry(0, "Quick Spin", "Quick Spin", "Character", false, false, false,  "Steve"),
-        MoveEntry(0, "Ducking", "Ducking", "Character", false, false, false,  "Steve"),
-        MoveEntry(0, "Peekaboo", "Peekaboo", "Character", false, false, false,  "Steve"),
-        MoveEntry(0, "Ducking In", "Ducking In", "Character", false, false, false,  "Steve"),
-        MoveEntry(0, "Ducking Left", "Ducking Left", "Character", false, false, false,  "Steve"),
-        MoveEntry(0, "Ducking Right", "Ducking Right", "Character", false, false, false,  "Steve"),
-        MoveEntry(0, "Flicker Stance", "Flicker Stance", "Character", false, false, false,  "Steve"),
-        MoveEntry(0, "Swaying", "Swaying", "Character", false, false, false,  "Steve"),
-        MoveEntry(0, "Lion Heart", "Lion Heart", "Character", false, false, false,  "Steve"),
-        MoveEntry(0, "Iai", "Iai", "Character", false, false, false,  "Victor"),
-        MoveEntry(0, "Perfumer", "Perfumer", "Character", false, false, false,  "Victor"),
-        MoveEntry(0, "Phoenix", "Phoenix", "Character", false, false, false,  "Xiaoyu"),
-        MoveEntry(0, "Hypnotist", "Hypnotist", "Character", false, false, false,  "Xiaoyu"),
-        MoveEntry(0, "Kincho", "Kincho", "Character", false, false, false,  "Yoshimitsu"),
-        MoveEntry(0, "Mutou No Kiwami", "Mutou No Kiwami", "Character", false, false, false,  "Yoshimitsu"),
-        MoveEntry(0, "Manji Dragonfly", "Manji Dragonfly", "Character", false, false, false,  "Yoshimitsu"),
-        MoveEntry(0, "Flea", "Flea", "Character", false, false, false,  "Yoshimitsu"),
-        MoveEntry(0, "Indian Stance", "Indian Stance", "Character", false, false, false,  "Yoshimitsu"),
-        MoveEntry(0, "Tarantula", "Tarantula", "Character", false, false, false,  "Zafina"),
-        MoveEntry(0, "Scarecrow", "Scarecrow", "Character", false, false, false,  "Zafina"),
-        MoveEntry(0, "Mantis", "Mantis", "Character", false, false, false,  "Zafina"),
-    )
+    val moveEntries =
+        listOf(
+            MoveEntry(
+                0, "break", "►", "Break",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "forward",
+                notation = "f",
+                moveType = "Movement",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "forward_dash",
+                notation = "F",
+                moveType = "Movement",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "down_forward",
+                notation = "d/f",
+                moveType = "Movement",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "down",
+                notation = "d",
+                moveType = "Movement",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "down_back",
+                notation = "d/b",
+                moveType = "Movement",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "back",
+                notation = "b",
+                moveType = "Movement",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "up_back",
+                notation = "u/b",
+                moveType = "Movement",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "up",
+                notation = "u",
+                moveType = "Movement",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "up_forward",
+                notation = "u/f",
+                moveType = "Movement",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "neutral",
+                notation = "n",
+                moveType = "Movement",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "one",
+                notation = "1",
+                moveType = "Input",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "two",
+                notation = "2",
+                moveType = "Input",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "three",
+                notation = "3",
+                moveType = "Input",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "four",
+                notation = "4",
+                moveType = "Input",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "one_plus_two",
+                notation = "1+2",
+                moveType = "Input",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "three_plus_four",
+                notation = "3+4",
+                moveType = "Input",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "one_plus_three",
+                notation = "1+3",
+                moveType = "Input",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "two_plus_four",
+                notation = "2+4",
+                moveType = "Input",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "one_plus_four",
+                notation = "1+4",
+                moveType = "Input",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "two_plus_three",
+                notation = "2+3",
+                moveType = "Input",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "one_plus_two_plus_three",
+                notation = "1+2+3",
+                moveType = "Input",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "one_plus_two_plus_four",
+                notation = "1+2+4",
+                moveType = "Input",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "one_plus_three_plus_four",
+                notation = "1+3+4",
+                moveType = "Input",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "two_plus_three_plus_four",
+                notation = "2+3+4",
+                moveType = "Input",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "one_plus_two_plus_three_plus_four",
+                notation = "1+2+3+4",
+                moveType = "Input",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Hold",
+                notation = "h",
+                moveType = "Common",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Hold Max",
+                notation = "H",
+                moveType = "Common",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Delay",
+                notation = "delay",
+                moveType = "Common",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Just Frame",
+                notation = "j/f",
+                moveType = "Common",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Slide",
+                notation = "(s)",
+                moveType = "Common",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Side Switch",
+                notation = "s/s",
+                moveType = "Common",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Back Turned",
+                notation = "b/t",
+                moveType = "Common",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "While Standing",
+                notation = "w/s",
+                moveType = "Common",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Crouch",
+                notation = "crouch",
+                moveType = "Common",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Dash",
+                notation = "dash",
+                moveType = "Common",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Sidestep Left",
+                notation = "s/l",
+                moveType = "Common",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Sidestep Right",
+                notation = "s/r",
+                moveType = "Common",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Low Parry",
+                notation = "l/p",
+                moveType = "Common",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Heat Burst",
+                notation = "h/burst",
+                moveType = "Mechanics Input",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Heat Dash",
+                notation = "h/dash",
+                moveType = "Mechanic Input",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "During Heat",
+                notation = "in heat",
+                moveType = "Mechanics Input",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Rage Art",
+                notation = "rage",
+                moveType = "Mechanics Input",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Wall Splat",
+                notation = "w/splat",
+                moveType = "Stage",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Wall Break",
+                notation = "w/break",
+                moveType = "Stage",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Wall Blast",
+                notation = "w/blast",
+                moveType = "Stage",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Wall Bounce",
+                notation = "w/bounce",
+                moveType = "Stage",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Floor Break",
+                notation = "f/break",
+                moveType = "Stage",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Floor Blast",
+                notation = "f/blast",
+                moveType = "Stage",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Balcony Break",
+                notation = "b/break",
+                moveType = "Stage",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Generic"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Wind God Step",
+                notation = "WGS",
+                moveType = "Mishima",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Mishima"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Wind God Fist",
+                notation = "WGF",
+                moveType = "Mishima",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Mishima"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Thunder God Fist",
+                notation = "TGF",
+                moveType = "Mishima",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Mishima"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Electric Wind God Fist",
+                notation = "EWGF",
+                moveType = "Mishima",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Mishima"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Omen Thunder God Fist",
+                notation = "OTGF",
+                moveType = "Mishima",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Mishima"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Electric Thunder God Fist",
+                notation = "ETGF",
+                moveType = "Mishima",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Mishima"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Destructive Form",
+                notation = "Destructive Form",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Alisa"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Boot",
+                notation = "Boot",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Alisa"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Dual Boot",
+                notation = "Dual Boot",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Alisa"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Naniwa Gusto",
+                notation = "Naniwa Gusto",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Asuka"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Leg Cutter",
+                notation = "Leg Cutter",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Asuka"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Libertador",
+                notation = "Libertador",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Azucena"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Taking High Attack",
+                notation = "Taking High Attack",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Azucena"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Taking Low Attack",
+                notation = "Taking Low Attack",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Azucena"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Snake Eyes",
+                notation = "Snake Eyes",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Bryan"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Slither Step",
+                notation = "Slither Step",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Bryan"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Starburst",
+                notation = "Starburst",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Claudio"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Phoenix Shift",
+                notation = "Phoenix Shift",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Clive"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Wings Of Light",
+                notation = "Wings Of Light",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Clive"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Updraft",
+                notation = "Updraft",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Clive"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Zantetsuken",
+                notation = "Zantetsuken",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Clive"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Mourning Crow",
+                notation = "Mourning Crow",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Devil Jin"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Fly",
+                notation = "Fly",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Devil Jin"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Sneak",
+                notation = "Sneak",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Dragunov"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Ginga",
+                notation = "Ginga",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Eddy"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Bananeira",
+                notation = "Bananeira",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Eddy"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Negativa",
+                notation = "Negativa",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Eddy"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Mandinga",
+                notation = "Mandinga",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Eddy"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Deceptive Step",
+                notation = "Deceptive Step",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Feng"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Shifting Clouds",
+                notation = "Shifting Clouds",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Feng"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Wind God's Kamae",
+                notation = "Wind God's Kamae",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Heihachi"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Thunder God's Kamae",
+                notation = "Thunder God's Kamae",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Heihachi"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Warrior Instinct",
+                notation = "Warrior Instinct",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Heihachi"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Right Stance",
+                notation = "Right Stance",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Hwoarang"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Left Stance",
+                notation = "Left Stance",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Hwoarang"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Right Flamingo",
+                notation = "Right Flamingo",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Hwoarang"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Left Flamingo",
+                notation = "Left Flamingo",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Hwoarang"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Sit Down",
+                notation = "Sit Down",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Jack-8"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Gamma Howl",
+                notation = "Gamma Howl",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Jack-8"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Zenshin",
+                notation = "Zenshin",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Jin"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Izumo",
+                notation = "Izumo",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Jun"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Genjutsu",
+                notation = "Genjutsu",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Jun"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Miare",
+                notation = "Miare",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Jun"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Hunting",
+                notation = "Hunting",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Kuma & Panda"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Bear Sit",
+                notation = "Bear Sit",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Kuma & Panda"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Bear Roll",
+                notation = "Bear Roll",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Kuma & Panda"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Dynamic Entry",
+                notation = "Dynamic Entry",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Lars"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Silent Entry",
+                notation = "Silent Entry",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Lars"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Limited Entry",
+                notation = "Limited Entry",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Lars"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Dragon Charge",
+                notation = "Dragon Charge",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Law"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Hitman",
+                notation = "Hitman",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Lee"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Jin Ji Du Li",
+                notation = "Jin Ji Du Li",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Leo"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Fo Bu",
+                notation = "Fo Bu",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Leo"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Hermit",
+                notation = "Hermit",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Leroy"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Horse Stance",
+                notation = "Horse Stance",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Lidia"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Cat Stance",
+                notation = "Cat Stance",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Lidia"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Heaven and Earth",
+                notation = "Heaven and Earth",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Lidia"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Stalking Wolf Stance",
+                notation = "Stalking Wolf Stance",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Lidia"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Dew Glide",
+                notation = "Dew Glide",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Lili"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Soulzone",
+                notation = "Soulzone",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Raven"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Unsoku",
+                notation = "Unsoku",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Reina"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Sentai",
+                notation = "Sentai",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Reina"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Heaven's Wrath",
+                notation = "Heaven's Wrath",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Reina"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Stealth Step",
+                notation = "Stealth Step",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Shaheen"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Quick Spin",
+                notation = "Quick Spin",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Steve"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Ducking",
+                notation = "Ducking",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Steve"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Peekaboo",
+                notation = "Peekaboo",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Steve"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Ducking In",
+                notation = "Ducking In",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Steve"
+            ),
+            MoveEntry(
+                0,
+                "Ducking Left",
+                "Ducking Left",
+                "Character",
+                false,
+                false,
+                false,
+                "Steve"
+            ),
+            MoveEntry(
+                0,
+                "Ducking Right",
+                "Ducking Right",
+                "Character",
+                false,
+                false,
+                false,
+                "Steve"
+            ),
+            MoveEntry(
+                0,
+                "Flicker Stance",
+                "Flicker Stance",
+                "Character",
+                false,
+                false,
+                false,
+                "Steve"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Swaying",
+                notation = "Swaying",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Steve"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Lion Heart",
+                notation = "Lion Heart",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Steve"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Iai",
+                notation = "Iai",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Victor"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Perfumer",
+                notation = "Perfumer",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Victor"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Phoenix",
+                notation = "Phoenix",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Xiaoyu"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Hypnotist",
+                notation = "Hypnotist",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Xiaoyu"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Kincho",
+                notation = "Kincho",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Yoshimitsu"
+            ),
+            MoveEntry(
+                0,
+                "Mutou No Kiwami",
+                "Mutou No Kiwami",
+                "Character",
+                false,
+                false,
+                false,
+                "Yoshimitsu"
+            ),
+            MoveEntry(
+                0,
+                "Manji Dragonfly",
+                "Manji Dragonfly",
+                "Character",
+                false,
+                false,
+                false,
+                "Yoshimitsu"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Flea",
+                notation = "Flea",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Yoshimitsu"
+            ),
+            MoveEntry(
+                0,
+                "Indian Stance",
+                "Indian Stance",
+                "Character",
+                false,
+                false,
+                false,
+                "Yoshimitsu"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Tarantula",
+                notation = "Tarantula",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Zafina"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Scarecrow",
+                notation = "Scarecrow",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Zafina"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Mantis",
+                notation = "Mantis",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Zafina"
+            ),
+        )
+
 //    val consoleButtons = listOf(
 //        MoveEntry(0, "×", "Console", "Playstation"),
 //        MoveEntry(0, "○", "Console", "Playstation"),
@@ -505,3 +1769,4 @@ class CharacterAndMoveData() {
 //        MoveEntry(0, "LS", "Console", "Xbox")
 //    )
 }
+

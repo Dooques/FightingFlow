@@ -6,9 +6,9 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
 import com.example.fightingflow.data.database.FlowDatabase
-import com.example.fightingflow.data.database.TekkenDatabaseRepository
+import com.example.fightingflow.data.database.FlowDataRepository
 import com.example.fightingflow.data.database.ProfileDatabaseRepository
-import com.example.fightingflow.data.database.TekkenDbRepository
+import com.example.fightingflow.data.database.FlowRepository
 import com.example.fightingflow.data.database.ProfileDbRepository
 import com.example.fightingflow.data.database.dao.CharacterDao
 import com.example.fightingflow.data.database.dao.ComboDao
@@ -44,7 +44,7 @@ fun provideDatabase(context: Context) =
         FlowDatabase::class.java,
         "fighting_flow"
     )
-        .fallbackToDestructiveMigration()
+        .fallbackToDestructiveMigration(false)
         .build()
 
 val databaseModule = module {
@@ -58,7 +58,7 @@ val databaseModule = module {
 val repositoryModule = module {
     // Database
     single<ProfileDbRepository> { ProfileDatabaseRepository(get()) }
-    single<TekkenDbRepository> { TekkenDatabaseRepository(get(), get(), get()) }
+    single<FlowRepository> { FlowDataRepository(get(), get(), get()) }
 
     // DataStore
     single<ProfileDsRepository> { ProfileDatastoreRepository(androidContext().dataStore) }

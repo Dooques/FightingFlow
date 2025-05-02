@@ -4,12 +4,11 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fightingflow.data.database.ProfileDbRepository
-import com.example.fightingflow.data.database.TekkenDbRepository
+import com.example.fightingflow.data.database.FlowRepository
 import com.example.fightingflow.data.datastore.ProfileDsRepository
 import com.example.fightingflow.model.toDisplay
 import com.example.fightingflow.model.toEntry
 import com.example.fightingflow.util.ComboDisplayListUiState
-import com.example.fightingflow.util.PROFILE_VM_TAG
 import com.example.fightingflow.util.ProfileCreationUiState
 import com.example.fightingflow.util.ProfileListUiState
 import com.example.fightingflow.util.ProfileUiState
@@ -19,11 +18,12 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import timber.log.Timber
 
 class ProfileViewModel(
     private val profileDsRepository: ProfileDsRepository,
     private val profileDbRepository: ProfileDbRepository,
-    private val tekkenDataRepository: TekkenDbRepository,
+    private val tekkenDataRepository: FlowRepository,
 ): ViewModel() {
 
     companion object {
@@ -35,19 +35,19 @@ class ProfileViewModel(
 
     fun updateProfileCreation(profile: ProfileCreationUiState) {
         profileState.update { ProfileCreationUiState(profile.profileCreation) }
-        Log.d(PROFILE_VM_TAG, "Profile Updated: ${profileState.value.profileCreation}")
+        Timber.d("Profile Updated: ${profileState.value.profileCreation}")
     }
 
     suspend fun saveProfileData(): String {
-        Log.d(PROFILE_VM_TAG, "")
-        Log.d(PROFILE_VM_TAG, "Checking passwords match...")
+        Timber.d("")
+        Timber.d("Checking passwords match...")
         if (profileState.value.profileCreation.password == profileState.value.profileCreation.confirmPassword) {
-            Log.d(PROFILE_VM_TAG, "Passwords match, adding Profile to datastore...")
-            Log.d(PROFILE_VM_TAG, "Updating data in datastore from ViewModel...")
-            Log.d(PROFILE_VM_TAG, "ProfileCreationUiState: ${profileState.value.profileCreation}")
-            Log.d(PROFILE_VM_TAG, "ProfileEntryUiState: ${profileState.value.profileCreation.toEntry()}")
+            Timber.d("Passwords match, adding Profile to datastore...")
+            Timber.d("Updating data in datastore from ViewModel...")
+            Timber.d("ProfileCreationUiState: ${profileState.value.profileCreation}")
+            Timber.d("ProfileEntryUiState: ${profileState.value.profileCreation.toEntry()}")
             updateUsernameInDs(profileState.value.profileCreation.username)
-            Log.d(PROFILE_VM_TAG, "Profile added to datastore.")
+            Timber.d("Profile added to datastore.")
             return "Success"
         } else {
             return ""
@@ -113,14 +113,14 @@ class ProfileViewModel(
             )
 
     suspend fun saveProfileToDb() {
-        Log.d(PROFILE_VM_TAG, "")
-        Log.d(PROFILE_VM_TAG, "Saving profile to database...")
+        Timber.d("")
+        Timber.d("Saving profile to database...")
         profileDbRepository.insert(profileState.value.profileCreation.toEntry())
     }
 
     suspend fun deleteProfileFromDb(profile: ProfileUiState) {
-        Log.d(PROFILE_VM_TAG, "")
-        Log.d(PROFILE_VM_TAG, "Deleting profile from database...")
+        Timber.d("")
+        Timber.d("Deleting profile from database...")
         profileDbRepository.delete(profile.profile)
     }
 }

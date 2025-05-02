@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.fightingflow.R
 import com.example.fightingflow.util.ComboDisplayListUiState
-import com.example.fightingflow.util.PROFILE_SCREEN_TAG
 import com.example.fightingflow.util.ProfileUiState
 import timber.log.Timber
 

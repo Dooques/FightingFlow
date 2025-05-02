@@ -48,7 +48,7 @@ fun FightingFlowApp(
     deviceType: WindowSizeClass
 ) {
     val scope = rememberCoroutineScope()
-    var databaseExists = remember { mutableStateOf(false) }
+    val databaseExists = remember { mutableStateOf(false) }
 
     Timber.d("Checking data in database...")
     LaunchedEffect(scope) {

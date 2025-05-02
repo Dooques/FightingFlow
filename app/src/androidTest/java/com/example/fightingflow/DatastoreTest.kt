@@ -14,6 +14,7 @@ import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.ComboEntry
 import com.example.fightingflow.model.MoveEntry
+import com.example.fightingflow.util.ImmutableList
 import com.example.fightingflow.util.emptyCharacter
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
@@ -73,15 +74,16 @@ class DatastoreTest {
     }
 
     /* Character Repository */
-    val testCharacterRepository: CharacterDsRepository = CharacterDatastoreRepository(testDataStore)
-
-    val character = CharacterEntry(
+    private val testCharacterRepository: CharacterDsRepository = CharacterDatastoreRepository(testDataStore)
+    private val reina = CharacterEntry(
         id = 1,
         name = "Reina",
         imageId = 1,
         fightingStyle = "Mishima",
         uniqueMoves = "",
-        combosById = ""
+        combosById = "",
+        gameFranchise = "Tekken",
+        gameEntry = "8"
     )
 
     @Test
@@ -96,31 +98,33 @@ class DatastoreTest {
     @Test
     @Throws(IOException::class)
     fun updateCharacterName_ReturnUpdatedName() = testScope.runTest {
-        testCharacterRepository.updateCharacter(character)
+        testCharacterRepository.updateCharacter(reina)
         val characterName = testCharacterRepository.getName().first()
         val characterImage = testCharacterRepository.getImage().first()
         assertEquals("Reina", characterName)
         assertEquals(1, characterImage)
     }
 
-    val testComboRepository: ComboDsRepository = ComboDatastoreRepository(testDataStore)
+    private val testComboRepository: ComboDsRepository = ComboDatastoreRepository(testDataStore)
 
-    val combo = ComboDisplay(
+    private val combo = ComboDisplay(
         id = 1,
         comboId = UUID.randomUUID().toString(),
         character = "Reina",
         damage = 60,
         createdBy = "Sam",
-        moves = listOf(
-            MoveEntry(
-                id = 1,
-                moveName = "forward",
-                notation = "f",
-                moveType = "Movement",
-                counterHit = false,
-                hold = false,
-                justFrame = false,
-                associatedCharacter = "Generic"
+        moves = ImmutableList(
+            listOf(
+                MoveEntry(
+                    id = 1,
+                    moveName = "forward",
+                    notation = "f",
+                    moveType = "Movement",
+                    counterHit = false,
+                    hold = false,
+                    justFrame = false,
+                    associatedCharacter = "Generic"
+                )
             )
         )
     )

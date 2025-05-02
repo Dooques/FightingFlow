@@ -35,8 +35,8 @@ import com.example.fightingflow.R
 import com.example.fightingflow.ui.profileScreen.ProfileCreationForm
 import com.example.fightingflow.ui.profileScreen.ProfileViewModel
 import com.example.fightingflow.util.ProfileCreationUiState
-import com.example.fightingflow.util.TITLE_TAG
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
@@ -50,13 +50,13 @@ fun TitleScreen(
     onProfileSelect: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Log.d(TITLE_TAG, "")
-    Log.d(TITLE_TAG, "Loading title screen...")
+    Timber.d("")
+    Timber.d("Loading title screen...")
 
     val profilesList by profileViewModel.allExistingProfiles.collectAsStateWithLifecycle()
     val profileCreation by profileViewModel.profileState.collectAsStateWithLifecycle()
 
-    Log.d(TITLE_TAG, "Profile List: ${profilesList.profileList}")
+    Timber.d("Profile List: ${profilesList.profileList}")
 
     val uiScale = if (deviceType.heightSizeClass == WindowHeightSizeClass.Compact) 2 else 1
     val scope = rememberCoroutineScope()
@@ -67,7 +67,7 @@ fun TitleScreen(
         modifier = modifier
             .fillMaxSize()
     ) {
-        Log.d(TITLE_TAG, "Loading logo...")
+        Timber.d("Loading logo...")
         Image(
             painter = painterResource(R.drawable.fighting_flow_title_logo),
             contentDescription = "Fighting Flow Logo",
@@ -76,10 +76,10 @@ fun TitleScreen(
                 .padding(end = if (uiScale != 2) 10.dp else 0.dp)
         )
 
-        Log.d(TITLE_TAG, "Checking if user is logged in...")
+        Timber.d("Checking if user is logged in...")
         if (isLoggedIn) {
-            Log.d(TITLE_TAG, "User is logged in.")
-            Log.d(TITLE_TAG, "Loading greeting...")
+            Timber.d("User is logged in.")
+            Timber.d("Loading greeting...")
             Text(
                 text = "Welcome ${username.replaceFirstChar { it.uppercase() }}",
                 style = MaterialTheme.typography.bodyLarge,
@@ -89,12 +89,13 @@ fun TitleScreen(
             )
         }
         LazyColumn {
-            Log.d(TITLE_TAG, "Loading buttons...")
+            Timber.d("Loading buttons...")
              item {
                  if (profilesList.profileList.isEmpty()) {
                      Row(Modifier.fillMaxWidth()) {
                          Text(
-                             text = "Welcome to Fighting Flow, please create a profile so we can start creating some combos!",
+                             text = "Welcome to Fighting Flow, please create a " +
+                                     "profile so we can start creating some combos!",
                              modifier = modifier.padding(horizontal = 16.dp)
                          )
                      }
@@ -103,23 +104,23 @@ fun TitleScreen(
                          profile = profileCreation,
                          onConfirm = {
                              scope.launch {
-                                 Log.d(TITLE_TAG, "")
-                                 Log.d(
-                                     TITLE_TAG,
-                                     "Preparing to save ${profileCreation.profileCreation.username}'s profile to datastore..."
+                                 Timber.d("")
+                                 Timber.d(
+                                     "Preparing to save ${profileCreation.profileCreation.username}'s " +
+                                         "profile to datastore..."
                                  )
                                  val saveProfileSuccess = profileViewModel.saveProfileData()
-                                 Log.d(TITLE_TAG, "Profile saved to Ds.")
+                                 Timber.d("Profile saved to Ds.")
 
                                  if (saveProfileSuccess == "Success") {
-                                     Log.d(TITLE_TAG, "Saving Profile to database...")
+                                     Timber.d("Saving Profile to database...")
                                      profileViewModel.saveProfileToDb()
-                                     Log.d(TITLE_TAG, "Profile saved to Db.")
+                                     Timber.d("Profile saved to Db.")
 
-                                     Log.d(TITLE_TAG, "Logging in profile...")
+                                     Timber.d("Logging in profile...")
                                      profileViewModel.loginProfile()
-                                     Log.d(TITLE_TAG, "Profile logged in.")
-                                     Log.d(TITLE_TAG, "Returning to title screen...")
+                                     Timber.d("Profile logged in.")
+                                     Timber.d("Returning to title screen...")
                                  } else {
                                      snackbarHostState.showSnackbar("Passwords do not match, please try again")
                                  }

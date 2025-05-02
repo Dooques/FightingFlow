@@ -31,6 +31,28 @@ class FlowDaoTest {
     private lateinit var moveDao: MoveDao
     private lateinit var flowDatabase: FlowDatabase
 
+    private val asuka = CharacterEntry(
+            id = 2,
+            name = "Asuka",
+            imageId = 1,
+            fightingStyle = "Kazama",
+            uniqueMoves = "",
+            combosById = "",
+            gameFranchise = "Tekken",
+            gameEntry ="8"
+        )
+
+    private val reina = CharacterEntry(
+            id = 1,
+            name = "Reina",
+            imageId = 1,
+            fightingStyle = "Mishima",
+            uniqueMoves = "",
+            combosById = "",
+            gameFranchise = "Tekken",
+            gameEntry = "8"
+        )
+
     @Before
     fun createDb() {
         val context: Context = ApplicationProvider.getApplicationContext()
@@ -101,37 +123,23 @@ class FlowDaoTest {
     }
 
     /* ComboDaoTests */
-    val combo1 = ComboEntry(
-        1,
-        UUID.randomUUID().toString(),
-        CharacterEntry(
-            id = 1,
-            name = "Reina",
-            imageId = 1,
-            fightingStyle = "Mishima",
-            uniqueMoves = "",
-            combosById = ""
-        ),
+    private val combo1 = ComboEntry(
+        id = 1,
+        comboId = UUID.randomUUID().toString(),
+        character = reina,
         damage = 60,
         createdBy = "Sam",
         moves = "1, 2, 1",
     )
-    val combo2 = ComboEntry(
-        2,
-        UUID.randomUUID().toString(),
-        CharacterEntry(
-            id = 2,
-            name = "Asuka",
-            imageId = 1,
-            fightingStyle = "Kazama",
-            uniqueMoves = "",
-            combosById = ""
-        ),
+    private val combo2 = ComboEntry(
+        id = 2,
+        comboId = UUID.randomUUID().toString(),
+        character = asuka,
         damage = 60,
         createdBy = "Sam",
         moves = "1, 2, 1",
     )
-    val combo3 = ComboEntry(
+    private val combo3 = ComboEntry(
         3,
         UUID.randomUUID().toString(),
         CharacterEntry(
@@ -140,7 +148,9 @@ class FlowDaoTest {
             imageId = 1,
             fightingStyle = "Mishima",
             uniqueMoves = "",
-            combosById = ""
+            combosById = "",
+            gameFranchise = "Tekken",
+            gameEntry ="8"
         ),
         damage = 60,
         createdBy = "Dave",
@@ -173,14 +183,7 @@ class FlowDaoTest {
     @Throws(IOException::class)
     fun getComboByCharacter() = runBlocking {
         addAllCombosToDb()
-        val character = CharacterEntry(id = 1,
-            name = "Reina",
-            imageId = 1,
-            fightingStyle = "Mishima",
-            uniqueMoves = "",
-            combosById = ""
-        )
-        val combos = comboDao.getAllCombosByCharacter(character).first()
+        val combos = comboDao.getAllCombosByCharacter(reina).first()
         assertEquals(combo1, combos[0])
         assertEquals(combo3, combos[1])
     }
@@ -194,26 +197,9 @@ class FlowDaoTest {
         assertEquals(combo2, combos[1])
     }
 
-    val character1 = CharacterEntry(
-        id = 1,
-        name = "Reina",
-        imageId = 1,
-        fightingStyle = "Mishima",
-        uniqueMoves = "",
-        combosById = ""
-    )
-    val character2 = CharacterEntry(
-        id = 2,
-        name = "Asuka",
-        imageId = 1,
-        fightingStyle = "Kazama",
-        uniqueMoves = "",
-        combosById = ""
-    )
-
     private suspend fun addCharactersToDb() {
-        characterDao.insert(character1)
-        characterDao.insert(character2)
+        characterDao.insert(reina)
+        characterDao.insert(asuka)
     }
 
     @Test
@@ -221,18 +207,18 @@ class FlowDaoTest {
     fun getCharacter() = runBlocking {
         addCharactersToDb()
         val character = characterDao.getCharacter("Reina").first()
-        assertEquals(character1, character)
+        assertEquals(reina, character)
     }
     @Test
     @Throws(IOException::class)
     fun getAllCharacters() = runBlocking {
         addCharactersToDb()
         val characters = characterDao.getAllCharacters().first()
-        assertEquals(characters[0], character1)
-        assertEquals(characters[1], character2)
+        assertEquals(characters[0], reina)
+        assertEquals(characters[1], asuka)
     }
 
-    val move1 = MoveEntry(
+    private val move1 = MoveEntry(
         id = 1,
         moveName = "forward",
         notation = "f",
@@ -242,7 +228,7 @@ class FlowDaoTest {
         justFrame = false,
         associatedCharacter = "Generic"
     )
-    val move2 = MoveEntry(
+    private val move2 = MoveEntry(
         id = 2,
         moveName = "one",
         notation = "1",
