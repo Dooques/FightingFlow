@@ -1,4 +1,4 @@
-package com.example.fightingflow.ui.comboAddScreen
+package com.example.fightingflow.ui.comboCreationScreen
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -54,8 +54,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
-import com.example.fightingflow.ui.comboScreen.ComboItem
-import com.example.fightingflow.ui.comboScreen.ComboDisplayViewModel
+import com.example.fightingflow.ui.comboDisplayScreen.ComboItem
+import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayViewModel
 import com.example.fightingflow.util.ComboDisplayUiState
 import com.example.fightingflow.util.MoveEntryListUiState
 import kotlinx.coroutines.flow.update

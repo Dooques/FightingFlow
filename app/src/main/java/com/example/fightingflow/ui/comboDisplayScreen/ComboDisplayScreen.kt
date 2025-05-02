@@ -1,4 +1,4 @@
-package com.example.fightingflow.ui.comboScreen
+package com.example.fightingflow.ui.comboDisplayScreen
 
 import android.app.Activity
 import android.content.Context

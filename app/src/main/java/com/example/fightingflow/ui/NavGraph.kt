@@ -22,10 +22,10 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.fightingflow.R
 import com.example.fightingflow.ui.characterScreen.CharacterScreen
-import com.example.fightingflow.ui.comboAddScreen.ComboCreationScreen
-import com.example.fightingflow.ui.comboAddScreen.ComboCreationViewModel
-import com.example.fightingflow.ui.comboScreen.ComboDisplayScreen
-import com.example.fightingflow.ui.comboScreen.ComboDisplayViewModel
+import com.example.fightingflow.ui.comboCreationScreen.ComboCreationScreen
+import com.example.fightingflow.ui.comboCreationScreen.ComboCreationViewModel
+import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayScreen
+import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayViewModel
 import com.example.fightingflow.ui.profileScreen.ProfileList
 import com.example.fightingflow.ui.profileScreen.ProfileViewModel
 import kotlinx.coroutines.flow.update
@@ -75,22 +75,20 @@ fun NavGraph(
     val scope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
 
-    Timber.d(
-        "Flows collected" +
-
-                "\nComboViewModel Flows" +
-                "\nCharacter: ${characterState.character}" +
-                "\nCombo Entry List: ${comboEntryListState.comboEntryList}" +
-                "\nCombo Display: ${comboStateAddCombo.comboDisplay}" +
-
-                "\n\nAddComboViewModel Flows" +
-                "\nComboStateAddCombo: ${comboStateAddCombo.comboDisplay}" +
-                "\ncomboEntryListStateAddCombo: ${comboEntryListStateAddCombo.comboEntryList}" +
-
-                "\n\nProfileViewModel Flows" +
-                "\nIsUserLoggedIn: $loggedInState" +
-                "\nUsername: $username"
-    )
+    Timber.d("")
+    Timber.d("Flows collected")
+    Timber.d("ComboViewModel Flows")
+    Timber.d("Character: ${characterState.character}")
+    Timber.d("Combo Entry List: ${comboEntryListState.comboEntryList}")
+    Timber.d("Combo Display: ${comboStateAddCombo.comboDisplay}")
+    Timber.d("")
+    Timber.d("AddComboViewModel Flows")
+    Timber.d("ComboStateAddCombo: ${comboStateAddCombo.comboDisplay}")
+    Timber.d("comboEntryListStateAddCombo: ${comboEntryListStateAddCombo.comboEntryList}")
+    Timber.d("")
+    Timber.d("ProfileViewModel Flows")
+    Timber.d("IsUserLoggedIn: $loggedInState")
+    Timber.d("Username: $username")
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) }

@@ -45,7 +45,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.fightingflow.R
 import com.example.fightingflow.model.CharacterEntry
-import com.example.fightingflow.ui.comboScreen.ComboDisplayViewModel
+import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayViewModel
 import com.example.fightingflow.util.CharacterUiState
 import timber.log.Timber
 

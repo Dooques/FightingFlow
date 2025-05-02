@@ -1,4 +1,4 @@
-package com.example.fightingflow.ui.comboScreen
+package com.example.fightingflow.ui.comboDisplayScreen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,11 +15,9 @@ import com.example.fightingflow.util.CharNameUiState
 import com.example.fightingflow.util.CharacterEntryListUiState
 import com.example.fightingflow.util.CharacterUiState
 import com.example.fightingflow.util.ComboDisplayListUiState
-import com.example.fightingflow.util.ComboDisplayUiState
 import com.example.fightingflow.util.ComboEntryListUiState
 import com.example.fightingflow.util.ImmutableList
 import com.example.fightingflow.util.MoveEntryListUiState
-import com.example.fightingflow.util.emptyComboDisplay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

@@ -1,4 +1,4 @@
-package com.example.fightingflow.ui.comboAddScreen
+package com.example.fightingflow.ui.comboCreationScreen
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
