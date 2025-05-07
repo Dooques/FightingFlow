@@ -54,9 +54,7 @@ const val TAG = "CharacterScreen"
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CharacterScreen(
-    comboViewModel: ComboDisplayViewModel,
-    updateCharacterState: (String) -> Unit,
-    setCharacterToDS: (CharacterEntry) -> Unit,
+    comboDisplayViewModel: ComboDisplayViewModel,
     onClick: () -> Unit,
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier
@@ -64,7 +62,7 @@ fun CharacterScreen(
     Timber.d("")
     Timber.d("\nLoading Character Screen")
 
-    val characterListState by comboViewModel.characterEntryListState.collectAsState()
+    val characterListState by comboDisplayViewModel.characterEntryListState.collectAsState()
     Timber.d("Flows Collected")
     Timber.d("Character List: ${characterListState.characterList}")
 
@@ -116,8 +114,8 @@ fun CharacterScreen(
                 Timber.d("Loading Character Grid...")
                 items(items = characterListState.characterList.sortedBy { it.name }) { character ->
                     CharacterCard(
-                        updateCharacterState = updateCharacterState,
-                        setCharacterToDS = setCharacterToDS,
+                        updateCharacterState = comboDisplayViewModel::updateCharacterState,
+                        setCharacterToDS = comboDisplayViewModel::updateCharacterInDS,
                         onClick = onClick,
                         characterState = CharacterUiState(character),
                         modifier = modifier

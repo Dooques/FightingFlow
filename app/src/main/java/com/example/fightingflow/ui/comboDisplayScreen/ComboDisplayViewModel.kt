@@ -51,17 +51,17 @@ class ComboDisplayViewModel(
     private val _comboEntryListState = MutableStateFlow(ComboEntryListUiState())
     val comboEntryListState: StateFlow<ComboEntryListUiState> = _comboEntryListState
 
+    private val _characterState = MutableStateFlow(CharacterUiState())
+    val characterState: StateFlow<CharacterUiState> = _characterState
+
     init {
-        Timber.d("")
         Timber.d("Initializing Combo Display View Model...")
         Timber.d("Getting character entry list...")
         getCharacterEntryList()
         Timber.d("Getting move entry list...")
         getAllMoveEntries()
-        getAllCombos()
     }
 
-    val characterState = MutableStateFlow(CharacterUiState())
 
     val characterNameState = characterDsRepository.getName()
             .map { CharNameUiState(it) }
@@ -81,16 +81,14 @@ class ComboDisplayViewModel(
 
     // Datastore
     fun updateCharacterState(name: String) {
-        Timber.d("")
         Timber.d("Getting character from Character List")
         val character = characterEntryListState.value.characterList.first { it.name == name }
-        characterState.update { CharacterUiState(character) }
+        _characterState.update { CharacterUiState(character) }
         Timber.d("Found $character and updated CharacterState")
     }
 
     fun updateCharacterInDS(character: CharacterEntry) {
         viewModelScope.launch {
-            Timber.d("")
             Timber.d("Setting ${character.name} to Character Datastore")
             characterDsRepository.updateCharacter(character)
         }
@@ -112,25 +110,17 @@ class ComboDisplayViewModel(
         }
     }
 
-    private fun getAllCombos() = viewModelScope.launch {
-        Timber.d("")
+    fun getComboDisplayList() = viewModelScope.launch {
         Timber.d("Getting combos from database...")
-        val comboEntryList = flowRepository.getAllCombos()
-            .map { ComboEntryListUiState(it) }
+        val comboDisplayList = flowRepository.getAllCombosByCharacter(characterState.value.character)
+            .map { comboList -> ComboDisplayListUiState(comboList.map { combo -> combo.toDisplay()}) }
             .stateIn(
                 scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIME_MILLIS),
-                initialValue = ComboEntryListUiState()
+                started = SharingStarted.WhileSubscribed(),
+                initialValue = ComboDisplayListUiState()
             )
-        Timber.d("Combo Entry List: ${comboEntryList.value.comboEntryList}")
-        _comboEntryListState.update { comboEntryList.value }
-        _comboDisplayListState.update {
-            ComboDisplayListUiState(
-                comboEntryList.value.comboEntryList.map {
-                        combo -> combo.toDisplay()
-                }
-            )
-        }
+        Timber.d("Combo Display List: ${comboDisplayList.value.comboDisplayList}")
+        _comboDisplayListState.update { comboDisplayList.value }
     }
 
     suspend fun deleteCombo(combo: ComboDisplay, comboEntries: List<ComboEntry>) {

@@ -59,22 +59,16 @@ import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayViewModel
 import com.example.fightingflow.util.ComboDisplayUiState
 import com.example.fightingflow.util.MoveEntryListUiState
 import kotlinx.coroutines.flow.update
+import org.koin.compose.koinInject
 import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("SourceLockedOrientationActivity")
 @Composable
 fun ComboCreationScreen(
-    comboCreationViewModel: ComboCreationViewModel,
     comboDisplayViewModel: ComboDisplayViewModel,
-    saveComboDetailsToDs: (ComboDisplayUiState) -> Unit,
-    updateComboData: (ComboDisplayUiState) -> Unit,
-    updateMoveList: (String, MoveEntryListUiState) -> Unit,
-    saveCombo: () -> Unit,
-    deleteLastMove: () -> Unit,
-    clearMoveList: () -> Unit,
-    onConfirm: () -> Unit,
     navigateBack: () -> Unit,
+    onConfirm: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Timber.d("")
@@ -83,6 +77,8 @@ fun ComboCreationScreen(
     Timber.d("Locking orientation until solution for lost combo data is found.")
     val context = LocalContext.current
     (context as? Activity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+
+    val comboCreationViewModel = koinInject<ComboCreationViewModel>()
 
     // ComboViewModel
     val characterState by comboDisplayViewModel.characterState.collectAsState()
@@ -172,16 +168,16 @@ fun ComboCreationScreen(
             Timber.d("")
             Timber.d("Loading Header...")
             ComboForm(
-                updateComboData = updateComboData,
-                updateMoveList = updateMoveList,
+                updateComboData = comboCreationViewModel::updateComboDetails,
+                updateMoveList = comboCreationViewModel::updateMoveList,
                 character = characterState.character,
                 characterName = characterNameState.name,
                 combo = comboDisplayState.comboDisplay,
                 comboAsString = comboAsString,
                 moveList = moveListState,
-                saveCombo = saveCombo,
-                deleteLastMove = deleteLastMove,
-                clearMoveList = clearMoveList,
+                saveCombo = comboCreationViewModel::saveCombo,
+                deleteLastMove = comboCreationViewModel::deleteLastMove,
+                clearMoveList = comboCreationViewModel::clearMoveList,
                 onConfirm = onConfirm
             )
         }

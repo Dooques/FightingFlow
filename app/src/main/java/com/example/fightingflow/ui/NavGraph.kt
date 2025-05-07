@@ -23,13 +23,10 @@ import androidx.navigation.compose.rememberNavController
 import com.example.fightingflow.R
 import com.example.fightingflow.ui.characterScreen.CharacterScreen
 import com.example.fightingflow.ui.comboCreationScreen.ComboCreationScreen
-import com.example.fightingflow.ui.comboCreationScreen.ComboCreationViewModel
 import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayScreen
 import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayViewModel
 import com.example.fightingflow.ui.profileScreen.ProfileList
 import com.example.fightingflow.ui.profileScreen.ProfileViewModel
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import timber.log.Timber
 
@@ -58,15 +55,7 @@ fun NavGraph(
 
     Timber.d("Initializing ViewModels")
     val comboDisplayViewModel = koinInject<ComboDisplayViewModel>()
-    val comboCreationViewModel = koinInject<ComboCreationViewModel>()
     val profileViewModel = koinInject<ProfileViewModel>()
-
-    // ComboDisplayViewModel Flows
-    val comboEntryListState by comboDisplayViewModel.comboEntryListState.collectAsStateWithLifecycle()
-
-    // Combo Creation Flows
-    val comboStateAddCombo by comboCreationViewModel.comboDisplayState.collectAsStateWithLifecycle()
-    val comboEntryListStateAddCombo by comboCreationViewModel.comboEntryListState.collectAsStateWithLifecycle()
 
     // ProfileViewModel Flows
     val loggedInState by profileViewModel.loggedInState.collectAsStateWithLifecycle()
@@ -75,20 +64,9 @@ fun NavGraph(
     val scope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
 
-//    Timber.d("")
-//    Timber.d("Flows collected")
-//    Timber.d("ComboViewModel Flows")
-//    Timber.d("Character: ${characterState.character}")
-//    Timber.d("Combo Entry List: ${comboEntryListState.comboEntryList}")
-//    Timber.d("Character Entry List: ${characterEntryList.characterList}")
-//    Timber.d("")
-//    Timber.d("AddComboViewModel Flows")
-//    Timber.d("ComboStateAddCombo: ${comboStateAddCombo.comboDisplay}")
-//    Timber.d("comboEntryListStateAddCombo: ${comboEntryListStateAddCombo.comboEntryList}")
-//    Timber.d("")
-//    Timber.d("ProfileViewModel Flows")
-//    Timber.d("IsUserLoggedIn: $loggedInState")
-//    Timber.d("Username: $username")
+    Timber.d("Flows collected")
+    Timber.d("IsUserLoggedIn: $loggedInState")
+    Timber.d("Username: $username")
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
@@ -133,9 +111,7 @@ fun NavGraph(
             // Character Screen
             composable(route = FlowScreen.PickChar.name) {
                 CharacterScreen(
-                    comboViewModel = comboDisplayViewModel,
-                    updateCharacterState = comboDisplayViewModel::updateCharacterState,
-                    setCharacterToDS = comboDisplayViewModel::updateCharacterInDS,
+                    comboDisplayViewModel = comboDisplayViewModel,
                     onClick = { navController.navigate(FlowScreen.Combos.name) },
                     navigateBack = { navController.navigate(FlowScreen.Start.name)}
                 )
@@ -145,30 +121,10 @@ fun NavGraph(
             composable(route = FlowScreen.Combos.name) {
                 ComboDisplayScreen(
                     deviceType = deviceType,
-                    comboViewModel = comboDisplayViewModel,
+                    comboDisplayViewModel = comboDisplayViewModel,
                     snackbarHostState = snackBarHostState,
                     updateCharacterState = comboDisplayViewModel::updateCharacterState,
-                    getMoveEntryData = comboDisplayViewModel::getMoveEntryData,
-                    onAddCombo = {
-                        Timber.d("")
-                        Timber.d("Preparing to create new combo...")
-                        Timber.d("Setting edit state to false...")
-                        comboCreationViewModel.editingState.value = false
-                        Timber.d("Moving to AddComboScreen")
-                        navController.navigate(FlowScreen.AddCombo.name)
-                    },
-                    onEditCombo = {
-                        scope.launch {
-                            Timber.d("")
-                            Timber.d("Preparing to edit selected combo")
-                            Timber.d("Saving selected combo to AddComboViewModel...")
-                            comboCreationViewModel.comboDisplayState.update { it }
-                            Timber.d("AddComboViewModel Combo state: ${comboStateAddCombo.comboDisplay}")
-                            Timber.d("Updated Combo List: ${comboEntryListStateAddCombo.comboEntryList}")
-                            comboCreationViewModel.editingState.value = true
-                            navController.navigate(FlowScreen.AddCombo.name)
-                        }
-                    },
+                    onNavigateToComboEditor = { navController.navigate(FlowScreen.AddCombo.name) },
                     navigateBack = {navController.navigate(FlowScreen.PickChar.name) }
                 )
             }
@@ -176,14 +132,7 @@ fun NavGraph(
             // Add Combo Screen
             composable(route = FlowScreen.AddCombo.name) {
                 ComboCreationScreen(
-                    comboCreationViewModel = comboCreationViewModel,
                     comboDisplayViewModel = comboDisplayViewModel,
-                    saveComboDetailsToDs = comboCreationViewModel::saveComboDetailsToDs,
-                    updateComboData = comboCreationViewModel::updateComboDetails,
-                    updateMoveList = comboCreationViewModel::updateMoveList,
-                    saveCombo = comboCreationViewModel::saveCombo,
-                    deleteLastMove = comboCreationViewModel::deleteLastMove,
-                    clearMoveList = comboCreationViewModel::clearMoveList,
                     onConfirm = { navController.navigate(FlowScreen.Combos.name) },
                     navigateBack = navController::navigateUp
                 )

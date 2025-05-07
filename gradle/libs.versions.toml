@@ -1,8 +1,8 @@
 [versions]
-agp = "8.8.2"
+agp = "8.10.0"
 coilCompose = "2.7.0"
 core = "1.6.1"
-datastorePreferences = "1.1.5"
+datastorePreferences = "1.1.4"
 kotlin = "2.1.10"
 coreKtx = "1.16.0"
 junit = "4.13.2"
@@ -12,9 +12,6 @@ kotlinxCoroutinesTest = "1.10.1"
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.10.1"
 composeBom = "2025.04.01"
-mockk = "1.13.0"
-mockkAgent = "1.13.0"
-mockkAndroid = "1.13.0"
 timber = "5.0.1"
 uiTextGoogleFonts = "1.8.0"
 navigationRuntimeKtx = "2.8.9"
@@ -57,9 +54,6 @@ koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", versi
 koin-test = { module = "io.insert-koin:koin-test-junit4", version.ref = "koin" }
 koin-android-test = { module = "io.insert-koin:koin-android-test", version.ref = "koin" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
-mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
-mockk-agent = { module = "io.mockk:mockk-agent", version.ref = "mockkAgent" }
-mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockkAndroid" }
 moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
 moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshiKotlin" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }

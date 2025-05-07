@@ -51,9 +51,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.MoveEntry
+import com.example.fightingflow.ui.comboCreationScreen.ComboCreationViewModel
 import com.example.fightingflow.util.ActionIcon
 import com.example.fightingflow.util.SwipeableItem
 import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,32 +63,32 @@ import timber.log.Timber
 fun ComboDisplayScreen(
     deviceType: WindowSizeClass,
     snackbarHostState: SnackbarHostState,
-    comboViewModel: ComboDisplayViewModel,
+    comboDisplayViewModel: ComboDisplayViewModel,
     updateCharacterState: (String) -> Unit,
-    getMoveEntryData: (List<MoveEntry>, ComboDisplay) -> ComboDisplay,
-    onAddCombo: () -> Unit,
-    onEditCombo: () -> Unit,
+    onNavigateToComboEditor: () -> Unit,
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Timber.d("")
     Timber.d("Opening Combo Screen...")
 
     val context = LocalContext.current
     (context as? Activity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
 
+    val comboCreationViewModel = koinInject<ComboCreationViewModel>()
+
+    Timber.d("Getting combo data from database...")
+    comboDisplayViewModel.getComboDisplayList()
+
     // Room Flows
-    val characterState by comboViewModel.characterState.collectAsState()
-    val characterListState by comboViewModel.characterEntryListState.collectAsState()
-    val comboDisplayListState by comboViewModel.comboDisplayListState.collectAsState()
-    val comboEntryListState by comboViewModel.comboEntryListState.collectAsState()
-    val moveListState by comboViewModel.moveEntryListUiState.collectAsState()
+    val characterState by comboDisplayViewModel.characterState.collectAsState()
+    val characterListState by comboDisplayViewModel.characterEntryListState.collectAsState()
+    val comboDisplayListState by comboDisplayViewModel.comboDisplayListState.collectAsState()
+    val comboEntryListState by comboDisplayViewModel.comboEntryListState.collectAsState()
 
     // Datastore Flows
-    val characterNameState by comboViewModel.characterNameState.collectAsState()
-    val characterImageState by comboViewModel.characterImageState.collectAsState()
+    val characterNameState by comboDisplayViewModel.characterNameState.collectAsState()
+    val characterImageState by comboDisplayViewModel.characterImageState.collectAsState()
 
-    Timber.d("")
     Timber.d("Flows Collected")
     Timber.d("Character: ${characterState.character}")
     Timber.d("Character Details: ${characterNameState.name} ${characterImageState.image}")
@@ -141,7 +143,10 @@ fun ComboDisplayScreen(
                         contentDescription = "",
                         modifier = modifier.size(60.dp)
                     )
-                    IconButton(onClick = onAddCombo) {
+                    IconButton(onClick = {
+                        comboCreationViewModel.editingState.value = false
+                        onNavigateToComboEditor()
+                    }) {
                         Icon(
                             imageVector = Icons.Default.Add,
                             contentDescription = "Add Combo",
@@ -189,12 +194,13 @@ fun ComboDisplayScreen(
                                 onclick = {
                                     Timber.d("Preparing to edit combo")
                                     scope.launch {
-                                        comboViewModel.saveComboIdToDs(combo)
-                                        onEditCombo()
+                                        comboDisplayViewModel.saveComboIdToDs(combo)
+                                        comboCreationViewModel.editingState.value = true
                                         snackbarHostState.showSnackbar(
                                             message = "Combo ${combo.comboId} is being sent to the editor.",
                                             duration = SnackbarDuration.Short
                                             )
+                                        onNavigateToComboEditor()
                                     }
                                 },
                                 tint = Color.Green,
@@ -205,7 +211,7 @@ fun ComboDisplayScreen(
                             ActionIcon(
                                 onclick = {
                                     scope.launch {
-                                        comboViewModel.deleteCombo(
+                                        comboDisplayViewModel.deleteCombo(
                                             combo,
                                             comboEntryListState.comboEntryList
                                         )
@@ -249,7 +255,6 @@ fun ComboItem(
     fontColor: Color,
     modifier: Modifier = Modifier,
 ) {
-    Timber.d("")
     Timber.d("Loading Combo Moves Composable...")
     Column {
         Timber.d("Loading flow row...")
