@@ -7,7 +7,6 @@ import com.example.fightingflow.data.datastore.ComboDsRepository
 import com.example.fightingflow.data.datastore.CharacterDsRepository
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
-import com.example.fightingflow.model.ComboEntry
 import com.example.fightingflow.model.MoveEntry
 import com.example.fightingflow.model.toDisplay
 import com.example.fightingflow.model.toEntry
@@ -98,7 +97,10 @@ class ComboDisplayViewModel(
 
     suspend fun saveComboIdToDs(comboDisplay: ComboDisplay) {
         comboDsRepository.setCombo(comboDisplay)
+        setEditingState(true)
     }
+
+    suspend fun setEditingState(editingStateValue: Boolean) = comboDsRepository.setEditingState(editingStateValue)
 
     // Database Functions
     private fun getAllMoveEntries() = viewModelScope.launch {
@@ -118,7 +120,7 @@ class ComboDisplayViewModel(
             .map { comboEntryList ->
                 _comboEntryListState.update { ComboEntryListUiState(comboEntryList ?: emptyList()) }
                 ComboDisplayListUiState(comboDisplayList = comboEntryList?.map { combo ->
-                    getMoveEntryData(combo.toDisplay())
+                    getMoveEntryDataCD(combo.toDisplay())
                 } ?: emptyList())
             }
             .collect { comboDisplayList ->
@@ -134,7 +136,7 @@ class ComboDisplayViewModel(
     }
 
     // Move List Conversion
-    private fun getMoveEntryData(combo: ComboDisplay): ComboDisplay {
+    private fun getMoveEntryDataCD(combo: ComboDisplay): ComboDisplay {
         Timber.d("Processing moveList for ${combo.comboId}")
         val updatedCombo = combo.copy(
             moves = ImmutableList(

@@ -71,14 +71,14 @@ fun ComboCreationScreen(
     onConfirm: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Timber.d("")
     Timber.d("Opening Add Combo Screen...")
-
     Timber.d("Locking orientation until solution for lost combo data is found.")
     val context = LocalContext.current
     (context as? Activity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
     val comboCreationViewModel = koinInject<ComboCreationViewModel>()
+
+    var comboReceived by remember { mutableStateOf(false) }
 
     // ComboViewModel
     val characterState by comboDisplayViewModel.characterState.collectAsState()
@@ -89,26 +89,23 @@ fun ComboCreationScreen(
     val characterFromAddCombo by comboCreationViewModel.characterState.collectAsState()
     val comboDisplayState by comboCreationViewModel.comboDisplayState.collectAsState()
     val comboAsString by comboCreationViewModel.comboAsStringState.collectAsState()
-    val existingComboList by comboCreationViewModel.existingCombos.collectAsState()
-    val editingState by comboCreationViewModel.editingState
 
     // Datastore Flows
     val characterNameState by comboDisplayViewModel.characterNameState.collectAsState()
     val characterImageState by comboDisplayViewModel.characterImageState.collectAsState()
-    val comboIdState by comboCreationViewModel.comboIdFromDs.collectAsState()
+    val comboIdState by comboCreationViewModel.comboIdState
+    val editingState by comboCreationViewModel.editingState
 
-    Timber.d("")
     Timber.d("Flows Collected: ")
     Timber.d("Character Details (Ds): ")
     Timber.d("Name: ${characterNameState.name} ")
     Timber.d("Image: ${characterImageState.image}")
 
-    Timber.d("")
     Timber.d("Character: ${characterFromAddCombo.character}")
     Timber.d("ComboDisplayState: ${comboDisplayState.comboDisplay}")
     Timber.d("ComboString: $comboAsString")
     Timber.d("ComboId from DS: $comboIdState")
-    Timber.d("ExistingComboList: $existingComboList")
+    Timber.d("Editing State: $editingState")
 
     Timber.d("Updating Character State")
     if (characterListState.characterList.isNotEmpty() && characterNameState.name.isNotEmpty()) {
@@ -117,15 +114,11 @@ fun ComboCreationScreen(
     Timber.d("${characterState.character.name} is loaded.")
 
     Timber.d("Checking if in editing state & existing combo list contains data...")
-    if (editingState && existingComboList.comboEntryList.isNotEmpty()) {
-        Timber.d("Existing combos contains data, preparing to add combo to ComboDisplayState...")
+    if (editingState && comboIdState.isNotEmpty() && !comboReceived) {
+        Timber.d("Combo found and editing mode is true...")
         comboCreationViewModel.getExistingCombo()
+        comboReceived = true
     }
-
-    Timber.d("")
-    Timber.d("Combo: ${comboDisplayState.comboDisplay}" +
-            "\nComboMoves: ${comboDisplayState.comboDisplay.moves}"
-    )
 
     Scaffold(
         topBar = {
@@ -165,7 +158,6 @@ fun ComboCreationScreen(
                 .fillMaxSize()
                 .padding(contentPadding)
         ) {
-            Timber.d("")
             Timber.d("Loading Header...")
             ComboForm(
                 updateComboData = comboCreationViewModel::updateComboDetails,
@@ -181,27 +173,6 @@ fun ComboCreationScreen(
                 onConfirm = onConfirm
             )
         }
-    }
-}
-
-@Composable
-fun Header(
-    characterName: String,
-    characterImage: Int,
-    navigateBack: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Timber.d("Loading Back Icon.")
-        IconButton(onClick = navigateBack) { Icon(imageVector = Icons.Default.Close, contentDescription = null, Modifier.size(50.dp)) }
-        Timber.d("Loading Character Name")
-        Text(text = characterName, style = MaterialTheme.typography.displayLarge)
-        Timber.d("Loading Character Icon")
-        Image(painter = painterResource(characterImage), contentDescription = null, modifier.size(50.dp))
     }
 }
 
@@ -311,11 +282,36 @@ fun InputSelector(
             when (moveType) {
                 "Text Combo" -> ComboTextEntry(comboAsString)
                 "Radio Buttons" -> RadioButtons()
-                "Damage" -> DamageAndBreak(combo, updateComboData, updateMoveList, moveList)
-                "Movement" -> IconMoves(moveType, moveList, updateMoveList, context)
-                "Input" -> IconMoves(moveType, moveList, updateMoveList, context)
-                "Common", "Mishima", "Character", "Mechanics Input", "Stage" -> TextMoves(moveType, moveList, character, updateMoveList)
-                "Buttons" -> ConfirmAndClear(saveCombo, deleteLastMove, clearMoveList, onConfirm)
+                "Damage" -> DamageAndBreak(
+                    combo = combo,
+                    updateComboData = updateComboData,
+                    updateMoveList = updateMoveList,
+                    moveList = moveList
+                )
+                "Movement" -> IconMoves(
+                    moveType = moveType,
+                    moveList = moveList,
+                    updateMoveList = updateMoveList,
+                    context = context
+                )
+                "Input" -> IconMoves(
+                    moveType = moveType,
+                    moveList = moveList,
+                    updateMoveList = updateMoveList,
+                    context = context
+                )
+                "Common", "Mishima", "Character", "Mechanics Input", "Stage" -> TextMoves(
+                    moveType = moveType,
+                    moveList = moveList,
+                    character = character,
+                    updateMoveList = updateMoveList
+                )
+                "Buttons" -> ConfirmAndClear(
+                    saveCombo = saveCombo,
+                    deleteLastMove = deleteLastMove,
+                    clearMoveList = clearMoveList,
+                    onConfirm = onConfirm
+                )
                 "Divider" -> InputDivider()
                 "Stances", "Mechanics", "${character.name}'s Stances", "Inputs", "Mishima Moves" -> StanceAndMechanicsTitle(moveType)
             }
@@ -560,7 +556,7 @@ fun ConfirmAndClear(
                 saveCombo()
                 Timber.d("Combo saved, returning to Combo Screen")
                 onConfirm()
-                      },
+            },
             content = { Text("Confirm", color = MaterialTheme.colorScheme.onBackground) }
         )
         OutlinedButton(

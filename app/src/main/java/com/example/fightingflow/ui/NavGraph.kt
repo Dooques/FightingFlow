@@ -118,7 +118,7 @@ fun NavGraph(
 
             // Combo Display Screen
             composable(route = FlowScreen.Combos.name) {
-                Timber.d("Combo Display Screen")
+                Timber.d("Loading Combo Display Screen")
                 ComboDisplayScreen(
                     deviceType = deviceType,
                     comboDisplayViewModel = comboDisplayViewModel,
@@ -131,7 +131,7 @@ fun NavGraph(
 
             // Combo Creation Screen
             composable(route = FlowScreen.ComboCreation.name) {
-                Timber.d("Combo Creation Screen")
+                Timber.d("Loading Combo Creation Screen")
                 ComboCreationScreen(
                     comboDisplayViewModel = comboDisplayViewModel,
                     onConfirm = { navController.navigate(FlowScreen.Combos.name) },

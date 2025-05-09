@@ -136,10 +136,10 @@ fun ComboDisplayScreen(
                         contentDescription = "",
                         modifier = modifier.size(60.dp)
                     )
-                    IconButton(onClick = {
-                        comboCreationViewModel.editingState.value = false
+                    IconButton(onClick = { scope.launch {
+                        comboDisplayViewModel.setEditingState(false)
                         onNavigateToComboEditor()
-                    }) {
+                    } }) {
                         Icon(
                             imageVector = Icons.Default.Add,
                             contentDescription = "Add Combo",
@@ -172,11 +172,6 @@ fun ComboDisplayScreen(
                             ActionIcon(
                                 onclick = {
                                     Timber.d("Sharing Combo")
-                                    Toast.makeText(
-                                        context,
-                                        "Combo ${combo.comboId} was shared.",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
                                 },
                                 tint = Color.Blue,
                                 icon = Icons.Default.Share,
@@ -188,11 +183,7 @@ fun ComboDisplayScreen(
                                     Timber.d("Preparing to edit combo")
                                     scope.launch {
                                         comboDisplayViewModel.saveComboIdToDs(combo)
-                                        comboCreationViewModel.editingState.value = true
-                                        snackbarHostState.showSnackbar(
-                                            message = "\"${combo.comboId}\" is being sent to the editor.",
-                                            duration = SnackbarDuration.Short
-                                            )
+                                        comboDisplayViewModel.setEditingState(true)
                                         onNavigateToComboEditor()
                                     }
                                 },
