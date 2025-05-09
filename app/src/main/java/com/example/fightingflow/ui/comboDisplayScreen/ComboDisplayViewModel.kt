@@ -10,6 +10,7 @@ import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.ComboEntry
 import com.example.fightingflow.model.MoveEntry
 import com.example.fightingflow.model.toDisplay
+import com.example.fightingflow.model.toEntry
 import com.example.fightingflow.util.CharImageUiState
 import com.example.fightingflow.util.CharNameUiState
 import com.example.fightingflow.util.CharacterEntryListUiState
@@ -60,6 +61,7 @@ class ComboDisplayViewModel(
         getCharacterEntryList()
         Timber.d("Getting move entry list...")
         getAllMoveEntries()
+        Timber.d("Getting Combo Display List")
     }
 
 
@@ -110,35 +112,34 @@ class ComboDisplayViewModel(
         }
     }
 
-    fun getComboDisplayList() = viewModelScope.launch {
+    fun getComboDisplayListByCharacter() = viewModelScope.launch {
         Timber.d("Getting combos from database...")
-        val comboDisplayList = flowRepository.getAllCombosByCharacter(characterState.value.character)
-            .map { comboList -> ComboDisplayListUiState(comboList.map { combo -> combo.toDisplay()}) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(),
-                initialValue = ComboDisplayListUiState()
-            )
-        Timber.d("Combo Display List: ${comboDisplayList.value.comboDisplayList}")
-        _comboDisplayListState.update { comboDisplayList.value }
+        flowRepository.getAllCombosByCharacter(characterState.value.character)
+            .map { comboEntryList ->
+                _comboEntryListState.update { ComboEntryListUiState(comboEntryList ?: emptyList()) }
+                ComboDisplayListUiState(comboDisplayList = comboEntryList?.map { combo ->
+                    getMoveEntryData(combo.toDisplay())
+                } ?: emptyList())
+            }
+            .collect { comboDisplayList ->
+                _comboDisplayListState.update { comboDisplayList }
+            }
     }
 
-    suspend fun deleteCombo(combo: ComboDisplay, comboEntries: List<ComboEntry>) {
+    suspend fun deleteCombo(combo: ComboDisplay) {
         Timber.d("Starting delete process...")
-        Timber.d("Existing combo list: $comboEntries")
-        val comboToDelete = comboEntries.first {it.comboId == combo.comboId}
-        Timber.d("Deleting: $comboToDelete")
-        flowRepository.deleteCombo(comboToDelete)
+        Timber.d("Deleting: $combo")
+        flowRepository.deleteCombo(combo.toEntry(characterEntryListState.value.characterList.first {it.name == combo.character}))
         Timber.d("Combo Deleted.")
     }
 
-    // Object Conversion
-    fun getMoveEntryData(moveData: List<MoveEntry>, combo: ComboDisplay): ComboDisplay {
+    // Move List Conversion
+    private fun getMoveEntryData(combo: ComboDisplay): ComboDisplay {
         Timber.d("Processing moveList for ${combo.comboId}")
         val updatedCombo = combo.copy(
             moves = ImmutableList(
                 combo.moves.map { move ->
-                    val updateData = moveData.first { it.moveName == move.moveName }
+                    val updateData = moveEntryListUiState.value.moveList.first { it.moveName == move.moveName }
                     MoveEntry(
                         id = updateData.id,
                         moveName = updateData.moveName,

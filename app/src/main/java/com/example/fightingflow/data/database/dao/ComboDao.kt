@@ -15,8 +15,8 @@ interface ComboDao: BaseDao<ComboEntry> {
     fun getAllCombos(): Flow<List<ComboEntry>>
 
     @Query("select * from combo_table where character = :characterEntry")
-    fun getAllCombosByCharacter(characterEntry: CharacterEntry): Flow<List<ComboEntry>>
+    fun getAllCombosByCharacter(characterEntry: CharacterEntry): Flow<List<ComboEntry>?>
 
     @Query("select * from combo_table where created_by = :userName")
-    fun getAllCombosByProfile(userName: String): Flow<List<ComboEntry>>
+    fun getAllCombosByProfile(userName: String): Flow<List<ComboEntry>?>
 }

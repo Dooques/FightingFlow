@@ -49,7 +49,7 @@ fun ComboEntry.toDisplay(): ComboDisplay =
 
 fun ComboDisplay.toEntry(character: CharacterEntry): ComboEntry =
     ComboEntry(
-        id = 0,
+        id = id,
         comboId = comboId.let { UUID.randomUUID().toString() },
         character = character,
         damage = damage,

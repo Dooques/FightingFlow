@@ -95,7 +95,7 @@ class ProfileViewModel(
                 initialValue = ProfileListUiState()
             )
 
-    val currentProfile = profileDbRepository.getProfile(username.value)
+    private val currentProfile = profileDbRepository.getProfile(username.value)
         .mapNotNull { ProfileUiState(it ?: emptyProfile) }
         .stateIn(
             scope = viewModelScope,
@@ -105,7 +105,7 @@ class ProfileViewModel(
 
     val combosByProfile =
         tekkenDataRepository.getAllCombosByProfile(currentProfile.value.profile.username)
-            .mapNotNull { ComboDisplayListUiState(it.map { it.toDisplay() }) }
+            .mapNotNull { comboEntryList -> ComboDisplayListUiState(comboEntryList?.map { it.toDisplay() } ?: emptyList()) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIME_MILLIS),

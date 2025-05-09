@@ -39,7 +39,7 @@ enum class FlowScreen(@StringRes val title: Int) {
     Menu(title = R.string.menu),
     PickChar(title = R.string.char_select),
     Combos(title = R.string.combos),
-    AddCombo(title = R.string.add_combo)
+    ComboCreation(title = R.string.combo_creation)
 }
 
 @SuppressLint("SourceLockedOrientationActivity")
@@ -48,7 +48,6 @@ fun NavGraph(
     navController: NavHostController = rememberNavController(),
     deviceType: WindowSizeClass
 ) {
-    Timber.d("")
     Timber.d("Initializing NavController")
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = FlowScreen.valueOf(backStackEntry?.destination?.route ?: FlowScreen.Start.name)
@@ -71,7 +70,6 @@ fun NavGraph(
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
     ) { innerPadding ->
-        Timber.d("")
         Timber.d("Loading NavHost...")
         NavHost(
             navController = navController,
@@ -83,7 +81,6 @@ fun NavGraph(
             Timber.d("Getting Composable Routes...")
             // Title Screen
             composable(route = FlowScreen.Start.name) {
-                Timber.d("")
                 Timber.d("Loading Title Screen...")
                 TitleScreen(
                     profileViewModel = profileViewModel,
@@ -98,6 +95,7 @@ fun NavGraph(
 
             // Profiles
             composable(route = FlowScreen.ProfileList.name) {
+                Timber.d("Loading Profile List Screen")
                 ProfileList(
                     profileViewModel = profileViewModel,
                     username = username,
@@ -110,6 +108,7 @@ fun NavGraph(
 
             // Character Screen
             composable(route = FlowScreen.PickChar.name) {
+                Timber.d("Loading Character Screen")
                 CharacterScreen(
                     comboDisplayViewModel = comboDisplayViewModel,
                     onClick = { navController.navigate(FlowScreen.Combos.name) },
@@ -119,18 +118,20 @@ fun NavGraph(
 
             // Combo Display Screen
             composable(route = FlowScreen.Combos.name) {
+                Timber.d("Combo Display Screen")
                 ComboDisplayScreen(
                     deviceType = deviceType,
                     comboDisplayViewModel = comboDisplayViewModel,
                     snackbarHostState = snackBarHostState,
                     updateCharacterState = comboDisplayViewModel::updateCharacterState,
-                    onNavigateToComboEditor = { navController.navigate(FlowScreen.AddCombo.name) },
+                    onNavigateToComboEditor = { navController.navigate(FlowScreen.ComboCreation.name) },
                     navigateBack = {navController.navigate(FlowScreen.PickChar.name) }
                 )
             }
 
-            // Add Combo Screen
-            composable(route = FlowScreen.AddCombo.name) {
+            // Combo Creation Screen
+            composable(route = FlowScreen.ComboCreation.name) {
+                Timber.d("Combo Creation Screen")
                 ComboCreationScreen(
                     comboDisplayViewModel = comboDisplayViewModel,
                     onConfirm = { navController.navigate(FlowScreen.Combos.name) },

@@ -37,7 +37,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,11 +48,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.MoveEntry
 import com.example.fightingflow.ui.comboCreationScreen.ComboCreationViewModel
 import com.example.fightingflow.util.ActionIcon
 import com.example.fightingflow.util.SwipeableItem
+import com.example.fightingflow.util.emptyCharacter
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import timber.log.Timber
@@ -76,28 +77,23 @@ fun ComboDisplayScreen(
 
     val comboCreationViewModel = koinInject<ComboCreationViewModel>()
 
-    Timber.d("Getting combo data from database...")
-    comboDisplayViewModel.getComboDisplayList()
 
     // Room Flows
-    val characterState by comboDisplayViewModel.characterState.collectAsState()
-    val characterListState by comboDisplayViewModel.characterEntryListState.collectAsState()
-    val comboDisplayListState by comboDisplayViewModel.comboDisplayListState.collectAsState()
-    val comboEntryListState by comboDisplayViewModel.comboEntryListState.collectAsState()
+    val characterState by comboDisplayViewModel.characterState.collectAsStateWithLifecycle()
+    val comboDisplayListState by comboDisplayViewModel.comboDisplayListState.collectAsStateWithLifecycle()
+    val comboEntryListState by comboDisplayViewModel.comboEntryListState.collectAsStateWithLifecycle()
 
     // Datastore Flows
-    val characterNameState by comboDisplayViewModel.characterNameState.collectAsState()
-    val characterImageState by comboDisplayViewModel.characterImageState.collectAsState()
+    val characterNameState by comboDisplayViewModel.characterNameState.collectAsStateWithLifecycle()
+    val characterImageState by comboDisplayViewModel.characterImageState.collectAsStateWithLifecycle()
 
     Timber.d("Flows Collected")
     Timber.d("Character: ${characterState.character}")
     Timber.d("Character Details: ${characterNameState.name} ${characterImageState.image}")
     Timber.d("Combo Display List: ${comboDisplayListState.comboDisplayList}")
-    Timber.d("Combo Entry List: ${comboEntryListState.comboEntryList}")
-    Timber.d("Updating character data")
-    Timber.d("Character List: ${characterListState.characterList}")
 
-    if (characterListState.characterList.isNotEmpty() && characterNameState.name.isNotEmpty()) {
+    Timber.d("Updating character data")
+    if (characterNameState.name.isNotEmpty()) {
         try {
             updateCharacterState(characterNameState.name)
         } catch (e: NoSuchElementException) {
@@ -111,19 +107,16 @@ fun ComboDisplayScreen(
 
     val uiScale = if (deviceType.widthSizeClass != WindowWidthSizeClass.Compact) 2f else 1f
 
-    Timber.d("Checking combos for ${characterNameState.name}")
-    val combosByCharacter =
-        if (comboDisplayListState.comboDisplayList.isNotEmpty()) {
-            Timber.d("Combos found.")
-            comboDisplayListState.comboDisplayList
-                .mapNotNull {
-                    if (it.character == characterState.character.name) it else null
-                }
-                .toMutableList()
-        } else {
-            Timber.d("No combos found.")
-            emptyList<ComboDisplay>().toMutableList()
-        }
+    Timber.d("Getting combos by character...")
+    val combosByCharacter = if (characterState.character != emptyCharacter) {
+        Timber.d("Character has been selected, getting combos...")
+        comboDisplayViewModel.getComboDisplayListByCharacter()
+        comboDisplayListState.comboDisplayList.toMutableList()
+    } else {
+        Timber.d("No characters selected, returning empty list...")
+        emptyList<ComboDisplay>().toMutableList()
+    }
+
     Timber.d("Combos reduced to ${characterState.character.name}'s: $combosByCharacter")
 
     Scaffold(
@@ -197,7 +190,7 @@ fun ComboDisplayScreen(
                                         comboDisplayViewModel.saveComboIdToDs(combo)
                                         comboCreationViewModel.editingState.value = true
                                         snackbarHostState.showSnackbar(
-                                            message = "Combo ${combo.comboId} is being sent to the editor.",
+                                            message = "\"${combo.comboId}\" is being sent to the editor.",
                                             duration = SnackbarDuration.Short
                                             )
                                         onNavigateToComboEditor()
@@ -213,7 +206,6 @@ fun ComboDisplayScreen(
                                     scope.launch {
                                         comboDisplayViewModel.deleteCombo(
                                             combo,
-                                            comboEntryListState.comboEntryList
                                         )
                                         Timber.d("UI deleted: $combo")
                                     }
