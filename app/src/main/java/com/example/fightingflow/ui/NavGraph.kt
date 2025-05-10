@@ -27,6 +27,7 @@ import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayScreen
 import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayViewModel
 import com.example.fightingflow.ui.profileScreen.ProfileList
 import com.example.fightingflow.ui.profileScreen.ProfileViewModel
+import kotlinx.coroutines.flow.Flow
 import org.koin.compose.koinInject
 import timber.log.Timber
 
@@ -49,8 +50,8 @@ fun NavGraph(
     deviceType: WindowSizeClass
 ) {
     Timber.d("Initializing NavController")
-    val backStackEntry by navController.currentBackStackEntryAsState()
-    val currentScreen = FlowScreen.valueOf(backStackEntry?.destination?.route ?: FlowScreen.Start.name)
+//    val backStackEntry by navController.currentBackStackEntryAsState()
+//    val currentScreen = FlowScreen.valueOf(value = backStackEntry?.destination?.route ?: FlowScreen.Start.name)
 
     Timber.d("Initializing ViewModels")
     val comboDisplayViewModel = koinInject<ComboDisplayViewModel>()
@@ -62,10 +63,6 @@ fun NavGraph(
 
     val scope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
-
-    Timber.d("Flows collected")
-    Timber.d("IsUserLoggedIn: $loggedInState")
-    Timber.d("Username: $username")
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
@@ -134,7 +131,9 @@ fun NavGraph(
                 Timber.d("Loading Combo Creation Screen")
                 ComboCreationScreen(
                     comboDisplayViewModel = comboDisplayViewModel,
-                    onConfirm = { navController.navigate(FlowScreen.Combos.name) },
+                    scope = scope,
+                    snackbarHostState = snackBarHostState,
+                    onNavigateToComboDisplay = { navController.navigate(FlowScreen.Combos.name) },
                     navigateBack = navController::navigateUp
                 )
             }

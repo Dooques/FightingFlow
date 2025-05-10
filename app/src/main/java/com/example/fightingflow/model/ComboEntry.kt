@@ -6,16 +6,17 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
 import com.example.fightingflow.util.ImmutableList
+import com.example.fightingflow.util.MoveEntryListUiState
 import com.example.fightingflow.util.emptyMove
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import timber.log.Timber
 import java.util.UUID
 import kotlin.String
 
 @Entity(tableName = "combo_table")
 data class ComboEntry (
-    @PrimaryKey(autoGenerate = true)
-    val id: Int,
+    @PrimaryKey
     @ColumnInfo(name = "combo_id")
     val comboId: String = UUID.randomUUID().toString(),
     val character: CharacterEntry,
@@ -27,7 +28,6 @@ data class ComboEntry (
 
 @Immutable
 data class ComboDisplay(
-    val id: Int,
     val comboId: String,
     val character: String,
     val damage: Int,
@@ -38,7 +38,6 @@ data class ComboDisplay(
 
 fun ComboEntry.toDisplay(): ComboDisplay =
     ComboDisplay(
-        id = id,
         comboId = comboId,
         character = character.name,
         damage = damage,
@@ -49,8 +48,7 @@ fun ComboEntry.toDisplay(): ComboDisplay =
 
 fun ComboDisplay.toEntry(character: CharacterEntry): ComboEntry =
     ComboEntry(
-        id = id,
-        comboId = comboId.let { UUID.randomUUID().toString() },
+        comboId = comboId,
         character = character,
         damage = damage,
         createdBy = createdBy,
@@ -74,6 +72,28 @@ fun moveEntryToMoveList(moveList: List<MoveEntry>): String {
         }
     }
     return moveString
+}
+fun getMoveEntryDataForComboDisplay(combo: ComboDisplay, moveEntryList: MoveEntryListUiState): ComboDisplay {
+    Timber.d("Processing moveList for ${combo.comboId}")
+    val updatedCombo = combo.copy(
+        moves = ImmutableList(
+            combo.moves.map { move ->
+                val updateData = moveEntryList.moveList.first { it.moveName == move.moveName }
+                MoveEntry(
+                    id = updateData.id,
+                    moveName = updateData.moveName,
+                    notation = updateData.notation,
+                    moveType = updateData.moveType,
+                    counterHit = updateData.counterHit,
+                    hold = updateData.hold,
+                    justFrame = updateData.justFrame,
+                    associatedCharacter = updateData.associatedCharacter
+                )
+            }
+        )
+    )
+    Timber.d("Move List completed for ${combo.comboId} and returning to UI")
+    return updatedCombo
 }
 
 class CharacterConverter {

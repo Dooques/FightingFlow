@@ -3,11 +3,11 @@ package com.example.fightingflow.ui.comboDisplayScreen
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fightingflow.data.database.FlowRepository
-import com.example.fightingflow.data.datastore.ComboDsRepository
 import com.example.fightingflow.data.datastore.CharacterDsRepository
+import com.example.fightingflow.data.datastore.ComboDsRepository
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
-import com.example.fightingflow.model.MoveEntry
+import com.example.fightingflow.model.getMoveEntryDataForComboDisplay
 import com.example.fightingflow.model.toDisplay
 import com.example.fightingflow.model.toEntry
 import com.example.fightingflow.util.CharImageUiState
@@ -16,7 +16,6 @@ import com.example.fightingflow.util.CharacterEntryListUiState
 import com.example.fightingflow.util.CharacterUiState
 import com.example.fightingflow.util.ComboDisplayListUiState
 import com.example.fightingflow.util.ComboEntryListUiState
-import com.example.fightingflow.util.ImmutableList
 import com.example.fightingflow.util.MoveEntryListUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -118,9 +117,10 @@ class ComboDisplayViewModel(
         Timber.d("Getting combos from database...")
         flowRepository.getAllCombosByCharacter(characterState.value.character)
             .map { comboEntryList ->
+                Timber.d("Combo List: $comboEntryList")
                 _comboEntryListState.update { ComboEntryListUiState(comboEntryList ?: emptyList()) }
                 ComboDisplayListUiState(comboDisplayList = comboEntryList?.map { combo ->
-                    getMoveEntryDataCD(combo.toDisplay())
+                    getMoveEntryDataForComboDisplay(combo.toDisplay(), moveEntryListUiState.value)
                 } ?: emptyList())
             }
             .collect { comboDisplayList ->
@@ -135,27 +135,5 @@ class ComboDisplayViewModel(
         Timber.d("Combo Deleted.")
     }
 
-    // Move List Conversion
-    private fun getMoveEntryDataCD(combo: ComboDisplay): ComboDisplay {
-        Timber.d("Processing moveList for ${combo.comboId}")
-        val updatedCombo = combo.copy(
-            moves = ImmutableList(
-                combo.moves.map { move ->
-                    val updateData = moveEntryListUiState.value.moveList.first { it.moveName == move.moveName }
-                    MoveEntry(
-                        id = updateData.id,
-                        moveName = updateData.moveName,
-                        notation = updateData.notation,
-                        moveType = updateData.moveType,
-                        counterHit = updateData.counterHit,
-                        hold = updateData.hold,
-                        justFrame = updateData.justFrame,
-                        associatedCharacter = updateData.associatedCharacter
-                    )
-                }
-            )
-        )
-        Timber.d("Move List completed for ${combo.comboId} and returning to UI")
-        return updatedCombo
-    }
+
 }

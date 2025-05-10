@@ -50,7 +50,6 @@ fun TitleScreen(
     onProfileSelect: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Timber.d("")
     Timber.d("Loading title screen...")
 
     val profilesList by profileViewModel.allExistingProfiles.collectAsStateWithLifecycle()
@@ -100,15 +99,13 @@ fun TitleScreen(
                          )
                      }
                      ProfileCreationForm(
-                         updateCurrentProfile = { profileViewModel.updateProfileCreation(profileCreation) },
+                         updateCurrentProfile = {
+                             profileViewModel.updateProfileCreation(profileCreation)
+                         },
                          profile = profileCreation,
                          onConfirm = {
                              scope.launch {
-                                 Timber.d("")
-                                 Timber.d(
-                                     "Preparing to save ${profileCreation.profileCreation.username}'s " +
-                                         "profile to datastore..."
-                                 )
+                                 Timber.d("Preparing to save ${profileCreation.profileCreation.username}'s profile to datastore...")
                                  val saveProfileSuccess = profileViewModel.saveProfileData()
                                  Timber.d("Profile saved to Ds.")
 

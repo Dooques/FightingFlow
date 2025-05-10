@@ -12,15 +12,15 @@ interface FlowRepository {
     // Character
     fun getCharacter(name: String): Flow<CharacterEntry?>
     fun getAllCharacters(): Flow<List<CharacterEntry>>
-    suspend fun updateCharacter(character: CharacterEntry)
+    suspend fun updateCharacter(characterEntry: CharacterEntry)
 
     // Combo
     fun getCombo(comboId: String): Flow<ComboEntry?>
     fun getAllCombos(): Flow<List<ComboEntry>>
     fun getAllCombosByCharacter(characterEntry: CharacterEntry): Flow<List<ComboEntry>?>
     fun getAllCombosByProfile(username: String): Flow<List<ComboEntry>?>
-    suspend fun updateCombo(combo: ComboEntry)
-    suspend fun deleteCombo(combo: ComboEntry)
+    suspend fun updateCombo(comboEntry: ComboEntry)
+    suspend fun deleteCombo(comboEntry: ComboEntry)
 
     // Move
     fun getMove(name: String): Flow<MoveEntry?>
@@ -29,7 +29,7 @@ interface FlowRepository {
     // InsertData
     suspend fun insertAllCharacters(characterList: List<CharacterEntry>)
     suspend fun insertMoves(moveList: List<MoveEntry>)
-    suspend fun insertCombo(combo: ComboEntry)
+    suspend fun insertCombo(comboEntry: ComboEntry)
 }
 
 class FlowDataRepository(
@@ -72,17 +72,17 @@ class FlowDataRepository(
     override suspend fun insertMoves(moveList: List<MoveEntry>) =
         moveDao.insertAll(moveList)
 
-    override suspend fun insertCombo(combo: ComboEntry) =
-        comboDao.insert(combo)
+    override suspend fun insertCombo(comboEntry: ComboEntry) =
+        comboDao.insert(comboEntry)
 
     // Update
-    override suspend fun updateCharacter(character: CharacterEntry) =
-        characterDao.update(character)
+    override suspend fun updateCharacter(characterEntry: CharacterEntry) =
+        characterDao.update(characterEntry)
 
-    override suspend fun updateCombo(combo: ComboEntry) =
-        comboDao.update(combo)
+    override suspend fun updateCombo(comboEntry: ComboEntry) =
+        comboDao.update(comboEntry)
 
     // Delete
-    override suspend fun deleteCombo(combo: ComboEntry) =
-        comboDao.delete(combo)
+    override suspend fun deleteCombo(comboEntry: ComboEntry) =
+        comboDao.delete(comboEntry)
 }

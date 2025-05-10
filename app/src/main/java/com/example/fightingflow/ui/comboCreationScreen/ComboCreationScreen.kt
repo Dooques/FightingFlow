@@ -35,10 +35,10 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -52,23 +52,29 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.ui.comboDisplayScreen.ComboItem
 import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayViewModel
 import com.example.fightingflow.util.ComboDisplayUiState
 import com.example.fightingflow.util.MoveEntryListUiState
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import timber.log.Timber
+import kotlin.reflect.KSuspendFunction0
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("SourceLockedOrientationActivity")
 @Composable
 fun ComboCreationScreen(
     comboDisplayViewModel: ComboDisplayViewModel,
+    scope: CoroutineScope,
+    snackbarHostState: SnackbarHostState,
     navigateBack: () -> Unit,
-    onConfirm: () -> Unit,
+    onNavigateToComboDisplay: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Timber.d("Opening Add Combo Screen...")
@@ -81,31 +87,32 @@ fun ComboCreationScreen(
     var comboReceived by remember { mutableStateOf(false) }
 
     // ComboViewModel
-    val characterState by comboDisplayViewModel.characterState.collectAsState()
-    val characterListState by comboDisplayViewModel.characterEntryListState.collectAsState()
-    val moveListState by comboDisplayViewModel.moveEntryListUiState.collectAsState()
+    val characterState by comboDisplayViewModel.characterState.collectAsStateWithLifecycle()
+    val characterListState by comboDisplayViewModel.characterEntryListState.collectAsStateWithLifecycle()
+    val moveListState by comboDisplayViewModel.moveEntryListUiState.collectAsStateWithLifecycle()
 
-    // AddComboViewModel
-    val characterFromAddCombo by comboCreationViewModel.characterState.collectAsState()
-    val comboDisplayState by comboCreationViewModel.comboDisplayState.collectAsState()
-    val comboAsString by comboCreationViewModel.comboAsStringState.collectAsState()
+    // ComboCreationViewModel
+    val characterFromAddCombo by comboCreationViewModel.characterState.collectAsStateWithLifecycle()
+    val comboDisplay by comboCreationViewModel.comboDisplayState.collectAsStateWithLifecycle()
+    val originalCombo by comboCreationViewModel.originalCombo.collectAsStateWithLifecycle()
+    val comboAsString by comboCreationViewModel.comboAsStringState.collectAsStateWithLifecycle()
 
     // Datastore Flows
-    val characterNameState by comboDisplayViewModel.characterNameState.collectAsState()
-    val characterImageState by comboDisplayViewModel.characterImageState.collectAsState()
+    val characterNameState by comboDisplayViewModel.characterNameState.collectAsStateWithLifecycle()
+    val characterImageState by comboDisplayViewModel.characterImageState.collectAsStateWithLifecycle()
     val comboIdState by comboCreationViewModel.comboIdState
     val editingState by comboCreationViewModel.editingState
 
-    Timber.d("Flows Collected: ")
-    Timber.d("Character Details (Ds): ")
-    Timber.d("Name: ${characterNameState.name} ")
-    Timber.d("Image: ${characterImageState.image}")
-
-    Timber.d("Character: ${characterFromAddCombo.character}")
-    Timber.d("ComboDisplayState: ${comboDisplayState.comboDisplay}")
-    Timber.d("ComboString: $comboAsString")
-    Timber.d("ComboId from DS: $comboIdState")
-    Timber.d("Editing State: $editingState")
+//    Timber.d("Flows Collected: ")
+//    Timber.d("Character Details (Ds): ")
+//    Timber.d("Name: ${characterNameState.name} ")
+//    Timber.d("Image: ${characterImageState.image}")
+//
+//    Timber.d("Character: ${characterFromAddCombo.character}")
+//    Timber.d("ComboDisplayState: ${comboDisplayState.comboDisplay}")
+//    Timber.d("ComboString: $comboAsString")
+//    Timber.d("ComboId from DS: $comboIdState")
+//    Timber.d("Editing State: $editingState")
 
     Timber.d("Updating Character State")
     if (characterListState.characterList.isNotEmpty() && characterNameState.name.isNotEmpty()) {
@@ -114,11 +121,15 @@ fun ComboCreationScreen(
     Timber.d("${characterState.character.name} is loaded.")
 
     Timber.d("Checking if in editing state & existing combo list contains data...")
-    if (editingState && comboIdState.isNotEmpty() && !comboReceived) {
-        Timber.d("Combo found and editing mode is true...")
-        comboCreationViewModel.getExistingCombo()
-        comboReceived = true
-    }
+    if (editingState) {
+        if (comboIdState.isNotEmpty()) {
+            if(!comboReceived) {
+                Timber.d("Combo found and editing mode is true...")
+                comboCreationViewModel.getExistingCombo()
+                comboReceived = true
+            } else { Timber.d("Combo already collected.") }
+        } else { Timber.d("Combo Ds Empty.") }
+    } else { Timber.d("Not in editing state.") }
 
     Scaffold(
         topBar = {
@@ -160,17 +171,21 @@ fun ComboCreationScreen(
         ) {
             Timber.d("Loading Header...")
             ComboForm(
+                scope = scope,
+                snackbarHostState = snackbarHostState,
+                editingState = editingState,
                 updateComboData = comboCreationViewModel::updateComboDetails,
                 updateMoveList = comboCreationViewModel::updateMoveList,
                 character = characterState.character,
                 characterName = characterNameState.name,
-                combo = comboDisplayState.comboDisplay,
+                comboDisplay = comboDisplay.comboDisplay,
+                originalCombo = originalCombo.comboDisplay,
                 comboAsString = comboAsString,
                 moveList = moveListState,
                 saveCombo = comboCreationViewModel::saveCombo,
                 deleteLastMove = comboCreationViewModel::deleteLastMove,
                 clearMoveList = comboCreationViewModel::clearMoveList,
-                onConfirm = onConfirm
+                onNavigateToComboDisplay = onNavigateToComboDisplay
             )
         }
     }
@@ -178,41 +193,49 @@ fun ComboCreationScreen(
 
 @Composable
 fun ComboForm(
+    scope: CoroutineScope,
+    snackbarHostState: SnackbarHostState,
+    editingState: Boolean,
+    comboDisplay: ComboDisplay,
+    originalCombo: ComboDisplay,
     updateComboData: (ComboDisplayUiState) -> Unit,
     updateMoveList: (String, MoveEntryListUiState) -> Unit,
     character: CharacterEntry,
     characterName: String,
-    combo: ComboDisplay,
     comboAsString: String,
     moveList: MoveEntryListUiState,
-    saveCombo: () -> Unit,
+    saveCombo: KSuspendFunction0<Unit>,
     deleteLastMove: () -> Unit,
     clearMoveList: () -> Unit,
-    onConfirm: () -> Unit,
+    onNavigateToComboDisplay: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Timber.d("")
     val context = LocalContext.current
     Column {
         Timber.d("Loading Combo Form")
-        if (combo.moves.isNotEmpty()) {
+        if (comboDisplay.moves.isNotEmpty()) {
             Timber.d("Combo Move List exists, populating with moves...")
-            ComboDisplay(context, combo)
+            ComboDisplay(context, comboDisplay)
         }
         if (moveList.moveList.isNotEmpty()) {
             Timber.d("Move Entry List exists, populating Input Selector Column...")
             InputSelector(
                 context = context,
+                scope = scope,
+                snackbarHostState = snackbarHostState,
+                editingState = editingState,
+                comboDisplay = comboDisplay,
+                originalCombo = originalCombo,
                 character = character,
                 characterName = characterName,
-                combo = combo,
+                combo = comboDisplay,
                 updateComboData = updateComboData,
                 updateMoveList = updateMoveList,
                 comboAsString = comboAsString,
                 saveCombo = saveCombo,
                 deleteLastMove = deleteLastMove,
                 clearMoveList = clearMoveList,
-                onConfirm = onConfirm,
+                onNavigateToComboDisplay = onNavigateToComboDisplay,
                 moveList = moveList
             )
         }
@@ -243,33 +266,25 @@ fun ComboDisplay(
 @Composable
 fun InputSelector(
     context: Context,
+    scope: CoroutineScope,
+    snackbarHostState: SnackbarHostState,
+    editingState: Boolean,
+    comboDisplay: ComboDisplay,
+    originalCombo: ComboDisplay,
     character: CharacterEntry,
     characterName: String,
     combo: ComboDisplay,
     updateComboData: (ComboDisplayUiState) -> Unit,
     updateMoveList: (String, MoveEntryListUiState) -> Unit,
     comboAsString: String,
-    saveCombo: () -> Unit,
+    saveCombo: KSuspendFunction0<Unit>,
     deleteLastMove: () -> Unit,
     clearMoveList: () -> Unit,
-    onConfirm: () -> Unit,
+    onNavigateToComboDisplay: () -> Unit,
     moveList: MoveEntryListUiState,
     modifier: Modifier = Modifier
 ) {
     Timber.d("Loading Input Selector")
-    val mishima = listOf("Reina", "Heihachi", "Jin", "Kazuya", "Devil Jin")
-
-    val mishimaSelectorLayout = listOf(
-         "Text Combo", "Buttons", "Divider", "Radio Buttons", "Damage", "Divider", "Inputs Title", "Movement", "Input", "Divider",
-        "Stances", "Common", "Divider", "Mishima Moves", "Mishima", "Divider", "${characterName}'s Stances", "Character",
-        "Divider", "Mechanics", "Mechanics Input", "Stage",
-    )
-
-    val selectorLayout = listOf(
-         "Text Combo", "Buttons", "Divider", "Radio Buttons", "Damage", "Divider", "Inputs", "Movement", "Input", "Divider",
-        "Stances", "Common", "Divider", "${characterName}'s Stances", "Character",
-        "Divider", "Mechanics", "Mechanics Input", "Stage",
-    )
 
     LazyColumn {
         val mishimaChar = characterName in mishima
@@ -307,10 +322,15 @@ fun InputSelector(
                     updateMoveList = updateMoveList
                 )
                 "Buttons" -> ConfirmAndClear(
+                    scope = scope,
+                    snackbarHostState = snackbarHostState,
+                    editingState = editingState,
+                    comboDisplay = comboDisplay,
+                    originalCombo = originalCombo,
                     saveCombo = saveCombo,
                     deleteLastMove = deleteLastMove,
                     clearMoveList = clearMoveList,
-                    onConfirm = onConfirm
+                    onNavigateToComboDisplay = onNavigateToComboDisplay,
                 )
                 "Divider" -> InputDivider()
                 "Stances", "Mechanics", "${character.name}'s Stances", "Inputs", "Mishima Moves" -> StanceAndMechanicsTitle(moveType)
@@ -442,7 +462,6 @@ fun DamageAndBreak(
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun IconMoves(
     moveType: String,
@@ -481,7 +500,6 @@ fun IconMoves(
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun TextMoves(
     moveType: String,
@@ -543,32 +561,56 @@ fun TextMoves(
 
 @Composable
 fun ConfirmAndClear(
-    saveCombo: () -> Unit,
+    scope: CoroutineScope,
+    snackbarHostState: SnackbarHostState,
+    editingState: Boolean,
+    comboDisplay: ComboDisplay,
+    originalCombo: ComboDisplay,
+    saveCombo: KSuspendFunction0<Unit>,
     deleteLastMove: () -> Unit,
     clearMoveList: () -> Unit,
-    onConfirm: () -> Unit,
+    onNavigateToComboDisplay: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Timber.d("Loading confirm and clear buttons")
     Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = modifier.fillMaxWidth().padding(vertical = 4.dp).padding(bottom = 8.dp)) {
         OutlinedButton(
             onClick = {
-                saveCombo()
-                Timber.d("Combo saved, returning to Combo Screen")
-                onConfirm()
+                if (comboDisplay == originalCombo) {
+                    scope.launch {
+                        if (editingState) {
+                            snackbarHostState.showSnackbar("No changes to the original combo...")
+                        } else {
+                            snackbarHostState.showSnackbar("Combo has no moves...")
+                        }
+                    }
+                } else if (comboDisplay.damage == 0) {
+                    scope.launch {
+                        snackbarHostState.showSnackbar("No damage value...")
+                    }
+                } else {
+                    scope.launch {
+                        Timber.d("Preparing to save combo...")
+                        saveCombo()
+                        Timber.d("Combo saved, returning to Combo Screen")
+                        onNavigateToComboDisplay()
+                    }
+                }
             },
             content = { Text("Confirm", color = MaterialTheme.colorScheme.onBackground) }
         )
         OutlinedButton(
             onClick = {
+                Timber.d("Deleting last move...")
                 deleteLastMove()
                 Timber.d("Last move deleted.")
-                      },
+            },
             content = {
                 Text("Delete Last", color = MaterialTheme.colorScheme.onBackground) }
         )
         OutlinedButton(
             onClick = {
+                Timber.d("Clearing move list...")
                 clearMoveList()
                 Timber.d("Combo move list cleared.")
             },

@@ -75,22 +75,13 @@ fun ComboDisplayScreen(
     val context = LocalContext.current
     (context as? Activity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
 
-    val comboCreationViewModel = koinInject<ComboCreationViewModel>()
-
-
     // Room Flows
     val characterState by comboDisplayViewModel.characterState.collectAsStateWithLifecycle()
     val comboDisplayListState by comboDisplayViewModel.comboDisplayListState.collectAsStateWithLifecycle()
-    val comboEntryListState by comboDisplayViewModel.comboEntryListState.collectAsStateWithLifecycle()
 
     // Datastore Flows
     val characterNameState by comboDisplayViewModel.characterNameState.collectAsStateWithLifecycle()
     val characterImageState by comboDisplayViewModel.characterImageState.collectAsStateWithLifecycle()
-
-    Timber.d("Flows Collected")
-    Timber.d("Character: ${characterState.character}")
-    Timber.d("Character Details: ${characterNameState.name} ${characterImageState.image}")
-    Timber.d("Combo Display List: ${comboDisplayListState.comboDisplayList}")
 
     Timber.d("Updating character data")
     if (characterNameState.name.isNotEmpty()) {
@@ -228,7 +219,6 @@ fun ComboDisplayScreen(
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ComboItem(
     context: Context,

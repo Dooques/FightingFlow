@@ -48,26 +48,26 @@ fun ProfileCreationForm(
                     )) },
             modifier = modifier.padding(4.dp))
 
-        Timber.d("Loading password field...")
-        TextInputField(
-            type = "password",
-            updateProfileState = { password ->
-                updateCurrentProfile(
-                    ProfileCreationUiState(
-                        profileCreation = profile.profileCreation.copy(password = password)
-                )) },
-            modifier.padding(4.dp)
-        )
-
-        Timber.d("Loading confirm password field...")
-        TextInputField(
-            type = "Confirm\nPassword",
-            updateProfileState = { confirmPassword ->
-                updateCurrentProfile(
-                    ProfileCreationUiState(profileCreation = profile.profileCreation.copy(confirmPassword = confirmPassword)
-                    )) },
-            modifier = modifier.padding(4.dp)
-        )
+//        Timber.d("Loading password field...")
+//        TextInputField(
+//            type = "password",
+//            updateProfileState = { password ->
+//                updateCurrentProfile(
+//                    ProfileCreationUiState(
+//                        profileCreation = profile.profileCreation.copy(password = password)
+//                )) },
+//            modifier.padding(4.dp)
+//        )
+//
+//        Timber.d("Loading confirm password field...")
+//        TextInputField(
+//            type = "Confirm\nPassword",
+//            updateProfileState = { confirmPassword ->
+//                updateCurrentProfile(
+//                    ProfileCreationUiState(profileCreation = profile.profileCreation.copy(confirmPassword = confirmPassword)
+//                    )) },
+//            modifier = modifier.padding(4.dp)
+//        )
 
         Spacer(modifier.size(height = 20.dp, width = 0.dp))
         Timber.d("Loading confirm button...")
