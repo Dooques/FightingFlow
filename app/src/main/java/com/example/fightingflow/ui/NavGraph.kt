@@ -1,8 +1,8 @@
 package com.example.fightingflow.ui
 
-import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -13,7 +13,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -23,11 +22,12 @@ import androidx.navigation.compose.rememberNavController
 import com.example.fightingflow.R
 import com.example.fightingflow.ui.characterScreen.CharacterScreen
 import com.example.fightingflow.ui.comboCreationScreen.ComboCreationScreen
+import com.example.fightingflow.ui.comboCreationScreen.ComboCreationViewModel
 import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayScreen
 import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayViewModel
 import com.example.fightingflow.ui.profileScreen.ProfileList
 import com.example.fightingflow.ui.profileScreen.ProfileViewModel
-import kotlinx.coroutines.flow.Flow
+import com.example.fightingflow.ui.profileScreen.TitleScreen
 import org.koin.compose.koinInject
 import timber.log.Timber
 
@@ -38,23 +38,24 @@ enum class FlowScreen(@StringRes val title: Int) {
     CreateProfile(title = R.string.create_profile),
     ProfileDetails(title = R.string.profile_details),
     Menu(title = R.string.menu),
-    PickChar(title = R.string.char_select),
+    CharSelect(title = R.string.char_select),
     Combos(title = R.string.combos),
     ComboCreation(title = R.string.combo_creation)
 }
 
-@SuppressLint("SourceLockedOrientationActivity")
+@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun NavGraph(
     navController: NavHostController = rememberNavController(),
     deviceType: WindowSizeClass
 ) {
     Timber.d("Initializing NavController")
-//    val backStackEntry by navController.currentBackStackEntryAsState()
+    val backStackEntry by navController.currentBackStackEntryAsState()
 //    val currentScreen = FlowScreen.valueOf(value = backStackEntry?.destination?.route ?: FlowScreen.Start.name)
 
     Timber.d("Initializing ViewModels")
     val comboDisplayViewModel = koinInject<ComboDisplayViewModel>()
+    val comboCreationViewModel = koinInject<ComboCreationViewModel>()
     val profileViewModel = koinInject<ProfileViewModel>()
 
     // ProfileViewModel Flows
@@ -73,7 +74,6 @@ fun NavGraph(
             startDestination = FlowScreen.Start.name,
             modifier = Modifier
                 .padding(innerPadding)
-                .background(Color.Black)
         ) {
             Timber.d("Getting Composable Routes...")
             // Title Screen
@@ -85,7 +85,7 @@ fun NavGraph(
                     deviceType = deviceType,
                     username = username,
                     isLoggedIn = loggedInState,
-                    onCharSelect = { navController.navigate(FlowScreen.PickChar.name) },
+                    onCharSelect = { navController.navigate(FlowScreen.CharSelect.name) },
                     onProfileSelect = { navController.navigate(FlowScreen.ProfileList.name) },
                 )
             }
@@ -104,7 +104,7 @@ fun NavGraph(
             }
 
             // Character Screen
-            composable(route = FlowScreen.PickChar.name) {
+            composable(route = FlowScreen.CharSelect.name) {
                 Timber.d("Loading Character Screen")
                 CharacterScreen(
                     comboDisplayViewModel = comboDisplayViewModel,
@@ -122,7 +122,7 @@ fun NavGraph(
                     snackbarHostState = snackBarHostState,
                     updateCharacterState = comboDisplayViewModel::updateCharacterState,
                     onNavigateToComboEditor = { navController.navigate(FlowScreen.ComboCreation.name) },
-                    navigateBack = {navController.navigate(FlowScreen.PickChar.name) }
+                    navigateBack = { navController.navigate(FlowScreen.CharSelect.name) }
                 )
             }
 
@@ -131,10 +131,12 @@ fun NavGraph(
                 Timber.d("Loading Combo Creation Screen")
                 ComboCreationScreen(
                     comboDisplayViewModel = comboDisplayViewModel,
+                    comboCreationViewModel = comboCreationViewModel,
                     scope = scope,
                     snackbarHostState = snackBarHostState,
                     onNavigateToComboDisplay = { navController.navigate(FlowScreen.Combos.name) },
-                    navigateBack = navController::navigateUp
+                    navigateBack = navController::navigateUp,
+                    navigateHome = { navController.navigate(FlowScreen.CharSelect.name) }
                 )
             }
         }

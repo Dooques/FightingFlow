@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,13 +21,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -52,13 +56,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.fightingflow.R
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.ui.comboDisplayScreen.ComboItem
 import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayViewModel
 import com.example.fightingflow.util.ComboDisplayUiState
 import com.example.fightingflow.util.MoveEntryListUiState
+import dev.shreyaspatil.capturable.controller.rememberCaptureController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -71,18 +78,18 @@ import kotlin.reflect.KSuspendFunction0
 @Composable
 fun ComboCreationScreen(
     comboDisplayViewModel: ComboDisplayViewModel,
+    comboCreationViewModel: ComboCreationViewModel,
     scope: CoroutineScope,
     snackbarHostState: SnackbarHostState,
-    navigateBack: () -> Unit,
     onNavigateToComboDisplay: () -> Unit,
+    navigateBack: () -> Unit,
+    navigateHome: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Timber.d("Opening Add Combo Screen...")
-    Timber.d("Locking orientation until solution for lost combo data is found.")
+//    Timber.d("Locking orientation until solution for lost combo data is found.")
     val context = LocalContext.current
     (context as? Activity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-
-    val comboCreationViewModel = koinInject<ComboCreationViewModel>()
 
     var comboReceived by remember { mutableStateOf(false) }
 
@@ -103,16 +110,16 @@ fun ComboCreationScreen(
     val comboIdState by comboCreationViewModel.comboIdState
     val editingState by comboCreationViewModel.editingState
 
-//    Timber.d("Flows Collected: ")
-//    Timber.d("Character Details (Ds): ")
-//    Timber.d("Name: ${characterNameState.name} ")
-//    Timber.d("Image: ${characterImageState.image}")
-//
-//    Timber.d("Character: ${characterFromAddCombo.character}")
-//    Timber.d("ComboDisplayState: ${comboDisplayState.comboDisplay}")
-//    Timber.d("ComboString: $comboAsString")
-//    Timber.d("ComboId from DS: $comboIdState")
-//    Timber.d("Editing State: $editingState")
+    Timber.d("Flows Collected: ")
+    Timber.d("Character Details (Ds): ")
+    Timber.d("Name: ${characterNameState.name} ")
+    Timber.d("Image: ${characterImageState.image}")
+
+    Timber.d("Character: ${characterFromAddCombo.character}")
+    Timber.d("ComboDisplayState: ${comboDisplay.comboDisplay}")
+    Timber.d("ComboString: $comboAsString")
+    Timber.d("ComboId from DS: $comboIdState")
+    Timber.d("Editing State: $editingState")
 
     Timber.d("Updating Character State")
     if (characterListState.characterList.isNotEmpty() && characterNameState.name.isNotEmpty()) {
@@ -254,6 +261,7 @@ fun ComboDisplay(
     Timber.d("Getting combo display composable from Combo Screen")
     ComboItem(
         context = context,
+        captureController = rememberCaptureController(),
         combo = combo,
         fontColor = fontColor,
         containerColor = containerColor,
@@ -336,6 +344,9 @@ fun InputSelector(
                 "Stances", "Mechanics", "${character.name}'s Stances", "Inputs", "Mishima Moves" -> StanceAndMechanicsTitle(moveType)
             }
             Timber.d("$moveType loaded.")
+        }
+        item {
+            Spacer(modifier.size(120.dp))
         }
     }
 }
@@ -440,12 +451,11 @@ fun DamageAndBreak(
         )
 
         // Add Break
-        Button(
+        OutlinedButton(
             onClick = {
                 updateMoveList("break", moveList)
                 Timber.d("Adding break to combo move list.")
                       },
-            colors = ButtonDefaults.buttonColors().copy(containerColor = Color(0xffed1664), contentColor = Color.White),
             modifier = modifier.fillMaxWidth().padding(horizontal = 4.dp)
         ) {
             Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = modifier.fillMaxWidth()) {
@@ -573,8 +583,12 @@ fun ConfirmAndClear(
     modifier: Modifier = Modifier
 ) {
     Timber.d("Loading confirm and clear buttons")
-    Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = modifier.fillMaxWidth().padding(vertical = 4.dp).padding(bottom = 8.dp)) {
-        OutlinedButton(
+    Row(
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        modifier = modifier.fillMaxWidth().padding(vertical = 4.dp).padding(bottom = 8.dp)
+    ) {
+        // Confirm
+        Button(
             onClick = {
                 if (comboDisplay == originalCombo) {
                     scope.launch {
@@ -597,8 +611,10 @@ fun ConfirmAndClear(
                     }
                 }
             },
+            colors = ButtonDefaults.buttonColors().copy(containerColor = Color(0xffed1664), contentColor = MaterialTheme.colorScheme.onBackground),
             content = { Text("Confirm", color = MaterialTheme.colorScheme.onBackground) }
         )
+        // Delete Last
         OutlinedButton(
             onClick = {
                 Timber.d("Deleting last move...")
@@ -608,6 +624,7 @@ fun ConfirmAndClear(
             content = {
                 Text("Delete Last", color = MaterialTheme.colorScheme.onBackground) }
         )
+        // Clear Move List
         OutlinedButton(
             onClick = {
                 Timber.d("Clearing move list...")

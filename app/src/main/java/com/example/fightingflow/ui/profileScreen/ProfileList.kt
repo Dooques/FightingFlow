@@ -137,25 +137,18 @@ fun ProfileList(
         ) {
             if (showCreationForm) {
                 ProfileCreationForm(
-                    updateCurrentProfile = {profileViewModel.updateProfileCreation(it)},
+                    updateCurrentProfile = { profileViewModel.updateProfileCreation(it) },
                     profile = profileCreation,
                     onConfirm = {
                         scope.launch {
-                            Timber.d("")
                             Timber.d("Preparing to save ${profileCreation.profileCreation.username}'s profile to datastore...")
                             val saveProfileSuccess = profileViewModel.saveProfileData()
                             Timber.d("Profile saved to Ds.")
 
-                            if (saveProfileSuccess == "Success") {
-                                Timber.d("Saving Profile to database...")
-                                profileViewModel.saveProfileToDb()
-                                Timber.d("Profile saved to Db.")
-                                Timber.d("Logging in profile...")
-                                profileViewModel.loginProfile()
-                                Timber.d("Profile logged in.")
-                                Timber.d("Returning to title screen...")
-                            } else {
-                                snackbarHostState.showSnackbar("Passwords do not match, please try again")
+                            if (saveProfileSuccess != "Success") {
+                                scope.launch {
+                                    snackbarHostState.showSnackbar("Passwords do not match, please try again", withDismissAction = true)
+                                }
                             }
                             showCreationForm = false
                         }

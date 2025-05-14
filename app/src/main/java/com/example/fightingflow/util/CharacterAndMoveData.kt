@@ -986,6 +986,26 @@ class CharacterAndMoveData {
             ),
             MoveEntry(
                 id = 0,
+                moveName = "Hammer Chance",
+                notation = "Hammer Chance",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Anna"
+            ),
+            MoveEntry(
+                id = 0,
+                moveName = "Chaos Judgement",
+                notation = "Chaos Judgement",
+                moveType = "Character",
+                counterHit = false,
+                hold = false,
+                justFrame = false,
+                associatedCharacter = "Anna"
+            ),
+            MoveEntry(
+                id = 0,
                 moveName = "Naniwa Gusto",
                 notation = "Naniwa Gusto",
                 moveType = "Character",

@@ -1,6 +1,7 @@
 package com.example.fightingflow.di
 
 import android.content.Context
+import android.provider.MediaStore
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
@@ -21,13 +22,13 @@ import com.example.fightingflow.data.datastore.ProfileDatastoreRepository
 import com.example.fightingflow.data.datastore.ProfileDsRepository
 import com.example.fightingflow.data.datastore.CharacterDatastoreRepository
 import com.example.fightingflow.data.datastore.CharacterDsRepository
+import com.example.fightingflow.data.mediastore.MediaStoreUtil
 import com.example.fightingflow.ui.comboCreationScreen.ComboCreationViewModel
 import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayViewModel
 import com.example.fightingflow.ui.profileScreen.ProfileViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
-
 
 private const val USER_SETTINGS = "settings"
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = USER_SETTINGS)
@@ -36,7 +37,6 @@ fun provideUserDao(flowDatabase: FlowDatabase): ProfileDao = flowDatabase.getUse
 fun provideCharacterDao(flowDatabase: FlowDatabase): CharacterDao = flowDatabase.getCharacterDao()
 fun provideMoveDao(flowDatabase: FlowDatabase): MoveDao = flowDatabase.getMoveDao()
 fun provideComboDao(flowDatabase: FlowDatabase): ComboDao = flowDatabase.getComboDao()
-
 
 fun provideDatabase(context: Context) =
     Room.databaseBuilder(
@@ -64,6 +64,9 @@ val repositoryModule = module {
     single<ProfileDsRepository> { ProfileDatastoreRepository(androidContext().dataStore) }
     single<CharacterDsRepository> { CharacterDatastoreRepository(androidContext().dataStore) }
     single<ComboDsRepository> { ComboDatastoreRepository(androidContext().dataStore) }
+
+    // MediaStore
+    single<MediaStoreUtil> { MediaStoreUtil(androidContext())}
 }
 
 val viewModelModule = module {

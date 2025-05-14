@@ -1,6 +1,5 @@
-package com.example.fightingflow.ui
+package com.example.fightingflow.ui.profileScreen
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -32,9 +31,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.fightingflow.R
-import com.example.fightingflow.ui.profileScreen.ProfileCreationForm
-import com.example.fightingflow.ui.profileScreen.ProfileViewModel
-import com.example.fightingflow.util.ProfileCreationUiState
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -100,7 +96,7 @@ fun TitleScreen(
                      }
                      ProfileCreationForm(
                          updateCurrentProfile = {
-                             profileViewModel.updateProfileCreation(profileCreation)
+                             profileViewModel.updateProfileCreation(it)
                          },
                          profile = profileCreation,
                          onConfirm = {
@@ -109,17 +105,10 @@ fun TitleScreen(
                                  val saveProfileSuccess = profileViewModel.saveProfileData()
                                  Timber.d("Profile saved to Ds.")
 
-                                 if (saveProfileSuccess == "Success") {
-                                     Timber.d("Saving Profile to database...")
-                                     profileViewModel.saveProfileToDb()
-                                     Timber.d("Profile saved to Db.")
-
-                                     Timber.d("Logging in profile...")
-                                     profileViewModel.loginProfile()
-                                     Timber.d("Profile logged in.")
-                                     Timber.d("Returning to title screen...")
-                                 } else {
-                                     snackbarHostState.showSnackbar("Passwords do not match, please try again")
+                                 if (saveProfileSuccess != "Success") {
+                                     scope.launch {
+                                         snackbarHostState.showSnackbar("Passwords do not match, please try again")
+                                     }
                                  }
                              }
                          }

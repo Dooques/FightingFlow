@@ -1,0 +1,215 @@
+package com.example.fightingflow.ui.comboDisplayScreen
+
+import android.content.Context
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.fightingflow.model.ComboDisplay
+import com.example.fightingflow.model.MoveEntry
+import dev.shreyaspatil.capturable.capturable
+import dev.shreyaspatil.capturable.controller.CaptureController
+import dev.shreyaspatil.capturable.controller.rememberCaptureController
+import timber.log.Timber
+
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun ComboItem(
+    context: Context,
+    captureController: CaptureController,
+    combo: ComboDisplay,
+    containerColor: Color,
+    uiScale: Float,
+    fontColor: Color,
+    modifier: Modifier = Modifier,
+) {
+    Timber.d("Loading Combo Moves Composable...")
+    Column(modifier.capturable(captureController)) {
+        Timber.d("Loading flow row...")
+        FlowRow(
+            verticalArrangement = Arrangement.Center,
+            horizontalArrangement = Arrangement.Start,
+            modifier = modifier
+                .fillMaxWidth()
+                .background(containerColor)
+                .padding(horizontal = 4.dp, vertical = 4.dp)
+        ) {
+            Timber.d("Loading moves from combo...")
+            combo.moves.forEach { move ->
+                Timber.d(move.moveName)
+                when (move.moveType) {
+                    "Break" -> MoveBreak(modifier.align(Alignment.CenterVertically))
+                    "Input", "Movement" -> {
+                        InputMove(
+                            context = context,
+                            input = move,
+                            uiScale = uiScale,
+                            modifier = modifier
+                                .align(Alignment.CenterVertically)
+                                .padding(4.dp)
+                        )
+                    }
+                    "Common" -> {
+                        TextMove(
+                            input = move,
+                            color = Color.Gray,
+                            uiScale = uiScale,
+                            modifier = modifier
+                                .align(Alignment.CenterVertically)
+                                .padding(4.dp)
+                        )
+                    }
+                    "Character" -> {
+                        TextMove(
+                            input = move,
+                            color = Color.Red,
+                            uiScale = uiScale,
+                            modifier = modifier
+                                .align(Alignment.CenterVertically)
+                                .padding(4.dp)
+                        )
+                    }
+                    "Stage" -> {
+                        TextMove(
+                            input = move,
+                            color = Color.Green,
+                            uiScale = uiScale,
+                            modifier = modifier
+                                .align(Alignment.CenterVertically)
+                                .padding(4.dp)
+                        )
+                    }
+                    "Mishima" -> {
+                        TextMove(
+                            input = move,
+                            color = Color.Blue,
+                            uiScale = uiScale,
+                            modifier = modifier
+                                .align(Alignment.CenterVertically)
+                                .padding(4.dp)
+                        )
+                    }
+                    "Mechanics Input" -> {
+                        TextMove(
+                            input = move,
+                            color = Color.Yellow,
+                            uiScale = uiScale,
+                            modifier = modifier
+                                .align(Alignment.CenterVertically)
+                                .padding(4.dp)
+                        )
+                    }
+                }
+            }
+        }
+        ComboData(combo, fontColor)
+    }
+}
+
+@Composable
+fun ComboData(
+    combo: ComboDisplay,
+    fontColor: Color,
+    modifier: Modifier = Modifier
+) {
+    Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = modifier.fillMaxWidth()) {
+        Row {
+            Text(text = "Damage: ", color = fontColor)
+            Text(text = combo.damage.toString(), color = Color.Red)
+        }
+        Row {
+            Text(text = "Created by: ", color = fontColor)
+            Text(text = combo.createdBy, color = fontColor)
+        }
+    }
+}
+
+@Composable
+fun InputMove(
+    context: Context,
+    input: MoveEntry,
+    uiScale: Float,
+    modifier: Modifier = Modifier
+) {
+    Row {
+        MoveImage(input.moveName, uiScale = uiScale,  context = context)
+    }
+}
+
+@Composable
+fun MoveImage(
+    move: String,
+    context: Context,
+    uiScale: Float,
+    modifier: Modifier = Modifier
+) {
+    val moveId = remember(move) { context.resources.getIdentifier(move, "drawable", context.packageName) }
+    val size = 40.dp
+
+    Image(
+        painter = painterResource(id = moveId),
+        contentDescription = move,
+        modifier = modifier
+            .padding(horizontal = 4.dp)
+            .size(size * uiScale)
+    )
+}
+
+@Composable
+fun TextMove(
+    input: MoveEntry,
+    color: Color,
+    uiScale: Float,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier
+            .clip(RoundedCornerShape(25.dp))
+            .background(color)
+    ) {
+        Text(
+            text = input.moveName,
+            color = when (color) {
+                Color.Green, Color.White, Color.Yellow -> Color.Black
+                else -> Color.White
+            },
+            fontSize = (16.sp * uiScale),
+            lineHeight = 17.sp,
+            modifier = modifier
+                .padding(horizontal = 1.dp, vertical = 0.dp)
+        )
+    }
+}
+
+@Composable
+fun MoveBreak(modifier: Modifier = Modifier) {
+    Icon(
+        imageVector = Icons.Filled.PlayArrow,
+        contentDescription = "",
+        tint = Color.Cyan,
+        modifier = modifier.size(20.dp)
+    )
+}

@@ -1,20 +1,16 @@
 package com.example.fightingflow.ui.comboDisplayScreen
 
 import android.app.Activity
-import android.content.Context
 import android.content.pm.ActivityInfo
+import android.net.Uri
+import android.os.Build
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -23,43 +19,47 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.fightingflow.R
+import com.example.fightingflow.data.mediastore.MediaStoreUtil
 import com.example.fightingflow.model.ComboDisplay
-import com.example.fightingflow.model.MoveEntry
-import com.example.fightingflow.ui.comboCreationScreen.ComboCreationViewModel
 import com.example.fightingflow.util.ActionIcon
 import com.example.fightingflow.util.SwipeableItem
 import com.example.fightingflow.util.emptyCharacter
+import dev.shreyaspatil.capturable.controller.rememberCaptureController
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import timber.log.Timber
+import java.io.File
 
-@OptIn(ExperimentalMaterial3Api::class)
+@RequiresApi(Build.VERSION_CODES.Q)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeApi::class)
 @Composable
 fun ComboDisplayScreen(
     deviceType: WindowSizeClass,
@@ -74,6 +74,17 @@ fun ComboDisplayScreen(
 
     val context = LocalContext.current
     (context as? Activity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+
+    val mediaStoreUtil = koinInject<MediaStoreUtil>()
+
+    val fontColor = MaterialTheme.colorScheme.onBackground
+    val containerColor = MaterialTheme.colorScheme.surfaceDim
+    val scope = rememberCoroutineScope()
+    val uiScale = if (deviceType.widthSizeClass != WindowWidthSizeClass.Compact) 2f else 1f
+
+    var showDialog by remember { mutableStateOf(false) }
+    var capturedImage by remember { mutableStateOf<Uri?>(null) }
+    var capturedImageFile by remember { mutableStateOf<File?>(null) }
 
     // Room Flows
     val characterState by comboDisplayViewModel.characterState.collectAsStateWithLifecycle()
@@ -92,12 +103,6 @@ fun ComboDisplayScreen(
         }
     }
 
-    val fontColor = MaterialTheme.colorScheme.onBackground
-    val containerColor = MaterialTheme.colorScheme.surfaceDim
-    val scope = rememberCoroutineScope()
-
-    val uiScale = if (deviceType.widthSizeClass != WindowWidthSizeClass.Compact) 2f else 1f
-
     Timber.d("Getting combos by character...")
     val combosByCharacter = if (characterState.character != emptyCharacter) {
         Timber.d("Character has been selected, getting combos...")
@@ -107,8 +112,6 @@ fun ComboDisplayScreen(
         Timber.d("No characters selected, returning empty list...")
         emptyList<ComboDisplay>().toMutableList()
     }
-
-    Timber.d("Combos reduced to ${characterState.character.name}'s: $combosByCharacter")
 
     Scaffold(
         topBar = {
@@ -138,16 +141,27 @@ fun ComboDisplayScreen(
                         )
                 } },
                 windowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp)
-        )
+            )
+        },
+        floatingActionButton = {
+            if (uiScale == 1f) {
+                FloatingActionButton(onClick = { navigateBack() }, containerColor = Color.Transparent) {
+                    Image(
+                        painter = painterResource(R.drawable.ff_character_screen_icon),
+                        contentDescription = "Return to Character Select",
+                        modifier = modifier.size(80.dp)
+                    )
+                }
+            }
         }
     ) { contentPadding ->
         Column(Modifier.padding(contentPadding)) {
             Timber.d("Character Details \n Name: ${characterNameState.name} \n Image: ${characterImageState.image}")
             Timber.d("Checking details valid...")
-
             LazyColumn {
                 Timber.d("Getting display combos as lazy column with swipeable actions.")
                 itemsIndexed(items = combosByCharacter) { index, combo ->
+                    val captureController = rememberCaptureController()
 
                     val isOptionRevealed by remember { mutableStateOf(false) }
                     SwipeableItem(
@@ -163,6 +177,26 @@ fun ComboDisplayScreen(
                             ActionIcon(
                                 onclick = {
                                     Timber.d("Sharing Combo")
+                                    scope.launch {
+                                        Timber.d("Creating bitmap of composable...")
+                                        val bitmapAsync = captureController.captureAsync()
+                                        try {
+                                            val bitmap = bitmapAsync.await().asAndroidBitmap()
+                                            val imageObject = mediaStoreUtil.createAndShareTempImage(bitmap)
+                                            if (imageObject?.uri != null && imageObject.file != null) {
+                                                capturedImage = imageObject.uri
+                                                capturedImageFile = imageObject.file
+                                                showDialog = true
+                                            }
+                                        } catch(e: Exception) {
+                                            Timber.e(e, "Error sharing image")
+                                            scope.launch {
+                                                snackbarHostState.showSnackbar(
+                                                    "Failed to share image: ${e.message}"
+                                                )
+                                            }
+                                        }
+                                    }
                                 },
                                 tint = Color.Blue,
                                 icon = Icons.Default.Share,
@@ -206,190 +240,26 @@ fun ComboDisplayScreen(
                     ) {
                         ComboItem(
                             context = context,
+                            captureController = captureController,
                             fontColor = fontColor,
                             combo = combo,
                             containerColor = containerColor,
                             uiScale = uiScale,
-                            modifier = modifier.padding(vertical = 4.dp, horizontal = 0.dp)
+                            modifier = modifier.padding(vertical = 4.dp, horizontal = if (uiScale == 2f) 40.dp else 4.dp)
                         )
                     }
                 }
             }
         }
+        SaveOrShareImageDialog(
+            showDialog = showDialog,
+            scope = scope,
+            snackbarHostState = snackbarHostState,
+            tempImageUri = capturedImage,
+            tempImageFile = capturedImageFile,
+            onSave = mediaStoreUtil::saveImageToUri,
+            onShare = mediaStoreUtil::shareImage,
+            onDismiss = { showDialog = false },
+        )
     }
-}
-
-@Composable
-fun ComboItem(
-    context: Context,
-    combo: ComboDisplay,
-    containerColor: Color,
-    uiScale: Float,
-    fontColor: Color,
-    modifier: Modifier = Modifier,
-) {
-    Timber.d("Loading Combo Moves Composable...")
-    Column {
-        Timber.d("Loading flow row...")
-        FlowRow(
-            verticalArrangement = Arrangement.Center,
-            horizontalArrangement = Arrangement.Start,
-            modifier = modifier
-                .fillMaxWidth()
-                .background(containerColor)
-                .padding(horizontal = 4.dp, vertical = 4.dp)
-        ) {
-            Timber.d("Loading moves from combo...")
-            combo.moves.forEach { move ->
-                Timber.d(move.moveName)
-                when (move.moveType) {
-                    "Break" -> MoveBreak(modifier.align(Alignment.CenterVertically))
-                    "Input", "Movement" -> {
-                        InputMove(
-                            context,
-                            move,
-                            uiScale,
-                            modifier
-                                .align(Alignment.CenterVertically)
-                                .padding(4.dp)
-                        )
-                    }
-                    "Common" -> {
-                        TextMove(
-                            move,
-                            Color.Gray,
-                            uiScale,
-                            modifier
-                                .align(Alignment.CenterVertically)
-                                .padding(4.dp)
-                        )
-                    }
-                    "Character" -> {
-                        TextMove(
-                            move,
-                            Color.Red,
-                            uiScale,
-                            modifier
-                                .align(Alignment.CenterVertically)
-                                .padding(4.dp)
-                        )
-                    }
-
-                    "SCOMBO_TAGe" -> {
-                        TextMove(
-                            move,
-                            Color.Green,
-                            uiScale,
-                            modifier
-                                .align(Alignment.CenterVertically)
-                                .padding(4.dp)
-                        )
-                    }
-
-                    "Mishima" -> {
-                        TextMove(
-                            move,
-                            Color.Blue,
-                            uiScale,
-                            modifier
-                                .align(Alignment.CenterVertically)
-                                .padding(4.dp)
-                        )
-                    }
-                    "Mechanics Input" -> {
-                        TextMove(
-                            move,
-                            Color.Blue,
-                            uiScale,
-                            modifier
-                                .align(Alignment.CenterVertically)
-                                .padding(4.dp)
-                        )
-                    }
-                }
-            }
-        }
-        ComboData(combo, fontColor)
-    }
-}
-
-@Composable
-fun ComboData(
-    combo: ComboDisplay,
-    fontColor: Color,
-    modifier: Modifier = Modifier
-) {
-    Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = modifier.fillMaxWidth()) {
-        Row {
-            Text(text = "Damage: ", color = fontColor)
-            Text(text = combo.damage.toString(), color = Color.Red)
-        }
-        Row {
-            Text(text = "Created by: ", color = fontColor)
-            Text(text = combo.createdBy, color = fontColor)
-        }
-    }
-}
-
-@Composable
-fun InputMove(
-    context: Context,
-    input: MoveEntry,
-    uiScale: Float,
-    modifier: Modifier = Modifier
-) {
-    Row {
-        MoveImage(input.moveName, uiScale = uiScale,  context = context)
-    }
-}
-
-@Composable
-fun MoveImage(
-    move: String,
-    context: Context,
-    uiScale: Float,
-    modifier: Modifier = Modifier
-) {
-    val moveId = remember(move) { context.resources.getIdentifier(move, "drawable", context.packageName) }
-    val size = 40.dp
-
-    Image(
-        painter = painterResource(id = moveId),
-        contentDescription = move,
-        modifier = modifier
-            .padding(horizontal = 4.dp)
-            .size(size * uiScale)
-    )
-}
-
-@Composable
-fun TextMove(
-    input: MoveEntry,
-    color: Color,
-    uiScale: Float,
-    modifier: Modifier = Modifier
-) {
-    Box(
-        modifier
-            .background(color)
-            .padding(horizontal = 2.dp)
-    ) {
-        Row {
-            Text(
-                input.moveName,
-                color = if (color == Color.White) Color.Black else Color.White,
-                fontSize = (16.sp * uiScale)
-            )
-        }
-    }
-}
-
-@Composable
-fun MoveBreak(modifier: Modifier = Modifier) {
-    Icon(
-        imageVector = Icons.Filled.PlayArrow,
-        contentDescription = "",
-        tint = Color.Cyan,
-        modifier = modifier.size(20.dp)
-    )
 }

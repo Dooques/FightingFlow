@@ -66,7 +66,6 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.material3.window.size.class1)
 
-
     // Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
@@ -88,9 +87,14 @@ dependencies {
     // Coil
     implementation(libs.coil.compose)
 
+    // Capturable
+    implementation(libs.capturable)
+
+    // Glide
+    implementation(libs.glide)
+
     // Timber
     implementation(libs.timber)
-
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)

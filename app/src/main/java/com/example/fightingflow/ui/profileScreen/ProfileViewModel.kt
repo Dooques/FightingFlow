@@ -42,12 +42,21 @@ class ProfileViewModel(
         Timber.d("")
         Timber.d("Checking passwords match...")
         if (profileState.value.profileCreation.password == profileState.value.profileCreation.confirmPassword) {
+            Timber.d("Saving profile to database...")
+            saveProfileToDb()
+            Timber.d("Profile saved to db.")
+
+            Timber.d("Logging in profile...")
+            loginProfile()
+
             Timber.d("Passwords match, adding Profile to datastore...")
+
             Timber.d("Updating data in datastore from ViewModel...")
             Timber.d("ProfileCreationUiState: ${profileState.value.profileCreation}")
             Timber.d("ProfileEntryUiState: ${profileState.value.profileCreation.toEntry()}")
             updateUsernameInDs(profileState.value.profileCreation.username)
             Timber.d("Profile added to datastore.")
+
             return "Success"
         } else {
             return ""
@@ -84,16 +93,14 @@ class ProfileViewModel(
         profileDsRepository.updateLoggedInState(false)
     }
 
-
     // Database Functions
-    val allExistingProfiles =
-        profileDbRepository.getAllProfiles()
-            .mapNotNull { ProfileListUiState(it) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIME_MILLIS),
-                initialValue = ProfileListUiState()
-            )
+    val allExistingProfiles = profileDbRepository.getAllProfiles()
+        .mapNotNull { ProfileListUiState(it) }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(TIME_MILLIS),
+            initialValue = ProfileListUiState()
+        )
 
     private val currentProfile = profileDbRepository.getProfile(username.value)
         .mapNotNull { ProfileUiState(it ?: emptyProfile) }
@@ -103,24 +110,28 @@ class ProfileViewModel(
             initialValue = ProfileUiState()
         )
 
-    val combosByProfile =
-        tekkenDataRepository.getAllCombosByProfile(currentProfile.value.profile.username)
-            .mapNotNull { comboEntryList -> ComboDisplayListUiState(comboEntryList?.map { it.toDisplay() } ?: emptyList()) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIME_MILLIS),
-                initialValue = ComboDisplayListUiState()
-            )
+    val combosByProfile = tekkenDataRepository.getAllCombosByProfile(currentProfile.value.profile.username)
+        .mapNotNull { comboEntryList -> ComboDisplayListUiState(comboEntryList?.map { it.toDisplay() } ?: emptyList()) }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(TIME_MILLIS),
+            initialValue = ComboDisplayListUiState()
+        )
 
-    suspend fun saveProfileToDb() {
-        Timber.d("")
+    private suspend fun saveProfileToDb() {
         Timber.d("Saving profile to database...")
         profileDbRepository.insert(profileState.value.profileCreation.toEntry())
     }
 
     suspend fun deleteProfileFromDb(profile: ProfileUiState) {
-        Timber.d("")
         Timber.d("Deleting profile from database...")
         profileDbRepository.delete(profile.profile)
+        Timber.d("Profile deleted.")
+        Timber.d("Logging out user...")
+        logoutProfile()
+        Timber.d("User logged out.")
+        Timber.d("Clearing username data from datastore...")
+        updateUsernameInDs("")
+        Timber.d("Username cleared.")
     }
 }
