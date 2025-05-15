@@ -11,6 +11,7 @@ import com.example.fightingflow.util.emptyMove
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import timber.log.Timber
+import java.time.LocalDate
 import java.util.UUID
 import kotlin.String
 
@@ -23,6 +24,7 @@ data class ComboEntry (
     val damage: Int,
     @ColumnInfo(name = "created_by")
     val createdBy: String,
+    val dateCreated: String,
     val moves: String
 )
 
@@ -32,6 +34,7 @@ data class ComboDisplay(
     val character: String,
     val damage: Int,
     val createdBy: String,
+    val dateCreated: String,
     val areOptionsRevealed: Boolean = false,
     val moves: ImmutableList<MoveEntry>
 )
@@ -42,6 +45,7 @@ fun ComboEntry.toDisplay(): ComboDisplay =
         character = character.name,
         damage = damage,
         createdBy = createdBy,
+        dateCreated = dateCreated,
         areOptionsRevealed = false,
         moves = ImmutableList(moveListStringToMoveEntryList(moves))
     )
@@ -52,6 +56,7 @@ fun ComboDisplay.toEntry(character: CharacterEntry): ComboEntry =
         character = character,
         damage = damage,
         createdBy = createdBy,
+        dateCreated = dateCreated,
         moves = moveEntryToMoveList(moves)
     )
 

@@ -7,6 +7,7 @@ import com.example.fightingflow.model.ComboEntry
 import com.example.fightingflow.model.MoveEntry
 import com.example.fightingflow.model.ProfileCreation
 import com.example.fightingflow.model.ProfileEntry
+import java.time.LocalDate
 import java.util.UUID
 
 val emptyCharacter = CharacterEntry(
@@ -25,6 +26,7 @@ val emptyComboDisplay = ComboDisplay(
     character = "",
     damage = 0,
     createdBy = "",
+    dateCreated = "15-05-2025",
     moves = ImmutableList(emptyList())
 )
 
@@ -33,6 +35,7 @@ val emptyComboEntry = ComboEntry(
     character = emptyCharacter,
     damage = 0,
     createdBy = "",
+    dateCreated = "15-05-2025",
     moves = ""
 )
 

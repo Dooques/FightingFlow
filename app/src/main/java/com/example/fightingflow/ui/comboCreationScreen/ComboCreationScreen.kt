@@ -10,27 +10,25 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -54,15 +52,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.fightingflow.R
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.ui.comboDisplayScreen.ComboItem
 import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayViewModel
+import com.example.fightingflow.ui.profileScreen.ProfileViewModel
+import com.example.fightingflow.util.CharacterEntryListUiState
 import com.example.fightingflow.util.ComboDisplayUiState
 import com.example.fightingflow.util.MoveEntryListUiState
 import dev.shreyaspatil.capturable.controller.rememberCaptureController
@@ -92,6 +91,7 @@ fun ComboCreationScreen(
     (context as? Activity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
     var comboReceived by remember { mutableStateOf(false) }
+    val profileViewModel = koinInject<ProfileViewModel>()
 
     // ComboViewModel
     val characterState by comboDisplayViewModel.characterState.collectAsStateWithLifecycle()
@@ -105,6 +105,7 @@ fun ComboCreationScreen(
     val comboAsString by comboCreationViewModel.comboAsStringState.collectAsStateWithLifecycle()
 
     // Datastore Flows
+    val username by profileViewModel.username.collectAsStateWithLifecycle()
     val characterNameState by comboDisplayViewModel.characterNameState.collectAsStateWithLifecycle()
     val characterImageState by comboDisplayViewModel.characterImageState.collectAsStateWithLifecycle()
     val comboIdState by comboCreationViewModel.comboIdState
@@ -142,22 +143,11 @@ fun ComboCreationScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = characterState.character.name,
-                            style = MaterialTheme.typography.displayMedium,
-                            modifier = modifier.padding(start = 16.dp)
-                        )
-                    }
-                },
-                navigationIcon = {
-                    IconButton(onClick = { navigateBack() }) {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = "Return to Combo screen",
-                            modifier.size(80.dp)
-                        )
-                    }
+                    Text(
+                        text = characterState.character.name,
+                        style = MaterialTheme.typography.displayMedium,
+                        modifier = modifier.padding(start = 16.dp)
+                    )
                 },
                 actions = {
                     Image(
@@ -165,6 +155,14 @@ fun ComboCreationScreen(
                         contentDescription = "",
                         modifier = modifier.size(60.dp)
                     )
+                    IconButton(onClick = { navigateBack() }, modifier.fillMaxHeight()) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Return to Combo screen",
+                            tint = Color.White,
+                            modifier = modifier.size(100.dp)
+                        )
+                    }
                 },
                 windowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp)
             )
@@ -181,6 +179,7 @@ fun ComboCreationScreen(
                 scope = scope,
                 snackbarHostState = snackbarHostState,
                 editingState = editingState,
+                username = username,
                 updateComboData = comboCreationViewModel::updateComboDetails,
                 updateMoveList = comboCreationViewModel::updateMoveList,
                 character = characterState.character,
@@ -203,6 +202,7 @@ fun ComboForm(
     scope: CoroutineScope,
     snackbarHostState: SnackbarHostState,
     editingState: Boolean,
+    username: String,
     comboDisplay: ComboDisplay,
     originalCombo: ComboDisplay,
     updateComboData: (ComboDisplayUiState) -> Unit,
@@ -220,32 +220,38 @@ fun ComboForm(
     val context = LocalContext.current
     Column {
         Timber.d("Loading Combo Form")
-        if (comboDisplay.moves.isNotEmpty()) {
-            Timber.d("Combo Move List exists, populating with moves...")
-            ComboDisplay(context, comboDisplay)
+        Timber.d("Combo Move List exists, populating with moves...")
+        if (comboDisplay.moves.isEmpty()) {
+            Row(
+                modifier = modifier.height(57.dp).padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = "Add some moves!", modifier = modifier.padding(4.dp))
+            }
         }
-        if (moveList.moveList.isNotEmpty()) {
-            Timber.d("Move Entry List exists, populating Input Selector Column...")
-            InputSelector(
-                context = context,
-                scope = scope,
-                snackbarHostState = snackbarHostState,
-                editingState = editingState,
-                comboDisplay = comboDisplay,
-                originalCombo = originalCombo,
-                character = character,
-                characterName = characterName,
-                combo = comboDisplay,
-                updateComboData = updateComboData,
-                updateMoveList = updateMoveList,
-                comboAsString = comboAsString,
-                saveCombo = saveCombo,
-                deleteLastMove = deleteLastMove,
-                clearMoveList = clearMoveList,
-                onNavigateToComboDisplay = onNavigateToComboDisplay,
-                moveList = moveList
-            )
-        }
+    }
+    ComboDisplay(context, comboDisplay, username)
+    if (moveList.moveList.isNotEmpty()) {
+        Timber.d("Move Entry List exists, populating Input Selector Column...")
+        InputSelector(
+            context = context,
+            scope = scope,
+            snackbarHostState = snackbarHostState,
+            editingState = editingState,
+            comboDisplay = comboDisplay,
+            originalCombo = originalCombo,
+            character = character,
+            characterName = characterName,
+            combo = comboDisplay,
+            updateComboData = updateComboData,
+            updateMoveList = updateMoveList,
+            comboAsString = comboAsString,
+            saveCombo = saveCombo,
+            deleteLastMove = deleteLastMove,
+            clearMoveList = clearMoveList,
+            onNavigateToComboDisplay = onNavigateToComboDisplay,
+            moveList = moveList
+        )
     }
 }
 
@@ -253,24 +259,26 @@ fun ComboForm(
 fun ComboDisplay(
     context: Context,
     combo: ComboDisplay,
+    username: String,
     modifier: Modifier = Modifier
 ) {
     val fontColor = MaterialTheme.colorScheme.onBackground
-    val containerColor = MaterialTheme.colorScheme.surfaceDim
     val uiScale = 1f
     Timber.d("Getting combo display composable from Combo Screen")
     ComboItem(
         context = context,
         captureController = rememberCaptureController(),
+        toShare = false,
+        display = false,
+        characterEntryListUiState = CharacterEntryListUiState(),
         combo = combo,
+        username =  username,
         fontColor = fontColor,
-        containerColor = containerColor,
         uiScale = uiScale,
         modifier = modifier.padding(vertical = 4.dp)
     )
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun InputSelector(
     context: Context,
@@ -426,51 +434,7 @@ fun RadioButtons(modifier: Modifier = Modifier) {
     }
 }
 
-@Composable
-fun DamageAndBreak(
-    combo: ComboDisplay,
-    updateComboData: (ComboDisplayUiState) -> Unit,
-    updateMoveList: (String, MoveEntryListUiState) -> Unit,
-    moveList: MoveEntryListUiState,
-    modifier: Modifier = Modifier
-) {
-    var damageValue by remember { mutableIntStateOf(combo.damage) }
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Timber.d("Loading Damage and Break Row")
-        // Damage Input
-        OutlinedTextField(
-            value = damageValue.toString(),
-            onValueChange = {
-                damageValue = it.toIntOrNull() ?: damageValue
-                updateComboData(ComboDisplayUiState(combo.copy(damage = damageValue)))
-                Timber.d("damage: $damageValue")
-            },
-            maxLines = 1,
-            label = { Text("Damage") },
-            modifier = modifier.fillMaxWidth(0.5f).padding(horizontal = 4.dp)
-        )
 
-        // Add Break
-        OutlinedButton(
-            onClick = {
-                updateMoveList("break", moveList)
-                Timber.d("Adding break to combo move list.")
-                      },
-            modifier = modifier.fillMaxWidth().padding(horizontal = 4.dp)
-        ) {
-            Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = modifier.fillMaxWidth()) {
-                Text("Add Break")
-                Icon(
-                    imageVector = Icons.Default.PlayArrow,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = modifier
-                        .size(20.dp)
-                )
-            }
-        }
-    }
-}
 
 @Composable
 fun IconMoves(
@@ -570,6 +534,56 @@ fun TextMoves(
 }
 
 @Composable
+fun DamageAndBreak(
+    combo: ComboDisplay,
+    updateComboData: (ComboDisplayUiState) -> Unit,
+    updateMoveList: (String, MoveEntryListUiState) -> Unit,
+    moveList: MoveEntryListUiState,
+    modifier: Modifier = Modifier
+) {
+    var damageValue by remember { mutableIntStateOf(combo.damage) }
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Timber.d("Loading Damage and Break Row")
+        // Damage Input
+        OutlinedTextField(
+            value = damageValue.toString(),
+            onValueChange = {
+                damageValue = it.toIntOrNull() ?: damageValue
+                updateComboData(ComboDisplayUiState(combo.copy(damage = damageValue)))
+                Timber.d("damage: $damageValue")
+            },
+            maxLines = 1,
+            label = { Text("Damage") },
+            modifier = modifier.fillMaxWidth(0.5f).padding(horizontal = 4.dp)
+        )
+
+        // Add Break
+        OutlinedButton(
+            onClick = {
+                updateMoveList("break", moveList)
+                Timber.d("Adding break to combo move list.")
+            },
+            colors = ButtonDefaults.buttonColors().copy(
+                containerColor = MaterialTheme.colorScheme.background,
+                contentColor = MaterialTheme.colorScheme.onBackground
+            ),
+            modifier = modifier.fillMaxWidth().padding(horizontal = 4.dp)
+        ) {
+            Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = modifier.fillMaxWidth()) {
+                Text("Add Break")
+                Icon(
+                    imageVector = Icons.Default.PlayArrow,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = modifier
+                        .size(20.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun ConfirmAndClear(
     scope: CoroutineScope,
     snackbarHostState: SnackbarHostState,
@@ -611,7 +625,7 @@ fun ConfirmAndClear(
                     }
                 }
             },
-            colors = ButtonDefaults.buttonColors().copy(containerColor = Color(0xffed1664), contentColor = MaterialTheme.colorScheme.onBackground),
+            colors = ButtonDefaults.buttonColors().copy(containerColor = Color(0xffed1664),),
             content = { Text("Confirm", color = MaterialTheme.colorScheme.onBackground) }
         )
         // Delete Last
@@ -632,6 +646,27 @@ fun ConfirmAndClear(
                 Timber.d("Combo move list cleared.")
             },
             content = { Text("Clear", color = MaterialTheme.colorScheme.onBackground) }
+        )
+    }
+}
+
+@Composable
+@Preview
+fun PreviewBox(modifier: Modifier = Modifier) {
+    Box(modifier.fillMaxSize()) {
+        Icon(
+            imageVector = Icons.Default.Close,
+            contentDescription = "Return to Combo screen",
+            tint = Color(0xffed1664),
+            modifier = modifier
+                .padding(start = 5.dp, top = 2.dp)
+                .size(100.dp)
+        )
+        Icon(
+            imageVector = Icons.Default.Close,
+            contentDescription = "Return to Combo screen",
+            tint = Color.White,
+            modifier = modifier.size(100.dp)
         )
     }
 }

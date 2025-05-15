@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,6 +18,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -25,6 +27,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -57,6 +60,7 @@ fun CharacterScreen(
     comboDisplayViewModel: ComboDisplayViewModel,
     onClick: () -> Unit,
     navigateBack: () -> Unit,
+    navigateToProfiles: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Timber.d("")
@@ -66,7 +70,8 @@ fun CharacterScreen(
     Timber.d("Flows Collected")
     Timber.d("Character List: ${characterListState.characterList}")
 
-    var menuExpanded by remember { mutableStateOf(false) }
+    var gameMenuExpanded by remember { mutableStateOf(false) }
+    var settingsMenuExpanded by remember { mutableStateOf(false) }
     var gameSelected by remember { mutableStateOf("Tekken 8") }
 
     Scaffold(
@@ -74,15 +79,34 @@ fun CharacterScreen(
             TopAppBar(
                 title = { Text("Characters", style = MaterialTheme.typography.displaySmall) },
                 actions = {
-                    IconButton(onClick = {menuExpanded = !menuExpanded}) {
-                        Icon(
-                            imageVector = Icons.Default.Menu,
-                            contentDescription = stringResource(R.string.open_menu),
-                            modifier = Modifier.size(80.dp)
-                        )
+                    IconButton(onClick = {settingsMenuExpanded = !settingsMenuExpanded}) {
+                        Icon(imageVector = Icons.Default.Settings, contentDescription = "Settings")
+                        DropdownMenu(
+                            expanded = settingsMenuExpanded,
+                            onDismissRequest = { settingsMenuExpanded = false}
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Profiles") },
+                                onClick = navigateToProfiles
+                            )
+                        }
                     }
-                    DropdownMenu(expanded = menuExpanded,
-                        onDismissRequest = { menuExpanded = false}) {
+                },
+                windowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp),
+            )
+        },
+    ) { contentPadding ->
+        Column(Modifier.padding(contentPadding)) {
+            Box(contentAlignment = Alignment.Center, modifier = modifier.fillMaxWidth()) {
+                GameSelectedHeader(gameSelected, modifier.align(Alignment.CenterStart))
+                IconButton(onClick = { gameMenuExpanded = !gameMenuExpanded}, modifier.align(Alignment.CenterEnd)) {
+                    Icon(
+                        imageVector = Icons.Default.Menu,
+                        contentDescription = stringResource(R.string.open_menu),
+                        modifier = Modifier.size(80.dp)
+                    )
+                    DropdownMenu(expanded = gameMenuExpanded,
+                        onDismissRequest = { gameMenuExpanded = false}) {
                         DropdownMenuItem(
                             text = { Text("Tekken 8") },
                             onClick = { gameSelected = "Tekken 8" }
@@ -96,13 +120,9 @@ fun CharacterScreen(
                             onClick = { gameSelected = "Mortal Kombat 1" }
                         )
                     }
-                },
-                windowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp),
-            )
-        },
-    ) { contentPadding ->
-        Column(Modifier.padding(contentPadding)) {
-            GameSelectedHeader(gameSelected)
+                }
+
+            }
             Spacer(modifier.size(16.dp))
             LazyVerticalGrid(
                 verticalArrangement = Arrangement.spacedBy(16.dp),

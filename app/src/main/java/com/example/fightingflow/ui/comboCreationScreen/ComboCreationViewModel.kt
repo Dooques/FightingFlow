@@ -1,5 +1,7 @@
 package com.example.fightingflow.ui.comboCreationScreen
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -22,6 +24,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.LocalDate
 
 
 class ComboCreationViewModel(
@@ -39,7 +42,7 @@ class ComboCreationViewModel(
 
     val characterState = MutableStateFlow(CharacterUiState())
     val originalCombo = MutableStateFlow(ComboDisplayUiState())
-    val comboDisplayState = MutableStateFlow(ComboDisplayUiState())
+    val comboDisplayState = MutableStateFlow(ComboDisplayUiState(emptyComboDisplay.copy(dateCreated = LocalDate.now().toString())))
     val comboAsStringState = MutableStateFlow(processComboAsString())
     private val moveEntryListUiState = MutableStateFlow(MoveEntryListUiState())
     private val profileNameState = MutableStateFlow("")
@@ -137,6 +140,7 @@ class ComboCreationViewModel(
         saveComboDetailsToDs(comboDisplayState.value)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun updateMoveList(moveName: String, moveListUiState: MoveEntryListUiState) {
         Timber.d("")
         Timber.d("Adding $moveName to combo...")

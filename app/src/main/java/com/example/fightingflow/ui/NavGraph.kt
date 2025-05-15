@@ -35,9 +35,6 @@ import timber.log.Timber
 enum class FlowScreen(@StringRes val title: Int) {
     Start(title = R.string.app_name),
     ProfileList(title = R.string.profile_select),
-    CreateProfile(title = R.string.create_profile),
-    ProfileDetails(title = R.string.profile_details),
-    Menu(title = R.string.menu),
     CharSelect(title = R.string.char_select),
     Combos(title = R.string.combos),
     ComboCreation(title = R.string.combo_creation)
@@ -109,7 +106,8 @@ fun NavGraph(
                 CharacterScreen(
                     comboDisplayViewModel = comboDisplayViewModel,
                     onClick = { navController.navigate(FlowScreen.Combos.name) },
-                    navigateBack = { navController.navigate(FlowScreen.Start.name)}
+                    navigateBack = { navController.navigate(FlowScreen.Start.name)},
+                    navigateToProfiles = { navController.navigate(FlowScreen.ProfileList.name) }
                 )
             }
 

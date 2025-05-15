@@ -8,7 +8,6 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
@@ -38,7 +37,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asAndroidBitmap
@@ -49,6 +47,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.fightingflow.R
 import com.example.fightingflow.data.mediastore.MediaStoreUtil
 import com.example.fightingflow.model.ComboDisplay
+import com.example.fightingflow.ui.profileScreen.ProfileViewModel
 import com.example.fightingflow.util.ActionIcon
 import com.example.fightingflow.util.SwipeableItem
 import com.example.fightingflow.util.emptyCharacter
@@ -76,6 +75,7 @@ fun ComboDisplayScreen(
     (context as? Activity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
 
     val mediaStoreUtil = koinInject<MediaStoreUtil>()
+    val profileViewModel = koinInject<ProfileViewModel>()
 
     val fontColor = MaterialTheme.colorScheme.onBackground
     val containerColor = MaterialTheme.colorScheme.surfaceDim
@@ -85,12 +85,15 @@ fun ComboDisplayScreen(
     var showDialog by remember { mutableStateOf(false) }
     var capturedImage by remember { mutableStateOf<Uri?>(null) }
     var capturedImageFile by remember { mutableStateOf<File?>(null) }
+    var shareDataOn by remember { mutableStateOf(false) }
 
     // Room Flows
     val characterState by comboDisplayViewModel.characterState.collectAsStateWithLifecycle()
+    val characterListState by comboDisplayViewModel.characterEntryListState.collectAsStateWithLifecycle()
     val comboDisplayListState by comboDisplayViewModel.comboDisplayListState.collectAsStateWithLifecycle()
 
     // Datastore Flows
+    val username by profileViewModel.username.collectAsStateWithLifecycle()
     val characterNameState by comboDisplayViewModel.characterNameState.collectAsStateWithLifecycle()
     val characterImageState by comboDisplayViewModel.characterImageState.collectAsStateWithLifecycle()
 
@@ -117,60 +120,63 @@ fun ComboDisplayScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = characterState.character.name,
-                            style = MaterialTheme.typography.displayMedium,
-                            modifier = modifier.padding(start = 16.dp)
-                        )
-                    } },
+                    Text(
+                        text = characterState.character.name,
+                        style = MaterialTheme.typography.displayMedium,
+                        modifier = modifier.padding(start = 16.dp)
+                    )
+                },
+                navigationIcon = {
+                    if (uiScale == 1f) {
+                        FloatingActionButton(onClick = { navigateBack() }, containerColor = Color.Transparent) {
+                            Image(
+                                painter = painterResource(R.drawable.ff_character_screen_icon),
+                                contentDescription = "Return to Character Select",
+                                modifier = modifier.size(50.dp)
+                            )
+                        }
+                    }
+                },
                 actions = {
                     Image(
                         painter = painterResource(characterState.character.imageId),
                         contentDescription = "",
                         modifier = modifier.size(60.dp)
                     )
-                    IconButton(onClick = { scope.launch {
-                        comboDisplayViewModel.setEditingState(false)
-                        onNavigateToComboEditor()
-                    } }) {
+                    IconButton(onClick = {
+                        scope.launch {
+                            comboDisplayViewModel.setEditingState(false)
+                            onNavigateToComboEditor()
+                        }
+                    }) {
                         Icon(
                             imageVector = Icons.Default.Add,
                             contentDescription = "Add Combo",
                             modifier = modifier.size(80.dp)
                         )
-                } },
+                    } },
                 windowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp)
             )
-        },
-        floatingActionButton = {
-            if (uiScale == 1f) {
-                FloatingActionButton(onClick = { navigateBack() }, containerColor = Color.Transparent) {
-                    Image(
-                        painter = painterResource(R.drawable.ff_character_screen_icon),
-                        contentDescription = "Return to Character Select",
-                        modifier = modifier.size(80.dp)
-                    )
-                }
-            }
         }
     ) { contentPadding ->
         Column(Modifier.padding(contentPadding)) {
             Timber.d("Character Details \n Name: ${characterNameState.name} \n Image: ${characterImageState.image}")
             Timber.d("Checking details valid...")
-            LazyColumn {
+            LazyColumn(modifier.padding(start = if (uiScale == 2f) 40.dp else 4.dp)) {
                 Timber.d("Getting display combos as lazy column with swipeable actions.")
                 itemsIndexed(items = combosByCharacter) { index, combo ->
                     val captureController = rememberCaptureController()
-
                     val isOptionRevealed by remember { mutableStateOf(false) }
+
                     SwipeableItem(
                         isRevealed = isOptionRevealed,
                         onExpanded = {
                             combosByCharacter[index] = combo.copy(areOptionsRevealed = true)
+                            shareDataOn = true
                         },
                         onCollapsed = {
                             combosByCharacter[index] = combo.copy(areOptionsRevealed = false)
+                            shareDataOn = false
                         },
                         actions = {
                             // Share Combo
@@ -236,16 +242,18 @@ fun ComboDisplayScreen(
                                 modifier = modifier.fillMaxHeight()
                             )
                         },
-                        modifier = modifier,
                     ) {
                         ComboItem(
                             context = context,
                             captureController = captureController,
+                            toShare = shareDataOn,
+                            display = true,
                             fontColor = fontColor,
+                            characterEntryListUiState = characterListState,
                             combo = combo,
-                            containerColor = containerColor,
+                            username = username,
                             uiScale = uiScale,
-                            modifier = modifier.padding(vertical = 4.dp, horizontal = if (uiScale == 2f) 40.dp else 4.dp)
+                            modifier = modifier.padding(vertical = 4.dp, )
                         )
                     }
                 }
