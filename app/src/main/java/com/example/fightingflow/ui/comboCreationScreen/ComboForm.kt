@@ -9,20 +9,19 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -45,7 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
-import com.example.fightingflow.ui.comboDisplayScreen.ComboItem
+import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplay
 import com.example.fightingflow.util.CharacterEntryListUiState
 import com.example.fightingflow.util.ComboDisplayUiState
 import com.example.fightingflow.util.MoveEntryListUiState
@@ -91,7 +90,7 @@ fun ComboForm(
     ComboDisplay(context, comboDisplay, username)
     if (moveList.moveList.isNotEmpty()) {
         Timber.d("Move Entry List exists, populating Input Selector Column...")
-        InputSelector(
+        TekkenInputSelector(
             context = context,
             scope = scope,
             snackbarHostState = snackbarHostState,
@@ -123,7 +122,7 @@ fun ComboDisplay(
     val fontColor = MaterialTheme.colorScheme.onBackground
     val uiScale = 1f
     Timber.d("Getting combo display composable from Combo Screen")
-    ComboItem(
+    ComboDisplay(
         context = context,
         captureController = rememberCaptureController(),
         toShare = false,
@@ -137,85 +136,7 @@ fun ComboDisplay(
     )
 }
 
-@Composable
-fun InputSelector(
-    context: Context,
-    scope: CoroutineScope,
-    snackbarHostState: SnackbarHostState,
-    editingState: Boolean,
-    comboDisplay: ComboDisplay,
-    originalCombo: ComboDisplay,
-    character: CharacterEntry,
-    characterName: String,
-    combo: ComboDisplay,
-    updateComboData: (ComboDisplayUiState) -> Unit,
-    updateMoveList: (String, MoveEntryListUiState) -> Unit,
-    comboAsString: String,
-    saveCombo: KSuspendFunction0<Unit>,
-    deleteLastMove: () -> Unit,
-    clearMoveList: () -> Unit,
-    onNavigateToComboDisplay: () -> Unit,
-    moveList: MoveEntryListUiState,
-    modifier: Modifier = Modifier
-) {
-    Timber.d("Loading Input Selector")
 
-    LazyColumn {
-        val mishimaChar = characterName in mishima
-        if (mishimaChar) {
-            Timber.d("Using mishima layout")
-        } else {
-            Timber.d("Using normal character layout")
-        }
-        items(items = if (mishimaChar) mishimaSelectorLayout else selectorLayout) { moveType ->
-            when (moveType) {
-                "Text Combo" -> ComboTextEntry(comboAsString)
-                "Radio Buttons" -> RadioButtons()
-                "Damage" -> DamageAndBreak(
-                    combo = combo,
-                    updateComboData = updateComboData,
-                    updateMoveList = updateMoveList,
-                    moveList = moveList
-                )
-                "Movement" -> IconMoves(
-                    moveType = moveType,
-                    moveList = moveList,
-                    updateMoveList = updateMoveList,
-                    context = context
-                )
-                "Input" -> IconMoves(
-                    moveType = moveType,
-                    moveList = moveList,
-                    updateMoveList = updateMoveList,
-                    context = context
-                )
-                "Common", "Mishima", "Character", "Mechanics Input", "Stage" -> TextMoves(
-                    moveType = moveType,
-                    moveList = moveList,
-                    character = character,
-                    updateMoveList = updateMoveList
-                )
-                "Buttons" -> ConfirmAndClear(
-                    scope = scope,
-                    snackbarHostState = snackbarHostState,
-                    editingState = editingState,
-                    comboDisplay = comboDisplay,
-                    originalCombo = originalCombo,
-                    saveCombo = saveCombo,
-                    deleteLastMove = deleteLastMove,
-                    clearMoveList = clearMoveList,
-                    onNavigateToComboDisplay = onNavigateToComboDisplay,
-                )
-                "Divider" -> InputDivider()
-                "Stances", "Mechanics", "${character.name}'s Stances", "Inputs", "Mishima Moves" -> StanceAndMechanicsTitle(moveType)
-            }
-            Timber.d("$moveType loaded.")
-        }
-        item {
-            Spacer(modifier.size(120.dp))
-        }
-    }
-}
 
 @Composable
 fun InputDivider(modifier: Modifier = Modifier) {
@@ -223,12 +144,12 @@ fun InputDivider(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun StanceAndMechanicsTitle(title: String, modifier: Modifier = Modifier) {
+fun SectionTitle(title: String, modifier: Modifier = Modifier) {
     Text(title, modifier = modifier.padding(start = 16.dp))
 }
 
 @Composable
-fun ComboTextEntry(
+fun ComboAsText(
     comboAsString: String,
     modifier: Modifier = Modifier
 ) {
@@ -244,6 +165,32 @@ fun ComboTextEntry(
                 .padding(horizontal = 8.dp, vertical = 8.dp)
         )
     }
+}
+
+@Composable
+fun ComboDescription(
+    combo: ComboDisplay,
+    updateComboData: (ComboDisplayUiState) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var description by remember { mutableStateOf(combo.description.ifEmpty { "" }) }
+    OutlinedTextField(
+        value = description,
+        onValueChange = {
+            if (description.length <= 34 ) {
+                description = it
+            updateComboData(ComboDisplayUiState(combo.copy(description = description)))
+            } },
+        label = { Text("Write a description of your combo...") },
+        maxLines = 1,
+        trailingIcon = {
+            IconButton(onClick = { description = "" }) {
+                Icon(imageVector = Icons.Default.Clear, contentDescription = "Clear description")
+        } },
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp, vertical = 8.dp)
+    )
 }
 
 @Composable
@@ -398,7 +345,10 @@ fun DamageAndBreak(
     modifier: Modifier = Modifier
 ) {
     var damageValue by remember { mutableIntStateOf(combo.damage) }
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier.padding(vertical = 8.dp)
+    ) {
         Timber.d("Loading Damage and Break Row")
         // Damage Input
         OutlinedTextField(

@@ -41,7 +41,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -52,12 +54,17 @@ import com.example.fightingflow.R
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayViewModel
 import com.example.fightingflow.util.CharacterUiState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CharacterScreen(
+    scope: CoroutineScope,
     comboDisplayViewModel: ComboDisplayViewModel,
+    characterScreenViewModel: CharacterScreenViewModel,
     onClick: () -> Unit,
     navigateBack: () -> Unit,
     navigateToProfiles: () -> Unit,
@@ -65,12 +72,21 @@ fun CharacterScreen(
 ) {
     Timber.d("\nLoading Character Screen")
 
-    var gameSelected by remember { mutableStateOf(Pair("Tekken", "8")) }
-    comboDisplayViewModel.getCharacterEntryListByGame(gameSelected.first, gameSelected.second)
-
     val characterListState by comboDisplayViewModel.characterEntryListState.collectAsStateWithLifecycle()
+    val gameSelectedState by characterScreenViewModel.gameSelected.collectAsStateWithLifecycle()
+
     Timber.d("Flows Collected")
     Timber.d("Character List: ${characterListState.characterList}")
+    Timber.d("Game Selected From DS: $gameSelectedState")
+
+    var gameSelected by remember { mutableStateOf("") }
+
+    if (gameSelectedState.isNotEmpty()) {
+        Timber.d("Processing")
+        gameSelected = gameSelectedState
+    }
+
+    comboDisplayViewModel.getCharacterEntryListByGame(gameSelected)
 
     var gameMenuExpanded by remember { mutableStateOf(false) }
     var settingsMenuExpanded by remember { mutableStateOf(false) }
@@ -98,35 +114,51 @@ fun CharacterScreen(
         },
     ) { contentPadding ->
         Column(Modifier.padding(contentPadding)) {
-            Box(contentAlignment = Alignment.Center, modifier = modifier.fillMaxWidth()) {
-                GameSelectedHeader(gameSelected.first + " " + gameSelected.second, modifier.align(Alignment.CenterStart))
-                IconButton(onClick = { gameMenuExpanded = !gameMenuExpanded}, modifier.align(Alignment.CenterEnd)) {
-                    Icon(
-                        imageVector = Icons.Default.Menu,
-                        contentDescription = stringResource(R.string.open_menu),
-                        modifier = Modifier.size(80.dp)
-                    )
-                    DropdownMenu(expanded = gameMenuExpanded,
-                        onDismissRequest = { gameMenuExpanded = false}) {
-                        DropdownMenuItem(
-                            text = { Text("Tekken 8") },
-                            onClick = {
-                                gameSelected = Pair("Tekken", "8")
-                                comboDisplayViewModel.getCharacterEntryListByGame(gameSelected.first, gameSelected.second)
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text("Street Fighter 6") },
-                            onClick = {
-                                gameSelected = Pair("Street Fighter", "6")
-                                comboDisplayViewModel.getCharacterEntryListByGame(gameSelected.first, gameSelected.second)
-                            }
-                        )
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = modifier.fillMaxWidth()
+            ) {
+                GameSelectedHeader(
+                    gameSelected = gameSelected,
+                    modifier = modifier.align(Alignment.CenterStart)
+                )
+                IconButton(
+                    onClick = { gameMenuExpanded = !gameMenuExpanded },
+                    modifier = modifier.fillMaxWidth(0.4f).align(Alignment.Center)
+                ) {
+                    DropdownMenu(
+                        expanded = gameMenuExpanded,
+                        onDismissRequest = { gameMenuExpanded = false },
+                        modifier = modifier.align(Alignment.Center)
+                    ) {
                         DropdownMenuItem(
                             text = { Text("Mortal Kombat 1") },
                             onClick = {
-                                gameSelected = Pair("Mortal Kombat", "1")
-                                comboDisplayViewModel.getCharacterEntryListByGame(gameSelected.first, gameSelected.second)
+                                gameMenuExpanded = false
+                                gameSelected = "Mortal Kombat 1"
+                                scope.launch {
+                                    characterScreenViewModel.updateGameInDs(gameSelected)
+                                }
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Street Fighter VI") },
+                            onClick = {
+                                gameMenuExpanded = false
+                                gameSelected = "Street Fighter VI"
+                                scope.launch {
+                                    characterScreenViewModel.updateGameInDs(gameSelected)
+                                }
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Tekken 8") },
+                            onClick = {
+                                gameMenuExpanded = false
+                                gameSelected = "Tekken 8"
+                                scope.launch {
+                                    characterScreenViewModel.updateGameInDs(gameSelected)
+                                }
                             }
                         )
                     }
@@ -136,8 +168,7 @@ fun CharacterScreen(
             LazyVerticalGrid(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly,
-                columns = GridCells.Fixed(3),
-                modifier = modifier
+                columns = GridCells.Fixed(3)
             ) {
                 Timber.d("Loading Character Grid...")
                 items(items = characterListState.characterList.sortedBy { it.name }) { character ->
@@ -206,10 +237,11 @@ fun GameSelectedHeader(gameSelected: String, modifier: Modifier = Modifier) {
     ) {
         val gameColor = when (gameSelected) {
             "Tekken 8" -> Color(color = 0xFFed1664)
-            "Street Fighter 6" -> Color(color = 0xFFff914d)
-            "Mortal Kombat 1" -> Color(color = 0xFF38b6ff)
+            "Street Fighter VI" -> Color(color = 0xFFff914d)
+            "Mortal Kombat 1" -> Color(color = 0xFFDC143C)
             else -> Color.Green
         }
+
         Text(
             text ="Game Selected: ",
             style = MaterialTheme.typography.bodyLarge,
@@ -217,11 +249,17 @@ fun GameSelectedHeader(gameSelected: String, modifier: Modifier = Modifier) {
         )
         Text(
             text = gameSelected,
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.bodyLarge
+                .copy(
+                    shadow = Shadow(
+                        color = gameColor,
+                        offset = Offset(10f, 10f),
+                        blurRadius = 30f,
+                    )
+                ),
+            color = Color.White,
+            fontWeight = FontWeight.ExtraBold,
             modifier = modifier
-                .clip(shape = RoundedCornerShape(100.dp))
-                .background(gameColor)
                 .padding(horizontal = 8.dp, vertical = 4.dp)
         )
     }

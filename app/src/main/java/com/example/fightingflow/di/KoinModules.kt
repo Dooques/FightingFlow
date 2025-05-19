@@ -22,7 +22,10 @@ import com.example.fightingflow.data.datastore.ProfileDatastoreRepository
 import com.example.fightingflow.data.datastore.ProfileDsRepository
 import com.example.fightingflow.data.datastore.CharacterDatastoreRepository
 import com.example.fightingflow.data.datastore.CharacterDsRepository
+import com.example.fightingflow.data.datastore.GameDatastoreRepository
+import com.example.fightingflow.data.datastore.GameDsRepository
 import com.example.fightingflow.data.mediastore.MediaStoreUtil
+import com.example.fightingflow.ui.characterScreen.CharacterScreenViewModel
 import com.example.fightingflow.ui.comboCreationScreen.ComboCreationViewModel
 import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayViewModel
 import com.example.fightingflow.ui.profileScreen.ProfileViewModel
@@ -64,6 +67,7 @@ val repositoryModule = module {
     single<ProfileDsRepository> { ProfileDatastoreRepository(androidContext().dataStore) }
     single<CharacterDsRepository> { CharacterDatastoreRepository(androidContext().dataStore) }
     single<ComboDsRepository> { ComboDatastoreRepository(androidContext().dataStore) }
+    single<GameDsRepository> { GameDatastoreRepository(androidContext().dataStore) }
 
     // MediaStore
     single<MediaStoreUtil> { MediaStoreUtil(androidContext())}
@@ -74,4 +78,5 @@ val viewModelModule = module {
     viewModel { InitViewModel(get()) }
     viewModel { ComboDisplayViewModel(get(), get(), get()) }
     viewModel { ComboCreationViewModel(get(), get(), get()) }
+    viewModel { CharacterScreenViewModel(get()) }
 }

@@ -15,12 +15,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -44,7 +44,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.fightingflow.R
 import com.example.fightingflow.data.mediastore.MediaStoreUtil
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.ui.profileScreen.ProfileViewModel
@@ -64,7 +63,6 @@ fun ComboDisplayScreen(
     deviceType: WindowSizeClass,
     snackbarHostState: SnackbarHostState,
     comboDisplayViewModel: ComboDisplayViewModel,
-    updateCharacterState: (String) -> Unit,
     onNavigateToComboEditor: () -> Unit,
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
@@ -99,7 +97,9 @@ fun ComboDisplayScreen(
     Timber.d("Updating character data")
     if (characterNameState.name.isNotEmpty()) {
         try {
-            updateCharacterState(characterNameState.name)
+            Timber.d("Getting ${characterNameState.name} from database...")
+            comboDisplayViewModel.updateCharacterState(characterNameState.name)
+            Timber.d("Character returned: $characterState")
         } catch (e: NoSuchElementException) {
             Timber.e(e, "Character Error, no element found in character list.")
         }
@@ -126,14 +126,12 @@ fun ComboDisplayScreen(
                     )
                 },
                 navigationIcon = {
-                    if (uiScale == 1f) {
-                        FloatingActionButton(onClick = { navigateBack() }, containerColor = Color.Transparent) {
-                            Image(
-                                painter = painterResource(R.drawable.ff_character_screen_icon),
-                                contentDescription = "Return to Character Select",
-                                modifier = modifier.size(50.dp)
-                            )
-                        }
+                    IconButton(onClick = { navigateBack() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                            contentDescription = "Return to Character Select",
+                            modifier = modifier.size(50.dp)
+                        )
                     }
                 },
                 actions = {
@@ -161,7 +159,11 @@ fun ComboDisplayScreen(
         Column(Modifier.padding(contentPadding)) {
             Timber.d("Character Details \n Name: ${characterNameState.name} \n Image: ${characterImageState.image}")
             Timber.d("Checking details valid...")
-            LazyColumn(modifier.padding(start = if (uiScale == 2f) 40.dp else 4.dp)) {
+            LazyColumn(modifier.padding(
+                start = if (uiScale == 2f) 40.dp else 4.dp,
+                end = if (uiScale == 2f) 16.dp else 0.dp
+            )
+            ) {
                 Timber.d("Getting display combos as lazy column with swipeable actions.")
                 itemsIndexed(items = combosByCharacter) { index, combo ->
                     val captureController = rememberCaptureController()
@@ -242,7 +244,7 @@ fun ComboDisplayScreen(
                             )
                         },
                     ) {
-                        ComboItem(
+                        ComboDisplay(
                             context = context,
                             captureController = captureController,
                             toShare = shareDataOn,

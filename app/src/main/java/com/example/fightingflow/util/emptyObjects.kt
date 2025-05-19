@@ -17,24 +17,25 @@ val emptyCharacter = CharacterEntry(
     uniqueMoves = "",
     combosById = "",
     game = "",
-    entry = "",
 )
 
 val emptyComboDisplay = ComboDisplay(
     comboId = UUID.randomUUID().toString(),
+    description = "",
     character = "",
     damage = 0,
     createdBy = "",
-    dateCreated = "15-05-2025",
+    dateCreated = "",
     moves = ImmutableList(emptyList())
 )
 
 val emptyComboEntry = ComboEntry(
     comboId = UUID.randomUUID().toString(),
+    description = "",
     character = emptyCharacter,
     damage = 0,
     createdBy = "",
-    dateCreated = "15-05-2025",
+    dateCreated = "",
     moves = ""
 )
 

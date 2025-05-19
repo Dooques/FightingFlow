@@ -82,7 +82,6 @@ class DatastoreTest {
         uniqueMoves = "",
         combosById = "",
         game = "Tekken",
-        entry = "8"
     )
 
     @Test
@@ -107,11 +106,12 @@ class DatastoreTest {
     private val testComboRepository: ComboDsRepository = ComboDatastoreRepository(testDataStore)
 
     private val combo = ComboDisplay(
-        id = 1,
         comboId = UUID.randomUUID().toString(),
+        description = "Combo",
         character = "Reina",
         damage = 60,
         createdBy = "Sam",
+        dateCreated = "19/05/2025",
         moves = ImmutableList(
             listOf(
                 MoveEntry(

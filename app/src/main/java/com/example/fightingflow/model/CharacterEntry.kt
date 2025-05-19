@@ -14,5 +14,4 @@ data class CharacterEntry(
     val uniqueMoves: String,
     val combosById: String = "",
     val game: String,
-    val entry: String
 )

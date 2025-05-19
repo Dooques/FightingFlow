@@ -48,9 +48,6 @@ class ComboDisplayViewModel(
     private val _comboDisplayListState = MutableStateFlow(ComboDisplayListUiState())
     val comboDisplayListState: StateFlow<ComboDisplayListUiState> = _comboDisplayListState
 
-    private val _comboEntryListState = MutableStateFlow(ComboEntryListUiState())
-    val comboEntryListState: StateFlow<ComboEntryListUiState> = _comboEntryListState
-
     private val _characterState = MutableStateFlow(CharacterUiState())
     val characterState: StateFlow<CharacterUiState> = _characterState
 
@@ -80,10 +77,15 @@ class ComboDisplayViewModel(
 
     // Datastore
     fun updateCharacterState(name: String) {
-        Timber.d("Getting character from Character List")
-        val character = characterEntryListState.value.characterList.first { it.name == name }
-        _characterState.update { CharacterUiState(character) }
-        Timber.d("Found $character and updated CharacterState")
+        viewModelScope.launch {
+            Timber.d("Getting character from Database")
+            flowRepository.getCharacter(name)
+                .map { it ?: emptyCharacter }
+                .collect { characterEntry ->
+                    Timber.d("Character: $characterEntry")
+                    _characterState.update { CharacterUiState(characterEntry) }
+                }
+        }
     }
 
     fun updateCharacterInDS(character: CharacterEntry) {
@@ -105,10 +107,10 @@ class ComboDisplayViewModel(
         _moveEntryListState.update { MoveEntryListUiState(flowRepository.getAllMoves().first()) }
     }
 
-    fun getCharacterEntryListByGame(game: String, entry: String) = viewModelScope.launch {
+    fun getCharacterEntryListByGame(game: String) = viewModelScope.launch {
         Timber.d("Updating character entry list state")
-        Timber.d("Game selected: $game $entry")
-            flowRepository.getCharactersByGame(game, entry)
+        Timber.d("Game selected: $game")
+            flowRepository.getCharactersByGame(game)
                 .map { characterList ->
                     Timber.d("CharacterList: $characterList")
                     CharacterEntryListUiState(characterList)
@@ -124,7 +126,6 @@ class ComboDisplayViewModel(
         flowRepository.getAllCombosByCharacter(characterState.value.character)
             .map { comboEntryList ->
                 Timber.d("Combo List: $comboEntryList")
-                _comboEntryListState.update { ComboEntryListUiState(comboEntryList ?: emptyList()) }
                 ComboDisplayListUiState(comboDisplayList = comboEntryList?.map { combo ->
                     getMoveEntryDataForComboDisplay(combo.toDisplay(), moveEntryListUiState.value)
                 } ?: emptyList())

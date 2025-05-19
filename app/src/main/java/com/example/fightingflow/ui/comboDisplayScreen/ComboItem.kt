@@ -45,7 +45,7 @@ import timber.log.Timber
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun ComboItem(
+fun ComboDisplay(
     context: Context,
     captureController: CaptureController,
     toShare: Boolean,
@@ -71,17 +71,18 @@ fun ComboItem(
                     .align(Alignment.BottomEnd)
             )
         }
-        Column {
+        Column(
+            modifier.padding(horizontal = (4 * uiScale).dp, vertical = (4 * uiScale).dp)
+        ) {
             Timber.d("Loading flow row...")
             if (display) {
-                Metadata(combo, uiScale)
+                ComboInfoTop(combo, uiScale)
             }
             FlowRow(
                 verticalArrangement = Arrangement.Center,
                 horizontalArrangement = Arrangement.Start,
                 modifier = modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 4.dp, vertical = 4.dp)
             ) {
                 Timber.d("Loading moves from combo...")
                 combo.moves.forEach { move ->
@@ -156,13 +157,13 @@ fun ComboItem(
                     }
                 }
             }
-            ComboData(combo, username, fontColor)
+            ComboInfoBottom(combo, username, fontColor)
         }
     }
 }
 
 @Composable
-fun Metadata(
+fun ComboInfoTop(
     combo: ComboDisplay,
     uiScale: Float,
     modifier: Modifier = Modifier
@@ -170,12 +171,14 @@ fun Metadata(
     val fontSize = if (uiScale == 2f) 20.sp else 16.sp
     Box(Modifier.fillMaxWidth()) {
         Row(
-            modifier = modifier.align(alignment = Alignment.CenterEnd)
-                .padding(end = (4 * uiScale).dp)
+            modifier = modifier.align(alignment = Alignment.CenterStart)
         ) {
+            Text(text = combo.description, fontSize = fontSize)
+        }
+        Row(modifier.align(Alignment.CenterEnd)) {
             Text(text = combo.character, fontSize = fontSize)
             Spacer(modifier.width((4 * uiScale).dp))
-            Text("|")
+            Text(text = "|")
             Spacer(modifier.width((4 * uiScale).dp))
             Text(text = combo.dateCreated, fontSize = fontSize)
         }
@@ -183,7 +186,7 @@ fun Metadata(
 }
 
 @Composable
-fun ComboData(
+fun ComboInfoBottom(
     combo: ComboDisplay,
     profile: String,
     fontColor: Color,
@@ -276,7 +279,7 @@ fun MoveBreak(
 fun ComboItemPreviewTablet() {
     FightingFlowTheme {
         Surface {
-            ComboItem(
+            ComboDisplay(
                 context = LocalContext.current,
                 captureController = rememberCaptureController(),
                 toShare = true,
@@ -296,7 +299,7 @@ fun ComboItemPreviewTablet() {
 fun ComboItemPreviewPhone() {
     FightingFlowTheme {
         Surface {
-            ComboItem(
+            ComboDisplay(
                 context = LocalContext.current,
                 captureController = rememberCaptureController(),
                 toShare = true,

@@ -20,6 +20,7 @@ data class ComboEntry (
     @PrimaryKey
     @ColumnInfo(name = "combo_id")
     val comboId: String = UUID.randomUUID().toString(),
+    val description: String,
     val character: CharacterEntry,
     val damage: Int,
     @ColumnInfo(name = "created_by")
@@ -31,6 +32,7 @@ data class ComboEntry (
 @Immutable
 data class ComboDisplay(
     val comboId: String,
+    val description: String,
     val character: String,
     val damage: Int,
     val createdBy: String,
@@ -42,6 +44,7 @@ data class ComboDisplay(
 fun ComboEntry.toDisplay(): ComboDisplay =
     ComboDisplay(
         comboId = comboId,
+        description = description,
         character = character.name,
         damage = damage,
         createdBy = createdBy,
@@ -53,6 +56,7 @@ fun ComboEntry.toDisplay(): ComboDisplay =
 fun ComboDisplay.toEntry(character: CharacterEntry): ComboEntry =
     ComboEntry(
         comboId = comboId,
+        description = description,
         character = character,
         damage = damage,
         createdBy = createdBy,

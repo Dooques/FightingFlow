@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 interface FlowRepository {
     // Character
     fun getCharacter(name: String): Flow<CharacterEntry?>
-    fun getCharactersByGame(game: String, entry: String): Flow<List<CharacterEntry>>
+    fun getCharactersByGame(game: String): Flow<List<CharacterEntry>>
     suspend fun updateCharacter(characterEntry: CharacterEntry)
 
     // Combo
@@ -42,8 +42,8 @@ class FlowDataRepository(
     override fun getCharacter(name: String): Flow<CharacterEntry?> =
         characterDao.getCharacter(name)
 
-    override fun getCharactersByGame(game: String, entry: String): Flow<List<CharacterEntry>> =
-        characterDao.getCharactersFromGame(game, entry)
+    override fun getCharactersByGame(game: String): Flow<List<CharacterEntry>> =
+        characterDao.getCharactersFromGame(game)
 
     // Get Combo
     override fun getCombo(comboId: String): Flow<ComboEntry?> =

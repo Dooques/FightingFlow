@@ -13,6 +13,7 @@ import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboEntry
 import com.example.fightingflow.model.MoveEntry
 import com.example.fightingflow.model.ProfileEntry
+import com.example.fightingflow.util.emptyComboEntry
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -39,7 +40,6 @@ class FlowDaoTest {
             uniqueMoves = "",
             combosById = "",
             game = "Tekken",
-            entry ="8"
         )
 
     private val reina = CharacterEntry(
@@ -50,17 +50,18 @@ class FlowDaoTest {
             uniqueMoves = "",
             combosById = "",
             game = "Tekken",
-            entry = "8"
         )
 
     @Before
     fun createDb() {
         val context: Context = ApplicationProvider.getApplicationContext()
+
         flowDatabase = Room.inMemoryDatabaseBuilder(
             context, FlowDatabase::class.java
         )
             .allowMainThreadQueries()
             .build()
+
         profileDao = flowDatabase.getUserDao()
         comboDao = flowDatabase.getComboDao()
         characterDao = flowDatabase.getCharacterDao()
@@ -74,8 +75,20 @@ class FlowDaoTest {
     }
 
     /* Profile Dao Tests */
-    private var profile1 = ProfileEntry(1, "Sam", "", "D00ques", false)
-    private var profile2 = ProfileEntry(2, "Dave", "", "0blivionIV", false)
+    private var profile1 = ProfileEntry(
+        id = 1,
+        username = "Sam",
+        profilePic = "",
+        password = "D00ques",
+        loggedIn = false
+    )
+    private var profile2 = ProfileEntry(
+        id = 2,
+        username = "Dave",
+        profilePic = "",
+        password = "0blivionIV",
+        loggedIn = false
+    )
 
     private suspend fun addProfileToDatabase() {
         profileDao.insert(profile1)
@@ -106,7 +119,13 @@ class FlowDaoTest {
     @Throws(IOException::class)
     fun updateProfile_UpdateProfileInDb() = runBlocking {
         addProfileToDatabase()
-        val profileUpdate = ProfileEntry(1, "Dooques", "", "Password420", true)
+        val profileUpdate = ProfileEntry(
+            id = 1,
+            username = "Dooques",
+            profilePic = "",
+            password = "Password420",
+            loggedIn = true
+        )
         profileDao.update(profileUpdate)
         val updatedProfile = profileDao.getAllProfiles().first()
         assertEquals(updatedProfile[0], profileUpdate)
@@ -124,36 +143,30 @@ class FlowDaoTest {
 
     /* ComboDaoTests */
     private val combo1 = ComboEntry(
-        id = 1,
         comboId = UUID.randomUUID().toString(),
+        description = "Combo",
         character = reina,
         damage = 60,
         createdBy = "Sam",
+        dateCreated = "19/05/2025",
         moves = "1, 2, 1",
     )
     private val combo2 = ComboEntry(
-        id = 2,
         comboId = UUID.randomUUID().toString(),
+        description = "Combo",
         character = asuka,
         damage = 60,
         createdBy = "Sam",
+        dateCreated = "19/05/2025",
         moves = "1, 2, 1",
     )
     private val combo3 = ComboEntry(
-        3,
-        UUID.randomUUID().toString(),
-        CharacterEntry(
-            id = 1,
-            name = "Reina",
-            imageId = 1,
-            fightingStyle = "Mishima",
-            uniqueMoves = "",
-            combosById = "",
-            game = "Tekken",
-            entry ="8"
-        ),
+        comboId = UUID.randomUUID().toString(),
+        description = "Combo",
+        character = reina,
         damage = 60,
         createdBy = "Dave",
+        dateCreated = "19/05/2025",
         moves = "1, 2, 1",
     )
 
@@ -184,8 +197,8 @@ class FlowDaoTest {
     fun getComboByCharacter() = runBlocking {
         addAllCombosToDb()
         val combos = comboDao.getAllCombosByCharacter(reina).first()
-        assertEquals(combo1, combos[0])
-        assertEquals(combo3, combos[1])
+        assertEquals(combo1, combos?.get(0) ?: emptyComboEntry)
+        assertEquals(combo3, combos?.get(1) ?: emptyComboEntry)
     }
 
     @Test
@@ -193,8 +206,8 @@ class FlowDaoTest {
     fun getCombosByCreator() = runBlocking {
         addAllCombosToDb()
         val combos = comboDao.getAllCombosByProfile("Sam").first()
-        assertEquals(combo1, combos[0])
-        assertEquals(combo2, combos[1])
+        assertEquals(combo1, combos?.get(0) ?: emptyComboEntry)
+        assertEquals(combo2, combos?.get(1) ?: emptyComboEntry)
     }
 
     private suspend fun addCharactersToDb() {
@@ -209,11 +222,12 @@ class FlowDaoTest {
         val character = characterDao.getCharacter("Reina").first()
         assertEquals(reina, character)
     }
+
     @Test
     @Throws(IOException::class)
-    fun getAllCharacters() = runBlocking {
+    fun getAllCharactersByGame() = runBlocking {
         addCharactersToDb()
-        val characters = characterDao.getCharactersFromGame().first()
+        val characters = characterDao.getCharactersFromGame("Tekken").first()
         assertEquals(characters[0], reina)
         assertEquals(characters[1], asuka)
     }

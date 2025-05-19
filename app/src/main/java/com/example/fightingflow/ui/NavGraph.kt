@@ -21,6 +21,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.fightingflow.R
 import com.example.fightingflow.ui.characterScreen.CharacterScreen
+import com.example.fightingflow.ui.characterScreen.CharacterScreenViewModel
 import com.example.fightingflow.ui.comboCreationScreen.ComboCreationScreen
 import com.example.fightingflow.ui.comboCreationScreen.ComboCreationViewModel
 import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayScreen
@@ -30,7 +31,6 @@ import com.example.fightingflow.ui.profileScreen.ProfileViewModel
 import com.example.fightingflow.ui.profileScreen.TitleScreen
 import org.koin.compose.koinInject
 import timber.log.Timber
-
 
 enum class FlowScreen(@StringRes val title: Int) {
     Start(title = R.string.app_name),
@@ -48,12 +48,12 @@ fun NavGraph(
 ) {
     Timber.d("Initializing NavController")
     val backStackEntry by navController.currentBackStackEntryAsState()
-//    val currentScreen = FlowScreen.valueOf(value = backStackEntry?.destination?.route ?: FlowScreen.Start.name)
 
     Timber.d("Initializing ViewModels")
     val comboDisplayViewModel = koinInject<ComboDisplayViewModel>()
     val comboCreationViewModel = koinInject<ComboCreationViewModel>()
     val profileViewModel = koinInject<ProfileViewModel>()
+    val characterScreenViewModel = koinInject<CharacterScreenViewModel>()
 
     // ProfileViewModel Flows
     val loggedInState by profileViewModel.loggedInState.collectAsStateWithLifecycle()
@@ -104,7 +104,9 @@ fun NavGraph(
             composable(route = FlowScreen.CharSelect.name) {
                 Timber.d("Loading Character Screen")
                 CharacterScreen(
+                    scope = scope,
                     comboDisplayViewModel = comboDisplayViewModel,
+                    characterScreenViewModel = characterScreenViewModel,
                     onClick = { navController.navigate(FlowScreen.Combos.name) },
                     navigateBack = { navController.navigate(FlowScreen.Start.name)},
                     navigateToProfiles = { navController.navigate(FlowScreen.ProfileList.name) }
@@ -118,7 +120,6 @@ fun NavGraph(
                     deviceType = deviceType,
                     comboDisplayViewModel = comboDisplayViewModel,
                     snackbarHostState = snackBarHostState,
-                    updateCharacterState = comboDisplayViewModel::updateCharacterState,
                     onNavigateToComboEditor = { navController.navigate(FlowScreen.ComboCreation.name) },
                     navigateBack = { navController.navigate(FlowScreen.CharSelect.name) }
                 )
