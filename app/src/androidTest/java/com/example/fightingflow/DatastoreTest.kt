@@ -12,7 +12,6 @@ import com.example.fightingflow.data.datastore.ProfileDatastoreRepository
 import com.example.fightingflow.data.datastore.ProfileDsRepository
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
-import com.example.fightingflow.model.ComboEntry
 import com.example.fightingflow.model.MoveEntry
 import com.example.fightingflow.util.ImmutableList
 import com.example.fightingflow.util.emptyCharacter
@@ -82,8 +81,8 @@ class DatastoreTest {
         fightingStyle = "Mishima",
         uniqueMoves = "",
         combosById = "",
-        gameFranchise = "Tekken",
-        gameEntry = "8"
+        game = "Tekken",
+        entry = "8"
     )
 
     @Test

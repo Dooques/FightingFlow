@@ -38,8 +38,8 @@ class FlowDaoTest {
             fightingStyle = "Kazama",
             uniqueMoves = "",
             combosById = "",
-            gameFranchise = "Tekken",
-            gameEntry ="8"
+            game = "Tekken",
+            entry ="8"
         )
 
     private val reina = CharacterEntry(
@@ -49,8 +49,8 @@ class FlowDaoTest {
             fightingStyle = "Mishima",
             uniqueMoves = "",
             combosById = "",
-            gameFranchise = "Tekken",
-            gameEntry = "8"
+            game = "Tekken",
+            entry = "8"
         )
 
     @Before
@@ -149,8 +149,8 @@ class FlowDaoTest {
             fightingStyle = "Mishima",
             uniqueMoves = "",
             combosById = "",
-            gameFranchise = "Tekken",
-            gameEntry ="8"
+            game = "Tekken",
+            entry ="8"
         ),
         damage = 60,
         createdBy = "Dave",
@@ -213,7 +213,7 @@ class FlowDaoTest {
     @Throws(IOException::class)
     fun getAllCharacters() = runBlocking {
         addCharactersToDb()
-        val characters = characterDao.getAllCharacters().first()
+        val characters = characterDao.getCharactersFromGame().first()
         assertEquals(characters[0], reina)
         assertEquals(characters[1], asuka)
     }

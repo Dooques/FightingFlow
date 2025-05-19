@@ -7,7 +7,6 @@ import com.example.fightingflow.model.ComboEntry
 import com.example.fightingflow.model.MoveEntry
 import com.example.fightingflow.model.ProfileCreation
 import com.example.fightingflow.model.ProfileEntry
-import java.time.LocalDate
 import java.util.UUID
 
 val emptyCharacter = CharacterEntry(
@@ -17,8 +16,8 @@ val emptyCharacter = CharacterEntry(
     fightingStyle = "",
     uniqueMoves = "",
     combosById = "",
-    gameFranchise = "",
-    gameEntry = "",
+    game = "",
+    entry = "",
 )
 
 val emptyComboDisplay = ComboDisplay(

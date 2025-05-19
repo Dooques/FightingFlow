@@ -34,6 +34,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -46,13 +47,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.fightingflow.R
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayViewModel
 import com.example.fightingflow.util.CharacterUiState
 import timber.log.Timber
-
-const val TAG = "CharacterScreen"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,16 +63,17 @@ fun CharacterScreen(
     navigateToProfiles: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Timber.d("")
     Timber.d("\nLoading Character Screen")
 
-    val characterListState by comboDisplayViewModel.characterEntryListState.collectAsState()
+    var gameSelected by remember { mutableStateOf(Pair("Tekken", "8")) }
+    comboDisplayViewModel.getCharacterEntryListByGame(gameSelected.first, gameSelected.second)
+
+    val characterListState by comboDisplayViewModel.characterEntryListState.collectAsStateWithLifecycle()
     Timber.d("Flows Collected")
     Timber.d("Character List: ${characterListState.characterList}")
 
     var gameMenuExpanded by remember { mutableStateOf(false) }
     var settingsMenuExpanded by remember { mutableStateOf(false) }
-    var gameSelected by remember { mutableStateOf("Tekken 8") }
 
     Scaffold(
         topBar = {
@@ -98,7 +99,7 @@ fun CharacterScreen(
     ) { contentPadding ->
         Column(Modifier.padding(contentPadding)) {
             Box(contentAlignment = Alignment.Center, modifier = modifier.fillMaxWidth()) {
-                GameSelectedHeader(gameSelected, modifier.align(Alignment.CenterStart))
+                GameSelectedHeader(gameSelected.first + " " + gameSelected.second, modifier.align(Alignment.CenterStart))
                 IconButton(onClick = { gameMenuExpanded = !gameMenuExpanded}, modifier.align(Alignment.CenterEnd)) {
                     Icon(
                         imageVector = Icons.Default.Menu,
@@ -109,27 +110,34 @@ fun CharacterScreen(
                         onDismissRequest = { gameMenuExpanded = false}) {
                         DropdownMenuItem(
                             text = { Text("Tekken 8") },
-                            onClick = { gameSelected = "Tekken 8" }
+                            onClick = {
+                                gameSelected = Pair("Tekken", "8")
+                                comboDisplayViewModel.getCharacterEntryListByGame(gameSelected.first, gameSelected.second)
+                            }
                         )
                         DropdownMenuItem(
                             text = { Text("Street Fighter 6") },
-                            onClick = { gameSelected = "Street Fighter 6"}
+                            onClick = {
+                                gameSelected = Pair("Street Fighter", "6")
+                                comboDisplayViewModel.getCharacterEntryListByGame(gameSelected.first, gameSelected.second)
+                            }
                         )
                         DropdownMenuItem(
                             text = { Text("Mortal Kombat 1") },
-                            onClick = { gameSelected = "Mortal Kombat 1" }
+                            onClick = {
+                                gameSelected = Pair("Mortal Kombat", "1")
+                                comboDisplayViewModel.getCharacterEntryListByGame(gameSelected.first, gameSelected.second)
+                            }
                         )
                     }
                 }
 
             }
-            Spacer(modifier.size(16.dp))
             LazyVerticalGrid(
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(32.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly,
                 columns = GridCells.Fixed(3),
                 modifier = modifier
-                    .padding(16.dp)
             ) {
                 Timber.d("Loading Character Grid...")
                 items(items = characterListState.characterList.sortedBy { it.name }) { character ->
@@ -156,12 +164,10 @@ fun CharacterCard(
     modifier: Modifier = Modifier
 ) {
     Timber.d("Loading Card: ${characterState.character.name}")
-    Card(
-        colors = CardDefaults.cardColors(Color.White),
+    Box(
         modifier = modifier
             .clickable(
                 onClick = {
-                    Timber.d("")
                     Timber.d("Preparing to open Combo Screen...")
                     updateCharacterState(characterState.character.name)
                     Timber.d("Updated Character State in Combo View Model")
@@ -181,12 +187,12 @@ fun CharacterCard(
                 painter = painterResource(characterState.character.imageId),
                 contentDescription = characterState.character.name,
                 contentScale = ContentScale.Fit,
-                modifier = modifier.size(100.dp)
+                modifier = modifier.size(150.dp)
             )
             Text(
                 text = characterState.character.name,
-                style = MaterialTheme.typography.labelLarge,
-                color = Color.Black
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.White
             )
         }
     }

@@ -11,8 +11,6 @@ interface CharacterDao: BaseDao<CharacterEntry> {
     @Query("select * from character_table where name = :name")
     fun getCharacter(name: String): Flow<CharacterEntry?>
 
-
-    @Query("select * from character_table")
-    fun getAllCharacters(): Flow<List<CharacterEntry>>
-
+    @Query("select * from character_table where game = :game and entry = :entry")
+    fun getCharactersFromGame(game: String, entry: String): Flow<List<CharacterEntry>>
 }

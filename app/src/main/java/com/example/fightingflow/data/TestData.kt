@@ -9,8 +9,8 @@ import kotlin.random.Random
 class TestData(moveData: CharacterAndMoveData) {
     val comboItem = ComboDisplayUiState(
         emptyComboDisplay.copy(
-            character = moveData.tekkenCharacterEntries[Random.nextInt(
-                0, until = moveData.tekkenCharacterEntries.size)].name,
+            character = moveData.characterEntries[0][Random.nextInt(
+                0, until = moveData.characterEntries.size)].name,
             moves = ImmutableList(list = listOf(
                 moveData.moveEntries[1],
                 moveData.moveEntries[2],

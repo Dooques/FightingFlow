@@ -17,6 +17,7 @@ import com.example.fightingflow.util.CharacterUiState
 import com.example.fightingflow.util.ComboDisplayListUiState
 import com.example.fightingflow.util.ComboEntryListUiState
 import com.example.fightingflow.util.MoveEntryListUiState
+import com.example.fightingflow.util.emptyCharacter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -55,8 +56,6 @@ class ComboDisplayViewModel(
 
     init {
         Timber.d("Initializing Combo Display View Model...")
-        Timber.d("Getting character entry list...")
-        getCharacterEntryList()
         Timber.d("Getting move entry list...")
         getAllMoveEntries()
         Timber.d("Getting Combo Display List")
@@ -106,11 +105,18 @@ class ComboDisplayViewModel(
         _moveEntryListState.update { MoveEntryListUiState(flowRepository.getAllMoves().first()) }
     }
 
-    private fun getCharacterEntryList() = viewModelScope.launch {
+    fun getCharacterEntryListByGame(game: String, entry: String) = viewModelScope.launch {
         Timber.d("Updating character entry list state")
-        _characterEntryListState.update {
-            CharacterEntryListUiState(flowRepository.getAllCharacters().first())
-        }
+        Timber.d("Game selected: $game $entry")
+            flowRepository.getCharactersByGame(game, entry)
+                .map { characterList ->
+                    Timber.d("CharacterList: $characterList")
+                    CharacterEntryListUiState(characterList)
+                }
+                .collect { characterList ->
+                    _characterEntryListState.update { characterList }
+                }
+
     }
 
     fun getComboDisplayListByCharacter() = viewModelScope.launch {

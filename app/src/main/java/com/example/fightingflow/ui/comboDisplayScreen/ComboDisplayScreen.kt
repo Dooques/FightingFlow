@@ -78,7 +78,6 @@ fun ComboDisplayScreen(
     val profileViewModel = koinInject<ProfileViewModel>()
 
     val fontColor = MaterialTheme.colorScheme.onBackground
-    val containerColor = MaterialTheme.colorScheme.surfaceDim
     val scope = rememberCoroutineScope()
     val uiScale = if (deviceType.widthSizeClass != WindowWidthSizeClass.Compact) 2f else 1f
 
