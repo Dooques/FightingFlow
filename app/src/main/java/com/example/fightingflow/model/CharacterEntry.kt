@@ -11,7 +11,6 @@ data class CharacterEntry(
     val name: String,
     val imageId: Int,
     val fightingStyle: String,
-    val uniqueMoves: String,
     val combosById: String = "",
     val game: String,
 )

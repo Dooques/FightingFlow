@@ -14,7 +14,6 @@ val emptyCharacter = CharacterEntry(
     name = "",
     imageId = R.drawable.t8_logo,
     fightingStyle = "",
-    uniqueMoves = "",
     combosById = "",
     game = "",
 )

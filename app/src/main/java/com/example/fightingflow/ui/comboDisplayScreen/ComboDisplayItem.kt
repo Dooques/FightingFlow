@@ -35,7 +35,7 @@ import com.example.fightingflow.data.TestData
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.MoveEntry
 import com.example.fightingflow.ui.theme.FightingFlowTheme
-import com.example.fightingflow.util.CharacterAndMoveData
+import com.example.fightingflow.util.characterAndMoveData.CharacterAndMoveData
 import com.example.fightingflow.util.CharacterEntryListUiState
 import dev.shreyaspatil.capturable.capturable
 import dev.shreyaspatil.capturable.controller.CaptureController
@@ -111,7 +111,7 @@ fun ComboDisplay(
                             )
                         }
 
-                        "Character" -> {
+                        "Character", "Special" -> {
                             TextMove(
                                 input = move,
                                 color = Color.Red,
@@ -122,7 +122,7 @@ fun ComboDisplay(
                             )
                         }
 
-                        "Stage" -> {
+                        "Stage", "Overdrive" -> {
                             TextMove(
                                 input = move,
                                 color = Color.Green,
@@ -133,7 +133,7 @@ fun ComboDisplay(
                             )
                         }
 
-                        "Mishima" -> {
+                        "Mishima", "Drive" -> {
                             TextMove(
                                 input = move,
                                 color = Color.Blue,
@@ -144,10 +144,20 @@ fun ComboDisplay(
                             )
                         }
 
-                        "Mechanics Input" -> {
+                        "Mechanics Input", "Fatal Blow", "Super Art" -> {
                             TextMove(
                                 input = move,
                                 color = Color.Yellow,
+                                uiScale = uiScale,
+                                modifier = modifier
+                                    .align(Alignment.CenterVertically)
+                                    .padding(4.dp)
+                            )
+                        }
+                        "Modifier" -> {
+                            TextMove(
+                                input = move,
+                                color = Color.White,
                                 uiScale = uiScale,
                                 modifier = modifier
                                     .align(Alignment.CenterVertically)

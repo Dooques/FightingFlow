@@ -36,12 +36,14 @@ fun TekkenInputSelector(
     clearMoveList: () -> Unit,
     onNavigateToComboDisplay: () -> Unit,
     moveList: MoveEntryListUiState,
+    characterMoveList: MoveEntryListUiState,
     modifier: Modifier = Modifier
 ) {
     Timber.d("Loading Input Selector")
 
     LazyColumn {
         val mishimaChar = characterName in mishima
+
         if (mishimaChar) {
             Timber.d("Using mishima layout")
         } else {
@@ -51,7 +53,7 @@ fun TekkenInputSelector(
             when (moveType) {
                 "Text Combo" -> ComboAsText(comboAsString)
 
-                "Radio Buttons" -> RadioButtons()
+                "Move Modifiers" -> MoveModifiers()
 
                 "Description" -> ComboDescription(combo, updateComboData)
 
@@ -76,13 +78,18 @@ fun TekkenInputSelector(
                     context = context
                 )
 
-                "Common", "Mishima", "Character", "Mechanics Input", "Stage", "Modifier" ->
+                "Common", "Mishima", "Mechanics Input", "Stage", "Modifier" ->
                     TextMoves(
                         moveType = moveType,
                         moveList = moveList,
                         character = character,
                         updateMoveList = updateMoveList
                     )
+
+                "Character" -> CharacterMoves(
+                    characterMoveList = characterMoveList,
+                    updateMoveList = updateMoveList
+                )
 
                 "Buttons" -> ConfirmAndClear(
                     scope = scope,
@@ -105,8 +112,8 @@ fun TekkenInputSelector(
 
                 "Character Stances" -> SectionTitle(
                     title = when (character.game) {
-                        "Tekken" -> "${character.name}'s Stances"
-                        "Street Fighter", "Mortal Kombat" -> "${character.name}'s Moves"
+                        "Tekken 8" -> "${character.name}'s Stances"
+                        "Street Fighter VI", "Mortal Kombat 1" -> "${character.name}'s Moves"
                         else -> "Invalid Game Selected"
                     }
                 )
@@ -145,7 +152,7 @@ fun StreetFighterLayout(
             when (moveType) {
                 "Text Combo" -> ComboAsText(comboAsString)
 
-                "Radio Buttons" -> RadioButtons()
+                "Move Modifiers" -> MoveModifiers()
 
                 "Damage" -> DamageAndBreak(
                     combo = combo,

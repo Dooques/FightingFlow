@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayViewModel
 import com.example.fightingflow.ui.profileScreen.ProfileViewModel
+import com.example.fightingflow.util.emptyCharacter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.update
 import org.koin.compose.koinInject
@@ -72,6 +73,7 @@ fun ComboCreationScreen(
     val comboDisplay by comboCreationViewModel.comboDisplayState.collectAsStateWithLifecycle()
     val originalCombo by comboCreationViewModel.originalCombo.collectAsStateWithLifecycle()
     val comboAsString by comboCreationViewModel.comboAsStringState.collectAsStateWithLifecycle()
+    val characterMoveListState by comboCreationViewModel.characterMoveEntryList.collectAsStateWithLifecycle()
 
     // Datastore Flows
     val username by profileViewModel.username.collectAsStateWithLifecycle()
@@ -79,14 +81,17 @@ fun ComboCreationScreen(
     val comboIdState by comboCreationViewModel.comboIdState
     val editingState by comboCreationViewModel.editingState
 
-    Timber.d("Flows Collected: ")
-    Timber.d("Character Details (Ds): ")
-    Timber.d("Name: ${characterNameState.name} ")
+    if (characterState.character != emptyCharacter) {
+        comboCreationViewModel.getCharacterMoveEntryList(characterState.character.name)
+    }
 
+    Timber.d("Flows Collected: ")
+    Timber.d("Character Name: ${characterNameState.name} ")
     Timber.d("ComboDisplayState: ${comboDisplay.comboDisplay}")
     Timber.d("ComboString: $comboAsString")
     Timber.d("ComboId from DS: $comboIdState")
     Timber.d("Editing State: $editingState")
+    Timber.d("Character Move List: $characterMoveListState")
 
     Timber.d("Updating Character State")
     if (characterListState.characterList.isNotEmpty() && characterNameState.name.isNotEmpty()) {
@@ -154,6 +159,7 @@ fun ComboCreationScreen(
                 originalCombo = originalCombo.comboDisplay,
                 comboAsString = comboAsString,
                 moveList = moveListState,
+                characterMoveList = characterMoveListState,
                 saveCombo = comboCreationViewModel::saveCombo,
                 deleteLastMove = comboCreationViewModel::deleteLastMove,
                 clearMoveList = comboCreationViewModel::clearMoveList,

@@ -8,10 +8,12 @@ import androidx.lifecycle.viewModelScope
 import com.example.fightingflow.data.database.FlowRepository
 import com.example.fightingflow.data.datastore.ComboDsRepository
 import com.example.fightingflow.data.datastore.ProfileDsRepository
+import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.MoveEntry
 import com.example.fightingflow.model.getMoveEntryDataForComboDisplay
 import com.example.fightingflow.model.toDisplay
 import com.example.fightingflow.model.toEntry
+import com.example.fightingflow.util.CharacterEntryListUiState
 import com.example.fightingflow.util.CharacterUiState
 import com.example.fightingflow.util.ComboDisplayUiState
 import com.example.fightingflow.util.ComboEntryUiState
@@ -44,6 +46,7 @@ class ComboCreationViewModel(
     val originalCombo = MutableStateFlow(ComboDisplayUiState())
     val comboDisplayState = MutableStateFlow(ComboDisplayUiState(emptyComboDisplay.copy(dateCreated = LocalDate.now().toString())))
     val comboAsStringState = MutableStateFlow(processComboAsString())
+    val characterMoveEntryList = MutableStateFlow(MoveEntryListUiState())
     private val moveEntryListUiState = MutableStateFlow(MoveEntryListUiState())
     private val profileNameState = MutableStateFlow("")
 
@@ -106,6 +109,16 @@ class ComboCreationViewModel(
         }
     }
 
+    fun getCharacterMoveEntryList(character: String) {
+        viewModelScope.launch {
+            flowRepository.getAllMovesByCharacter(character)
+                .map {moveList -> moveList}
+                .collect { characterMoveList ->
+                   characterMoveEntryList.update { MoveEntryListUiState(characterMoveList) }
+                }
+        }
+    }
+
     // Combo Processing Functions
     private fun processComboAsString(): String {
         Timber.d("Processing combo as string...")
@@ -140,9 +153,7 @@ class ComboCreationViewModel(
         saveComboDetailsToDs(comboDisplayState.value)
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun updateMoveList(moveName: String, moveListUiState: MoveEntryListUiState) {
-        Timber.d("")
         Timber.d("Adding $moveName to combo...")
         Timber.d("Move List: ${moveListUiState.moveList.size} moves")
         val moveToAdd = moveListUiState.moveList.first { it.moveName == moveName }

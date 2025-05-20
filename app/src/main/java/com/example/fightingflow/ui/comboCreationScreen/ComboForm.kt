@@ -68,6 +68,7 @@ fun ComboForm(
     characterName: String,
     comboAsString: String,
     moveList: MoveEntryListUiState,
+    characterMoveList: MoveEntryListUiState,
     saveCombo: KSuspendFunction0<Unit>,
     deleteLastMove: () -> Unit,
     clearMoveList: () -> Unit,
@@ -107,7 +108,8 @@ fun ComboForm(
             deleteLastMove = deleteLastMove,
             clearMoveList = clearMoveList,
             onNavigateToComboDisplay = onNavigateToComboDisplay,
-            moveList = moveList
+            moveList = moveList,
+            characterMoveList = characterMoveList
         )
     }
 }
@@ -121,6 +123,7 @@ fun ComboDisplay(
 ) {
     val fontColor = MaterialTheme.colorScheme.onBackground
     val uiScale = 1f
+
     Timber.d("Getting combo display composable from Combo Screen")
     ComboDisplay(
         context = context,
@@ -135,8 +138,6 @@ fun ComboDisplay(
         modifier = modifier.padding(vertical = 4.dp)
     )
 }
-
-
 
 @Composable
 fun InputDivider(modifier: Modifier = Modifier) {
@@ -194,7 +195,7 @@ fun ComboDescription(
 }
 
 @Composable
-fun RadioButtons(modifier: Modifier = Modifier) {
+fun MoveModifiers(modifier: Modifier = Modifier) {
     var counterHit by remember { mutableStateOf(false) }
     var hold by remember { mutableStateOf(false) }
     var justFrame by remember { mutableStateOf(false) }
@@ -301,11 +302,11 @@ fun TextMoves(
                 }
                 "Character" -> {
                     color = Color.Red
-                    booleanStatement = booleanStatement && (character.uniqueMoves.contains(move.moveName))
                 }
                 "Mechanics Input" -> { color = Color.Yellow }
                 "Common" -> { color = Color.Gray }
                 "Stage" -> { color = Color.Green }
+                "Modifier" -> { color = Color.White }
             }
 
             if (booleanStatement) {
@@ -330,6 +331,46 @@ fun TextMoves(
                             )
                         )
                     }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CharacterMoves(
+    characterMoveList: MoveEntryListUiState,
+    updateMoveList: (String, MoveEntryListUiState) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    FlowRow(
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        modifier = modifier.fillMaxWidth().padding(vertical = 4.dp)
+    ) {
+        Timber.d("Loading character moves...")
+        val color = Color.Red
+
+        characterMoveList.moveList.forEach { move ->
+            Box(modifier.padding(horizontal = 2.dp, vertical = 4.dp)) {
+                Box(
+                    modifier
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(color)
+                        .padding(horizontal = 4.dp)
+                ) {
+                    Text(
+                        text = move.moveName,
+                        color = Color.White,
+                        fontSize = (14.sp),
+                        modifier = modifier.padding(1.dp).clickable(
+                            enabled = true,
+                            onClick = {
+                                Timber.d("${move.moveName} selected, preparing to add combo to list...")
+                                updateMoveList(move.moveName, characterMoveList)
+                                Timber.d("Added ${move.moveName} to combo move list.")
+                            }
+                        )
+                    )
                 }
             }
         }
