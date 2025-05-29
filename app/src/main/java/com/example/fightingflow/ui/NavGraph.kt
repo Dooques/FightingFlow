@@ -17,7 +17,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.fightingflow.R
 import com.example.fightingflow.ui.characterScreen.CharacterScreen
@@ -47,7 +46,7 @@ fun NavGraph(
     deviceType: WindowSizeClass
 ) {
     Timber.d("Initializing NavController")
-    val backStackEntry by navController.currentBackStackEntryAsState()
+//    val backStackEntry by navController.currentBackStackEntryAsState()
 
     Timber.d("Initializing ViewModels")
     val comboDisplayViewModel = koinInject<ComboDisplayViewModel>()
@@ -108,7 +107,6 @@ fun NavGraph(
                     comboDisplayViewModel = comboDisplayViewModel,
                     characterScreenViewModel = characterScreenViewModel,
                     onClick = { navController.navigate(FlowScreen.Combos.name) },
-                    navigateBack = { navController.navigate(FlowScreen.Start.name)},
                     navigateToProfiles = { navController.navigate(FlowScreen.ProfileList.name) }
                 )
             }
@@ -135,7 +133,6 @@ fun NavGraph(
                     snackbarHostState = snackBarHostState,
                     onNavigateToComboDisplay = { navController.navigate(FlowScreen.Combos.name) },
                     navigateBack = navController::navigateUp,
-                    navigateHome = { navController.navigate(FlowScreen.CharSelect.name) }
                 )
             }
         }

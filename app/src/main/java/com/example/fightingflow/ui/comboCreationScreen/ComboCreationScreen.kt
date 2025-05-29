@@ -40,7 +40,6 @@ import com.example.fightingflow.util.emptyCharacter
 import com.example.fightingflow.util.emptyComboDisplay
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import timber.log.Timber
 
@@ -54,7 +53,6 @@ fun ComboCreationScreen(
     snackbarHostState: SnackbarHostState,
     onNavigateToComboDisplay: () -> Unit,
     navigateBack: () -> Unit,
-    navigateHome: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Timber.d("Opening Add Combo Screen...")
