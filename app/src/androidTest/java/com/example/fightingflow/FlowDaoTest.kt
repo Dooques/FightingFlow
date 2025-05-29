@@ -37,7 +37,6 @@ class FlowDaoTest {
             name = "Asuka",
             imageId = 1,
             fightingStyle = "Kazama",
-            uniqueMoves = "",
             combosById = "",
             game = "Tekken",
         )
@@ -47,7 +46,6 @@ class FlowDaoTest {
             name = "Reina",
             imageId = 1,
             fightingStyle = "Mishima",
-            uniqueMoves = "",
             combosById = "",
             game = "Tekken",
         )
@@ -240,7 +238,7 @@ class FlowDaoTest {
         counterHit = false,
         hold = false,
         justFrame = false,
-        associatedCharacter = "Generic"
+        character = "Generic"
     )
     private val move2 = MoveEntry(
         id = 2,
@@ -250,7 +248,7 @@ class FlowDaoTest {
         counterHit = false,
         hold = false,
         justFrame = false,
-        associatedCharacter = "Generic"
+        character = "Generic"
     )
     private suspend fun insertAllMoves() {
         moveDao.insert(move1)

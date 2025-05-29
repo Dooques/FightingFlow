@@ -1,6 +1,5 @@
 package com.example.fightingflow.ui.profileScreen
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -34,7 +33,6 @@ fun ProfileCreationForm(
     onConfirm: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Timber.d("")
     Timber.d("Loading profile creation form...")
 
     Column(modifier.fillMaxHeight()) {
@@ -70,6 +68,7 @@ fun ProfileCreationForm(
 //        )
 
         Spacer(modifier.size(height = 20.dp, width = 0.dp))
+
         Timber.d("Loading confirm button...")
         OutlinedButton(
             onClick = onConfirm,
@@ -77,7 +76,9 @@ fun ProfileCreationForm(
                 .fillMaxWidth()
                 .padding(horizontal = 32.dp)
         ) { Text("Confirm", color = Color.White) }
+
         Spacer(modifier.size(height = 50.dp, width = 0.dp))
+
         Timber.d("Form Loaded.")
     }
 }
@@ -93,16 +94,12 @@ fun TextInputField(
     val isItPassword = (type == "password" || type == "Confirm\nPassword")
 
     Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp)
     ) {
-        Text(
-            text = typeCap,
-            color = Color.White
-        )
         if (isItPassword) {
             OutlinedTextField(
                 value = inputText,
@@ -110,9 +107,11 @@ fun TextInputField(
                     inputText = it
                     updateProfileState(inputText)
                 },
+                label = { Text(typeCap) },
                 visualTransformation = PasswordVisualTransformation(),
                 maxLines = 1,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                modifier = modifier.fillMaxWidth(0.8f)
             )
         } else {
             OutlinedTextField(
@@ -121,8 +120,10 @@ fun TextInputField(
                     inputText = it
                     updateProfileState(inputText)
                 },
+                label = { Text(typeCap) },
                 maxLines = 1,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                modifier = modifier.fillMaxWidth(0.8f)
             )
         }
     }

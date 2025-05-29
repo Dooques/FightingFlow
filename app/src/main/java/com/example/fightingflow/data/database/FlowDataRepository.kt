@@ -26,6 +26,7 @@ interface FlowRepository {
     fun getMove(name: String): Flow<MoveEntry?>
     fun getAllMoves(): Flow<List<MoveEntry>>
     fun getAllMovesByCharacter(character: String): Flow<List<MoveEntry>>
+    fun getAllMovesByGame(game: String): Flow<List<MoveEntry>>
 
     // InsertData
     suspend fun insertAllCharacters(characterList: List<CharacterEntry>)
@@ -68,6 +69,9 @@ class FlowDataRepository(
 
     override fun getAllMovesByCharacter(character: String): Flow<List<MoveEntry>> =
         moveDao.getAllMovesByCharacter(character)
+
+    override fun getAllMovesByGame(game: String): Flow<List<MoveEntry>> =
+        moveDao.getAllMovesByGame(game)
 
     override suspend fun insertAllCharacters(characterList: List<CharacterEntry>) =
         characterDao.insertAll(characterList)

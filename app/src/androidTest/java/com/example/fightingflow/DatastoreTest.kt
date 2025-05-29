@@ -79,7 +79,6 @@ class DatastoreTest {
         name = "Reina",
         imageId = 1,
         fightingStyle = "Mishima",
-        uniqueMoves = "",
         combosById = "",
         game = "Tekken",
     )
@@ -122,7 +121,7 @@ class DatastoreTest {
                     counterHit = false,
                     hold = false,
                     justFrame = false,
-                    associatedCharacter = "Generic"
+                    character = "Generic"
                 )
             )
         )

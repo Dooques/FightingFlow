@@ -6,10 +6,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.FlowRowOverflow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -17,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -81,6 +86,7 @@ fun ComboDisplay(
             FlowRow(
                 verticalArrangement = Arrangement.Center,
                 horizontalArrangement = Arrangement.Start,
+                itemVerticalAlignment = Alignment.CenterVertically,
                 modifier = modifier
                     .fillMaxWidth()
             ) {
@@ -89,72 +95,66 @@ fun ComboDisplay(
                     Timber.d(move.moveName)
                     when (move.moveType) {
                         "Break" -> MoveBreak(uiScale, modifier.align(Alignment.CenterVertically))
-                        "Input", "Movement" -> {
-                            InputMove(
-                                context = context,
-                                input = move,
-                                uiScale = uiScale,
-                                modifier = modifier
-                                    .align(Alignment.CenterVertically)
-                                    .padding(4.dp)
-                            )
-                        }
+                        "Misc" -> MiscInput(move)
+                        "Input", "SF Input", "Movement", "Complex Movement" -> InputMove(
+                            context = context,
+                            input = move,
+                            uiScale = uiScale,
+                            modifier = modifier
+                                .align(Alignment.CenterVertically)
+                                .padding(4.dp)
+                        )
 
-                        "Common" -> {
+                        "Common" ->
                             TextMove(
                                 input = move,
-                                color = Color.Gray,
+                                color = Color(0xFF444444),
                                 uiScale = uiScale,
                                 modifier = modifier
                                     .align(Alignment.CenterVertically)
                                     .padding(4.dp)
                             )
-                        }
 
-                        "Character", "Special" -> {
+                        "Special" ->
                             TextMove(
                                 input = move,
-                                color = Color.Red,
+                                color = Color(0xFF0067B3),
                                 uiScale = uiScale,
                                 modifier = modifier
                                     .align(Alignment.CenterVertically)
                                     .padding(4.dp)
                             )
-                        }
-
-                        "Stage", "Overdrive" -> {
+                        "Stage" ->
                             TextMove(
                                 input = move,
-                                color = Color.Green,
+                                color = Color(0xFF2f5233),
                                 uiScale = uiScale,
                                 modifier = modifier
                                     .align(Alignment.CenterVertically)
                                     .padding(4.dp)
                             )
-                        }
 
-                        "Mishima", "Drive" -> {
+                        "Mechanics Input", "Super Art", "Mishima" ->
                             TextMove(
                                 input = move,
-                                color = Color.Blue,
+                                color = Color(0xFF8155BA),
                                 uiScale = uiScale,
                                 modifier = modifier
                                     .align(Alignment.CenterVertically)
                                     .padding(4.dp)
                             )
-                        }
 
-                        "Mechanics Input", "Fatal Blow", "Super Art" -> {
+                        "Character", "Fatal Blow", "Drive"   ->
                             TextMove(
                                 input = move,
-                                color = Color.Yellow,
+                                color = Color(0xFFDC143C),
                                 uiScale = uiScale,
                                 modifier = modifier
                                     .align(Alignment.CenterVertically)
                                     .padding(4.dp)
                             )
-                        }
-                        "Modifier" -> {
+
+                        "Modifier", "MK Input" ->
                             TextMove(
                                 input = move,
                                 color = Color.White,
@@ -163,7 +163,6 @@ fun ComboDisplay(
                                     .align(Alignment.CenterVertically)
                                     .padding(4.dp)
                             )
-                        }
                     }
                 }
             }
@@ -281,6 +280,19 @@ fun MoveBreak(
         contentDescription = "",
         tint = Color.Cyan,
         modifier = modifier.size((20 * uiScale).dp)
+    )
+}
+
+@Composable
+fun MiscInput(
+    move: MoveEntry,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        text = move.notation,
+        fontSize = 40.sp,
+        color = MaterialTheme.colorScheme.onBackground,
+
     )
 }
 

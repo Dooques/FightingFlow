@@ -77,7 +77,7 @@ fun ComboDisplayScreen(
 
     val fontColor = MaterialTheme.colorScheme.onBackground
     val scope = rememberCoroutineScope()
-    val uiScale = if (deviceType.widthSizeClass != WindowWidthSizeClass.Compact) 2f else 1f
+    val uiScale = if (deviceType.widthSizeClass != WindowWidthSizeClass.Compact) 1.5f else 1f
 
     var showDialog by remember { mutableStateOf(false) }
     var capturedImage by remember { mutableStateOf<Uri?>(null) }
@@ -160,8 +160,8 @@ fun ComboDisplayScreen(
             Timber.d("Character Details \n Name: ${characterNameState.name} \n Image: ${characterImageState.image}")
             Timber.d("Checking details valid...")
             LazyColumn(modifier.padding(
-                start = if (uiScale == 2f) 40.dp else 4.dp,
-                end = if (uiScale == 2f) 16.dp else 0.dp
+                start = if (uiScale == 1.5f) 40.dp else 4.dp,
+                end = if (uiScale == 1.5f) 16.dp else 0.dp
             )
             ) {
                 Timber.d("Getting display combos as lazy column with swipeable actions.")

@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fightingflow.data.database.FlowRepository
 import com.example.fightingflow.data.datastore.ComboDsRepository
+import com.example.fightingflow.data.datastore.GameDsRepository
 import com.example.fightingflow.data.datastore.ProfileDsRepository
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.MoveEntry
@@ -22,7 +23,9 @@ import com.example.fightingflow.util.MoveEntryListUiState
 import com.example.fightingflow.util.emptyComboDisplay
 import com.example.fightingflow.util.emptyComboEntry
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -32,7 +35,8 @@ import java.time.LocalDate
 class ComboCreationViewModel(
     private val flowRepository: FlowRepository,
     private val comboDsRepository: ComboDsRepository,
-    private val profileDsRepository: ProfileDsRepository
+    private val profileDsRepository: ProfileDsRepository,
+    private val gameDsRepository: GameDsRepository
 ): ViewModel() {
 
     companion object {
@@ -47,6 +51,7 @@ class ComboCreationViewModel(
     val comboDisplayState = MutableStateFlow(ComboDisplayUiState(emptyComboDisplay.copy(dateCreated = LocalDate.now().toString())))
     val comboAsStringState = MutableStateFlow(processComboAsString())
     val characterMoveEntryList = MutableStateFlow(MoveEntryListUiState())
+    val gameMoveEntryList = MutableStateFlow(MoveEntryListUiState())
     private val moveEntryListUiState = MutableStateFlow(MoveEntryListUiState())
     private val profileNameState = MutableStateFlow("")
 
@@ -56,6 +61,14 @@ class ComboCreationViewModel(
         getMoveEntryList()
         getProfileName()
     }
+
+    val gameSelected = gameDsRepository.getGame()
+        .map { it }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000L),
+            initialValue = ""
+        )
 
     private fun getComboIdFromDs() = viewModelScope.launch {
         comboDsRepository.getComboId()
@@ -115,6 +128,16 @@ class ComboCreationViewModel(
                 .map {moveList -> moveList}
                 .collect { characterMoveList ->
                    characterMoveEntryList.update { MoveEntryListUiState(characterMoveList) }
+                }
+        }
+    }
+
+    fun getGameMoveEntryList(game: String) {
+        viewModelScope.launch {
+            flowRepository.getAllMovesByGame(game)
+                .map { it }
+                .collect { gameMoves ->
+                    gameMoveEntryList.update { MoveEntryListUiState(gameMoves) }
                 }
         }
     }

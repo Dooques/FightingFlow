@@ -13,6 +13,9 @@ interface MoveDao: BaseDao<MoveEntry> {
     @Query("select * from move_table")
     fun getAllMoves(): Flow<List<MoveEntry>>
 
-    @Query("Select * from move_table where associated_character = :character")
+    @Query("Select * from move_table where character = :character")
     fun getAllMovesByCharacter(character: String): Flow<List<MoveEntry>>
+
+    @Query("Select * from move_table where game = :game")
+    fun getAllMovesByGame(game: String): Flow<List<MoveEntry>>
 }

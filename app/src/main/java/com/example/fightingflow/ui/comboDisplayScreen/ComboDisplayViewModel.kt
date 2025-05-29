@@ -104,7 +104,11 @@ class ComboDisplayViewModel(
 
     // Database Functions
     private fun getAllMoveEntries() = viewModelScope.launch {
-        _moveEntryListState.update { MoveEntryListUiState(flowRepository.getAllMoves().first()) }
+        flowRepository.getAllMoves()
+            .map { MoveEntryListUiState(it) }
+            .collect { moveList ->
+                _moveEntryListState.update { moveList }
+            }
     }
 
     fun getCharacterEntryListByGame(game: String) = viewModelScope.launch {

@@ -37,8 +37,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayViewModel
 import com.example.fightingflow.ui.profileScreen.ProfileViewModel
 import com.example.fightingflow.util.emptyCharacter
+import com.example.fightingflow.util.emptyComboDisplay
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import timber.log.Timber
 
@@ -74,6 +76,8 @@ fun ComboCreationScreen(
     val originalCombo by comboCreationViewModel.originalCombo.collectAsStateWithLifecycle()
     val comboAsString by comboCreationViewModel.comboAsStringState.collectAsStateWithLifecycle()
     val characterMoveListState by comboCreationViewModel.characterMoveEntryList.collectAsStateWithLifecycle()
+    val gameMoveListState by comboCreationViewModel.gameMoveEntryList.collectAsStateWithLifecycle()
+    val game by comboCreationViewModel.gameSelected.collectAsStateWithLifecycle()
 
     // Datastore Flows
     val username by profileViewModel.username.collectAsStateWithLifecycle()
@@ -83,6 +87,10 @@ fun ComboCreationScreen(
 
     if (characterState.character != emptyCharacter) {
         comboCreationViewModel.getCharacterMoveEntryList(characterState.character.name)
+    }
+
+    if (game.isNotEmpty()) {
+        comboCreationViewModel.getGameMoveEntryList(game)
     }
 
     Timber.d("Flows Collected: ")
@@ -102,7 +110,7 @@ fun ComboCreationScreen(
     Timber.d("Checking if in editing state & existing combo list contains data...")
     if (editingState) {
         if (comboIdState.isNotEmpty()) {
-            if(!comboReceived) {
+            if (!comboReceived) {
                 Timber.d("Combo found and editing mode is true...")
                 comboCreationViewModel.getExistingCombo()
                 comboReceived = true
@@ -126,7 +134,12 @@ fun ComboCreationScreen(
                         contentDescription = "",
                         modifier = modifier.size(60.dp)
                     )
-                    IconButton(onClick = { navigateBack() }, modifier.fillMaxHeight()) {
+                    IconButton(
+                        onClick = {
+                            comboCreationViewModel.clearMoveList()
+                            navigateBack()
+                                  },
+                        modifier.fillMaxHeight()) {
                         Icon(
                             imageVector = Icons.Default.Close,
                             contentDescription = "Return to Combo screen",
@@ -146,25 +159,29 @@ fun ComboCreationScreen(
                 .padding(contentPadding)
         ) {
             Timber.d("Loading Header...")
-            ComboForm(
-                scope = scope,
-                snackbarHostState = snackbarHostState,
-                editingState = editingState,
-                username = username,
-                updateComboData = comboCreationViewModel::updateComboDetails,
-                updateMoveList = comboCreationViewModel::updateMoveList,
-                character = characterState.character,
-                characterName = characterNameState.name,
-                comboDisplay = comboDisplay.comboDisplay,
-                originalCombo = originalCombo.comboDisplay,
-                comboAsString = comboAsString,
-                moveList = moveListState,
-                characterMoveList = characterMoveListState,
-                saveCombo = comboCreationViewModel::saveCombo,
-                deleteLastMove = comboCreationViewModel::deleteLastMove,
-                clearMoveList = comboCreationViewModel::clearMoveList,
-                onNavigateToComboDisplay = onNavigateToComboDisplay
-            )
+            if (comboDisplay.comboDisplay != emptyComboDisplay || !editingState) {
+                ComboForm(
+                    scope = scope,
+                    snackbarHostState = snackbarHostState,
+                    editingState = editingState,
+                    username = username,
+                    game = game,
+                    updateComboData = comboCreationViewModel::updateComboDetails,
+                    updateMoveList = comboCreationViewModel::updateMoveList,
+                    character = characterState.character,
+                    characterName = characterNameState.name,
+                    comboDisplay = comboDisplay.comboDisplay,
+                    originalCombo = originalCombo.comboDisplay,
+                    comboAsString = comboAsString,
+                    moveList = moveListState,
+                    characterMoveList = characterMoveListState,
+                    gameMoveList = gameMoveListState,
+                    saveCombo = comboCreationViewModel::saveCombo,
+                    deleteLastMove = comboCreationViewModel::deleteLastMove,
+                    clearMoveList = comboCreationViewModel::clearMoveList,
+                    onNavigateToComboDisplay = onNavigateToComboDisplay
+                )
+            }
         }
     }
 }

@@ -11,7 +11,6 @@ import com.example.fightingflow.util.emptyMove
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import timber.log.Timber
-import java.time.LocalDate
 import java.util.UUID
 import kotlin.String
 
@@ -96,7 +95,7 @@ fun getMoveEntryDataForComboDisplay(combo: ComboDisplay, moveEntryList: MoveEntr
                     counterHit = updateData.counterHit,
                     hold = updateData.hold,
                     justFrame = updateData.justFrame,
-                    associatedCharacter = updateData.associatedCharacter
+                    character = updateData.character
                 )
             }
         )

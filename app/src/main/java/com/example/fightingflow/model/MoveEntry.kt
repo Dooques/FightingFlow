@@ -19,8 +19,9 @@ data class MoveEntry(
     val hold: Boolean = false,
     @ColumnInfo(name = "just_frame")
     val justFrame: Boolean = false,
-    @ColumnInfo(name = "associated_character")
-    val associatedCharacter: String
+    @ColumnInfo(name = "character")
+    val character: String,
+    val game: String? = null
 )
 
 data class MoveString(

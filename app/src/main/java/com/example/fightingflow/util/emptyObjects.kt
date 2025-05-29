@@ -39,14 +39,13 @@ val emptyComboEntry = ComboEntry(
 )
 
 val emptyMove = MoveEntry(
-    id = 0,
     moveName = "",
     notation = "",
     moveType = "",
     counterHit = false,
     hold = false,
     justFrame = false,
-    associatedCharacter = ""
+    character = ""
 )
 
 val emptyProfile = ProfileEntry(
