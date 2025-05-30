@@ -1,20 +1,18 @@
 package com.example.fightingflow.ui.comboCreationScreen
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fightingflow.data.database.FlowRepository
 import com.example.fightingflow.data.datastore.ComboDsRepository
+import com.example.fightingflow.data.datastore.ControlType
 import com.example.fightingflow.data.datastore.GameDsRepository
 import com.example.fightingflow.data.datastore.ProfileDsRepository
-import com.example.fightingflow.model.CharacterEntry
+import com.example.fightingflow.data.datastore.SettingsDsRepository
 import com.example.fightingflow.model.MoveEntry
 import com.example.fightingflow.model.getMoveEntryDataForComboDisplay
 import com.example.fightingflow.model.toDisplay
 import com.example.fightingflow.model.toEntry
-import com.example.fightingflow.util.CharacterEntryListUiState
 import com.example.fightingflow.util.CharacterUiState
 import com.example.fightingflow.util.ComboDisplayUiState
 import com.example.fightingflow.util.ComboEntryUiState
@@ -36,7 +34,8 @@ class ComboCreationViewModel(
     private val flowRepository: FlowRepository,
     private val comboDsRepository: ComboDsRepository,
     private val profileDsRepository: ProfileDsRepository,
-    private val gameDsRepository: GameDsRepository
+    private val gameDsRepository: GameDsRepository,
+    private val settingsDsRepository: SettingsDsRepository
 ): ViewModel() {
 
     companion object {
@@ -66,8 +65,22 @@ class ComboCreationViewModel(
         .map { it }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000L),
+            started = SharingStarted.WhileSubscribed(TIME_MILLIS),
             initialValue = ""
+        )
+
+    val controlType = settingsDsRepository.getControlType()
+        .map { when (it) {
+            1 -> ControlType.STANDARD
+            2 -> ControlType.PLAYSTATION
+            3 -> ControlType.XBOX
+            4 -> ControlType.NINTENDO
+            else -> null
+        } }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(TIME_MILLIS),
+            initialValue = ControlType.STANDARD
         )
 
     private fun getComboIdFromDs() = viewModelScope.launch {
@@ -240,6 +253,8 @@ class ComboCreationViewModel(
         }
         Timber.d("Combo saved to datastore.")
     }
+
+    suspend fun updateControlType(controlType: Int) = settingsDsRepository.updateControlType(controlType)
 
     // Room Db Functions
     private suspend fun insertComboToDb() {

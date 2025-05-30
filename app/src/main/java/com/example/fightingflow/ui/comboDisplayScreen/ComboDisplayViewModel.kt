@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.fightingflow.data.database.FlowRepository
 import com.example.fightingflow.data.datastore.CharacterDsRepository
 import com.example.fightingflow.data.datastore.ComboDsRepository
+import com.example.fightingflow.data.datastore.SettingsDsRepository
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.getMoveEntryDataForComboDisplay
@@ -21,7 +22,6 @@ import com.example.fightingflow.util.emptyCharacter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -31,7 +31,8 @@ import timber.log.Timber
 class ComboDisplayViewModel(
     private val flowRepository: FlowRepository,
     private val characterDsRepository: CharacterDsRepository,
-    private val comboDsRepository: ComboDsRepository
+    private val comboDsRepository: ComboDsRepository,
+    private val settingsDsRepository: SettingsDsRepository
 ): ViewModel() {
 
     companion object {
@@ -48,6 +49,9 @@ class ComboDisplayViewModel(
     private val _comboDisplayListState = MutableStateFlow(ComboDisplayListUiState())
     val comboDisplayListState: StateFlow<ComboDisplayListUiState> = _comboDisplayListState
 
+    private val _comboEntryListState = MutableStateFlow(ComboEntryListUiState())
+    val comboEntryListUiState: StateFlow<ComboEntryListUiState> = _comboEntryListState
+
     private val _characterState = MutableStateFlow(CharacterUiState())
     val characterState: StateFlow<CharacterUiState> = _characterState
 
@@ -57,7 +61,6 @@ class ComboDisplayViewModel(
         getAllMoveEntries()
         Timber.d("Getting Combo Display List")
     }
-
 
     val characterNameState = characterDsRepository.getName()
             .map { CharNameUiState(it) }
@@ -74,6 +77,22 @@ class ComboDisplayViewModel(
                 started = SharingStarted.WhileSubscribed(TIME_MILLIS),
                 initialValue = CharImageUiState()
             )
+
+    val showIconState = settingsDsRepository.getIconDisplayState()
+        .map { it }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(TIME_MILLIS),
+            initialValue = true
+        )
+
+    val textComboState = settingsDsRepository.getComboTextState()
+        .map { it }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(TIME_MILLIS),
+            initialValue = false
+        )
 
     // Datastore
     fun updateCharacterState(name: String) {
@@ -93,6 +112,16 @@ class ComboDisplayViewModel(
             Timber.d("Setting ${character.name} to Character Datastore")
             characterDsRepository.updateCharacter(character)
         }
+    }
+
+    fun updateShowIconDisplayState(iconState: Boolean) = viewModelScope.launch {
+        Timber.d("Updating Icon Display State...")
+        settingsDsRepository.updateIconDisplayState(iconState)
+    }
+
+    fun updateShowComboTextState(textCombo: Boolean) = viewModelScope.launch {
+        Timber.d("Updating Combo Text State...")
+        settingsDsRepository.updateShowComboTextState(textCombo)
     }
 
     suspend fun saveComboIdToDs(comboDisplay: ComboDisplay) {
@@ -130,12 +159,17 @@ class ComboDisplayViewModel(
         flowRepository.getAllCombosByCharacter(characterState.value.character)
             .map { comboEntryList ->
                 Timber.d("Combo List: $comboEntryList")
-                ComboDisplayListUiState(comboDisplayList = comboEntryList?.map { combo ->
-                    getMoveEntryDataForComboDisplay(combo.toDisplay(), moveEntryListUiState.value)
-                } ?: emptyList())
+                ComboEntryListUiState(comboEntryList ?: emptyList())
             }
-            .collect { comboDisplayList ->
-                _comboDisplayListState.update { comboDisplayList }
+            .collect { comboEntryList ->
+                _comboEntryListState.update { comboEntryList }
+                _comboDisplayListState.update {
+                    ComboDisplayListUiState(
+                        comboDisplayList = comboEntryList.comboEntryList.map { combo ->
+                            getMoveEntryDataForComboDisplay(combo.toDisplay(), moveEntryListUiState.value)
+                        }
+                    )
+                }
             }
     }
 

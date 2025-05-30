@@ -1,30 +1,31 @@
 package com.example.fightingflow.di
 
 import android.content.Context
-import android.provider.MediaStore
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
-import com.example.fightingflow.data.database.FlowDatabase
 import com.example.fightingflow.data.database.FlowDataRepository
-import com.example.fightingflow.data.database.ProfileDatabaseRepository
+import com.example.fightingflow.data.database.FlowDatabase
 import com.example.fightingflow.data.database.FlowRepository
+import com.example.fightingflow.data.database.ProfileDatabaseRepository
 import com.example.fightingflow.data.database.ProfileDbRepository
 import com.example.fightingflow.data.database.dao.CharacterDao
 import com.example.fightingflow.data.database.dao.ComboDao
 import com.example.fightingflow.data.database.dao.MoveDao
 import com.example.fightingflow.data.database.dao.ProfileDao
-import com.example.fightingflow.ui.InitViewModel
-import com.example.fightingflow.data.datastore.ComboDatastoreRepository
-import com.example.fightingflow.data.datastore.ComboDsRepository
-import com.example.fightingflow.data.datastore.ProfileDatastoreRepository
-import com.example.fightingflow.data.datastore.ProfileDsRepository
 import com.example.fightingflow.data.datastore.CharacterDatastoreRepository
 import com.example.fightingflow.data.datastore.CharacterDsRepository
+import com.example.fightingflow.data.datastore.ComboDatastoreRepository
+import com.example.fightingflow.data.datastore.ComboDsRepository
 import com.example.fightingflow.data.datastore.GameDatastoreRepository
 import com.example.fightingflow.data.datastore.GameDsRepository
+import com.example.fightingflow.data.datastore.ProfileDatastoreRepository
+import com.example.fightingflow.data.datastore.ProfileDsRepository
+import com.example.fightingflow.data.datastore.SettingsDatastoreRepository
+import com.example.fightingflow.data.datastore.SettingsDsRepository
 import com.example.fightingflow.data.mediastore.MediaStoreUtil
+import com.example.fightingflow.ui.InitViewModel
 import com.example.fightingflow.ui.characterScreen.CharacterScreenViewModel
 import com.example.fightingflow.ui.comboCreationScreen.ComboCreationViewModel
 import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayViewModel
@@ -68,6 +69,7 @@ val repositoryModule = module {
     single<CharacterDsRepository> { CharacterDatastoreRepository(androidContext().dataStore) }
     single<ComboDsRepository> { ComboDatastoreRepository(androidContext().dataStore) }
     single<GameDsRepository> { GameDatastoreRepository(androidContext().dataStore) }
+    single<SettingsDsRepository> { SettingsDatastoreRepository(androidContext().dataStore) }
 
     // MediaStore
     single<MediaStoreUtil> { MediaStoreUtil(androidContext())}
@@ -76,7 +78,7 @@ val repositoryModule = module {
 val viewModelModule = module {
     viewModel { ProfileViewModel(get(), get(), get()) }
     viewModel { InitViewModel(get()) }
-    viewModel { ComboDisplayViewModel(get(), get(), get()) }
-    viewModel { ComboCreationViewModel(get(), get(), get(), get()) }
+    viewModel { ComboDisplayViewModel(get(), get(), get(), get()) }
+    viewModel { ComboCreationViewModel(get(), get(), get(), get(), get()) }
     viewModel { CharacterScreenViewModel(get()) }
 }

@@ -82,6 +82,8 @@ fun ComboCreationScreen(
     val characterNameState by comboDisplayViewModel.characterNameState.collectAsStateWithLifecycle()
     val comboIdState by comboCreationViewModel.comboIdState
     val editingState by comboCreationViewModel.editingState
+    val iconDisplayState by comboDisplayViewModel.showIconState.collectAsStateWithLifecycle()
+    val textComboDisplayState by comboDisplayViewModel.textComboState.collectAsStateWithLifecycle()
 
     if (characterState.character != emptyCharacter) {
         comboCreationViewModel.getCharacterMoveEntryList(characterState.character.name)
@@ -174,6 +176,8 @@ fun ComboCreationScreen(
                     moveList = moveListState,
                     characterMoveList = characterMoveListState,
                     gameMoveList = gameMoveListState,
+                    iconDisplayState = iconDisplayState,
+                    textComboDisplay = textComboDisplayState,
                     saveCombo = comboCreationViewModel::saveCombo,
                     deleteLastMove = comboCreationViewModel::deleteLastMove,
                     clearMoveList = comboCreationViewModel::clearMoveList,

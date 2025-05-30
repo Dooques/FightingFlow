@@ -1,5 +1,5 @@
 [versions]
-agp = "8.10.0"
+agp = "8.10.1"
 capturable = "2.1.0"
 coilCompose = "2.7.0"
 core = "1.6.1"

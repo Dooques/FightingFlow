@@ -1,10 +1,11 @@
 package com.example.fightingflow
 
+import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
@@ -16,16 +17,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import com.example.fightingflow.ui.InitViewModel
 import com.example.fightingflow.ui.NavGraph
 import com.example.fightingflow.ui.theme.FightingFlowTheme
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.KoinAndroidContext
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
 import timber.log.Timber
-import timber.log.Timber.DebugTree
 
-const val TAG = "Main Activity"
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.Q)
     @OptIn(KoinExperimentalAPI::class, ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +41,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun FightingFlowApp(
     initViewModel: InitViewModel = koinViewModel<InitViewModel>(),

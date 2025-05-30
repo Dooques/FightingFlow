@@ -6,14 +6,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.FlowRowOverflow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -22,7 +18,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -31,33 +26,31 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.fightingflow.data.TestData
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.MoveEntry
-import com.example.fightingflow.ui.theme.FightingFlowTheme
-import com.example.fightingflow.util.characterAndMoveData.CharacterAndMoveData
+import com.example.fightingflow.ui.comboCreationScreen.ComboAsText
 import com.example.fightingflow.util.CharacterEntryListUiState
 import dev.shreyaspatil.capturable.capturable
 import dev.shreyaspatil.capturable.controller.CaptureController
-import dev.shreyaspatil.capturable.controller.rememberCaptureController
 import timber.log.Timber
 
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun ComboDisplay(
+fun ComboDisplayItem(
     context: Context,
     captureController: CaptureController,
     toShare: Boolean,
     display: Boolean,
     characterEntryListUiState: CharacterEntryListUiState,
     combo: ComboDisplay,
+    comboAsText: String,
     username: String,
+    iconDisplayState: Boolean,
+    textComboState: Boolean,
     uiScale: Float,
     fontColor: Color,
     modifier: Modifier = Modifier,
@@ -83,88 +76,98 @@ fun ComboDisplay(
             if (display) {
                 ComboInfoTop(combo, uiScale)
             }
-            FlowRow(
-                verticalArrangement = Arrangement.Center,
-                horizontalArrangement = Arrangement.Start,
-                itemVerticalAlignment = Alignment.CenterVertically,
-                modifier = modifier
-                    .fillMaxWidth()
-            ) {
-                Timber.d("Loading moves from combo...")
-                combo.moves.forEach { move ->
-                    Timber.d(move.moveName)
-                    when (move.moveType) {
-                        "Break" -> MoveBreak(uiScale, modifier.align(Alignment.CenterVertically))
-                        "Misc" -> MiscInput(move)
-                        "Input", "SF Input", "Movement", "Complex Movement" -> InputMove(
-                            context = context,
-                            input = move,
-                            uiScale = uiScale,
-                            modifier = modifier
-                                .align(Alignment.CenterVertically)
-                                .padding(4.dp)
-                        )
+            if (iconDisplayState) {
+                FlowRow(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalArrangement = Arrangement.Start,
+                    itemVerticalAlignment = Alignment.CenterVertically,
+                    modifier = modifier
+                        .fillMaxWidth()
+                ) {
+                    Timber.d("Loading moves from combo...")
+                    combo.moves.forEach { move ->
+                        Timber.d(move.moveName)
+                        when (move.moveType) {
+                            "Break" -> MoveBreak(
+                                uiScale,
+                                modifier.align(Alignment.CenterVertically)
+                            )
 
-                        "Common" ->
-                            TextMove(
+                            "Misc" -> MiscInput(move)
+                            "Input", "SF Input", "Movement", "Complex Movement" -> InputMove(
+                                context = context,
                                 input = move,
-                                color = Color(0xFF444444),
                                 uiScale = uiScale,
                                 modifier = modifier
                                     .align(Alignment.CenterVertically)
                                     .padding(4.dp)
                             )
 
-                        "Special" ->
-                            TextMove(
-                                input = move,
-                                color = Color(0xFF0067B3),
-                                uiScale = uiScale,
-                                modifier = modifier
-                                    .align(Alignment.CenterVertically)
-                                    .padding(4.dp)
-                            )
-                        "Stage" ->
-                            TextMove(
-                                input = move,
-                                color = Color(0xFF2f5233),
-                                uiScale = uiScale,
-                                modifier = modifier
-                                    .align(Alignment.CenterVertically)
-                                    .padding(4.dp)
-                            )
+                            "Common" ->
+                                TextMove(
+                                    input = move,
+                                    color = Color(0xFF444444),
+                                    uiScale = uiScale,
+                                    modifier = modifier
+                                        .align(Alignment.CenterVertically)
+                                        .padding(4.dp)
+                                )
 
-                        "Mechanics Input", "Super Art", "Mishima" ->
-                            TextMove(
-                                input = move,
-                                color = Color(0xFF8155BA),
-                                uiScale = uiScale,
-                                modifier = modifier
-                                    .align(Alignment.CenterVertically)
-                                    .padding(4.dp)
-                            )
+                            "Special" ->
+                                TextMove(
+                                    input = move,
+                                    color = Color(0xFF0067B3),
+                                    uiScale = uiScale,
+                                    modifier = modifier
+                                        .align(Alignment.CenterVertically)
+                                        .padding(4.dp)
+                                )
 
-                        "Character", "Fatal Blow", "Drive"   ->
-                            TextMove(
-                                input = move,
-                                color = Color(0xFFDC143C),
-                                uiScale = uiScale,
-                                modifier = modifier
-                                    .align(Alignment.CenterVertically)
-                                    .padding(4.dp)
-                            )
+                            "Stage" ->
+                                TextMove(
+                                    input = move,
+                                    color = Color(0xFF2f5233),
+                                    uiScale = uiScale,
+                                    modifier = modifier
+                                        .align(Alignment.CenterVertically)
+                                        .padding(4.dp)
+                                )
 
-                        "Modifier", "MK Input" ->
-                            TextMove(
-                                input = move,
-                                color = Color.White,
-                                uiScale = uiScale,
-                                modifier = modifier
-                                    .align(Alignment.CenterVertically)
-                                    .padding(4.dp)
-                            )
+                            "Mechanics Input", "Super Art", "Mishima" ->
+                                TextMove(
+                                    input = move,
+                                    color = Color(0xFF8155BA),
+                                    uiScale = uiScale,
+                                    modifier = modifier
+                                        .align(Alignment.CenterVertically)
+                                        .padding(4.dp)
+                                )
+
+                            "Character", "Fatal Blow", "Drive" ->
+                                TextMove(
+                                    input = move,
+                                    color = Color(0xFFDC143C),
+                                    uiScale = uiScale,
+                                    modifier = modifier
+                                        .align(Alignment.CenterVertically)
+                                        .padding(4.dp)
+                                )
+
+                            "Modifier", "MK Input" ->
+                                TextMove(
+                                    input = move,
+                                    color = Color.White,
+                                    uiScale = uiScale,
+                                    modifier = modifier
+                                        .align(Alignment.CenterVertically)
+                                        .padding(4.dp)
+                                )
+                        }
                     }
                 }
+            }
+            if (textComboState) {
+                ComboAsText(comboAsText)
             }
             ComboInfoBottom(combo, username, fontColor)
         }
@@ -294,44 +297,4 @@ fun MiscInput(
         color = MaterialTheme.colorScheme.onBackground,
 
     )
-}
-
-@Composable
-@Preview(device = "spec:width=673dp,height=841dp")
-fun ComboItemPreviewTablet() {
-    FightingFlowTheme {
-        Surface {
-            ComboDisplay(
-                context = LocalContext.current,
-                captureController = rememberCaptureController(),
-                toShare = true,
-                display = false,
-                characterEntryListUiState = CharacterEntryListUiState(CharacterAndMoveData().characterEntries[0]),
-                combo = TestData(CharacterAndMoveData()).comboItem.comboDisplay,
-                username = "",
-                uiScale = 2f,
-                fontColor = Color.White,
-            )
-        }
-    }
-}
-
-@Composable
-@Preview(device = "spec:width=411dp,height=891dp")
-fun ComboItemPreviewPhone() {
-    FightingFlowTheme {
-        Surface {
-            ComboDisplay(
-                context = LocalContext.current,
-                captureController = rememberCaptureController(),
-                toShare = true,
-                display = true,
-                characterEntryListUiState = CharacterEntryListUiState(CharacterAndMoveData().characterEntries[0]),
-                combo = TestData(CharacterAndMoveData()).comboItem.comboDisplay,
-                username = "",
-                uiScale = 1f,
-                fontColor = Color.White,
-            )
-        }
-    }
 }

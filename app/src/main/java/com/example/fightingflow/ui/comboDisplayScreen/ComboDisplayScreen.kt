@@ -19,6 +19,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -46,6 +47,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.fightingflow.data.mediastore.MediaStoreUtil
 import com.example.fightingflow.model.ComboDisplay
+import com.example.fightingflow.model.ComboEntry
+import com.example.fightingflow.ui.comboCreationScreen.ComboCreationViewModel
+import com.example.fightingflow.ui.components.SettingsMenu
 import com.example.fightingflow.ui.profileScreen.ProfileViewModel
 import com.example.fightingflow.util.ActionIcon
 import com.example.fightingflow.util.SwipeableItem
@@ -63,6 +67,7 @@ fun ComboDisplayScreen(
     deviceType: WindowSizeClass,
     snackbarHostState: SnackbarHostState,
     comboDisplayViewModel: ComboDisplayViewModel,
+    comboCreationViewModel: ComboCreationViewModel,
     onNavigateToComboEditor: () -> Unit,
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
@@ -93,6 +98,12 @@ fun ComboDisplayScreen(
     val username by profileViewModel.username.collectAsStateWithLifecycle()
     val characterNameState by comboDisplayViewModel.characterNameState.collectAsStateWithLifecycle()
     val characterImageState by comboDisplayViewModel.characterImageState.collectAsStateWithLifecycle()
+    val iconDisplayState by comboDisplayViewModel.showIconState.collectAsStateWithLifecycle()
+    val textComboState by comboDisplayViewModel.textComboState.collectAsStateWithLifecycle()
+
+    // ComboCreationViewModel
+    val comboEntryListState by comboDisplayViewModel.comboEntryListUiState.collectAsStateWithLifecycle()
+
 
     Timber.d("Updating character data")
     if (characterNameState.name.isNotEmpty()) {
@@ -106,13 +117,11 @@ fun ComboDisplayScreen(
     }
 
     Timber.d("Getting combos by character...")
-    val combosByCharacter = if (characterState.character != emptyCharacter) {
+    val comboEntryList = comboEntryListState.comboEntryList.toMutableList()
+    val comboDisplayList = comboDisplayListState.comboDisplayList.toMutableList()
+    if (characterState.character != emptyCharacter) {
         Timber.d("Character has been selected, getting combos...")
         comboDisplayViewModel.getComboDisplayListByCharacter()
-        comboDisplayListState.comboDisplayList.toMutableList()
-    } else {
-        Timber.d("No characters selected, returning empty list...")
-        emptyList<ComboDisplay>().toMutableList()
     }
 
     Scaffold(
@@ -165,18 +174,18 @@ fun ComboDisplayScreen(
             )
             ) {
                 Timber.d("Getting display combos as lazy column with swipeable actions.")
-                itemsIndexed(items = combosByCharacter) { index, combo ->
+                itemsIndexed(items = comboDisplayList) { index, combo ->
                     val captureController = rememberCaptureController()
                     val isOptionRevealed by remember { mutableStateOf(false) }
 
                     SwipeableItem(
                         isRevealed = isOptionRevealed,
                         onExpanded = {
-                            combosByCharacter[index] = combo.copy(areOptionsRevealed = true)
+                            comboDisplayList[index] = combo.copy(areOptionsRevealed = true)
                             shareDataOn = true
                         },
                         onCollapsed = {
-                            combosByCharacter[index] = combo.copy(areOptionsRevealed = false)
+                            comboDisplayList[index] = combo.copy(areOptionsRevealed = false)
                             shareDataOn = false
                         },
                         actions = {
@@ -242,9 +251,27 @@ fun ComboDisplayScreen(
                                 icon = Icons.Default.Delete,
                                 modifier = modifier.fillMaxHeight()
                             )
+                            var settingsMenuExpanded by remember { mutableStateOf(false) }
+                            ActionIcon(
+                                onclick = {
+                                    Timber.d("Configuring Layout")
+                                    settingsMenuExpanded = true
+                                },
+                                tint = Color.White,
+                                icon = Icons.Default.Settings,
+                                modifier = modifier.fillMaxHeight()
+                            )
+                            SettingsMenu(
+                                settingsMenuExpanded = settingsMenuExpanded,
+                                onDismissRequest = { settingsMenuExpanded = !settingsMenuExpanded },
+                                updateIconSetting = { comboDisplayViewModel.updateShowIconDisplayState(!iconDisplayState) },
+                                updateTextComboSetting = { comboDisplayViewModel.updateShowComboTextState(!textComboState) },
+                                iconState = iconDisplayState,
+                                textComboState = textComboState
+                            )
                         },
                     ) {
-                        ComboDisplay(
+                        ComboDisplayItem(
                             context = context,
                             captureController = captureController,
                             toShare = shareDataOn,
@@ -252,7 +279,10 @@ fun ComboDisplayScreen(
                             fontColor = fontColor,
                             characterEntryListUiState = characterListState,
                             combo = combo,
+                            comboAsText = comboEntryList[index].moves,
                             username = username,
+                            iconDisplayState = iconDisplayState,
+                            textComboState = textComboState,
                             uiScale = uiScale,
                             modifier = modifier.padding(vertical = 4.dp, )
                         )

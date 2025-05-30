@@ -117,6 +117,7 @@ fun NavGraph(
                 ComboDisplayScreen(
                     deviceType = deviceType,
                     comboDisplayViewModel = comboDisplayViewModel,
+                    comboCreationViewModel = comboCreationViewModel,
                     snackbarHostState = snackBarHostState,
                     onNavigateToComboEditor = { navController.navigate(FlowScreen.ComboCreation.name) },
                     navigateBack = { navController.navigate(FlowScreen.CharSelect.name) }

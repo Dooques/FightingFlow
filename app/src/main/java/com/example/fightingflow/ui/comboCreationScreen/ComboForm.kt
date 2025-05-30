@@ -17,7 +17,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -39,7 +38,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -52,7 +50,7 @@ import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.ui.comboCreationScreen.layouts.MortalKombatLayout
 import com.example.fightingflow.ui.comboCreationScreen.layouts.StreetFighterLayout
 import com.example.fightingflow.ui.comboCreationScreen.layouts.TekkenLayout
-import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplay
+import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayItem
 import com.example.fightingflow.util.CharacterEntryListUiState
 import com.example.fightingflow.util.ComboDisplayUiState
 import com.example.fightingflow.util.MoveEntryListUiState
@@ -79,6 +77,8 @@ fun ComboForm(
     moveList: MoveEntryListUiState,
     characterMoveList: MoveEntryListUiState,
     gameMoveList: MoveEntryListUiState,
+    iconDisplayState: Boolean,
+    textComboDisplay: Boolean,
     saveCombo: KSuspendFunction0<Unit>,
     deleteLastMove: () -> Unit,
     clearMoveList: () -> Unit,
@@ -98,7 +98,21 @@ fun ComboForm(
             }
         }
     }
-    ComboDisplay(context, comboDisplay, username)
+    ComboDisplayItem(
+        context = context,
+        captureController = rememberCaptureController(),
+        toShare = false,
+        display = false,
+        characterEntryListUiState = CharacterEntryListUiState(),
+        combo = comboDisplay,
+        username =  username,
+        fontColor = MaterialTheme.colorScheme.onBackground,
+        iconDisplayState = iconDisplayState,
+        textComboState = textComboDisplay,
+        comboAsText = comboAsString,
+        uiScale = 1f,
+        modifier = modifier.padding(vertical = 4.dp)
+    )
     if (moveList.moveList.isNotEmpty()) {
         Timber.d("Move Entry List exists, populating Input Selector Column...")
         when (game) {
@@ -170,31 +184,6 @@ fun ComboForm(
             )
         }
     }
-}
-
-@Composable
-fun ComboDisplay(
-    context: Context,
-    combo: ComboDisplay,
-    username: String,
-    modifier: Modifier = Modifier
-) {
-    val fontColor = MaterialTheme.colorScheme.onBackground
-    val uiScale = 1f
-
-    Timber.d("Getting combo display composable from Combo Screen")
-    ComboDisplay(
-        context = context,
-        captureController = rememberCaptureController(),
-        toShare = false,
-        display = false,
-        characterEntryListUiState = CharacterEntryListUiState(),
-        combo = combo,
-        username =  username,
-        fontColor = fontColor,
-        uiScale = uiScale,
-        modifier = modifier.padding(vertical = 4.dp)
-    )
 }
 
 @Composable
