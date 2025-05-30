@@ -1,10 +1,9 @@
 package com.example.fightingflow.ui.profileScreen
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.fightingflow.data.database.ProfileDbRepository
 import com.example.fightingflow.data.database.FlowRepository
+import com.example.fightingflow.data.database.ProfileDbRepository
 import com.example.fightingflow.data.datastore.ProfileDsRepository
 import com.example.fightingflow.model.toDisplay
 import com.example.fightingflow.model.toEntry

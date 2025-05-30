@@ -14,12 +14,12 @@ import com.example.fightingflow.model.ComboEntry
 import com.example.fightingflow.model.MoveEntry
 import com.example.fightingflow.model.ProfileEntry
 
-
 @Database(
     entities = [ProfileEntry::class, CharacterEntry::class, MoveEntry::class, ComboEntry::class],
     version = 1,
     exportSchema = false
 )
+
 @TypeConverters(ComboConverter::class, CharacterConverter::class)
 abstract class FlowDatabase: RoomDatabase() {
     abstract fun getUserDao(): ProfileDao
