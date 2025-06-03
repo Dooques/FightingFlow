@@ -13,12 +13,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -39,9 +36,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.fightingflow.data.datastore.Game
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayViewModel
+import com.example.fightingflow.ui.components.GameSelectedMenu
 import com.example.fightingflow.util.CharacterUiState
+import com.example.fightingflow.ui.components.SettingsMenu
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -60,96 +60,46 @@ fun CharacterScreen(
 
     val characterListState by comboDisplayViewModel.characterEntryListState.collectAsStateWithLifecycle()
     val gameSelectedState by characterScreenViewModel.gameSelected.collectAsStateWithLifecycle()
+    val modernOrClassicState by characterScreenViewModel.modernOrClassicState.collectAsStateWithLifecycle()
 
     Timber.d("Flows Collected")
     Timber.d("Character List: ${characterListState.characterList}")
-    Timber.d("Game Selected From DS: $gameSelectedState")
+    Timber.d("Game Selected From DS: ${gameSelectedState?.title}")
 
-    var gameSelected by remember { mutableStateOf("") }
 
-    if (gameSelectedState.isNotEmpty()) {
-        Timber.d("Processing")
+    var gameSelected by remember { mutableStateOf<Game?>(null) }
+
+    gameSelectedState?.let {
+        Timber.d("Getting characters by game...")
         gameSelected = gameSelectedState
+        Timber.d("Game selected: $gameSelected")
+        gameSelected?.let { game -> comboDisplayViewModel.getCharacterEntryListByGame(game) }
     }
-
-    comboDisplayViewModel.getCharacterEntryListByGame(gameSelected)
-
-    var gameMenuExpanded by remember { mutableStateOf(false) }
-    var settingsMenuExpanded by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Characters", style = MaterialTheme.typography.displaySmall) },
                 actions = {
-                    IconButton(onClick = {settingsMenuExpanded = !settingsMenuExpanded}) {
-                        Icon(imageVector = Icons.Default.Settings, contentDescription = "Settings")
-                        DropdownMenu(
-                            expanded = settingsMenuExpanded,
-                            onDismissRequest = { settingsMenuExpanded = false}
-                        ) {
-                            DropdownMenuItem(
-                                text = { Text("Profiles") },
-                                onClick = navigateToProfiles
-                            )
-                        }
-                    }
+                    SettingsMenu(
+                        navigate = navigateToProfiles,
+                        updateConsoleInput = { comboDisplayViewModel.updateConsoleType(it) }
+                    )
                 },
                 windowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp),
             )
         },
     ) { contentPadding ->
-        Column(Modifier.padding(contentPadding)) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = modifier.fillMaxWidth()
-            ) {
-                GameSelectedHeader(
-                    gameSelected = gameSelected,
-                    modifier = modifier.align(Alignment.CenterStart)
-                )
-                IconButton(
-                    onClick = { gameMenuExpanded = !gameMenuExpanded },
-                    modifier = modifier.fillMaxWidth(0.4f).align(Alignment.Center)
-                ) {
-                    DropdownMenu(
-                        expanded = gameMenuExpanded,
-                        onDismissRequest = { gameMenuExpanded = false },
-                        modifier = modifier.align(Alignment.Center)
-                    ) {
-                        DropdownMenuItem(
-                            text = { Text("Mortal Kombat 1") },
-                            onClick = {
-                                gameMenuExpanded = false
-                                gameSelected = "Mortal Kombat 1"
-                                scope.launch {
-                                    characterScreenViewModel.updateGameInDs(gameSelected)
-                                }
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text("Street Fighter VI") },
-                            onClick = {
-                                gameMenuExpanded = false
-                                gameSelected = "Street Fighter VI"
-                                scope.launch {
-                                    characterScreenViewModel.updateGameInDs(gameSelected)
-                                }
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text("Tekken 8") },
-                            onClick = {
-                                gameMenuExpanded = false
-                                gameSelected = "Tekken 8"
-                                scope.launch {
-                                    characterScreenViewModel.updateGameInDs(gameSelected)
-                                }
-                            }
-                        )
-                    }
-                }
 
+        Column(Modifier.padding(contentPadding)) {
+            Row(modifier.fillMaxWidth()) {
+                GameSelectedMenu(
+                    scope = scope,
+                    characterScreenViewModel = characterScreenViewModel,
+                    gameSelected = gameSelected,
+                    sf6Option = modernOrClassicState,
+                    changeSelectedGame = { gameSelected = it },
+                )
             }
             LazyVerticalGrid(
                 verticalArrangement = Arrangement.spacedBy(8.dp),

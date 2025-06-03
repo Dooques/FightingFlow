@@ -3,6 +3,7 @@ package com.example.fightingflow.model
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.fightingflow.data.datastore.SF6ControlType
 import kotlin.String
 
 @Entity("move_table")
@@ -21,7 +22,8 @@ data class MoveEntry(
     val justFrame: Boolean = false,
     @ColumnInfo(name = "character")
     val character: String,
-    val game: String? = null
+    val game: String? = null,
+    val controlType: SF6ControlType? = SF6ControlType.Invalid
 )
 
 data class MoveString(

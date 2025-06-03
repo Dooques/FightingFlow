@@ -5,14 +5,13 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
+import com.example.fightingflow.data.datastore.Console
 import com.example.fightingflow.util.ImmutableList
 import com.example.fightingflow.util.MoveEntryListUiState
-import com.example.fightingflow.util.emptyMove
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import timber.log.Timber
 import java.util.UUID
-import kotlin.String
 
 @Entity(tableName = "combo_table")
 data class ComboEntry (
@@ -40,7 +39,7 @@ data class ComboDisplay(
     val moves: ImmutableList<MoveEntry>
 )
 
-fun ComboEntry.toDisplay(): ComboDisplay =
+fun ComboEntry.toDisplay(moveEntryList: MoveEntryListUiState): ComboDisplay =
     ComboDisplay(
         comboId = comboId,
         description = description,
@@ -49,7 +48,7 @@ fun ComboEntry.toDisplay(): ComboDisplay =
         createdBy = createdBy,
         dateCreated = dateCreated,
         areOptionsRevealed = false,
-        moves = ImmutableList(moveListStringToMoveEntryList(moves))
+        moves = ImmutableList(moveListStringToMoveEntryList(moves, moveEntryList))
     )
 
 fun ComboDisplay.toEntry(character: CharacterEntry): ComboEntry =
@@ -60,20 +59,23 @@ fun ComboDisplay.toEntry(character: CharacterEntry): ComboEntry =
         damage = damage,
         createdBy = createdBy,
         dateCreated = dateCreated,
-        moves = moveEntryToMoveList(moves)
+        moves = moveEntryListToMoveListString(moves)
     )
 
-fun moveListStringToMoveEntryList(moveList: String): List<MoveEntry> {
+fun moveListStringToMoveEntryList(moveList: String, moveListEntries: MoveEntryListUiState): List<MoveEntry> {
     val moveEntryList = mutableListOf<MoveEntry>()
-    moveList.split(",").map { it.trimIndent() }.forEach { moveEntryList.add(emptyMove.copy(moveName = it)) }
+    moveList
+        .split(",")
+        .map { move -> move.trimIndent() }
+        .forEach { move -> moveEntryList.add(moveListEntries.moveList.first { it.notation == move }) }
     return moveEntryList
 }
 
-fun moveEntryToMoveList(moveList: List<MoveEntry>): String {
+fun moveEntryListToMoveListString(moveList: List<MoveEntry>): String {
     var moveString = ""
     val listIterator = moveList.iterator()
     while (listIterator.hasNext()) {
-        val nextMove = listIterator.next().moveName
+        val nextMove = listIterator.next().notation
         moveString += nextMove
         if (listIterator.hasNext()) {
             moveString += ", "
@@ -81,7 +83,11 @@ fun moveEntryToMoveList(moveList: List<MoveEntry>): String {
     }
     return moveString
 }
-fun getMoveEntryDataForComboDisplay(combo: ComboDisplay, moveEntryList: MoveEntryListUiState): ComboDisplay {
+fun getMoveEntryDataForComboDisplay(
+    combo: ComboDisplay,
+    moveEntryList: MoveEntryListUiState,
+    controlType: Console
+): ComboDisplay {
     Timber.d("Processing moveList for ${combo.comboId}")
     val updatedCombo = combo.copy(
         moves = ImmutableList(
@@ -95,7 +101,8 @@ fun getMoveEntryDataForComboDisplay(combo: ComboDisplay, moveEntryList: MoveEntr
                     counterHit = updateData.counterHit,
                     hold = updateData.hold,
                     justFrame = updateData.justFrame,
-                    character = updateData.character
+                    character = updateData.character,
+                    game = updateData.game
                 )
             }
         )

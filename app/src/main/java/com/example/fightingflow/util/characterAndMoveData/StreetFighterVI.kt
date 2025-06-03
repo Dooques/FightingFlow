@@ -1,6 +1,7 @@
 package com.example.fightingflow.util.characterAndMoveData
 
 import com.example.fightingflow.R
+import com.example.fightingflow.data.datastore.SF6ControlType
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.MoveEntry
 import com.example.fightingflow.util.ImmutableList
@@ -168,6 +169,30 @@ val streetFighter6Characters = ImmutableList(
 
 val streetFighterVIMoves = ImmutableList(
     listOf(
+        // Inputs
+        MoveEntry(moveName = "LP", notation = "lp", moveType = "SF Classic", character = "Generic", game = "Street Fighter VI", controlType = SF6ControlType.Classic),
+        MoveEntry(moveName = "MP", notation = "mp", moveType = "SF Classic", character = "Generic", game = "Street Fighter VI", controlType = SF6ControlType.Classic),
+        MoveEntry(moveName = "HP", notation = "hp", moveType = "SF Classic", character = "Generic", game = "Street Fighter VI", controlType = SF6ControlType.Classic),
+        MoveEntry(moveName = "LK", notation = "lk", moveType = "SF Classic", character = "Generic", game = "Street Fighter VI", controlType = SF6ControlType.Classic),
+        MoveEntry(moveName = "MK", notation = "mk", moveType = "SF Classic", character = "Generic", game = "Street Fighter VI", controlType = SF6ControlType.Classic),
+        MoveEntry(moveName = "HK", notation = "hk", moveType = "SF Classic", character = "Generic", game = "Street Fighter VI", controlType = SF6ControlType.Classic),
+
+        // Classic Inputs
+        MoveEntry(moveName = "L", notation = "l", moveType = "SF Modern", character = "Generic", game = "Street Fighter VI", controlType = SF6ControlType.Modern),
+        MoveEntry(moveName = "M", notation = "m", moveType = "SF Modern", character = "Generic", game = "Street Fighter VI", controlType = SF6ControlType.Modern),
+        MoveEntry(moveName = "H", notation = "h", moveType = "SF Modern", character = "Generic", game = "Street Fighter VI", controlType = SF6ControlType.Modern),
+        MoveEntry(moveName = "S", notation = "special", moveType = "SF Modern", character = "Generic", game = "Street Fighter VI", controlType = SF6ControlType.Modern),
+        MoveEntry(moveName = "Assist", notation = "assist", moveType = "SF Modern", character = "Generic", game = "Street Fighter VI", controlType = SF6ControlType.Modern),
+
+        // Mechanics
+        MoveEntry(moveName = "Taunt", notation = "taunt", moveType = "Mechanic", character = "Generic", game = "Street Fighter VI"),
+        MoveEntry(moveName = "Throw", notation = "throw", moveType = "Mechanic", character = "Generic", game = "Street Fighter VI"),
+        MoveEntry(moveName = "DI", notation = "hp + hk", moveType = "Mechanic",character = "Generic", game = "Street Fighter VI"),
+        MoveEntry(moveName = "Parry", notation = "mp + mk", moveType = "Mechanic", character = "Generic", game = "Street Fighter VI"),
+        MoveEntry(moveName = "Perfect Parry", notation = "mp + mk", moveType = "Mechanic", character = "Generic", game = "Street Fighter VI"),
+        MoveEntry(moveName = "DR", notation = "dr", moveType = "Mechanic", character = "Generic", game = "Street Fighter VI"),
+        MoveEntry(moveName = "OD", notation = "od", moveType = "Mechanic", character = "Generic", game = "Street Fighter VI"),
+        MoveEntry(moveName = "Air", notation = "Air", moveType = "Mechanic", character = "Generic", game = "Street Fighter VI"),
 
         // Movements
         MoveEntry(moveName = "forward", notation = "f", moveType = "Movement", character = "Generic", game = "Street Fighter VI"),
@@ -185,23 +210,6 @@ val streetFighterVIMoves = ImmutableList(
         MoveEntry(moveName = "hcb", notation = "bd", moveType = "Movement", character = "Generic", game = "Street Fighter VI"),
         MoveEntry(moveName = "fc", notation = "fc", moveType = "Movement", character = "Generic", game = "Street Fighter VI"),
         MoveEntry(moveName = "dp", notation = "dp", moveType = "Movement", character = "Generic", game = "Street Fighter VI"),
-
-        // Inputs
-        MoveEntry(moveName = "light_punch", notation = "lp", moveType = "SF Input", character = "Generic", game = "Street Fighter VI"),
-        MoveEntry(moveName = "medium_punch", notation = "mp", moveType = "SF Input", character = "Generic", game = "Street Fighter VI"),
-        MoveEntry(moveName = "heavy_punch", notation = "hp", moveType = "SF Input", character = "Generic", game = "Street Fighter VI"),
-        MoveEntry(moveName = "light_kick", notation = "lk", moveType = "SF Input", character = "Generic", game = "Street Fighter VI"),
-        MoveEntry(moveName = "medium_kick", notation = "mk", moveType = "SF Input", character = "Generic", game = "Street Fighter VI"),
-        MoveEntry(moveName = "heavy_kick", notation = "hk", moveType = "SF Input", character = "Generic", game = "Street Fighter VI"),
-
-        // Mechanics
-        MoveEntry(moveName = "Taunt", notation = "taunt", moveType = "Mechanic", character = "Generic", game = "Street Fighter VI"),
-        MoveEntry(moveName = "DI", notation = "hp + hk", moveType = "Mechanic",character = "Generic", game = "Street Fighter VI"),
-        MoveEntry(moveName = "Parry", notation = "mp + mk", moveType = "Mechanic", character = "Generic", game = "Street Fighter VI"),
-        MoveEntry(moveName = "Perfect Parry", notation = "mp + mk", moveType = "Mechanic", character = "Generic", game = "Street Fighter VI"),
-        MoveEntry(moveName = "DR", notation = "dr", moveType = "Mechanic", character = "Generic", game = "Street Fighter VI"),
-        MoveEntry(moveName = "OD", notation = "od", moveType = "Mechanic", character = "Generic", game = "Street Fighter VI"),
-        MoveEntry(moveName = "Air", notation = "Air", moveType = "Mechanic", character = "Generic", game = "Street Fighter VI"),
 
         // A.K.I.
         MoveEntry(moveName = "Nightshade Pulse", notation = "qcb, lp", moveType = "Special", character = "A.K.I."),

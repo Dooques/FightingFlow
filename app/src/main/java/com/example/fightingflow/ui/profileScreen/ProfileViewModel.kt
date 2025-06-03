@@ -26,7 +26,7 @@ class ProfileViewModel(
 ): ViewModel() {
 
     companion object {
-        private const val TIME_MILLIS = 2_000L
+        private const val TIME_MILLIS = 5_000L
     }
 
     // Update Profile State
@@ -107,14 +107,6 @@ class ProfileViewModel(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(TIME_MILLIS),
             initialValue = ProfileUiState()
-        )
-
-    val combosByProfile = tekkenDataRepository.getAllCombosByProfile(currentProfile.value.profile.username)
-        .mapNotNull { comboEntryList -> ComboDisplayListUiState(comboEntryList?.map { it.toDisplay() } ?: emptyList()) }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(TIME_MILLIS),
-            initialValue = ComboDisplayListUiState()
         )
 
     private suspend fun saveProfileToDb() {

@@ -9,12 +9,13 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.fightingflow.model.CharacterEntry
+import com.example.fightingflow.data.datastore.Console
+import com.example.fightingflow.data.datastore.Game
+import com.example.fightingflow.data.datastore.SF6ControlType
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.ui.comboCreationScreen.CharacterMoves
-import com.example.fightingflow.ui.comboCreationScreen.ComboAsText
 import com.example.fightingflow.ui.comboCreationScreen.ComboDescription
-import com.example.fightingflow.ui.comboCreationScreen.ConfirmAndClear
+import com.example.fightingflow.ui.comboCreationScreen.BreakDeleteClear
 import com.example.fightingflow.ui.comboCreationScreen.DamageAndConfirm
 import com.example.fightingflow.ui.comboCreationScreen.IconMoves
 import com.example.fightingflow.ui.comboCreationScreen.InputDivider
@@ -23,8 +24,13 @@ import com.example.fightingflow.ui.comboCreationScreen.SectionTitle
 import com.example.fightingflow.ui.comboCreationScreen.TextMoves
 import com.example.fightingflow.util.ComboDisplayUiState
 import com.example.fightingflow.util.MoveEntryListUiState
+import com.example.fightingflow.util.characterAndMoveData.nintendoInputs
+import com.example.fightingflow.util.characterAndMoveData.playstationInputs
+import com.example.fightingflow.util.characterAndMoveData.xboxInputs
 import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
+import kotlin.reflect.KFunction0
+import kotlin.reflect.KFunction4
 import kotlin.reflect.KSuspendFunction0
 
 
@@ -36,14 +42,14 @@ fun StreetFighterLayout(
     editingState: Boolean,
     comboDisplay: ComboDisplay,
     originalCombo: ComboDisplay,
-    character: CharacterEntry,
-    characterName: String,
     combo: ComboDisplay,
     updateComboData: (ComboDisplayUiState) -> Unit,
-    updateMoveList: (String, MoveEntryListUiState) -> Unit,
+    updateMoveList: KFunction4<String, MoveEntryListUiState, Game?, Console?, Unit>,
     comboAsString: String,
+    console: Console?,
+    sF6ControlType: SF6ControlType?,
     saveCombo: KSuspendFunction0<Unit>,
-    deleteLastMove: () -> Unit,
+    deleteLastMove: KFunction0<Unit>,
     clearMoveList: () -> Unit,
     onNavigateToComboDisplay: () -> Unit,
     moveList: MoveEntryListUiState,
@@ -53,10 +59,11 @@ fun StreetFighterLayout(
 ) {
     Timber.d("Loading Input Selector")
     LazyColumn {
-        items(items = streetFighterLayout) { moveType ->
+        items(items =
+            if (sF6ControlType == SF6ControlType.Classic) streetFighterLayoutClassic
+            else streetFighterLayoutModern
+        ) { moveType ->
             when (moveType) {
-                "Text Combo" -> ComboAsText(comboAsString)
-
                 "Description" -> ComboDescription(combo, updateComboData)
 
                 "Move Modifiers" -> MoveModifiers()
@@ -69,8 +76,6 @@ fun StreetFighterLayout(
                     originalCombo = originalCombo,
                     saveCombo = saveCombo,
                     updateComboData = updateComboData,
-                    updateMoveList = updateMoveList,
-                    moveList = moveList,
                     onNavigateToComboDisplay = onNavigateToComboDisplay,
                 )
 
@@ -79,40 +84,56 @@ fun StreetFighterLayout(
                     moveList = moveList,
                     updateMoveList = updateMoveList,
                     maxItemsPerRow = 6,
-                    context = context
+                    context = context,
+                    console = console,
+                    sF6ControlType = sF6ControlType
                 )
 
-                 "Movement", "Complex Movement" -> IconMoves(
+                "Movement", "Complex Movement", "Console" -> IconMoves(
                     moveType = moveType,
                     moveList = gameMoveList,
                     updateMoveList = updateMoveList,
                     maxItemsPerRow = 5,
-                    context = context
+                    context = context,
+                    console = console,
+                    sF6ControlType = sF6ControlType
                 )
 
-                "SF Input" -> IconMoves(
-                    moveType = moveType,
-                    moveList = gameMoveList,
-                    updateMoveList = updateMoveList,
-                    maxItemsPerRow = 6,
-                    context = context
-                )
+                "SF Classic", "SF Modern" -> if (console == Console.STANDARD)
+                    TextMoves(
+                        moveType = moveType,
+                        moveList = gameMoveList,
+                        updateMoveList = updateMoveList,
+                        console = console
+                    )
 
                 "Mechanic" -> TextMoves(
                     moveType = moveType,
                     moveList = gameMoveList,
-                    character = character,
+                    updateMoveList = updateMoveList,
+                    console = console
+                )
+
+                "Console Text" -> TextMoves(
+                    moveType = moveType,
+                    moveList = when (console) {
+                        Console.PLAYSTATION -> MoveEntryListUiState(playstationInputs)
+                        Console.XBOX -> MoveEntryListUiState(xboxInputs)
+                        Console.NINTENDO -> MoveEntryListUiState(nintendoInputs)
+                        else -> MoveEntryListUiState()
+                    },
+                    updateMoveList = updateMoveList,
+                    console = console
+                )
+
+                "Special", "Super Art" -> CharacterMoves(
+                    characterMoveList = characterMoveList,
+                    moveType = moveType,
                     updateMoveList = updateMoveList
                 )
 
-                 "Special", "Super Art" -> CharacterMoves(
-                     characterMoveList = characterMoveList,
-                     moveType = moveType,
-                     updateMoveList = updateMoveList
-                 )
-
-                "Buttons" -> ConfirmAndClear(
-                    deleteLastMove = deleteLastMove,
+                "Buttons" -> BreakDeleteClear(
+                    deleteMove = deleteLastMove,
                     clearMoveList = clearMoveList,
                     updateMoveList = updateMoveList,
                     moveList = moveList,
@@ -121,8 +142,9 @@ fun StreetFighterLayout(
                 "Divider" ->
                     InputDivider()
 
-                "Drive Moves", "Overdrive Moves", "Inputs", "Movements", "Special Moves",
-                "Super Arts", "Complex Movements", "Mechanics", "Misc Inputs" -> SectionTitle(moveType)
+                "Drive Moves", "Overdrive Moves", "Classic Inputs", "Modern Inputs", "Movements",
+                "Special Moves", "Super Arts", "Complex Movements", "Mechanics", "Misc Inputs" ->
+                    SectionTitle(moveType)
             }
             Timber.d("$moveType loaded.")
         }

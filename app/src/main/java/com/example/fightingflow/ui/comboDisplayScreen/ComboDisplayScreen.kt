@@ -46,13 +46,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.fightingflow.data.mediastore.MediaStoreUtil
-import com.example.fightingflow.model.ComboDisplay
-import com.example.fightingflow.model.ComboEntry
 import com.example.fightingflow.ui.comboCreationScreen.ComboCreationViewModel
+import com.example.fightingflow.ui.comboItem.ComboItemDisplay
 import com.example.fightingflow.ui.components.SettingsMenu
 import com.example.fightingflow.ui.profileScreen.ProfileViewModel
-import com.example.fightingflow.util.ActionIcon
-import com.example.fightingflow.util.SwipeableItem
+import com.example.fightingflow.ui.components.ActionIcon
+import com.example.fightingflow.ui.components.SwipeableItem
 import com.example.fightingflow.util.emptyCharacter
 import dev.shreyaspatil.capturable.controller.rememberCaptureController
 import kotlinx.coroutines.launch
@@ -100,10 +99,13 @@ fun ComboDisplayScreen(
     val characterImageState by comboDisplayViewModel.characterImageState.collectAsStateWithLifecycle()
     val iconDisplayState by comboDisplayViewModel.showIconState.collectAsStateWithLifecycle()
     val textComboState by comboDisplayViewModel.textComboState.collectAsStateWithLifecycle()
+    val consoleTypeState by comboDisplayViewModel.consoleTypeState.collectAsStateWithLifecycle()
+    val sF6ControlType by comboDisplayViewModel.modernOrClassicState.collectAsStateWithLifecycle()
 
     // ComboCreationViewModel
     val comboEntryListState by comboDisplayViewModel.comboEntryListUiState.collectAsStateWithLifecycle()
 
+    Timber.d("Console: $consoleTypeState")
 
     Timber.d("Updating character data")
     if (characterNameState.name.isNotEmpty()) {
@@ -151,7 +153,7 @@ fun ComboDisplayScreen(
                     )
                     IconButton(onClick = {
                         scope.launch {
-                            comboDisplayViewModel.setEditingState(false)
+                            comboDisplayViewModel.updateEditingState(false)
                             onNavigateToComboEditor()
                         }
                     }) {
@@ -223,8 +225,8 @@ fun ComboDisplayScreen(
                                 onclick = {
                                     Timber.d("Preparing to edit combo")
                                     scope.launch {
-                                        comboDisplayViewModel.saveComboIdToDs(combo)
-                                        comboDisplayViewModel.setEditingState(true)
+                                        comboDisplayViewModel.updateComboStateInDs(combo)
+                                        comboDisplayViewModel.updateEditingState(true)
                                         onNavigateToComboEditor()
                                     }
                                 },
@@ -271,7 +273,7 @@ fun ComboDisplayScreen(
                             )
                         },
                     ) {
-                        ComboDisplayItem(
+                        ComboItemDisplay(
                             context = context,
                             captureController = captureController,
                             toShare = shareDataOn,
@@ -281,6 +283,8 @@ fun ComboDisplayScreen(
                             combo = combo,
                             comboAsText = comboEntryList[index].moves,
                             username = username,
+                            console = consoleTypeState,
+                            sf6ControlType = sF6ControlType,
                             iconDisplayState = iconDisplayState,
                             textComboState = textComboState,
                             uiScale = uiScale,

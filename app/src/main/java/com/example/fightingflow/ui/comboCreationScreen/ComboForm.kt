@@ -38,26 +38,34 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.example.fightingflow.data.datastore.Console
+import com.example.fightingflow.data.datastore.Game
+import com.example.fightingflow.data.datastore.SF6ControlType
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.ui.comboCreationScreen.layouts.MortalKombatLayout
 import com.example.fightingflow.ui.comboCreationScreen.layouts.StreetFighterLayout
 import com.example.fightingflow.ui.comboCreationScreen.layouts.TekkenLayout
-import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayItem
-import com.example.fightingflow.util.CharacterEntryListUiState
+import com.example.fightingflow.ui.comboItem.ComboItemEditor
+import com.example.fightingflow.ui.comboDisplayScreen.inputConverter.convertInputsToConsole
+import com.example.fightingflow.ui.comboItem.ComboItemViewModel
 import com.example.fightingflow.util.ComboDisplayUiState
 import com.example.fightingflow.util.MoveEntryListUiState
-import dev.shreyaspatil.capturable.controller.rememberCaptureController
+import com.example.fightingflow.util.characterAndMoveData.convertibleInputs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 import timber.log.Timber
+import kotlin.reflect.KFunction0
+import kotlin.reflect.KFunction4
 import kotlin.reflect.KSuspendFunction0
 
 @Composable
@@ -66,11 +74,15 @@ fun ComboForm(
     snackbarHostState: SnackbarHostState,
     editingState: Boolean,
     username: String,
-    game: String,
+    game: Game?,
+    consoleTypeState: Console?,
+    sF6ControlType: SF6ControlType?,
     comboDisplay: ComboDisplay,
     originalCombo: ComboDisplay,
     updateComboData: (ComboDisplayUiState) -> Unit,
-    updateMoveList: (String, MoveEntryListUiState) -> Unit,
+    setSelectedItem: (Int) -> Unit,
+    selectedItem: Int,
+    updateMoveList: KFunction4<String, MoveEntryListUiState, Game?, Console?, Unit>,
     character: CharacterEntry,
     characterName: String,
     comboAsString: String,
@@ -80,7 +92,7 @@ fun ComboForm(
     iconDisplayState: Boolean,
     textComboDisplay: Boolean,
     saveCombo: KSuspendFunction0<Unit>,
-    deleteLastMove: () -> Unit,
+    deleteMove: KFunction0<Unit>,
     clearMoveList: () -> Unit,
     onNavigateToComboDisplay: () -> Unit,
     modifier: Modifier = Modifier
@@ -98,90 +110,92 @@ fun ComboForm(
             }
         }
     }
-    ComboDisplayItem(
+    ComboItemEditor(
         context = context,
-        captureController = rememberCaptureController(),
-        toShare = false,
-        display = false,
-        characterEntryListUiState = CharacterEntryListUiState(),
         combo = comboDisplay,
-        username =  username,
+        username = username,
+        console = consoleTypeState,
+        sf6ControlType = sF6ControlType,
         fontColor = MaterialTheme.colorScheme.onBackground,
         iconDisplayState = iconDisplayState,
-        textComboState = textComboDisplay,
         comboAsText = comboAsString,
         uiScale = 1f,
-        modifier = modifier.padding(vertical = 4.dp)
+        setSelectedItem = setSelectedItem,
+        selectedItem = selectedItem,
+        modifier = modifier.padding(vertical = 4.dp),
     )
     if (moveList.moveList.isNotEmpty()) {
         Timber.d("Move Entry List exists, populating Input Selector Column...")
-        when (game) {
+        game?.let { innerGame ->
+            when (innerGame) {
 
-            "Tekken 8" -> TekkenLayout(
-                context = context,
-                scope = scope,
-                snackbarHostState = snackbarHostState,
-                editingState = editingState,
-                comboDisplay = comboDisplay,
-                originalCombo = originalCombo,
-                character = character,
-                characterName = characterName,
-                combo = comboDisplay,
-                updateComboData = updateComboData,
-                updateMoveList = updateMoveList,
-                comboAsString = comboAsString,
-                saveCombo = saveCombo,
-                deleteLastMove = deleteLastMove,
-                clearMoveList = clearMoveList,
-                onNavigateToComboDisplay = onNavigateToComboDisplay,
-                moveList = moveList,
-                characterMoveList = characterMoveList,
-                gameMoveList = gameMoveList
-            )
+                Game.T8 -> TekkenLayout(
+                    context = context,
+                    scope = scope,
+                    snackbarHostState = snackbarHostState,
+                    editingState = editingState,
+                    comboDisplay = comboDisplay,
+                    originalCombo = originalCombo,
+                    character = character,
+                    characterName = characterName,
+                    combo = comboDisplay,
+                    console = consoleTypeState,
+                    updateComboData = updateComboData,
+                    updateMoveList = updateMoveList,
+                    comboAsString = comboAsString,
+                    saveCombo = saveCombo,
+                    deleteMove = deleteMove,
+                    clearMoveList = clearMoveList,
+                    onNavigateToComboDisplay = onNavigateToComboDisplay,
+                    moveList = moveList,
+                    characterMoveList = characterMoveList,
+                    gameMoveList = gameMoveList
+                )
 
-            "Street Fighter VI" -> StreetFighterLayout(
-                context = context,
-                scope = scope,
-                snackbarHostState = snackbarHostState,
-                editingState = editingState,
-                comboDisplay = comboDisplay,
-                originalCombo = originalCombo,
-                character = character,
-                characterName = characterName,
-                combo = comboDisplay,
-                updateComboData = updateComboData,
-                updateMoveList = updateMoveList,
-                comboAsString = comboAsString,
-                saveCombo = saveCombo,
-                deleteLastMove = deleteLastMove,
-                clearMoveList = clearMoveList,
-                onNavigateToComboDisplay = onNavigateToComboDisplay,
-                moveList = moveList,
-                characterMoveList = characterMoveList,
-                gameMoveList = gameMoveList
-            )
+                Game.SF6 -> StreetFighterLayout(
+                    context = context,
+                    scope = scope,
+                    snackbarHostState = snackbarHostState,
+                    editingState = editingState,
+                    comboDisplay = comboDisplay,
+                    originalCombo = originalCombo,
+                    combo = comboDisplay,
+                    updateComboData = updateComboData,
+                    updateMoveList = updateMoveList,
+                    comboAsString = comboAsString,
+                    console = consoleTypeState,
+                    sF6ControlType = sF6ControlType,
+                    saveCombo = saveCombo,
+                    deleteLastMove = deleteMove,
+                    clearMoveList = clearMoveList,
+                    onNavigateToComboDisplay = onNavigateToComboDisplay,
+                    moveList = moveList,
+                    characterMoveList = characterMoveList,
+                    gameMoveList = gameMoveList
+                )
 
-            "Mortal Kombat 1" -> MortalKombatLayout(
-                context = context,
-                scope = scope,
-                snackbarHostState = snackbarHostState,
-                editingState = editingState,
-                comboDisplay = comboDisplay,
-                originalCombo = originalCombo,
-                character = character,
-                characterName = characterName,
-                combo = comboDisplay,
-                updateComboData = updateComboData,
-                updateMoveList = updateMoveList,
-                comboAsString = comboAsString,
-                saveCombo = saveCombo,
-                deleteLastMove = deleteLastMove,
-                clearMoveList = clearMoveList,
-                onNavigateToComboDisplay = onNavigateToComboDisplay,
-                moveList = moveList,
-                characterMoveList = characterMoveList,
-                gameMoveList = gameMoveList
-            )
+                Game.MK1 -> MortalKombatLayout(
+                    context = context,
+                    scope = scope,
+                    snackbarHostState = snackbarHostState,
+                    editingState = editingState,
+                    originalCombo = originalCombo,
+                    character = character,
+                    characterName = characterName,
+                    combo = comboDisplay,
+                    console = consoleTypeState,
+                    updateComboData = updateComboData,
+                    updateMoveList = updateMoveList,
+                    comboAsString = comboAsString,
+                    saveCombo = saveCombo,
+                    deleteMove = deleteMove,
+                    clearMoveList = clearMoveList,
+                    onNavigateToComboDisplay = onNavigateToComboDisplay,
+                    moveList = moveList,
+                    characterMoveList = characterMoveList,
+                    gameMoveList = gameMoveList
+                )
+            }
         }
     }
 }
@@ -202,9 +216,10 @@ fun ComboAsText(
     comboAsString: String,
     modifier: Modifier = Modifier
 ) {
+    val comboItemViewModel = koinInject<ComboItemViewModel>()
     Column {
         OutlinedTextField(
-            value = comboAsString,
+            value = if (comboAsString.isNotEmpty())comboItemViewModel.processComboStringForDisplay(comboAsString) else comboAsString,
             onValueChange = {},
             minLines = 2,
             label = { Text("Your combo") },
@@ -292,7 +307,9 @@ fun MoveModifiers(modifier: Modifier = Modifier) {
 fun IconMoves(
     moveType: String,
     moveList: MoveEntryListUiState,
-    updateMoveList: (String, MoveEntryListUiState) -> Unit,
+    updateMoveList: KFunction4<String, MoveEntryListUiState, Game?, Console?, Unit>,
+    console: Console?,
+    sF6ControlType: SF6ControlType? = SF6ControlType.Invalid,
     context: Context,
     maxItemsPerRow: Int,
     modifier: Modifier = Modifier
@@ -306,11 +323,32 @@ fun IconMoves(
         Timber.d("MoveType: $moveType")
         Timber.d("Move List: $moveList")
 
-        moveList.moveList.forEach { move ->
+
+        moveList.moveList.forEach {
+            val game = when (it.game) {
+                "Tekken 8" -> Game.T8
+                "Street Fighter VI" -> Game.SF6
+                "Mortal Kombat 1" -> Game.MK1
+                else -> null
+            }
+
+            val move = if (it.moveName in convertibleInputs) convertInputsToConsole(
+                move = it,
+                game = game,
+                console = console,
+                classic = sF6ControlType == SF6ControlType.Classic
+            ) else it
+
             if (move.moveType == moveType) {
-                val moveId = remember(move) {
-                    context.resources.getIdentifier(move.moveName, "drawable", context.packageName)
-                }
+                val moveId =
+                    remember(move) {
+                        context.resources.getIdentifier(
+                            move.moveName,
+                            "drawable",
+                            context.packageName
+                        )
+                    }
+
                 Box(modifier.padding(vertical = 4.dp).clip(RoundedCornerShape(10.dp))) {
                     Image(
                         painter = painterResource(moveId),
@@ -322,7 +360,14 @@ fun IconMoves(
                                 enabled = true,
                                 onClick = {
                                     Timber.d("${move.moveName} selected, preparing to add combo to list...")
-                                    updateMoveList(move.moveName, moveList)
+                                    if (game == null && moveType == "Misc") {
+                                        updateMoveList(move.moveName, moveList, null, null)
+                                    }
+                                    console?.let { outerConsole ->
+                                        game?.let { innerGame ->
+                                            updateMoveList(move.moveName, moveList, innerGame, outerConsole)
+                                        }
+                                    }
                                     Timber.d("Added ${move.moveName} to combo move list.")
                                 }
                             )
@@ -337,45 +382,60 @@ fun IconMoves(
 fun TextMoves(
     moveType: String,
     moveList: MoveEntryListUiState,
-    character: CharacterEntry,
-    updateMoveList: (String, MoveEntryListUiState) -> Unit,
+    console: Console?,
+    updateMoveList: KFunction4<String, MoveEntryListUiState, Game?, Console?, Unit>,
     modifier: Modifier = Modifier
 ) {
-    Timber.d("Moves: $moveList")
     FlowRow(
         horizontalArrangement = Arrangement.SpaceEvenly,
         modifier = modifier.fillMaxWidth().padding(vertical = 4.dp, horizontal = 4.dp)
     ) {
         Timber.d("Loading $moveType text moves")
+        Timber.d("Console: $console")
         moveList.moveList.forEach { move ->
 
-            var color = Color.White
+            if (move.moveType == moveType) Timber.d("Move: $move")
+
+            val game = when (move.game) {
+                "Tekken 8" -> Game.T8
+                "Street Fighter VI" -> Game.SF6
+                "Mortal Kombat 1" -> Game.MK1
+                else -> null
+            }
+
             val booleanStatement = move.moveType == moveType && move.moveName != "move_break"
 
-            when (moveType) {
+            val color: Color = when (moveType) {
                 "Mishima" -> {
-                    color = Color(0xFF000c66)
+                    Color(0xFF000c66)
                 }
+
+                "SF Classic", "SF Modern" ->
+                    if (move.moveName.contains("L")) {
+                        Color(0xFFf0c027)
+                    } else if (move.moveName.contains("M")) {
+                        Color(0xFFff914d)
+                    } else if (move.moveName.contains("H")) {
+                        Color(0xFFff0000)
+                    } else { Color(0xFF7ed957) }
 
                 "Character" -> {
-                    color = Color.Red
+                    Color.Red
                 }
 
-                "Mechanics Input" -> {
-                    color = Color(0xFF8155BA)
+                "Mechanic", "Mechanics Input" -> {
+                    Color(0xFF8155BA)
                 }
 
                 "Common" -> {
-                    color = Color(0xFF444444)
+                    Color(0xFF444444)
                 }
 
                 "Stage" -> {
-                    color = Color(0xFF2f5233)
+                    Color(0xFF2f5233)
                 }
+                else -> Color.White
 
-                "Modifier" -> {
-                    color = Color.White
-                }
             }
 
             if (booleanStatement) {
@@ -388,14 +448,25 @@ fun TextMoves(
                     ) {
                         Text(
                             move.moveName,
-                            color = if (color == Color.White || color == Color.Green || color == Color.Yellow) Color.Black else Color.White,
-                            fontSize = (14.sp),
-                            fontWeight = FontWeight.ExtraBold,
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                fontWeight = FontWeight.ExtraBold,
+                                color = if (color == Color.White || color == Color.Green) Color.Black else Color.White,
+                                shadow = Shadow(color = Color.Black.copy(alpha = 0.5f), offset = Offset(2f, 2f), blurRadius = 4f)
+                            ),
                             modifier = modifier.padding(1.dp).clickable(
                                 enabled = true,
                                 onClick = {
-                                    Timber.d("${move.moveName} selected, preparing to add combo to list...")
-                                    updateMoveList(move.moveName, moveList)
+                                    Timber.d("$move selected, preparing to add combo to list...")
+                                    Timber.d("$console")
+                                    Timber.d("$game")
+
+                                    if (game == null && move.moveType == moveType) { updateMoveList(move.moveName, moveList, null, null)}
+
+                                    console?.let { outerConsole ->
+                                        game?.let { innerGame ->
+                                            updateMoveList(move.moveName, moveList, innerGame, outerConsole)
+                                        }
+                                    }
                                     Timber.d("Added ${move.moveName} to combo move list.")
                                 }
                             )
@@ -411,7 +482,7 @@ fun TextMoves(
 fun CharacterMoves(
     characterMoveList: MoveEntryListUiState,
     moveType: String,
-    updateMoveList: (String, MoveEntryListUiState) -> Unit,
+    updateMoveList: KFunction4<String, MoveEntryListUiState, Game?, Console?, Unit>,
     modifier: Modifier = Modifier
 ) {
     Timber.d("Moves: $characterMoveList")
@@ -420,10 +491,12 @@ fun CharacterMoves(
         modifier = modifier.fillMaxWidth().padding(vertical = 4.dp, horizontal = 4.dp)
     ) {
         Timber.d("Loading character moves...")
-        val color = if (moveType == "Special") Color(0xFF0067B3) else Color(0xFFDC143C)
-        val fontColor = Color.White
+        val color =
+            if (moveType == "Special") Color(0xFF0067B3)
+            else Color(0xFFDC143C)
 
         characterMoveList.moveList.forEach { move ->
+
             if (move.moveType == moveType) {
                 Box(modifier.padding(horizontal = 4.dp, vertical = 4.dp)) {
                     Box(
@@ -434,14 +507,16 @@ fun CharacterMoves(
                     ) {
                         Text(
                             text = move.moveName,
-                            color = fontColor,
-                            fontSize = (14.sp),
-                            fontWeight = FontWeight.ExtraBold,
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                fontWeight = FontWeight.ExtraBold,
+                                color = if (color == Color.White || color == Color.Green) Color.Black else Color.White,
+                                shadow =Shadow(color = Color.Black, offset = Offset(2f, 2f), blurRadius = 2f)
+                            ),
                             modifier = modifier.padding(1.dp).clickable(
                                 enabled = true,
                                 onClick = {
                                     Timber.d("${move.moveName} selected, preparing to add combo to list...")
-                                    updateMoveList(move.moveName, characterMoveList)
+                                    updateMoveList(move.moveName, characterMoveList, null, null)
                                     Timber.d("Added ${move.moveName} to combo move list.")
                                 }
                             )
@@ -460,8 +535,6 @@ fun DamageAndConfirm(
     comboDisplay: ComboDisplay,
     updateComboData: (ComboDisplayUiState) -> Unit,
     saveCombo: KSuspendFunction0<Unit>,
-    updateMoveList: (String, MoveEntryListUiState) -> Unit,
-    moveList: MoveEntryListUiState,
     editingState: Boolean,
     originalCombo: ComboDisplay,
     onNavigateToComboDisplay: () -> Unit,
@@ -556,17 +629,24 @@ fun DamageAndConfirm(
             colors = ButtonDefaults.buttonColors().copy(containerColor = Color(0xffed1664),),
             modifier = modifier.fillMaxWidth().padding(16.dp)
         ) {
-            Text("Confirm", color = MaterialTheme.colorScheme.onBackground)
+            Text(
+                text = "Confirm",
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontWeight = FontWeight.ExtraBold,
+                    color =  Color.White,
+                    shadow = Shadow(color = Color.Black.copy(alpha = 0.5f), offset = Offset(2f, 2f), blurRadius = 4f)
+                )
+            )
         }
     }
 }
 
 @Composable
-fun ConfirmAndClear(
+fun BreakDeleteClear(
     moveList: MoveEntryListUiState,
-    deleteLastMove: () -> Unit,
+    deleteMove: () -> Unit,
     clearMoveList: () -> Unit,
-    updateMoveList: (String, MoveEntryListUiState) -> Unit,
+    updateMoveList: KFunction4<String, MoveEntryListUiState, Game?, Console?, Unit>,
     modifier: Modifier = Modifier
 ) {
     Timber.d("Loading confirm and clear buttons")
@@ -577,7 +657,7 @@ fun ConfirmAndClear(
         // Add Break
         OutlinedButton(
             onClick = {
-                updateMoveList("break", moveList)
+                updateMoveList("break", moveList, null, null)
                 Timber.d("Adding break to combo move list.")
             },
             colors = ButtonDefaults.buttonColors().copy(
@@ -591,11 +671,11 @@ fun ConfirmAndClear(
         OutlinedButton(
             onClick = {
                 Timber.d("Deleting last move...")
-                deleteLastMove()
+                deleteMove()
                 Timber.d("Last move deleted.")
             },
             content = {
-                Text("Delete Last", color = MaterialTheme.colorScheme.onBackground) }
+                Text("Delete", color = MaterialTheme.colorScheme.onBackground) }
         )
         // Clear Move List
         OutlinedButton(

@@ -75,7 +75,8 @@ fun ComboCreationScreen(
     val comboAsString by comboCreationViewModel.comboAsStringState.collectAsStateWithLifecycle()
     val characterMoveListState by comboCreationViewModel.characterMoveEntryList.collectAsStateWithLifecycle()
     val gameMoveListState by comboCreationViewModel.gameMoveEntryList.collectAsStateWithLifecycle()
-    val game by comboCreationViewModel.gameSelected.collectAsStateWithLifecycle()
+    val game by comboCreationViewModel.gameState.collectAsStateWithLifecycle()
+    val selectedItem by comboCreationViewModel.itemIndexState.collectAsStateWithLifecycle()
 
     // Datastore Flows
     val username by profileViewModel.username.collectAsStateWithLifecycle()
@@ -84,14 +85,14 @@ fun ComboCreationScreen(
     val editingState by comboCreationViewModel.editingState
     val iconDisplayState by comboDisplayViewModel.showIconState.collectAsStateWithLifecycle()
     val textComboDisplayState by comboDisplayViewModel.textComboState.collectAsStateWithLifecycle()
+    val consoleTypeState by comboDisplayViewModel.consoleTypeState.collectAsStateWithLifecycle()
+    val sf6ControlType by comboDisplayViewModel.modernOrClassicState.collectAsStateWithLifecycle()
 
     if (characterState.character != emptyCharacter) {
         comboCreationViewModel.getCharacterMoveEntryList(characterState.character.name)
     }
 
-    if (game.isNotEmpty()) {
-        comboCreationViewModel.getGameMoveEntryList(game)
-    }
+    game?.title?.let { comboCreationViewModel.getGameMoveEntryList(it) }
 
     Timber.d("Flows Collected: ")
     Timber.d("Character Name: ${characterNameState.name} ")
@@ -137,6 +138,7 @@ fun ComboCreationScreen(
                     IconButton(
                         onClick = {
                             comboCreationViewModel.clearMoveList()
+                            comboCreationViewModel.resetItemIndex()
                             navigateBack()
                                   },
                         modifier.fillMaxHeight()) {
@@ -166,7 +168,11 @@ fun ComboCreationScreen(
                     editingState = editingState,
                     username = username,
                     game = game,
+                    consoleTypeState = consoleTypeState,
+                    sF6ControlType = sf6ControlType,
                     updateComboData = comboCreationViewModel::updateComboDetails,
+                    setSelectedItem = comboCreationViewModel::updateItemIndex,
+                    selectedItem = selectedItem,
                     updateMoveList = comboCreationViewModel::updateMoveList,
                     character = characterState.character,
                     characterName = characterNameState.name,
@@ -179,7 +185,7 @@ fun ComboCreationScreen(
                     iconDisplayState = iconDisplayState,
                     textComboDisplay = textComboDisplayState,
                     saveCombo = comboCreationViewModel::saveCombo,
-                    deleteLastMove = comboCreationViewModel::deleteLastMove,
+                    deleteMove = comboCreationViewModel::deleteMove,
                     clearMoveList = comboCreationViewModel::clearMoveList,
                     onNavigateToComboDisplay = onNavigateToComboDisplay
                 )

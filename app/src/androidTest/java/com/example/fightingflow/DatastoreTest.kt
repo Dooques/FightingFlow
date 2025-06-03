@@ -137,7 +137,7 @@ class DatastoreTest {
     @Test
     @Throws(IOException::class)
     fun updateComboIF_ReturnComboID() = testScope.runTest {
-        testComboRepository.setCombo(combo)
+        testComboRepository.updateComboState(combo)
         val comboID = testComboRepository.getComboId().first()
         assertEquals(combo.comboId, comboID)
     }

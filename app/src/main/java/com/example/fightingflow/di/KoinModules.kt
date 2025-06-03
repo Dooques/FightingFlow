@@ -18,8 +18,6 @@ import com.example.fightingflow.data.datastore.CharacterDatastoreRepository
 import com.example.fightingflow.data.datastore.CharacterDsRepository
 import com.example.fightingflow.data.datastore.ComboDatastoreRepository
 import com.example.fightingflow.data.datastore.ComboDsRepository
-import com.example.fightingflow.data.datastore.GameDatastoreRepository
-import com.example.fightingflow.data.datastore.GameDsRepository
 import com.example.fightingflow.data.datastore.ProfileDatastoreRepository
 import com.example.fightingflow.data.datastore.ProfileDsRepository
 import com.example.fightingflow.data.datastore.SettingsDatastoreRepository
@@ -29,6 +27,7 @@ import com.example.fightingflow.ui.InitViewModel
 import com.example.fightingflow.ui.characterScreen.CharacterScreenViewModel
 import com.example.fightingflow.ui.comboCreationScreen.ComboCreationViewModel
 import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayViewModel
+import com.example.fightingflow.ui.comboItem.ComboItemViewModel
 import com.example.fightingflow.ui.profileScreen.ProfileViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -68,7 +67,6 @@ val repositoryModule = module {
     single<ProfileDsRepository> { ProfileDatastoreRepository(androidContext().dataStore) }
     single<CharacterDsRepository> { CharacterDatastoreRepository(androidContext().dataStore) }
     single<ComboDsRepository> { ComboDatastoreRepository(androidContext().dataStore) }
-    single<GameDsRepository> { GameDatastoreRepository(androidContext().dataStore) }
     single<SettingsDsRepository> { SettingsDatastoreRepository(androidContext().dataStore) }
 
     // MediaStore
@@ -79,6 +77,7 @@ val viewModelModule = module {
     viewModel { ProfileViewModel(get(), get(), get()) }
     viewModel { InitViewModel(get()) }
     viewModel { ComboDisplayViewModel(get(), get(), get(), get()) }
-    viewModel { ComboCreationViewModel(get(), get(), get(), get(), get()) }
+    viewModel { ComboCreationViewModel(get(), get(), get(), get()) }
     viewModel { CharacterScreenViewModel(get()) }
+    viewModel { ComboItemViewModel() }
 }

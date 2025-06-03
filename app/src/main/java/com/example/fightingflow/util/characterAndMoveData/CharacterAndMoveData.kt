@@ -16,7 +16,9 @@ class CharacterAndMoveData {
     val moveEntries = ImmutableList(
         listOf(
             commonMoves,
-            consoleButtons,
+            playstationInputs,
+            xboxInputs,
+            nintendoInputs,
             tekken8CharacterMoves,
             mk1MoveList,
             streetFighterVIMoves

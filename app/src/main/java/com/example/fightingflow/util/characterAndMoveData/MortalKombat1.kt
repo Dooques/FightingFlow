@@ -20,16 +20,16 @@ val mortalKombat1Characters = ImmutableList(
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
-            name = "Conan the Barbarian",
+            name = "Conan",
             imageId = R.drawable.conan, // Replace with actual image ID
             fightingStyle = "Barbarian",
-            game = "MK1",
+            game = "Mortal Kombat 1",
         ),
         CharacterEntry(
             name = "Cyrax",
             imageId = R.drawable.cyrax,  // Replace with actual image ID
             fightingStyle = "Tekunin",
-            game = "MK1",
+            game = "Mortal Kombat 1",
         ),
         CharacterEntry(
             name = "Ermac", // DLC
@@ -47,13 +47,13 @@ val mortalKombat1Characters = ImmutableList(
             name = "Geras",
             imageId = R.drawable.geras, // Replace with actual image ID
             fightingStyle = "Temporal",
-            game = "MK1",
+            game = "Mortal Kombat 1",
         ),
         CharacterEntry(
             name = "Ghostface",
-            imageId = 0,
+            imageId = R.drawable.ghostface,
             fightingStyle = "Stealth",
-            game = "MK1"
+            game = "Mortal Kombat 1"
         ),
         CharacterEntry(
             name = "Havik",
@@ -119,7 +119,7 @@ val mortalKombat1Characters = ImmutableList(
             name = "Noob Saibot",
             imageId = R.drawable.noobsaibot, // Replace with actual image ID
             fightingStyle = "Shadow",
-            game = "MK1",
+            game = "Mortal Kombat 1",
         ),
         CharacterEntry(
             name = "Omni-Man", // DLC
@@ -209,7 +209,7 @@ val mortalKombat1Characters = ImmutableList(
             name = "T-1000",
             imageId = R.drawable.t1000, // Replace with actual image ID
             fightingStyle = "Mimicry",
-            game = "MK1",
+            game = "Mortal Kombat 1",
         ),
         CharacterEntry(
             name = "Tanya",
@@ -242,6 +242,7 @@ val mk1MoveList = ImmutableList(
         // Mechanics
         MoveEntry(moveName = "Block", notation = "block", moveType = "MK Input", character = "Generic", game = "Mortal Kombat 1"),
         MoveEntry(moveName = "Stance", notation = "stance", moveType = "MK Input", character = "Generic", game = "Mortal Kombat 1"),
+        MoveEntry(moveName = "Throw", notation = "throw", moveType = "MK Input", character = "Generic", game = "Mortal Kombat 1"),
         MoveEntry(moveName = "Boost", notation = "Air", moveType = "MK Input", character = "Generic", game = "Mortal Kombat 1"),
         MoveEntry(moveName = "Kameo", notation = "Kameo", moveType = "MK Input", character = "Generic", game = "Mortal Kombat 1"),
         MoveEntry(moveName = "Air", notation = "Air", moveType = "MK Input", character = "Generic", game = "Mortal Kombat 1"),

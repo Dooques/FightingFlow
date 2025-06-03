@@ -16,8 +16,8 @@ import timber.log.Timber
 
 
 interface ComboDsRepository {
-    suspend fun setCombo(comboDisplay: ComboDisplay)
-    suspend fun setEditingState(editingStateValue: Boolean)
+    suspend fun updateComboState(comboDisplay: ComboDisplay)
+    suspend fun updateEditingState(editingStateValue: Boolean)
 
     fun getComboId(): Flow<String>
     fun getEditingState(): Flow<Boolean>
@@ -31,7 +31,7 @@ interface ComboDsRepository {
 class ComboDatastoreRepository(private val dataStore: DataStore<Preferences>): ComboDsRepository {
     val Context.dataStore: DataStore<Preferences> by preferencesDataStore("combo_data")
 
-    override suspend fun setCombo(comboDisplay: ComboDisplay) {
+    override suspend fun updateComboState(comboDisplay: ComboDisplay) {
         Timber.d("Setting combo to datastore...")
         Timber.d("ComboId: ${comboDisplay.comboId}")
         dataStore.edit { preference ->
@@ -39,7 +39,7 @@ class ComboDatastoreRepository(private val dataStore: DataStore<Preferences>): C
         }
     }
 
-    override suspend fun setEditingState(editingStateValue: Boolean) {
+    override suspend fun updateEditingState(editingStateValue: Boolean) {
         Timber.d("Setting editing state to datastore...")
         Timber.d("Editing state: $editingState")
         dataStore.edit { preference ->

@@ -5,6 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.fightingflow.data.database.FlowRepository
 import com.example.fightingflow.data.datastore.CharacterDsRepository
 import com.example.fightingflow.data.datastore.ComboDsRepository
+import com.example.fightingflow.data.datastore.Console
+import com.example.fightingflow.data.datastore.Game
+import com.example.fightingflow.data.datastore.SF6ControlType
 import com.example.fightingflow.data.datastore.SettingsDsRepository
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
@@ -94,6 +97,33 @@ class ComboDisplayViewModel(
             initialValue = false
         )
 
+    val consoleTypeState = settingsDsRepository.getConsoleType()
+        .map { when (it) {
+            1 -> Console.PLAYSTATION
+            2 -> Console.XBOX
+            3 -> Console.NINTENDO
+            else -> Console.STANDARD
+        } }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(TIME_MILLIS),
+            initialValue = Console.STANDARD
+        )
+
+    val modernOrClassicState = settingsDsRepository.getSF6ControlType()
+        .map { type ->
+            when (type) {
+                0 -> SF6ControlType.Classic
+                1 -> SF6ControlType.Modern
+                else -> SF6ControlType.Invalid
+            }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000L),
+            initialValue = SF6ControlType.Invalid
+        )
+
     // Datastore
     fun updateCharacterState(name: String) {
         viewModelScope.launch {
@@ -124,12 +154,24 @@ class ComboDisplayViewModel(
         settingsDsRepository.updateShowComboTextState(textCombo)
     }
 
-    suspend fun saveComboIdToDs(comboDisplay: ComboDisplay) {
-        comboDsRepository.setCombo(comboDisplay)
-        setEditingState(true)
+    suspend fun updateComboStateInDs(comboDisplay: ComboDisplay) {
+        comboDsRepository.updateComboState(comboDisplay)
+        updateEditingState(true)
     }
 
-    suspend fun setEditingState(editingStateValue: Boolean) = comboDsRepository.setEditingState(editingStateValue)
+    suspend fun updateEditingState(editingStateValue: Boolean) =
+        comboDsRepository.updateEditingState(editingStateValue)
+
+    fun updateConsoleType(console: Console) = viewModelScope.launch {
+        settingsDsRepository.updateConsoleType(
+            when (console) {
+                Console.STANDARD -> 0
+                Console.PLAYSTATION -> 1
+                Console.XBOX -> 2
+                Console.NINTENDO -> 3
+            }
+        )
+    }
 
     // Database Functions
     private fun getAllMoveEntries() = viewModelScope.launch {
@@ -140,10 +182,10 @@ class ComboDisplayViewModel(
             }
     }
 
-    fun getCharacterEntryListByGame(game: String) = viewModelScope.launch {
+    fun getCharacterEntryListByGame(game: Game) = viewModelScope.launch {
         Timber.d("Updating character entry list state")
-        Timber.d("Game selected: $game")
-            flowRepository.getCharactersByGame(game)
+        Timber.d("Game selected: ${game.title}")
+            flowRepository.getCharactersByGame(game.title)
                 .map { characterList ->
                     Timber.d("CharacterList: $characterList")
                     CharacterEntryListUiState(characterList)
@@ -166,7 +208,11 @@ class ComboDisplayViewModel(
                 _comboDisplayListState.update {
                     ComboDisplayListUiState(
                         comboDisplayList = comboEntryList.comboEntryList.map { combo ->
-                            getMoveEntryDataForComboDisplay(combo.toDisplay(), moveEntryListUiState.value)
+                            getMoveEntryDataForComboDisplay(
+                                combo = combo.toDisplay(moveEntryListUiState.value),
+                                moveEntryList = moveEntryListUiState.value,
+                                controlType = consoleTypeState.value.let { Console.STANDARD }
+                            )
                         }
                     )
                 }
@@ -175,7 +221,7 @@ class ComboDisplayViewModel(
 
     suspend fun deleteCombo(combo: ComboDisplay) {
         Timber.d("Starting delete process...")
-        Timber.d("Deleting: $combo")
+        Timber.d("Deleting: $combo...")
         flowRepository.deleteCombo(combo.toEntry(characterEntryListState.value.characterList.first {it.name == combo.character}))
         Timber.d("Combo Deleted.")
     }

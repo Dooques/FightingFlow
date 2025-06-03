@@ -45,10 +45,8 @@ fun NavGraph(
     navController: NavHostController = rememberNavController(),
     deviceType: WindowSizeClass
 ) {
-    Timber.d("Initializing NavController")
-//    val backStackEntry by navController.currentBackStackEntryAsState()
-
-    Timber.d("Initializing ViewModels")
+    Timber.d("Initializing NavController...")
+    Timber.d("Initializing ViewModels...")
     val comboDisplayViewModel = koinInject<ComboDisplayViewModel>()
     val comboCreationViewModel = koinInject<ComboCreationViewModel>()
     val profileViewModel = koinInject<ProfileViewModel>()
@@ -88,7 +86,7 @@ fun NavGraph(
 
             // Profiles
             composable(route = FlowScreen.ProfileList.name) {
-                Timber.d("Loading Profile List Screen")
+                Timber.d("Loading Profile List Screen...")
                 ProfileList(
                     profileViewModel = profileViewModel,
                     username = username,
@@ -101,7 +99,7 @@ fun NavGraph(
 
             // Character Screen
             composable(route = FlowScreen.CharSelect.name) {
-                Timber.d("Loading Character Screen")
+                Timber.d("Loading Character Screen...")
                 CharacterScreen(
                     scope = scope,
                     comboDisplayViewModel = comboDisplayViewModel,
@@ -113,7 +111,7 @@ fun NavGraph(
 
             // Combo Display Screen
             composable(route = FlowScreen.Combos.name) {
-                Timber.d("Loading Combo Display Screen")
+                Timber.d("Loading Combo Display Screen...")
                 ComboDisplayScreen(
                     deviceType = deviceType,
                     comboDisplayViewModel = comboDisplayViewModel,
@@ -126,7 +124,7 @@ fun NavGraph(
 
             // Combo Creation Screen
             composable(route = FlowScreen.ComboCreation.name) {
-                Timber.d("Loading Combo Creation Screen")
+                Timber.d("Loading Combo Creation Screen...")
                 ComboCreationScreen(
                     comboDisplayViewModel = comboDisplayViewModel,
                     comboCreationViewModel = comboCreationViewModel,
