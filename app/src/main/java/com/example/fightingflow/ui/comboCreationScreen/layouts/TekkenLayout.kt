@@ -67,7 +67,7 @@ fun TekkenLayout(
         } else {
             Timber.d("Using normal character layout")
         }
-        items(items = if (mishimaChar) tekkenLayoutMishima else tekkenLayout) { moveType ->
+        items(items = tekkenLayout) { moveType ->
             when (moveType) {
                 "Move Modifiers" -> MoveModifiers()
 
@@ -91,15 +91,14 @@ fun TekkenLayout(
                     moveType = moveType,
                     moveList = gameMoveList,
                     updateMoveList = updateMoveList,
-                    maxItemsPerRow = 5,
                     context = context,
                     console = console,
                 )
+
                 "Input" -> if (console == Console.STANDARD) IconMoves(
                     moveType = moveType,
                     moveList = gameMoveList,
                     updateMoveList = updateMoveList,
-                    maxItemsPerRow = 5,
                     context = context,
                     console = console,
                 )
@@ -132,10 +131,11 @@ fun TekkenLayout(
                     console = console
                 )
 
-                "Mishima" -> TextMoves(
+                "Mishima" -> if (character.name in mishima) TextMoves(
                     moveType = moveType,
                     moveList = characterMoveList,
                     updateMoveList = updateMoveList,
+                    maxItems = if (characterMoveList.moveList.size > 5) 4 else 5,
                     console = console
                 )
 
@@ -153,10 +153,13 @@ fun TekkenLayout(
                 )
 
                 "Divider" -> InputDivider()
+                "Mishima Divider" -> if (character.name in mishima) InputDivider()
 
-                "Stances", "Heat and Rage", "Inputs", "Movements", "Mishima Moves", "Stage Mechanics",
+                "Stances", "Heat and Rage", "Inputs", "Movements",  "Stage Mechanics",
                 "Mechanics", "Modifiers", "Combo Description", "Damage and Break", "Misc Inputs" ->
                     SectionTitle(moveType)
+
+                "Mishima Moves" -> if (character.name in mishima) SectionTitle(moveType)
 
                 "Character Stances" -> SectionTitle(
                     title = when (character.game) {

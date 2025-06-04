@@ -157,6 +157,7 @@ fun ComboForm(
                     scope = scope,
                     snackbarHostState = snackbarHostState,
                     editingState = editingState,
+                    character = character,
                     comboDisplay = comboDisplay,
                     originalCombo = originalCombo,
                     combo = comboDisplay,
@@ -311,7 +312,7 @@ fun IconMoves(
     console: Console?,
     sF6ControlType: SF6ControlType? = SF6ControlType.Invalid,
     context: Context,
-    maxItemsPerRow: Int,
+    maxItemsPerRow: Int = 5,
     modifier: Modifier = Modifier
 ) {
     FlowRow(
@@ -382,12 +383,14 @@ fun IconMoves(
 fun TextMoves(
     moveType: String,
     moveList: MoveEntryListUiState,
+    maxItems: Int = 5,
     console: Console?,
     updateMoveList: KFunction4<String, MoveEntryListUiState, Game?, Console?, Unit>,
     modifier: Modifier = Modifier
 ) {
     FlowRow(
         horizontalArrangement = Arrangement.SpaceEvenly,
+        maxItemsInEachRow = maxItems,
         modifier = modifier.fillMaxWidth().padding(vertical = 4.dp, horizontal = 4.dp)
     ) {
         Timber.d("Loading $moveType text moves")

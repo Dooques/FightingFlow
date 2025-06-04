@@ -2,25 +2,19 @@ package com.example.fightingflow.ui.comboCreationScreen.layouts
 
 val mishima = listOf("Reina", "Heihachi", "Jin", "Kazuya", "Devil Jin")
 
-val tekkenLayoutMishima = listOf(
-    "Text Combo", "Description", "Damage", "Buttons", "Divider", "Misc Inputs", "Misc", "Divider",
-    "Movements", "Movement", "Divider", "Inputs", "Input", "Console", " Console Text", "Divider", "Character Stances",
-    "Character", "Divider", "Mishima Moves", "Mishima", "Divider", "Stances", "Common", "Divider",
-    "Heat and Rage", "Mechanics Input", "Divider", "Stage Mechanics", "Stage",
-)
-
 val tekkenLayout = listOf(
     "Text Combo", "Description", "Damage", "Buttons", "Divider", "Misc Inputs", "Misc", "Divider",
-    "Movements", "Movement", "Divider", "Inputs", "Console", "Console Text", "Input", "Divider", "Character Stances",
-    "Character", "Divider", "Stances", "Common", "Divider", "Mechanics", "Mechanics Input",
-    "Divider", "Stage Mechanics", "Stage",
+    "Movements", "Movement", "Divider", "Inputs", "Console", "Console Text", "Input", "Divider",
+    "Character Stances", "Character", "Divider", "Mishima Moves", "Mishima", "Mishima Divider",
+    "Stances", "Common", "Divider", "Mechanics", "Mechanics Input", "Divider", "Stage Mechanics",
+    "Stage",
 )
 
 val streetFighterLayoutClassic = listOf(
     "Text Combo", "Description", "Damage", "Buttons", "Divider", "Misc Inputs", "Misc", "Divider",
-    "Movements", "Movement", "Complex Movement", "Divider", "Classic Inputs", "SF Classic", "Console",
-    "Console Text", "Divider", "Mechanics", "Mechanic", "Divider", "Special Moves", "Special",
-    "Divider", "Super Arts", "Super Art"
+    "Movements", "Movement", "Complex Movement", "Divider", "Classic Inputs", "SF Classic",
+    "Console", "Console Text", "Divider", "Mechanics", "Mechanic", "Divider", "Special Moves",
+    "Special", "Divider", "Super Arts", "Super Art"
 )
 
 val streetFighterLayoutModern = listOf(
