@@ -16,7 +16,6 @@ import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.ui.comboCreationScreen.CharacterMoves
 import com.example.fightingflow.ui.comboCreationScreen.ComboDescription
-import com.example.fightingflow.ui.comboCreationScreen.BreakDeleteClear
 import com.example.fightingflow.ui.comboCreationScreen.DamageAndConfirm
 import com.example.fightingflow.ui.comboCreationScreen.IconMoves
 import com.example.fightingflow.ui.comboCreationScreen.InputDivider
@@ -101,7 +100,16 @@ fun StreetFighterLayout(
                     sF6ControlType = sF6ControlType
                 )
 
-                "SF Classic", "SF Modern" -> if (console == Console.STANDARD)
+                "SF Classic" -> if (console == Console.STANDARD)
+                    TextMoves(
+                        moveType = moveType,
+                        moveList = gameMoveList,
+                        updateMoveList = updateMoveList,
+                        console = console,
+                        maxItems = 3
+                    )
+
+                "SF Modern" -> if (console == Console.STANDARD)
                     TextMoves(
                         moveType = moveType,
                         moveList = gameMoveList,
@@ -125,20 +133,14 @@ fun StreetFighterLayout(
                         else -> MoveEntryListUiState()
                     },
                     updateMoveList = updateMoveList,
-                    console = console
+                    console = console,
+                    maxItems = 6
                 )
 
                 "Special", "Super Art" -> CharacterMoves(
                     characterMoveList = characterMoveList,
                     moveType = moveType,
                     updateMoveList = updateMoveList
-                )
-
-                "Buttons" -> BreakDeleteClear(
-                    deleteMove = deleteLastMove,
-                    clearMoveList = clearMoveList,
-                    updateMoveList = updateMoveList,
-                    moveList = moveList,
                 )
 
                 "Divider" ->

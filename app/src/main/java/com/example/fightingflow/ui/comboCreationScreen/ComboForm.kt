@@ -103,27 +103,35 @@ fun ComboForm(
         Timber.d("Combo Move List exists, populating with moves...")
         if (comboDisplay.moves.isEmpty()) {
             Row(
-                modifier = modifier.height(57.dp).padding(horizontal = 16.dp),
+                modifier = modifier.height(if (textComboDisplay && iconDisplayState)114.dp else 57.dp).padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(text = "Add some moves!", modifier = modifier.padding(4.dp))
             }
+        } else {
+            ComboItemEditor(
+                context = context,
+                combo = comboDisplay,
+                username = username,
+                console = consoleTypeState,
+                sf6ControlType = sF6ControlType,
+                fontColor = MaterialTheme.colorScheme.onBackground,
+                iconDisplayState = iconDisplayState,
+                comboAsText = comboAsString,
+                uiScale = 1f,
+                setSelectedItem = setSelectedItem,
+                selectedItem = selectedItem,
+                modifier = modifier.padding(vertical = 4.dp),
+            )
         }
+        BreakDeleteClear(
+            deleteMove = deleteMove,
+            clearMoveList = clearMoveList,
+            updateMoveList = updateMoveList,
+            moveList = moveList,
+        )
     }
-    ComboItemEditor(
-        context = context,
-        combo = comboDisplay,
-        username = username,
-        console = consoleTypeState,
-        sf6ControlType = sF6ControlType,
-        fontColor = MaterialTheme.colorScheme.onBackground,
-        iconDisplayState = iconDisplayState,
-        comboAsText = comboAsString,
-        uiScale = 1f,
-        setSelectedItem = setSelectedItem,
-        selectedItem = selectedItem,
-        modifier = modifier.padding(vertical = 4.dp),
-    )
+
     if (moveList.moveList.isNotEmpty()) {
         Timber.d("Move Entry List exists, populating Input Selector Column...")
         game?.let { innerGame ->
@@ -426,7 +434,7 @@ fun TextMoves(
                     Color.Red
                 }
 
-                "Mechanic", "Mechanics Input" -> {
+                "Mechanic" -> {
                     Color(0xFF8155BA)
                 }
 
@@ -486,11 +494,13 @@ fun CharacterMoves(
     characterMoveList: MoveEntryListUiState,
     moveType: String,
     updateMoveList: KFunction4<String, MoveEntryListUiState, Game?, Console?, Unit>,
+    maxItems: Int = 5,
     modifier: Modifier = Modifier
 ) {
     Timber.d("Moves: $characterMoveList")
     FlowRow(
         horizontalArrangement = Arrangement.SpaceEvenly,
+        maxItemsInEachRow = maxItems,
         modifier = modifier.fillMaxWidth().padding(vertical = 4.dp, horizontal = 4.dp)
     ) {
         Timber.d("Loading character moves...")

@@ -107,7 +107,7 @@ fun MoveImage(
 
 @Composable
 fun TextMove(
-    input: MoveEntry,
+    move: MoveEntry,
     color: Color,
     uiScale: Float,
     modifier: Modifier = Modifier
@@ -118,7 +118,20 @@ fun TextMove(
             .background(color)
     ) {
         Text(
-            text = input.moveName,
+            text =
+                when (move.moveType) {
+                    "Stage", "Mechanic", "Common", "Modifier"->
+                    if (!move.notation.contains("/")) {
+                        move.notation.replaceFirstChar { it.uppercase() }
+                    } else {
+                        if (move.moveName.length > 3) {
+                            move.notation.replaceFirstChar { it.uppercase() }
+                        } else {
+                            move.notation.uppercase()
+                        }
+                    }
+                else -> move.moveName },
+
             style = MaterialTheme.typography.bodyLarge.copy(
                 fontWeight = FontWeight.ExtraBold,
                 color = if (color == Color.White || color == Color.Green) Color.Black else Color.White,

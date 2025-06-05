@@ -23,10 +23,7 @@ fun SettingsMenu(
         onDismissRequest = { onDismissRequest() }
     ) {
         DropdownMenuItem(
-            text = { Text(
-                if (iconState) "Disable Icons in Combos"
-                else "Enable Icons in Combos"
-            ) },
+            text = { Text( "Icons in Combos") },
             trailingIcon = {
                 if (iconState) Icon(
                     imageVector = Icons.Default.Check,
@@ -40,10 +37,7 @@ fun SettingsMenu(
             onClick = { updateIconSetting() }
         )
         DropdownMenuItem(
-            text = { Text(
-                if (textComboState) "Disable Text in Combos"
-                else "Enable Text in Combos"
-            ) },
+            text = { Text("Text in Combos") },
             trailingIcon = {
                 if (textComboState)
                     Icon(

@@ -15,7 +15,6 @@ import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.ui.comboCreationScreen.CharacterMoves
 import com.example.fightingflow.ui.comboCreationScreen.ComboDescription
-import com.example.fightingflow.ui.comboCreationScreen.BreakDeleteClear
 import com.example.fightingflow.ui.comboCreationScreen.DamageAndConfirm
 import com.example.fightingflow.ui.comboCreationScreen.IconMoves
 import com.example.fightingflow.ui.comboCreationScreen.InputDivider
@@ -119,20 +118,15 @@ fun MortalKombatLayout(
                     },
                     updateMoveList = updateMoveList,
                     console = console,
+                    maxItems = 6
                 )
 
                 "MK Input" -> TextMoves(
                     moveType = moveType,
                     moveList = gameMoveList,
                     updateMoveList = updateMoveList,
-                    console = console
-                )
-
-                "Buttons" -> BreakDeleteClear(
-                    deleteMove = deleteMove,
-                    clearMoveList = clearMoveList,
-                    updateMoveList = updateMoveList,
-                    moveList = moveList,
+                    console = console,
+                    maxItems = 4
                 )
 
                 "Divider" ->

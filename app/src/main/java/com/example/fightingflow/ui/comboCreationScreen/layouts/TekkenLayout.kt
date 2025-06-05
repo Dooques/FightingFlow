@@ -15,7 +15,6 @@ import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.ui.comboCreationScreen.CharacterMoves
 import com.example.fightingflow.ui.comboCreationScreen.ComboDescription
-import com.example.fightingflow.ui.comboCreationScreen.BreakDeleteClear
 import com.example.fightingflow.ui.comboCreationScreen.DamageAndConfirm
 import com.example.fightingflow.ui.comboCreationScreen.IconMoves
 import com.example.fightingflow.ui.comboCreationScreen.InputDivider
@@ -87,7 +86,15 @@ fun TekkenLayout(
                     onNavigateToComboDisplay = onNavigateToComboDisplay,
                 )
 
-                 "Movement", "Console" -> IconMoves(
+                "Movement" -> IconMoves(
+                    moveType = moveType,
+                    moveList = gameMoveList,
+                    updateMoveList = updateMoveList,
+                    context = context,
+                    console = console,
+                )
+
+                "Console" -> IconMoves(
                     moveType = moveType,
                     moveList = gameMoveList,
                     updateMoveList = updateMoveList,
@@ -112,11 +119,12 @@ fun TekkenLayout(
                     console = console
                 )
 
-                "Common", "Mechanics Input", "Stage" -> TextMoves(
+                "Common", "Mechanic", "Stage" -> TextMoves(
                     moveType = moveType,
-                    moveList = moveList,
+                    moveList = gameMoveList,
                     updateMoveList = updateMoveList,
-                    console = console
+                    console = console,
+                    maxItems = if (gameMoveList.moveList.first().game == "Tekken 8") 2 else 5
                 )
 
                 "Console Text" -> TextMoves(
@@ -128,7 +136,8 @@ fun TekkenLayout(
                         else -> MoveEntryListUiState()
                     },
                     updateMoveList = updateMoveList,
-                    console = console
+                    console = console,
+                    maxItems = 6
                 )
 
                 "Mishima" -> if (character.name in mishima) TextMoves(
@@ -143,13 +152,6 @@ fun TekkenLayout(
                     characterMoveList = characterMoveList,
                     moveType = moveType,
                     updateMoveList = updateMoveList,
-                )
-
-                "Buttons" -> BreakDeleteClear(
-                    deleteMove = deleteMove,
-                    clearMoveList = clearMoveList,
-                    updateMoveList = updateMoveList,
-                    moveList = moveList,
                 )
 
                 "Divider" -> InputDivider()

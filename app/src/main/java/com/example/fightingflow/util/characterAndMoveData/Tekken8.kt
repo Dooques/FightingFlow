@@ -281,10 +281,10 @@ val tekken8CharacterMoves = ImmutableList(
         MoveEntry(moveName = "Low Parry", notation = "l/p", moveType = "Common", character = "Generic", game = "Tekken 8"),
 
         // Mechanics
-        MoveEntry(moveName = "Heat Burst", notation = "h/burst", moveType = "Mechanics Input", character = "Generic", game = "Tekken 8"),
-        MoveEntry(moveName = "Heat Dash", notation = "h/dash", moveType = "Mechanic Input", character = "Generic", game = "Tekken 8"),
-        MoveEntry(moveName = "During Heat", notation = "in heat", moveType = "Mechanics Input", character = "Generic", game = "Tekken 8"),
-        MoveEntry(moveName = "Rage Art", notation = "rage", moveType = "Mechanics Input", character = "Generic", game = "Tekken 8"),
+        MoveEntry(moveName = "Heat", notation = "heat", moveType = "Mechanic", character = "Generic", game = "Tekken 8"),
+        MoveEntry(moveName = "Heat Burst", notation = "h/burst", moveType = "Mechanic", character = "Generic", game = "Tekken 8"),
+        MoveEntry(moveName = "Heat Dash", notation = "h/dash", moveType = "Mechanic", character = "Generic", game = "Tekken 8"),
+        MoveEntry(moveName = "Rage Art", notation = "rage", moveType = "Mechanic", character = "Generic", game = "Tekken 8"),
 
         // Stage
         MoveEntry(moveName = "Wall Splat", notation = "w/splat", moveType = "Stage", character = "Generic", game = "Tekken 8"),
@@ -296,172 +296,172 @@ val tekken8CharacterMoves = ImmutableList(
         MoveEntry(moveName = "Balcony Break", notation = "b/break", moveType = "Stage", character = "Generic", game = "Tekken 8"),
 
         // Alisa
-        MoveEntry(moveName = "Destructive Form", notation = "Destructive Form", moveType = "Character", game = "Tekken 8", character = "Alisa"),
-        MoveEntry(moveName = "Boot", notation = "Boot", moveType = "Character", game = "Tekken 8", character = "Alisa"),
-        MoveEntry(moveName = "Dual Boot", notation = "Dual Boot", moveType = "Character", game = "Tekken 8", character = "Alisa"),
+        MoveEntry(moveName = "Destructive Form", notation = "Destructive Form", moveType = "Character", character = "Alisa", game = "Tekken 8"),
+        MoveEntry(moveName = "Boot", notation = "Boot", moveType = "Character", character = "Alisa", game = "Tekken 8"),
+        MoveEntry(moveName = "Dual Boot", notation = "Dual Boot", moveType = "Character", character = "Alisa", game = "Tekken 8"),
 
         // Anna
-        MoveEntry(moveName = "Hammer Chance", notation = "Hammer Chance", moveType = "Character", game = "Tekken 8", character = "Anna"),
-        MoveEntry(moveName = "Chaos Judgement", notation = "Chaos Judgement", moveType = "Character", game = "Tekken 8", character = "Anna"),
+        MoveEntry(moveName = "Hammer Chance", notation = "Hammer Chance", moveType = "Character", character = "Anna", game = "Tekken 8"),
+        MoveEntry(moveName = "Chaos Judgement", notation = "Chaos Judgement", moveType = "Character", character = "Anna", game = "Tekken 8"),
 
         //Asuka
-        MoveEntry(moveName = "Naniwa Gusto", notation = "Naniwa Gusto", moveType = "Character", game = "Tekken 8", character = "Asuka"),
-        MoveEntry(moveName = "Leg Cutter", notation = "Leg Cutter", moveType = "Character", game = "Tekken 8", character = "Asuka"),
+        MoveEntry(moveName = "Naniwa Gusto", notation = "Naniwa Gusto", moveType = "Character", character = "Asuka", game = "Tekken 8"),
+        MoveEntry(moveName = "Leg Cutter", notation = "Leg Cutter", moveType = "Character", character = "Asuka", game = "Tekken 8"),
 
         // Azucena
-        MoveEntry(moveName = "Libertador", notation = "Libertador", moveType = "Character", game = "Tekken 8", character = "Azucena"),
-        MoveEntry(moveName = "Taking High Attack", notation = "Taking High Attack", moveType = "Character", game = "Tekken 8", character = "Azucena"),
-        MoveEntry(moveName = "Taking Low Attack", notation = "Taking Low Attack", moveType = "Character", game = "Tekken 8", character = "Azucena"),
+        MoveEntry(moveName = "Libertador", notation = "Libertador", moveType = "Character", character = "Azucena", game = "Tekken 8"),
+        MoveEntry(moveName = "Taking High Attack", notation = "Taking High Attack", moveType = "Character", character = "Azucena", game = "Tekken 8"),
+        MoveEntry(moveName = "Taking Low Attack", notation = "Taking Low Attack", moveType = "Character", character = "Azucena", game = "Tekken 8"),
 
         // Bryan
-        MoveEntry(moveName = "Snake Eyes", notation = "Snake Eyes", moveType = "Character", game = "Tekken 8", character = "Bryan"),
-        MoveEntry(moveName = "Slither Step", notation = "Slither Step", moveType = "Character", game = "Tekken 8", character = "Bryan"),
+        MoveEntry(moveName = "Snake Eyes", notation = "Snake Eyes", moveType = "Character", character = "Bryan", game = "Tekken 8"),
+        MoveEntry(moveName = "Slither Step", notation = "Slither Step", moveType = "Character", character = "Bryan", game = "Tekken 8"),
 
         // Claudio
-        MoveEntry(moveName = "Starburst", notation = "Starburst", moveType = "Character", game = "Tekken 8", character = "Claudio"),
+        MoveEntry(moveName = "Starburst", notation = "Starburst", moveType = "Character", character = "Claudio"),
 
         // Clive
-        MoveEntry(moveName = "Phoenix Shift", notation = "Phoenix Shift", moveType = "Character", game = "Tekken 8", character = "Clive"),
-        MoveEntry(moveName = "Wings Of Light", notation = "Wings Of Light", moveType = "Character", game = "Tekken 8", character = "Clive"),
-        MoveEntry(moveName = "Updraft", notation = "Updraft", moveType = "Character", game = "Tekken 8", character = "Clive"),
-        MoveEntry(moveName = "Zantetsuken", notation = "Zantetsuken", moveType = "Character", game = "Tekken 8", character = "Clive"),
+        MoveEntry(moveName = "Phoenix Shift", notation = "Phoenix Shift", moveType = "Character", character = "Clive", game = "Tekken 8"),
+        MoveEntry(moveName = "Wings Of Light", notation = "Wings Of Light", moveType = "Character", character = "Clive", game = "Tekken 8"),
+        MoveEntry(moveName = "Updraft", notation = "Updraft", moveType = "Character", character = "Clive", game = "Tekken 8"),
+        MoveEntry(moveName = "Zantetsuken", notation = "Zantetsuken", moveType = "Character", character = "Clive", game = "Tekken 8"),
 
         // Devil Jin
-        MoveEntry(moveName = "Mourning Crow", notation = "Mourning Crow", moveType = "Character", game = "Tekken 8", character = "Devil Jin"),
-        MoveEntry(moveName = "Fly", notation = "Fly", moveType = "Character", game = "Tekken 8", character = "Devil Jin"),
-        MoveEntry(moveName = "WGS", notation = "WGS", moveType = "Mishima", game = "Tekken 8", character = "Devil Jin"),
-        MoveEntry(moveName = "WGF", notation = "WGF", moveType = "Mishima", game = "Tekken 8", character = "Devil Jin"),
-        MoveEntry(moveName = "EWGF", notation = "EWGF", moveType = "Mishima", game = "Tekken 8", character = "Devil Jin"),
+        MoveEntry(moveName = "Mourning Crow", notation = "Mourning Crow", moveType = "Character", character = "Devil Jin", game = "Tekken 8"),
+        MoveEntry(moveName = "Fly", notation = "Fly", moveType = "Character", character = "Devil Jin", game = "Tekken 8"),
+        MoveEntry(moveName = "WGS", notation = "WGS", moveType = "Mishima", character = "Devil Jin", game = "Tekken 8"),
+        MoveEntry(moveName = "WGF", notation = "WGF", moveType = "Mishima", character = "Devil Jin", game = "Tekken 8"),
+        MoveEntry(moveName = "EWGF", notation = "EWGF", moveType = "Mishima", character = "Devil Jin", game = "Tekken 8"),
 
         // Dragunov
-        MoveEntry(moveName = "Sneak", notation = "Sneak", moveType = "Character", game = "Tekken 8", character = "Dragunov"),
+        MoveEntry(moveName = "Sneak", notation = "Sneak", moveType = "Character", character = "Dragunov", game = "Tekken 8"),
 
         // Eddy
-        MoveEntry(moveName = "Ginga", notation = "Ginga", moveType = "Character", game = "Tekken 8", character = "Eddy"),
-        MoveEntry(moveName = "Bananeira", notation = "Bananeira", moveType = "Character", game = "Tekken 8", character = "Eddy"),
-        MoveEntry(moveName = "Negativa", notation = "Negativa", moveType = "Character", game = "Tekken 8", character = "Eddy"),
-        MoveEntry(moveName = "Mandinga", notation = "Mandinga", moveType = "Character", game = "Tekken 8", character = "Eddy"),
+        MoveEntry(moveName = "Ginga", notation = "Ginga", moveType = "Character", character = "Eddy", game = "Tekken 8"),
+        MoveEntry(moveName = "Bananeira", notation = "Bananeira", moveType = "Character", character = "Eddy", game = "Tekken 8"),
+        MoveEntry(moveName = "Negativa", notation = "Negativa", moveType = "Character", character = "Eddy", game = "Tekken 8"),
+        MoveEntry(moveName = "Mandinga", notation = "Mandinga", moveType = "Character", character = "Eddy", game = "Tekken 8"),
 
         // Feng
-        MoveEntry(moveName = "Deceptive Step", notation = "Deceptive Step", moveType = "Character", game = "Tekken 8", character = "Feng"),
-        MoveEntry(moveName = "Shifting Clouds", notation = "Shifting Clouds", moveType = "Character", game = "Tekken 8", character = "Feng"),
+        MoveEntry(moveName = "Deceptive Step", notation = "Deceptive Step", moveType = "Character", character = "Feng", game = "Tekken 8"),
+        MoveEntry(moveName = "Shifting Clouds", notation = "Shifting Clouds", moveType = "Character", character = "Feng", game = "Tekken 8"),
 
         // Heihachi
-        MoveEntry(moveName = "Wind God's Kamae", notation = "Wind God's Kamae", moveType = "Character", game = "Tekken 8", character = "Heihachi"),
-        MoveEntry(moveName = "Thunder God's Kamae", notation = "Thunder God's Kamae", moveType = "Character", game = "Tekken 8", character = "Heihachi"),
-        MoveEntry(moveName = "Warrior Instinct", notation = "Warrior Instinct", moveType = "Character", game = "Tekken 8", character = "Heihachi"),
-        MoveEntry(moveName = "WGS", notation = "WGS", moveType = "Mishima", game = "Tekken 8", character = "Heihachi"),
-        MoveEntry(moveName = "WGF", notation = "WGF", moveType = "Mishima", game = "Tekken 8", character = "Heihachi"),
-        MoveEntry(moveName = "EWGF", notation = "EWGF", moveType = "Mishima", game = "Tekken 8", character = "Heihachi"),
-        MoveEntry(moveName = "TGF", notation = "TGF", moveType = "Mishima", game = "Tekken 8", character = "Heihachi"),
-        MoveEntry(moveName = "ETGF", notation = "ETGF", moveType = "Mishima", game = "Tekken 8", character = "Heihachi"),
-        MoveEntry(moveName = "BSK", notation = "BSK", moveType = "Mishima", game = "Tekken 8", character = "Heihachi"),
-        MoveEntry(moveName = "ESK", notation = "ESK", moveType = "Mishima", game = "Tekken 8", character = "Heihachi"),
-        MoveEntry(moveName = "SD", notation = "SD", moveType = "Mishima", game = "Tekken 8", character = "Heihachi"),
+        MoveEntry(moveName = "Wind God's Kamae", notation = "Wind God's Kamae", moveType = "Character", character = "Heihachi", game = "Tekken 8"),
+        MoveEntry(moveName = "Thunder God's Kamae", notation = "Thunder God's Kamae", moveType = "Character", character = "Heihachi", game = "Tekken 8"),
+        MoveEntry(moveName = "Warrior Instinct", notation = "Warrior Instinct", moveType = "Character", character = "Heihachi", game = "Tekken 8"),
+        MoveEntry(moveName = "WGS", notation = "WGS", moveType = "Mishima", character = "Heihachi", game = "Tekken 8"),
+        MoveEntry(moveName = "WGF", notation = "WGF", moveType = "Mishima", character = "Heihachi", game = "Tekken 8"),
+        MoveEntry(moveName = "EWGF", notation = "EWGF", moveType = "Mishima", character = "Heihachi", game = "Tekken 8"),
+        MoveEntry(moveName = "TGF", notation = "TGF", moveType = "Mishima", character = "Heihachi", game = "Tekken 8"),
+        MoveEntry(moveName = "ETGF", notation = "ETGF", moveType = "Mishima", character = "Heihachi", game = "Tekken 8"),
+        MoveEntry(moveName = "BSK", notation = "BSK", moveType = "Mishima", character = "Heihachi", game = "Tekken 8"),
+        MoveEntry(moveName = "ESK", notation = "ESK", moveType = "Mishima", character = "Heihachi", game = "Tekken 8"),
+        MoveEntry(moveName = "SD", notation = "SD", moveType = "Mishima", character = "Heihachi", game = "Tekken 8"),
 
         // Hwoarang
-        MoveEntry(moveName = "Right Stance", notation = "Right Stance", moveType = "Character", game = "Tekken 8", character = "Hwoarang"),
-        MoveEntry(moveName = "Left Stance", notation = "Left Stance", moveType = "Character", game = "Tekken 8", character = "Hwoarang"),
-        MoveEntry(moveName = "Right Flamingo", notation = "Right Flamingo", moveType = "Character", game = "Tekken 8", character = "Hwoarang"),
-        MoveEntry(moveName = "Left Flamingo", notation = "Left Flamingo", moveType = "Character", game = "Tekken 8", character = "Hwoarang"),
+        MoveEntry(moveName = "Right Stance", notation = "Right Stance", moveType = "Character", character = "Hwoarang", game = "Tekken 8"),
+        MoveEntry(moveName = "Left Stance", notation = "Left Stance", moveType = "Character", character = "Hwoarang", game = "Tekken 8"),
+        MoveEntry(moveName = "Right Flamingo", notation = "Right Flamingo", moveType = "Character", character = "Hwoarang", game = "Tekken 8"),
+        MoveEntry(moveName = "Left Flamingo", notation = "Left Flamingo", moveType = "Character", character = "Hwoarang", game = "Tekken 8"),
 
         // Jack-8
-        MoveEntry(moveName = "Sit Down", notation = "Sit Down", moveType = "Character", game = "Tekken 8", character = "Jack-8"),
-        MoveEntry(moveName = "Gamma Howl", notation = "Gamma Howl", moveType = "Character", game = "Tekken 8", character = "Jack-8"),
+        MoveEntry(moveName = "Sit Down", notation = "Sit Down", moveType = "Character", character = "Jack-8", game = "Tekken 8"),
+        MoveEntry(moveName = "Gamma Howl", notation = "Gamma Howl", moveType = "Character", character = "Jack-8", game = "Tekken 8"),
 
         // Jin
-        MoveEntry(moveName = "Zenshin", notation = "Zenshin", moveType = "Character", game = "Tekken 8", character = "Jin"),
-        MoveEntry(moveName = "WGS", notation = "WGS", moveType = "Mishima", game = "Tekken 8", character = "Jin"),
-        MoveEntry(moveName = "WHF", notation = "WGF", moveType = "Mishima", game = "Tekken 8", character = "Jin"),
-        MoveEntry(moveName = "EWHF", notation = "EWGF", moveType = "Mishima", game = "Tekken 8", character = "Jin"),
+        MoveEntry(moveName = "Zenshin", notation = "Zenshin", moveType = "Character", character = "Jin", game = "Tekken 8"),
+        MoveEntry(moveName = "WGS", notation = "WGS", moveType = "Mishima", character = "Jin", game = "Tekken 8"),
+        MoveEntry(moveName = "WHF", notation = "WGF", moveType = "Mishima", character = "Jin", game = "Tekken 8"),
+        MoveEntry(moveName = "EWHF", notation = "EWGF", moveType = "Mishima", character = "Jin", game = "Tekken 8"),
 
         // Jun
-        MoveEntry(moveName = "Izumo", notation = "Izumo", moveType = "Character", game = "Tekken 8", character = "Jun"),
-        MoveEntry(moveName = "Genjutsu", notation = "Genjutsu", moveType = "Character", game = "Tekken 8", character = "Jun"),
-        MoveEntry(moveName = "Miare", notation = "Miare", moveType = "Character", game = "Tekken 8", character = "Jun"),
+        MoveEntry(moveName = "Izumo", notation = "Izumo", moveType = "Character", character = "Jun", game = "Tekken 8"),
+        MoveEntry(moveName = "Genjutsu", notation = "Genjutsu", moveType = "Character", character = "Jun", game = "Tekken 8"),
+        MoveEntry(moveName = "Miare", notation = "Miare", moveType = "Character", character = "Jun", game = "Tekken 8"),
 
         // Kazuya
-        MoveEntry(moveName = "Devil Form", notation = "Devil Form", moveType = "Character", game = "Tekken 8", character = "Kazuya"),
-        MoveEntry(moveName = "WGS", notation = "WGS", moveType = "Mishima", game = "Tekken 8", character = "Kazuya"),
-        MoveEntry(moveName = "WGF", notation = "WGF", moveType = "Mishima", game = "Tekken 8", character = "Kazuya"),
-        MoveEntry(moveName = "EWGF", notation = "EWGF", moveType = "Mishima", game = "Tekken 8", character = "Kazuya"),
+        MoveEntry(moveName = "Devil Form", notation = "Devil Form", moveType = "Character", character = "Kazuya", game = "Tekken 8"),
+        MoveEntry(moveName = "WGS", notation = "WGS", moveType = "Mishima", character = "Kazuya", game = "Tekken 8"),
+        MoveEntry(moveName = "WGF", notation = "WGF", moveType = "Mishima", character = "Kazuya", game = "Tekken 8"),
+        MoveEntry(moveName = "EWGF", notation = "EWGF", moveType = "Mishima", character = "Kazuya", game = "Tekken 8"),
 
         // Kuma & Panda
-        MoveEntry(moveName = "Hunting", notation = "Hunting", moveType = "Character", game = "Tekken 8", character = "Kuma & Panda"),
-        MoveEntry(moveName = "Bear Sit", notation = "Bear Sit", moveType = "Character", game = "Tekken 8", character = "Kuma & Panda"),
-        MoveEntry(moveName = "Bear Roll", notation = "Bear Roll", moveType = "Character", game = "Tekken 8", character = "Kuma & Panda"),
+        MoveEntry(moveName = "Hunting", notation = "Hunting", moveType = "Character", character = "Kuma & Panda", game = "Tekken 8"),
+        MoveEntry(moveName = "Bear Sit", notation = "Bear Sit", moveType = "Character", character = "Kuma & Panda", game = "Tekken 8"),
+        MoveEntry(moveName = "Bear Roll", notation = "Bear Roll", moveType = "Character", character = "Kuma & Panda", game = "Tekken 8"),
 
         // Lars
-        MoveEntry(moveName = "Dynamic Entry", notation = "Dynamic Entry", moveType = "Character", game = "Tekken 8", character = "Lars"),
-        MoveEntry(moveName = "Silent Entry", notation = "Silent Entry", moveType = "Character", game = "Tekken 8", character = "Lars"),
-        MoveEntry(moveName = "Limited Entry", notation = "Limited Entry", moveType = "Character", game = "Tekken 8", character = "Lars"),
+        MoveEntry(moveName = "Dynamic Entry", notation = "Dynamic Entry", moveType = "Character", character = "Lars", game = "Tekken 8"),
+        MoveEntry(moveName = "Silent Entry", notation = "Silent Entry", moveType = "Character", character = "Lars", game = "Tekken 8"),
+        MoveEntry(moveName = "Limited Entry", notation = "Limited Entry", moveType = "Character", character = "Lars", game = "Tekken 8"),
 
         // Law
-        MoveEntry(moveName = "Dragon Charge", notation = "Dragon Charge", moveType = "Character", game = "Tekken 8", character = "Law"),
+        MoveEntry(moveName = "Dragon Charge", notation = "Dragon Charge", moveType = "Character", character = "Law", game = "Tekken 8"),
 
         // Lee
-        MoveEntry(moveName = "Hitman", notation = "Hitman", moveType = "Character", game = "Tekken 8", character = "Lee"),
+        MoveEntry(moveName = "Hitman", notation = "Hitman", moveType = "Character", character = "Lee", game = "Tekken 8"),
 
         // Leo
-        MoveEntry(moveName = "Jin Ji Du Li", notation = "Jin Ji Du Li", moveType = "Character", game = "Tekken 8", character = "Leo"),
-        MoveEntry(moveName = "Fo Bu", notation = "Fo Bu", moveType = "Character", game = "Tekken 8", character = "Leo"),
+        MoveEntry(moveName = "Jin Ji Du Li", notation = "Jin Ji Du Li", moveType = "Character", character = "Leo", game = "Tekken 8"),
+        MoveEntry(moveName = "Fo Bu", notation = "Fo Bu", moveType = "Character", character = "Leo", game = "Tekken 8"),
 
         // Leroy
-        MoveEntry(moveName = "Hermit", notation = "Hermit", moveType = "Character", game = "Tekken 8", character = "Leroy"),
+        MoveEntry(moveName = "Hermit", notation = "Hermit", moveType = "Character", character = "Leroy", game = "Tekken 8"),
 
         // Lidia
-        MoveEntry(moveName = "Horse Stance", notation = "Horse Stance", moveType = "Character", game = "Tekken 8", character = "Lidia"),
-        MoveEntry(moveName = "Cat Stance", notation = "Cat Stance", moveType = "Character", game = "Tekken 8", character = "Lidia"),
-        MoveEntry(moveName = "Heaven and Earth", notation = "Heaven and Earth", moveType = "Character", game = "Tekken 8", character = "Lidia"),
-        MoveEntry(moveName = "Stalking Wolf Stance", notation = "Stalking Wolf Stance", moveType = "Character", game = "Tekken 8", character = "Lidia"),
+        MoveEntry(moveName = "Horse Stance", notation = "Horse Stance", moveType = "Character", character = "Lidia", game = "Tekken 8"),
+        MoveEntry(moveName = "Cat Stance", notation = "Cat Stance", moveType = "Character", character = "Lidia", game = "Tekken 8"),
+        MoveEntry(moveName = "Heaven and Earth", notation = "Heaven and Earth", moveType = "Character", character = "Lidia", game = "Tekken 8"),
+        MoveEntry(moveName = "Stalking Wolf Stance", notation = "Stalking Wolf Stance", moveType = "Character", character = "Lidia", game = "Tekken 8"),
 
         // Lili
-        MoveEntry(moveName = "Dew Glide", notation = "Dew Glide", moveType = "Character", game = "Tekken 8", character = "Lili"),
+        MoveEntry(moveName = "Dew Glide", notation = "Dew Glide", moveType = "Character", character = "Lili", game = "Tekken 8"),
 
         // Raven
-        MoveEntry(moveName = "Soulzone", notation = "Soulzone", moveType = "Character", game = "Tekken 8", character = "Raven"),
+        MoveEntry(moveName = "Soulzone", notation = "Soulzone", moveType = "Character", character = "Raven", game = "Tekken 8"),
 
         // Reina
-        MoveEntry(moveName = "Unsoku", notation = "Unsoku", moveType = "Character", game = "Tekken 8", character = "Reina"),
-        MoveEntry(moveName = "Sentai", notation = "Sentai", moveType = "Character", game = "Tekken 8", character = "Reina"),
-        MoveEntry(moveName = "Heaven's Wrath", notation = "Heaven's Wrath", moveType = "Character", game = "Tekken 8", character = "Reina"),
-        MoveEntry(moveName = "WGS", notation = "WGS", moveType = "Mishima", game = "Tekken 8", character = "Reina"),
-        MoveEntry(moveName = "WGF", notation = "WGF", moveType = "Mishima", game = "Tekken 8", character = "Reina"),
-        MoveEntry(moveName = "EWGF", notation = "EWGF", moveType = "Mishima", game = "Tekken 8", character = "Reina"),
-        MoveEntry(moveName = "WGK", notation = "WGK", moveType = "Mishima", game = "Tekken 8", character = "Reina"),
-        MoveEntry(moveName = "EWGK", notation = "EWGK", moveType = "Mishima", game = "Tekken 8", character = "Reina"),
+        MoveEntry(moveName = "Unsoku", notation = "Unsoku", moveType = "Character", character = "Reina", game = "Tekken 8"),
+        MoveEntry(moveName = "Sentai", notation = "Sentai", moveType = "Character", character = "Reina", game = "Tekken 8"),
+        MoveEntry(moveName = "Heaven's Wrath", notation = "Heaven's Wrath", moveType = "Character", character = "Reina", game = "Tekken 8"),
+        MoveEntry(moveName = "WGS", notation = "WGS", moveType = "Mishima", character = "Reina", game = "Tekken 8"),
+        MoveEntry(moveName = "WGF", notation = "WGF", moveType = "Mishima", character = "Reina", game = "Tekken 8"),
+        MoveEntry(moveName = "EWGF", notation = "EWGF", moveType = "Mishima", character = "Reina", game = "Tekken 8"),
+        MoveEntry(moveName = "WGK", notation = "WGK", moveType = "Mishima", character = "Reina", game = "Tekken 8"),
+        MoveEntry(moveName = "EWGK", notation = "EWGK", moveType = "Mishima", character = "Reina", game = "Tekken 8"),
 
         // Shaheen
-        MoveEntry(moveName = "Stealth Step", notation = "Stealth Step", moveType = "Character", game = "Tekken 8", character = "Shaheen"),
+        MoveEntry(moveName = "Stealth Step", notation = "Stealth Step", moveType = "Character", character = "Shaheen", game = "Tekken 8"),
 
         // Steve
-        MoveEntry(moveName = "Quick Spin", notation = "Quick Spin", moveType = "Character", game = "Tekken 8", character = "Steve"),
-        MoveEntry(moveName = "Ducking", notation = "Ducking", moveType = "Character", game = "Tekken 8", character = "Steve"),
-        MoveEntry(moveName = "Peekaboo", notation = "Peekaboo", moveType = "Character", game = "Tekken 8", character = "Steve"),
-        MoveEntry(moveName = "Ducking In", notation = "Ducking In", moveType = "Character", game = "Tekken 8", character = "Steve"),
-        MoveEntry(moveName = "Ducking Left", notation = "Ducking Left", moveType = "Character", game = "Tekken 8", character = "Steve"),
-        MoveEntry(moveName = "Ducking Right", notation = "Ducking Right", moveType = "Character", game = "Tekken 8", character = "Steve"),
-        MoveEntry(moveName = "Flicker Stance", notation = "Flicker Stance", moveType = "Character", game = "Tekken 8", character = "Steve"),
-        MoveEntry(moveName = "Swaying", notation = "Swaying", moveType = "Character", game = "Tekken 8", character = "Steve"),
-        MoveEntry(moveName = "Lion Heart", notation = "Lion Heart", moveType = "Character", game = "Tekken 8", character = "Steve"),
+        MoveEntry(moveName = "Quick Spin", notation = "Quick Spin", moveType = "Character", character = "Steve", game = "Tekken 8"),
+        MoveEntry(moveName = "Ducking", notation = "Ducking", moveType = "Character", character = "Steve", game = "Tekken 8"),
+        MoveEntry(moveName = "Peekaboo", notation = "Peekaboo", moveType = "Character", character = "Steve", game = "Tekken 8"),
+        MoveEntry(moveName = "Ducking In", notation = "Ducking In", moveType = "Character", character = "Steve", game = "Tekken 8"),
+        MoveEntry(moveName = "Ducking Left", notation = "Ducking Left", moveType = "Character", character = "Steve", game = "Tekken 8"),
+        MoveEntry(moveName = "Ducking Right", notation = "Ducking Right", moveType = "Character", character = "Steve", game = "Tekken 8"),
+        MoveEntry(moveName = "Flicker Stance", notation = "Flicker Stance", moveType = "Character", character = "Steve", game = "Tekken 8"),
+        MoveEntry(moveName = "Swaying", notation = "Swaying", moveType = "Character", character = "Steve", game = "Tekken 8"),
+        MoveEntry(moveName = "Lion Heart", notation = "Lion Heart", moveType = "Character", character = "Steve", game = "Tekken 8"),
 
         // Victor
-        MoveEntry(moveName = "Iai", notation = "Iai", moveType = "Character", game = "Tekken 8", character = "Victor"),
-        MoveEntry(moveName = "Perfumer", notation = "Perfumer", moveType = "Character", game = "Tekken 8", character = "Victor"),
+        MoveEntry(moveName = "Iai", notation = "Iai", moveType = "Character", character = "Victor", game = "Tekken 8"),
+        MoveEntry(moveName = "Perfumer", notation = "Perfumer", moveType = "Character", character = "Victor", game = "Tekken 8"),
 
         // Xiaoyu
-        MoveEntry(moveName = "Phoenix", notation = "Phoenix", moveType = "Character", game = "Tekken 8", character = "Xiaoyu"),
-        MoveEntry(moveName = "Hypnotist", notation = "Hypnotist", moveType = "Character", game = "Tekken 8", character = "Xiaoyu"),
+        MoveEntry(moveName = "Phoenix", notation = "Phoenix", moveType = "Character", character = "Xiaoyu", game = "Tekken 8"),
+        MoveEntry(moveName = "Hypnotist", notation = "Hypnotist", moveType = "Character", character = "Xiaoyu", game = "Tekken 8"),
 
         // Yoshimitsu
-        MoveEntry(moveName = "Kincho", notation = "Kincho", moveType = "Character", game = "Tekken 8", character = "Yoshimitsu"),
-        MoveEntry(moveName = "Mutou No Kiwami", notation = "Mutou No Kiwami", moveType = "Character", game = "Tekken 8", character = "Yoshimitsu"),
-        MoveEntry(moveName = "Manji Dragonfly", notation = "Manji Dragonfly", moveType = "Character", game = "Tekken 8", character = "Yoshimitsu"),
-        MoveEntry(moveName = "Flea", notation = "Flea", moveType = "Character", game = "Tekken 8", character = "Yoshimitsu"),
-        MoveEntry(moveName = "Indian Stance", notation = "Indian Stance", moveType = "Character", game = "Tekken 8", character = "Yoshimitsu"),
+        MoveEntry(moveName = "Kincho", notation = "Kincho", moveType = "Character", character = "Yoshimitsu", game = "Tekken 8"),
+        MoveEntry(moveName = "Mutou No Kiwami", notation = "Mutou No Kiwami", moveType = "Character", character = "Yoshimitsu", game = "Tekken 8"),
+        MoveEntry(moveName = "Manji Dragonfly", notation = "Manji Dragonfly", moveType = "Character", character = "Yoshimitsu", game = "Tekken 8"),
+        MoveEntry(moveName = "Flea", notation = "Flea", moveType = "Character", character = "Yoshimitsu", game = "Tekken 8"),
+        MoveEntry(moveName = "Indian Stance", notation = "Indian Stance", moveType = "Character", character = "Yoshimitsu", game = "Tekken 8"),
 
         // Zafina
-        MoveEntry(moveName = "Tarantula", notation = "Tarantula", moveType = "Character", game = "Tekken 8", character = "Zafina"),
-        MoveEntry(moveName = "Scarecrow", notation = "Scarecrow", moveType = "Character", game = "Tekken 8", character = "Zafina"),
-        MoveEntry(moveName = "Mantis", notation = "Mantis", moveType = "Character", game = "Tekken 8", character = "Zafina"),)
+        MoveEntry(moveName = "Tarantula", notation = "Tarantula", moveType = "Character", character = "Zafina", game = "Tekken 8"),
+        MoveEntry(moveName = "Scarecrow", notation = "Scarecrow", moveType = "Character", character = "Zafina", game = "Tekken 8"),
+        MoveEntry(moveName = "Mantis", notation = "Mantis", moveType = "Character", character = "Zafina", game = "Tekken 8"),)
 )

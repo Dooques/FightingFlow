@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,6 +36,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayViewModel
+import com.example.fightingflow.ui.components.ActionIcon
+import com.example.fightingflow.ui.components.SettingsMenu
 import com.example.fightingflow.ui.profileScreen.ProfileViewModel
 import com.example.fightingflow.util.emptyCharacter
 import com.example.fightingflow.util.emptyComboDisplay
@@ -64,6 +67,8 @@ fun ComboCreationScreen(
     var comboReceived by remember { mutableStateOf(false) }
     val profileViewModel = koinInject<ProfileViewModel>()
 
+    var settingsMenuExpanded by remember { mutableStateOf(false) }
+
     // ComboViewModel
     val characterState by comboDisplayViewModel.characterState.collectAsStateWithLifecycle()
     val characterListState by comboDisplayViewModel.characterEntryListState.collectAsStateWithLifecycle()
@@ -75,6 +80,7 @@ fun ComboCreationScreen(
     val comboAsString by comboCreationViewModel.comboAsStringState.collectAsStateWithLifecycle()
     val characterMoveListState by comboCreationViewModel.characterMoveEntryList.collectAsStateWithLifecycle()
     val gameMoveListState by comboCreationViewModel.gameMoveEntryList.collectAsStateWithLifecycle()
+    val textComboState by comboDisplayViewModel.textComboState.collectAsStateWithLifecycle()
     val game by comboCreationViewModel.gameState.collectAsStateWithLifecycle()
     val selectedItem by comboCreationViewModel.itemIndexState.collectAsStateWithLifecycle()
 
@@ -135,6 +141,23 @@ fun ComboCreationScreen(
                         contentDescription = "",
                         modifier = modifier.size(60.dp)
                     )
+                    ActionIcon(
+                            onclick = {
+                                Timber.d("Configuring Layout")
+                                settingsMenuExpanded = true
+                            },
+                    tint = Color.White,
+                    icon = Icons.Default.Settings,
+                    modifier = modifier.fillMaxHeight()
+                    )
+                    SettingsMenu(
+                        settingsMenuExpanded = settingsMenuExpanded,
+                        onDismissRequest = { settingsMenuExpanded = !settingsMenuExpanded },
+                        updateIconSetting = { comboDisplayViewModel.updateShowIconDisplayState(!iconDisplayState) },
+                        updateTextComboSetting = { comboDisplayViewModel.updateShowComboTextState(!textComboState) },
+                        iconState = iconDisplayState,
+                        textComboState = textComboState
+                    )
                     IconButton(
                         onClick = {
                             comboCreationViewModel.clearMoveList()
@@ -191,26 +214,5 @@ fun ComboCreationScreen(
                 )
             }
         }
-    }
-}
-
-@Composable
-@Preview
-fun PreviewBox(modifier: Modifier = Modifier) {
-    Box(modifier.fillMaxSize()) {
-        Icon(
-            imageVector = Icons.Default.Close,
-            contentDescription = "Return to Combo screen",
-            tint = Color(0xffed1664),
-            modifier = modifier
-                .padding(start = 5.dp, top = 2.dp)
-                .size(100.dp)
-        )
-        Icon(
-            imageVector = Icons.Default.Close,
-            contentDescription = "Return to Combo screen",
-            tint = Color.White,
-            modifier = modifier.size(100.dp)
-        )
     }
 }

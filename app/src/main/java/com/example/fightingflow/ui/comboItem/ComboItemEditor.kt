@@ -7,15 +7,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -158,7 +152,7 @@ fun ComboItemEditor(
                                     }
                                 ) {
                                     TextMove(
-                                        input = move,
+                                        move = move,
                                         color = if (move.moveName.contains("L")) {
                                             Color(0xFFf0c027)
                                         } else if (move.moveName.contains("M")) {
@@ -189,7 +183,7 @@ fun ComboItemEditor(
                                 }
                             ) {
                                 TextMove(
-                                    input = move,
+                                    move = move,
                                     color = Color(0xFF444444),
                                     uiScale = uiScale,
                                     modifier = modifier
@@ -212,7 +206,7 @@ fun ComboItemEditor(
                                     }
                                 ) {
                                     TextMove(
-                                        input = move,
+                                        move = move,
                                         color = Color(0xFF0067B3),
                                         uiScale = uiScale,
                                         modifier = modifier
@@ -236,7 +230,7 @@ fun ComboItemEditor(
                                     }
                                 ) {
                                     TextMove(
-                                        input = move,
+                                        move = move,
                                         color = Color(0xFF2f5233),
                                         uiScale = uiScale,
                                         modifier = modifier
@@ -246,7 +240,7 @@ fun ComboItemEditor(
                                 }
                             }
 
-                            "Mechanics Input", "Mechanic", "Mishima" -> {
+                            "Mechanic", "Mishima" -> {
                                 SelectableItem(
                                     color = if (index == selectedIndex) Color.Gray else Color.Transparent,
                                     changeColor = {
@@ -260,7 +254,7 @@ fun ComboItemEditor(
                                     }
                                 ) {
                                     TextMove(
-                                        input = move,
+                                        move = move,
                                         color = Color(0xFF8155BA),
                                         uiScale = uiScale,
                                         modifier = modifier
@@ -284,7 +278,7 @@ fun ComboItemEditor(
                                     }
                                 ) {
                                     TextMove(
-                                        input = move,
+                                        move = move,
                                         color = Color(0xFFDC143C),
                                         uiScale = uiScale,
                                         modifier = modifier
@@ -308,7 +302,7 @@ fun ComboItemEditor(
                                     }
                                 ) {
                                     TextMove(
-                                        input = move,
+                                        move = move,
                                         color = Color.White,
                                         uiScale = uiScale,
                                         modifier = modifier

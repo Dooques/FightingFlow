@@ -6,7 +6,7 @@ val tekkenLayout = listOf(
     "Text Combo", "Description", "Damage", "Buttons", "Divider", "Misc Inputs", "Misc", "Divider",
     "Movements", "Movement", "Divider", "Inputs", "Console", "Console Text", "Input", "Divider",
     "Character Stances", "Character", "Divider", "Mishima Moves", "Mishima", "Mishima Divider",
-    "Stances", "Common", "Divider", "Mechanics", "Mechanics Input", "Divider", "Stage Mechanics",
+    "Stances", "Common", "Divider", "Mechanics", "Mechanic", "Divider", "Stage Mechanics",
     "Stage",
 )
 

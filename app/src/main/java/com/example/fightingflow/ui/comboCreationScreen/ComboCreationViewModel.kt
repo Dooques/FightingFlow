@@ -280,6 +280,7 @@ class ComboCreationViewModel(
         comboDisplayState.update { ComboDisplayUiState() }
         comboAsStringState.update { "" }
         Timber.d("Cleared move list: ${comboAsStringState.value}")
+        itemIndexState.update { 0 }
     }
 
     suspend fun saveCombo() {

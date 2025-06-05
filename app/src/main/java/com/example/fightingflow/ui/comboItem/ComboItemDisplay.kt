@@ -27,7 +27,6 @@ import dev.shreyaspatil.capturable.capturable
 import dev.shreyaspatil.capturable.controller.CaptureController
 import timber.log.Timber
 
-
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ComboItemDisplay(
@@ -111,7 +110,7 @@ fun ComboItemDisplay(
                             )
 
                             "SF Classic", "SF Modern" -> TextMove(
-                                input = move,
+                                move = move,
                                 color = if (move.moveName.contains("L")) {
                                     Color(0xFFf0c027)
                                 } else if (move.moveName.contains("M")) {
@@ -127,7 +126,7 @@ fun ComboItemDisplay(
 
                             "Common", "Console Text" ->
                                 TextMove(
-                                    input = move,
+                                    move = move,
                                     color = Color(0xFF444444),
                                     uiScale = uiScale,
                                     modifier = modifier
@@ -137,7 +136,7 @@ fun ComboItemDisplay(
 
                             "Special" ->
                                 TextMove(
-                                    input = move,
+                                    move = move,
                                     color = Color(0xFF0067B3),
                                     uiScale = uiScale,
                                     modifier = modifier
@@ -147,7 +146,7 @@ fun ComboItemDisplay(
 
                             "Stage" ->
                                 TextMove(
-                                    input = move,
+                                    move = move,
                                     color = Color(0xFF2f5233),
                                     uiScale = uiScale,
                                     modifier = modifier
@@ -155,9 +154,9 @@ fun ComboItemDisplay(
                                         .padding(4.dp)
                                 )
 
-                            "Mechanics Input", "Mechanic", "Mishima" ->
+                            "Mishima" ->
                                 TextMove(
-                                    input = move,
+                                    move = move,
                                     color = Color(0xFF8155BA),
                                     uiScale = uiScale,
                                     modifier = modifier
@@ -167,7 +166,7 @@ fun ComboItemDisplay(
 
                             "Character", "Fatal Blow", "Drive", "Super Art"->
                                 TextMove(
-                                    input = move,
+                                    move = move,
                                     color = Color(0xFFDC143C),
                                     uiScale = uiScale,
                                     modifier = modifier
@@ -175,9 +174,9 @@ fun ComboItemDisplay(
                                         .padding(4.dp)
                                 )
 
-                            "Modifier", "MK Input" ->
+                            "Modifier", "Mechanic", "MK Input" ->
                                 TextMove(
-                                    input = move,
+                                    move = move,
                                     color = Color.White,
                                     uiScale = uiScale,
                                     modifier = modifier
