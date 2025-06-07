@@ -299,4 +299,5 @@
     <string name="create_profile">Create Profile</string>
     <string name="profile_details">Profile Details</string>
     <string name="open_menu">Open Menu</string>
+    <string name="add_character">Add Character</string>
 </resources>

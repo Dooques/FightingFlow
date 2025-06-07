@@ -21,9 +21,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import com.example.fightingflow.data.datastore.Console
-import com.example.fightingflow.data.datastore.Game
-import com.example.fightingflow.data.datastore.SF6ControlType
+import com.example.fightingflow.model.Console
+import com.example.fightingflow.model.Game
+import com.example.fightingflow.model.SF6ControlType
 import com.example.fightingflow.ui.characterScreen.CharacterScreenViewModel
 import com.example.fightingflow.ui.characterScreen.GameSelectedHeader
 import kotlinx.coroutines.CoroutineScope

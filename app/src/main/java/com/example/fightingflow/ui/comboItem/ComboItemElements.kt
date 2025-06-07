@@ -94,13 +94,12 @@ fun MoveImage(
     modifier: Modifier = Modifier
 ) {
     val moveId = remember(move) { context.resources.getIdentifier(move, "drawable", context.packageName) }
-    val size = 40.dp
+    val size = 35.dp
 
     Image(
         painter = painterResource(id = moveId),
         contentDescription = move,
         modifier = modifier
-            .padding(horizontal = 4.dp)
             .size(size * uiScale)
     )
 }
@@ -114,7 +113,7 @@ fun TextMove(
 ) {
     Box(
         modifier
-            .clip(RoundedCornerShape(25.dp))
+            .clip(RoundedCornerShape(100.dp))
             .background(color)
     ) {
         Text(
@@ -133,6 +132,8 @@ fun TextMove(
                 else -> move.moveName },
 
             style = MaterialTheme.typography.bodyLarge.copy(
+                fontSize = (12 * uiScale).sp,
+                lineHeight = 14.sp,
                 fontWeight = FontWeight.ExtraBold,
                 color = if (color == Color.White || color == Color.Green) Color.Black else Color.White,
                 shadow = if (color != Color.White)
@@ -141,7 +142,6 @@ fun TextMove(
                     Shadow()
             ),
             modifier = modifier
-                .padding(horizontal = 1.dp, vertical = 0.dp)
         )
     }
 }
@@ -151,12 +151,14 @@ fun MoveBreak(
     uiScale: Float,
     modifier: Modifier = Modifier
 ) {
-    Icon(
-        imageVector = Icons.Filled.PlayArrow,
-        contentDescription = "",
-        tint = Color.Cyan,
-        modifier = modifier.size((20 * uiScale).dp)
-    )
+    Box(modifier.padding(4.dp)) {
+        Icon(
+            imageVector = Icons.Filled.PlayArrow,
+            contentDescription = "",
+            tint = Color.Cyan,
+            modifier = modifier.size((15 * uiScale).dp)
+        )
+    }
 }
 
 @Composable
@@ -166,7 +168,7 @@ fun MiscInput(
 ) {
     Text(
         text = move.notation,
-        fontSize = 40.sp,
+        fontSize = 20.sp,
         color = MaterialTheme.colorScheme.onBackground,
 
         )

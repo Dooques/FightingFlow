@@ -5,19 +5,19 @@ import androidx.lifecycle.viewModelScope
 import com.example.fightingflow.data.database.FlowRepository
 import com.example.fightingflow.data.datastore.CharacterDsRepository
 import com.example.fightingflow.data.datastore.ComboDsRepository
-import com.example.fightingflow.data.datastore.Console
-import com.example.fightingflow.data.datastore.Game
-import com.example.fightingflow.data.datastore.SF6ControlType
 import com.example.fightingflow.data.datastore.SettingsDsRepository
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
+import com.example.fightingflow.model.Console
+import com.example.fightingflow.model.Game
+import com.example.fightingflow.model.SF6ControlType
 import com.example.fightingflow.model.getMoveEntryDataForComboDisplay
 import com.example.fightingflow.model.toDisplay
 import com.example.fightingflow.model.toEntry
 import com.example.fightingflow.util.CharImageUiState
 import com.example.fightingflow.util.CharNameUiState
 import com.example.fightingflow.util.CharacterEntryListUiState
-import com.example.fightingflow.util.CharacterUiState
+import com.example.fightingflow.util.CharacterEntryUiState
 import com.example.fightingflow.util.ComboDisplayListUiState
 import com.example.fightingflow.util.ComboEntryListUiState
 import com.example.fightingflow.util.MoveEntryListUiState
@@ -55,8 +55,8 @@ class ComboDisplayViewModel(
     private val _comboEntryListState = MutableStateFlow(ComboEntryListUiState())
     val comboEntryListUiState: StateFlow<ComboEntryListUiState> = _comboEntryListState
 
-    private val _characterState = MutableStateFlow(CharacterUiState())
-    val characterState: StateFlow<CharacterUiState> = _characterState
+    private val _characterState = MutableStateFlow(CharacterEntryUiState())
+    val characterState: StateFlow<CharacterEntryUiState> = _characterState
 
     init {
         Timber.d("Initializing Combo Display View Model...")
@@ -132,7 +132,7 @@ class ComboDisplayViewModel(
                 .map { it ?: emptyCharacter }
                 .collect { characterEntry ->
                     Timber.d("Character: $characterEntry")
-                    _characterState.update { CharacterUiState(characterEntry) }
+                    _characterState.update { CharacterEntryUiState(characterEntry) }
                 }
         }
     }

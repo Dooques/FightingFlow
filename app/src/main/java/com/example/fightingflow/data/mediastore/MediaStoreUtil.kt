@@ -23,10 +23,10 @@ data class ImageObject(
 
 class MediaStoreUtil(private val context: Context) {
 
-    suspend fun createAndShareTempImage(bitmap: Bitmap): ImageObject?  {
+    suspend fun createAndShareTempImage(bitmap: Bitmap): ImageObject  {
         Timber.d("Preparing to save or share image...")
         Timber.d("Launching Dispatcher.IO coroutine...")
-        val imageObject: ImageObject? = withContext(Dispatchers.IO) {
+        val imageObject: ImageObject = withContext(Dispatchers.IO) {
             Timber.d("thread launched, getting cache directory")
             val cachePath = File(context.cacheDir, "images")
             cachePath.mkdirs()
@@ -62,52 +62,6 @@ class MediaStoreUtil(private val context: Context) {
             }
         }
         return imageObject
-    }
-
-    suspend fun saveImageToGallery(imageUri: Uri) {
-        withContext(Dispatchers.IO) {
-            try {
-                val contentResolver = context.contentResolver
-                val fileName = "${System.currentTimeMillis()}.jpg"
-                val imageCollection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
-                } else {
-                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-                }
-
-                val contentValues = ContentValues().apply {
-                    put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
-                    put(MediaStore.Images.Media.MIME_TYPE, "image/jpg")
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                        put(MediaStore.Images.Media.IS_PENDING, 1)
-                    }
-                }
-
-                val uri = contentResolver.insert(imageCollection, contentValues)
-
-                uri?.let {
-                    contentResolver.openOutputStream(it)?.use { outputStream ->
-                        val inputStream = FileInputStream(
-                            context.contentResolver.openFileDescriptor(
-                                imageUri, "r"
-                            )?.fileDescriptor
-                        )
-                        inputStream.copyTo(outputStream)
-                        inputStream.close()
-                    }
-
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                        contentValues.clear()
-                        contentValues.put(MediaStore.Images.Media.IS_PENDING, 0)
-                        contentResolver.update(it, contentValues, null, null)
-                    }
-                }
-                // Show a success message to the user
-            } catch (e: Exception) {
-                e.printStackTrace()
-                // Handle error
-            }
-        }
     }
 
     fun shareImage(activity: Activity, imageUri: Uri) {

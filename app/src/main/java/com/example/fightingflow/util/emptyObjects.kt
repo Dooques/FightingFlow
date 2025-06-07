@@ -12,10 +12,10 @@ import java.util.UUID
 val emptyCharacter = CharacterEntry(
     id = 0,
     name = "",
-    imageId = R.drawable.t8_logo,
+    imageId = R.drawable.mokujin,
     fightingStyle = "",
     combosById = "",
-    game = "",
+    game = "Custom",
 )
 
 val emptyComboDisplay = ComboDisplay(

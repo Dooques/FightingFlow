@@ -7,7 +7,9 @@ import com.example.fightingflow.model.MoveEntry
 import com.example.fightingflow.model.ProfileCreation
 import com.example.fightingflow.model.ProfileEntry
 
-data class CharacterUiState(val character: CharacterEntry = emptyCharacter)
+
+
+data class CharacterEntryUiState(val character: CharacterEntry = emptyCharacter)
 
 data class CharacterEntryListUiState(val characterList: List<CharacterEntry> = listOf())
 

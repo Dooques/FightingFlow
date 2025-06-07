@@ -13,9 +13,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -36,12 +37,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.fightingflow.data.datastore.Game
 import com.example.fightingflow.model.CharacterEntry
+import com.example.fightingflow.model.Game
 import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayViewModel
 import com.example.fightingflow.ui.components.GameSelectedMenu
-import com.example.fightingflow.util.CharacterUiState
 import com.example.fightingflow.ui.components.SettingsMenu
+import com.example.fightingflow.util.CharacterEntryUiState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -54,6 +55,7 @@ fun CharacterScreen(
     characterScreenViewModel: CharacterScreenViewModel,
     onClick: () -> Unit,
     navigateToProfiles: () -> Unit,
+    navigateToAddCharacter: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Timber.d("\nLoading Character Screen")
@@ -81,6 +83,20 @@ fun CharacterScreen(
             TopAppBar(
                 title = { Text("Characters", style = MaterialTheme.typography.displaySmall) },
                 actions = {
+                    IconButton(
+                        onClick = {
+                            scope.launch {
+                                comboDisplayViewModel.updateEditingState(false)
+                                navigateToAddCharacter()
+                            }
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Add Combo",
+                            modifier = modifier.size(80.dp)
+                        )
+                    }
                     SettingsMenu(
                         navigate = navigateToProfiles,
                         updateConsoleInput = { comboDisplayViewModel.updateConsoleType(it) }
@@ -98,7 +114,7 @@ fun CharacterScreen(
                     characterScreenViewModel = characterScreenViewModel,
                     gameSelected = gameSelected,
                     sf6Option = modernOrClassicState,
-                    changeSelectedGame = { gameSelected = it },
+                    changeSelectedGame = {gameSelected = it },
                 )
             }
             LazyVerticalGrid(
@@ -112,7 +128,7 @@ fun CharacterScreen(
                         updateCharacterState = comboDisplayViewModel::updateCharacterState,
                         setCharacterToDS = comboDisplayViewModel::updateCharacterInDS,
                         onClick = onClick,
-                        characterState = CharacterUiState(character),
+                        characterState = CharacterEntryUiState(character),
                         modifier = modifier
                     )
                 }
@@ -127,7 +143,7 @@ fun CharacterCard(
     updateCharacterState: (String) -> Unit,
     setCharacterToDS: (CharacterEntry) -> Unit,
     onClick: () -> Unit,
-    characterState: CharacterUiState,
+    characterState: CharacterEntryUiState,
     modifier: Modifier = Modifier
 ) {
     Timber.d("Loading Card: ${characterState.character.name}")

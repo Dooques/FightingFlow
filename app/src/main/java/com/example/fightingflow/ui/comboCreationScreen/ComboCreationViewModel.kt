@@ -5,17 +5,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fightingflow.data.database.FlowRepository
 import com.example.fightingflow.data.datastore.ComboDsRepository
-import com.example.fightingflow.data.datastore.Console
-import com.example.fightingflow.data.datastore.Game
 import com.example.fightingflow.data.datastore.ProfileDsRepository
-import com.example.fightingflow.data.datastore.SF6ControlType
 import com.example.fightingflow.data.datastore.SettingsDsRepository
+import com.example.fightingflow.model.Console
+import com.example.fightingflow.model.Game
 import com.example.fightingflow.model.MoveEntry
+import com.example.fightingflow.model.SF6ControlType
 import com.example.fightingflow.model.getMoveEntryDataForComboDisplay
 import com.example.fightingflow.model.toDisplay
 import com.example.fightingflow.model.toEntry
 import com.example.fightingflow.ui.comboDisplayScreen.inputConverter.convertInputToStandard
-import com.example.fightingflow.util.CharacterUiState
+import com.example.fightingflow.util.CharacterEntryUiState
 import com.example.fightingflow.util.ComboDisplayUiState
 import com.example.fightingflow.util.ComboEntryUiState
 import com.example.fightingflow.util.ImmutableList
@@ -25,7 +25,6 @@ import com.example.fightingflow.util.emptyComboDisplay
 import com.example.fightingflow.util.emptyComboEntry
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -48,7 +47,7 @@ class ComboCreationViewModel(
     val editingState = mutableStateOf(false)
     val comboIdState = mutableStateOf("")
 
-    val characterState = MutableStateFlow(CharacterUiState())
+    val characterState = MutableStateFlow(CharacterEntryUiState())
     val originalCombo = MutableStateFlow(ComboDisplayUiState())
     val comboDisplayState = MutableStateFlow(ComboDisplayUiState(emptyComboDisplay.copy(dateCreated = LocalDate.now().toString())))
     val comboAsStringState = MutableStateFlow(processComboAsString())

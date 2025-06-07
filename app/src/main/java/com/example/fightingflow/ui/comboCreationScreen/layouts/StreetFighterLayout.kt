@@ -9,11 +9,11 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.fightingflow.data.datastore.Console
-import com.example.fightingflow.data.datastore.Game
-import com.example.fightingflow.data.datastore.SF6ControlType
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
+import com.example.fightingflow.model.Console
+import com.example.fightingflow.model.Game
+import com.example.fightingflow.model.SF6ControlType
 import com.example.fightingflow.ui.comboCreationScreen.CharacterMoves
 import com.example.fightingflow.ui.comboCreationScreen.ComboDescription
 import com.example.fightingflow.ui.comboCreationScreen.DamageAndConfirm

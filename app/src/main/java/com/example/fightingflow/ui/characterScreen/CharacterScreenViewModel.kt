@@ -2,9 +2,9 @@ package com.example.fightingflow.ui.characterScreen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.fightingflow.data.datastore.Game
-import com.example.fightingflow.data.datastore.SF6ControlType
 import com.example.fightingflow.data.datastore.SettingsDsRepository
+import com.example.fightingflow.model.Game
+import com.example.fightingflow.model.SF6ControlType
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn

@@ -1,7 +1,7 @@
 package com.example.fightingflow.ui.comboDisplayScreen.inputConverter
 
-import com.example.fightingflow.data.datastore.Console
-import com.example.fightingflow.data.datastore.Game
+import com.example.fightingflow.model.Console
+import com.example.fightingflow.model.Game
 import com.example.fightingflow.model.MoveEntry
 import timber.log.Timber
 
@@ -40,6 +40,7 @@ fun convertInputsToConsole(
                             Timber.d("Getting $game input...")
                             mk1ToPlaystation(move)
                         }
+                        else -> move
                     }
                 }
 
@@ -63,6 +64,7 @@ fun convertInputsToConsole(
                             Timber.d("Getting $game input...")
                             mk1ToXbox(move)
                         }
+                        else -> move
                     }
                 }
 
@@ -87,6 +89,7 @@ fun convertInputsToConsole(
                             Timber.d("Getting $game input...")
                             mk1ToNintendo(move)
                         }
+                        else -> move
                     }
                 }
             }
@@ -135,6 +138,7 @@ fun convertInputToStandard(
                             Timber.d("Converting $console input...")
                             playStationToT8(move)
                         }
+                        else -> move
                     }
                 }
 
@@ -163,6 +167,7 @@ fun convertInputToStandard(
                             Timber.d("Getting $game input..")
                             xboxToT8(move)
                         }
+                        else -> move
                     }
                 }
 
@@ -190,6 +195,7 @@ fun convertInputToStandard(
                             Timber.d("Getting $game input..")
                             nintendoToT8(move)
                         }
+                        else -> move
                     }
                 }
             }

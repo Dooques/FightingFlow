@@ -19,6 +19,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.fightingflow.R
+import com.example.fightingflow.ui.addCharacterScreen.AddCharacterScreen
 import com.example.fightingflow.ui.characterScreen.CharacterScreen
 import com.example.fightingflow.ui.characterScreen.CharacterScreenViewModel
 import com.example.fightingflow.ui.comboCreationScreen.ComboCreationScreen
@@ -36,7 +37,8 @@ enum class FlowScreen(@StringRes val title: Int) {
     ProfileList(title = R.string.profile_select),
     CharSelect(title = R.string.char_select),
     Combos(title = R.string.combos),
-    ComboCreation(title = R.string.combo_creation)
+    ComboCreation(title = R.string.combo_creation),
+    AddCharacter(title = R.string.add_character)
 }
 
 @RequiresApi(Build.VERSION_CODES.Q)
@@ -105,7 +107,17 @@ fun NavGraph(
                     comboDisplayViewModel = comboDisplayViewModel,
                     characterScreenViewModel = characterScreenViewModel,
                     onClick = { navController.navigate(FlowScreen.Combos.name) },
-                    navigateToProfiles = { navController.navigate(FlowScreen.ProfileList.name) }
+                    navigateToProfiles = { navController.navigate(FlowScreen.ProfileList.name) },
+                    navigateToAddCharacter = { navController.navigate(FlowScreen.AddCharacter.name) }
+                )
+            }
+
+            composable(route = FlowScreen.AddCharacter.name) {
+                Timber.d("Loading Add Character Screen...")
+                AddCharacterScreen(
+                    navigateBack = { navController.navigateUp() },
+                    scope = scope,
+                    snackbarHostState = snackBarHostState
                 )
             }
 

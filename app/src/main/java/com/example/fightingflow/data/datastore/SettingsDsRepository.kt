@@ -98,16 +98,4 @@ class SettingsDatastoreRepository(private val dataStore: DataStore<Preferences>)
         }
 }
 
-enum class Console {
-    STANDARD, XBOX, PLAYSTATION, NINTENDO
-}
 
-enum class Game(val title: String) {
-    T8(title = "Tekken 8"),
-    MK1(title = "Mortal Kombat 1"),
-    SF6(title = "Street Fighter VI")
-}
-
-enum class SF6ControlType(val type: Int) {
-    Modern(type = 0), Classic(type = 1), Invalid(type = 2)
-}

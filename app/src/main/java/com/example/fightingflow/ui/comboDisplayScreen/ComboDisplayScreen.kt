@@ -201,7 +201,7 @@ fun ComboDisplayScreen(
                                         try {
                                             val bitmap = bitmapAsync.await().asAndroidBitmap()
                                             val imageObject = mediaStoreUtil.createAndShareTempImage(bitmap)
-                                            if (imageObject?.uri != null && imageObject.file != null) {
+                                            if (imageObject.uri != null && imageObject.file != null) {
                                                 capturedImage = imageObject.uri
                                                 capturedImageFile = imageObject.file
                                                 showDialog = true

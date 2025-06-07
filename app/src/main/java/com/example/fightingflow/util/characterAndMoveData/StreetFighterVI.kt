@@ -1,9 +1,9 @@
 package com.example.fightingflow.util.characterAndMoveData
 
 import com.example.fightingflow.R
-import com.example.fightingflow.data.datastore.SF6ControlType
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.MoveEntry
+import com.example.fightingflow.model.SF6ControlType
 import com.example.fightingflow.util.ImmutableList
 
 val streetFighter6Characters = ImmutableList(

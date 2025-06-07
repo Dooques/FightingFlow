@@ -46,11 +46,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.example.fightingflow.data.datastore.Console
-import com.example.fightingflow.data.datastore.Game
-import com.example.fightingflow.data.datastore.SF6ControlType
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
+import com.example.fightingflow.model.Console
+import com.example.fightingflow.model.Game
+import com.example.fightingflow.model.SF6ControlType
 import com.example.fightingflow.ui.comboCreationScreen.layouts.MortalKombatLayout
 import com.example.fightingflow.ui.comboCreationScreen.layouts.StreetFighterLayout
 import com.example.fightingflow.ui.comboCreationScreen.layouts.TekkenLayout
@@ -204,6 +204,8 @@ fun ComboForm(
                     characterMoveList = characterMoveList,
                     gameMoveList = gameMoveList
                 )
+
+                else -> null
             }
         }
     }
@@ -634,6 +636,7 @@ fun DamageAndConfirm(
                                 scope.launch {
                                     Timber.d("Saving combo")
                                     saveCombo()
+                                    onNavigateToComboDisplay()
                                 }
                             }
                         }

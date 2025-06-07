@@ -16,10 +16,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.example.fightingflow.data.datastore.Console
-import com.example.fightingflow.data.datastore.Game
-import com.example.fightingflow.data.datastore.SF6ControlType
 import com.example.fightingflow.model.ComboDisplay
+import com.example.fightingflow.model.Console
+import com.example.fightingflow.model.Game
+import com.example.fightingflow.model.SF6ControlType
 import com.example.fightingflow.ui.comboCreationScreen.ComboAsText
 import com.example.fightingflow.ui.comboDisplayScreen.inputConverter.convertInputsToConsole
 import com.example.fightingflow.util.CharacterEntryListUiState

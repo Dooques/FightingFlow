@@ -24,6 +24,7 @@ import com.example.fightingflow.data.datastore.SettingsDatastoreRepository
 import com.example.fightingflow.data.datastore.SettingsDsRepository
 import com.example.fightingflow.data.mediastore.MediaStoreUtil
 import com.example.fightingflow.ui.InitViewModel
+import com.example.fightingflow.ui.addCharacterScreen.AddCharacterViewModel
 import com.example.fightingflow.ui.characterScreen.CharacterScreenViewModel
 import com.example.fightingflow.ui.comboCreationScreen.ComboCreationViewModel
 import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayViewModel
@@ -80,4 +81,5 @@ val viewModelModule = module {
     viewModel { ComboCreationViewModel(get(), get(), get(), get()) }
     viewModel { CharacterScreenViewModel(get()) }
     viewModel { ComboItemViewModel() }
+    viewModel { AddCharacterViewModel(get()) }
 }

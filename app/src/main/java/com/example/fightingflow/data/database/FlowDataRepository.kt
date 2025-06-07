@@ -12,7 +12,9 @@ interface FlowRepository {
     // Character
     fun getCharacter(name: String): Flow<CharacterEntry?>
     fun getCharactersByGame(game: String): Flow<List<CharacterEntry>>
+    fun getCharacterByGameAndName(name: String, game: String): Flow<CharacterEntry?>
     suspend fun updateCharacter(characterEntry: CharacterEntry)
+    suspend fun insertCharacter(characterEntry: CharacterEntry)
 
     // Combo
     fun getCombo(comboId: String): Flow<ComboEntry?>
@@ -47,6 +49,10 @@ class FlowDataRepository(
     override fun getCharactersByGame(game: String): Flow<List<CharacterEntry>> =
         characterDao.getCharactersFromGame(game)
 
+    override fun getCharacterByGameAndName(name: String, game: String) =
+        characterDao.getCharacterByGameAndName(name, game)
+
+
     // Get Combo
     override fun getCombo(comboId: String): Flow<ComboEntry?> =
         comboDao.getCombo(comboId)
@@ -59,6 +65,7 @@ class FlowDataRepository(
 
     override fun getAllCombosByProfile(username: String): Flow<List<ComboEntry>?> =
         comboDao.getAllCombosByProfile(username)
+
 
     // Get Moves
     override fun getMove(name: String): Flow<MoveEntry?> =
@@ -76,6 +83,7 @@ class FlowDataRepository(
     override suspend fun insertAllCharacters(characterList: List<CharacterEntry>) =
         characterDao.insertAll(characterList)
 
+
     // Insert
     override suspend fun insertMoves(moveList: List<MoveEntry>) =
         moveDao.insertAll(moveList)
@@ -83,12 +91,17 @@ class FlowDataRepository(
     override suspend fun insertCombo(comboEntry: ComboEntry) =
         comboDao.insert(comboEntry)
 
+    override suspend fun insertCharacter(characterEntry: CharacterEntry) =
+        characterDao.insert(characterEntry)
+
+
     // Update
     override suspend fun updateCharacter(characterEntry: CharacterEntry) =
         characterDao.update(characterEntry)
 
     override suspend fun updateCombo(comboEntry: ComboEntry) =
         comboDao.update(comboEntry)
+
 
     // Delete
     override suspend fun deleteCombo(comboEntry: ComboEntry) =
