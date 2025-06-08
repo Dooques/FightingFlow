@@ -10,37 +10,37 @@ import com.example.fightingflow.util.MoveEntryListUiState
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import timber.log.Timber
-import java.util.UUID
 
 @Entity(tableName = "combo_table")
 data class ComboEntry (
-    @PrimaryKey
-    @ColumnInfo(name = "combo_id")
-    val comboId: String = UUID.randomUUID().toString(),
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "id")
+    val id: Int = 0,
     val description: String,
     val character: CharacterEntry,
     val damage: Int,
     @ColumnInfo(name = "created_by")
     val createdBy: String,
     val dateCreated: String,
-    val moves: String
+    val moves: String,
 )
 
 @Immutable
 data class ComboDisplay(
-    val comboId: String,
+    val id: Int,
     val description: String,
     val character: String,
     val damage: Int,
     val createdBy: String,
     val dateCreated: String,
     val areOptionsRevealed: Boolean = false,
+    val pinned: Boolean = false,
     val moves: ImmutableList<MoveEntry>
 )
 
 fun ComboEntry.toDisplay(moveEntryList: MoveEntryListUiState): ComboDisplay =
     ComboDisplay(
-        comboId = comboId,
+        id = id,
         description = description,
         character = character.name,
         damage = damage,
@@ -52,7 +52,7 @@ fun ComboEntry.toDisplay(moveEntryList: MoveEntryListUiState): ComboDisplay =
 
 fun ComboDisplay.toEntry(character: CharacterEntry): ComboEntry =
     ComboEntry(
-        comboId = comboId,
+        id = id,
         description = description,
         character = character,
         damage = damage,
@@ -87,7 +87,7 @@ fun getMoveEntryDataForComboDisplay(
     moveEntryList: MoveEntryListUiState,
     controlType: Console
 ): ComboDisplay {
-    Timber.d("Processing moveList for ${combo.comboId}")
+    Timber.d("Processing moveList for ${combo.id}")
     val updatedCombo = combo.copy(
         moves = ImmutableList(
             combo.moves.map { move ->
@@ -106,7 +106,7 @@ fun getMoveEntryDataForComboDisplay(
             }
         )
     )
-    Timber.d("Move List completed for ${combo.comboId} and returning to UI")
+    Timber.d("Move List completed for ${combo.id} and returning to UI")
     return updatedCombo
 }
 

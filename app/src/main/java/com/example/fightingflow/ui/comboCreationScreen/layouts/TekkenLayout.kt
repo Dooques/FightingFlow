@@ -124,7 +124,6 @@ fun TekkenLayout(
                     moveList = gameMoveList,
                     updateMoveList = updateMoveList,
                     console = console,
-                    maxItems = if (gameMoveList.moveList.first().game == "Tekken 8") 2 else 5
                 )
 
                 "Console Text" -> TextMoves(
@@ -144,7 +143,7 @@ fun TekkenLayout(
                     moveType = moveType,
                     moveList = characterMoveList,
                     updateMoveList = updateMoveList,
-                    maxItems = if (characterMoveList.moveList.size > 5) 4 else 5,
+                    maxItems = if (characterMoveList.moveList.size <= 4) 4 else 5,
                     console = console
                 )
 
@@ -157,7 +156,7 @@ fun TekkenLayout(
                 "Divider" -> InputDivider()
                 "Mishima Divider" -> if (character.name in mishima) InputDivider()
 
-                "Stances", "Heat and Rage", "Inputs", "Movements",  "Stage Mechanics",
+                "Stances", "Heat and Rage", "Inputs", "Movements", "Stage Mechanics",
                 "Mechanics", "Modifiers", "Combo Description", "Damage and Break", "Misc Inputs" ->
                     SectionTitle(moveType)
 

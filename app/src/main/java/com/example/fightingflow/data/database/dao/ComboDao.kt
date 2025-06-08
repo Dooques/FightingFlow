@@ -8,8 +8,8 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ComboDao: BaseDao<ComboEntry> {
-    @Query("select * from combo_table where combo_id = :comboId")
-    fun getCombo(comboId: String): Flow<ComboEntry?>
+    @Query("select * from combo_table where id = :id")
+    fun getCombo(id: Int): Flow<ComboEntry?>
 
     @Query("SELECT * FROM combo_table")
     fun getAllCombos(): Flow<List<ComboEntry>>

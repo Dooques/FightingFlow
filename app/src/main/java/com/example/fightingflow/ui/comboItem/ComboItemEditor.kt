@@ -32,6 +32,7 @@ fun ComboItemEditor(
     console: Console?,
     sf6ControlType: SF6ControlType?,
     iconDisplayState: Boolean,
+    textComboState: Boolean,
     uiScale: Float,
     fontColor: Color,
     setSelectedItem: (Int) -> Unit,
@@ -53,8 +54,7 @@ fun ComboItemEditor(
                     verticalArrangement = Arrangement.Center,
                     horizontalArrangement = Arrangement.Start,
                     itemVerticalAlignment = Alignment.CenterVertically,
-                    modifier = modifier
-                        .fillMaxWidth()
+                    modifier = modifier.fillMaxWidth()
                 ) {
                     Timber.d("Loading moves from combo...")
 
@@ -315,7 +315,9 @@ fun ComboItemEditor(
                     }
                 }
             }
-            ComboAsText(comboAsText)
+            if (textComboState) {
+                ComboAsText(comboAsText)
+            }
             ComboInfoBottom(combo, username, fontColor)
         }
     }

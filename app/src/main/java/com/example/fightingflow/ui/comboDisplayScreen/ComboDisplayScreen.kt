@@ -227,6 +227,7 @@ fun ComboDisplayScreen(
                                     scope.launch {
                                         comboDisplayViewModel.updateComboStateInDs(combo)
                                         comboDisplayViewModel.updateEditingState(true)
+                                        comboCreationViewModel.updateItemIndex(combo.moves.size)
                                         onNavigateToComboEditor()
                                     }
                                 },
@@ -245,7 +246,7 @@ fun ComboDisplayScreen(
                                     }
                                     Toast.makeText(
                                         context,
-                                        "Combo ${combo.comboId} was deleted.",
+                                        "Combo ${combo.id} was deleted.",
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 },

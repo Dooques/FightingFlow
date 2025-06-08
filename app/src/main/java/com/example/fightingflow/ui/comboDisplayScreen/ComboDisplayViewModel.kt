@@ -155,7 +155,7 @@ class ComboDisplayViewModel(
     }
 
     suspend fun updateComboStateInDs(comboDisplay: ComboDisplay) {
-        comboDsRepository.updateComboState(comboDisplay)
+        comboDsRepository.updateComboIdState(comboDisplay)
         updateEditingState(true)
     }
 

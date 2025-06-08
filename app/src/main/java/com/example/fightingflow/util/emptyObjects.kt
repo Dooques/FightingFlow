@@ -19,7 +19,7 @@ val emptyCharacter = CharacterEntry(
 )
 
 val emptyComboDisplay = ComboDisplay(
-    comboId = UUID.randomUUID().toString(),
+    id = 0,
     description = "",
     character = "",
     damage = 0,
@@ -29,7 +29,7 @@ val emptyComboDisplay = ComboDisplay(
 )
 
 val emptyComboEntry = ComboEntry(
-    comboId = UUID.randomUUID().toString(),
+    id = 0,
     description = "",
     character = emptyCharacter,
     damage = 0,

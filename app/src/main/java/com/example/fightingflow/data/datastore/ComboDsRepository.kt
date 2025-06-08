@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.fightingflow.data.datastore.ComboDsRepository.Companion.comboId
@@ -16,14 +17,14 @@ import timber.log.Timber
 
 
 interface ComboDsRepository {
-    suspend fun updateComboState(comboDisplay: ComboDisplay)
+    suspend fun updateComboIdState(comboDisplay: ComboDisplay)
     suspend fun updateEditingState(editingStateValue: Boolean)
 
-    fun getComboId(): Flow<String>
+    fun getComboId(): Flow<Int>
     fun getEditingState(): Flow<Boolean>
 
     companion object {
-        val comboId = stringPreferencesKey("combo_id")
+        val comboId = intPreferencesKey("combo_id")
         val editingState = booleanPreferencesKey("editing_state")
     }
 }
@@ -31,11 +32,11 @@ interface ComboDsRepository {
 class ComboDatastoreRepository(private val dataStore: DataStore<Preferences>): ComboDsRepository {
     val Context.dataStore: DataStore<Preferences> by preferencesDataStore("combo_data")
 
-    override suspend fun updateComboState(comboDisplay: ComboDisplay) {
+    override suspend fun updateComboIdState(comboDisplay: ComboDisplay) {
         Timber.d("Setting combo to datastore...")
-        Timber.d("ComboId: ${comboDisplay.comboId}")
+        Timber.d("ComboId: ${comboDisplay.id}")
         dataStore.edit { preference ->
-            preference[comboId] = comboDisplay.comboId
+            preference[comboId] = comboDisplay.id
         }
     }
 
@@ -49,7 +50,7 @@ class ComboDatastoreRepository(private val dataStore: DataStore<Preferences>): C
 
     override fun getComboId() = dataStore.data
         .map { preference ->
-            preference[comboId] ?: ""
+            preference[comboId] ?: 0
         }
 
     override fun getEditingState(): Flow<Boolean> = dataStore.data

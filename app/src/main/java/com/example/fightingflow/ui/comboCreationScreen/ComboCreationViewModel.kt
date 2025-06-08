@@ -1,5 +1,6 @@
 package com.example.fightingflow.ui.comboCreationScreen
 
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,13 +15,11 @@ import com.example.fightingflow.model.SF6ControlType
 import com.example.fightingflow.model.getMoveEntryDataForComboDisplay
 import com.example.fightingflow.model.toDisplay
 import com.example.fightingflow.model.toEntry
-import com.example.fightingflow.ui.comboDisplayScreen.inputConverter.convertInputToStandard
 import com.example.fightingflow.util.CharacterEntryUiState
 import com.example.fightingflow.util.ComboDisplayUiState
 import com.example.fightingflow.util.ComboEntryUiState
 import com.example.fightingflow.util.ImmutableList
 import com.example.fightingflow.util.MoveEntryListUiState
-import com.example.fightingflow.util.characterAndMoveData.consoleInputs
 import com.example.fightingflow.util.emptyComboDisplay
 import com.example.fightingflow.util.emptyComboEntry
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,18 +43,32 @@ class ComboCreationViewModel(
         const val TIME_MILLIS = 5_000L
     }
 
+    // Mutable State
     val editingState = mutableStateOf(false)
-    val comboIdState = mutableStateOf("")
+    val comboIdState = mutableIntStateOf(0)
+
+    // State Flow
+    val comboDisplayState = MutableStateFlow(
+        ComboDisplayUiState(emptyComboDisplay.copy(dateCreated = LocalDate.now().toString()))
+    )
 
     val characterState = MutableStateFlow(CharacterEntryUiState())
     val originalCombo = MutableStateFlow(ComboDisplayUiState())
-    val comboDisplayState = MutableStateFlow(ComboDisplayUiState(emptyComboDisplay.copy(dateCreated = LocalDate.now().toString())))
+
     val comboAsStringState = MutableStateFlow(processComboAsString())
+    private val profileNameState = MutableStateFlow("")
+
+    val itemIndexState = MutableStateFlow(comboDisplayState.value.comboDisplay.moves.size)
+    val gameTypeState = getGameState()
+
+    private val controlTypeState = getControlTypeState()
+    private val sf6ControlTypeState = getSF6ControlTypeState()
+
+    // State Flow Lists
     val characterMoveEntryList = MutableStateFlow(MoveEntryListUiState())
     val gameMoveEntryList = MutableStateFlow(MoveEntryListUiState())
-    val itemIndexState = MutableStateFlow(comboDisplayState.value.comboDisplay.moves.size)
     private val moveEntryListUiState = MutableStateFlow(MoveEntryListUiState())
-    private val profileNameState = MutableStateFlow("")
+
 
     init {
         getComboIdFromDs()
@@ -64,22 +77,187 @@ class ComboCreationViewModel(
         getProfileName()
     }
 
-    val gameState = settingsDsRepository.getGame()
-        .map {
-            when (it) {
-                Game.MK1.title -> Game.MK1
-                Game.SF6.title -> Game.SF6
-                Game.T8.title -> Game.T8
-                else -> null
+    // Combo Processing Functions
+     fun updateMoveList(
+            moveName: String,
+            moveListUiState: MoveEntryListUiState,
+            game: Game? = null,
+            console: Console? = null
+        ) {
+            Timber.d("Adding $moveName to combo...")
+            Timber.d("Move List: ${moveListUiState.moveList.size} moves")
+            Timber.d("Game: ${gameTypeState.value}, Console: ${controlTypeState.value}")
+
+            val updatedCombo = updateMoveListAbstract(
+                moveName = moveName,
+                comboDisplayState = comboDisplayState.value,
+                game = game,
+                console = console,
+                sf6ControlTypeState = sf6ControlTypeState.value,
+                itemIndexState = itemIndexState.value,
+                moveList = moveListUiState.moveList
+            )
+
+            Timber.d("Updated Combo: $updatedCombo")
+            updateComboDetails(ComboDisplayUiState(updatedCombo))
+            itemIndexState.update { itemIndexState.value + 1 }
+            Timber.d("Index: ${itemIndexState.value}")
+        }
+
+
+    fun updateComboDetails(comboDisplay: ComboDisplayUiState) {
+        Timber.d("Updating combo details...")
+        val comboDisplayWithCharacterData = comboDisplay.comboDisplay.copy(
+                character = characterState.value.character.name)
+
+        Timber.d("Combo Display with Character: $comboDisplayWithCharacterData")
+        comboDisplayState.update { ComboDisplayUiState(comboDisplayWithCharacterData) }
+
+        Timber.d("Combo Display Ui State: ")
+        comboAsStringState.update { processComboAsString() }
+
+        Timber.d("Saving updated combo to datastore...")
+        updateComboIdInDs(comboDisplayState.value)
+    }
+
+    private fun processComboAsString(): String {
+        Timber.d("Processing combo as string...")
+        val moveList = comboDisplayState.value.comboDisplay.moves
+        return processComboAsStringAbstract(moveList)
+    }
+
+    fun deleteMove() {
+        Timber.d("Deleting last move...")
+        if (itemIndexState.value > 0) {
+            val currentMoves: MutableList<MoveEntry> =
+                comboDisplayState.value.comboDisplay.moves.toMutableList()
+            Timber.d("Temporary move list created, move to delete: ${currentMoves.last()}")
+
+            val index =
+                if (itemIndexState.value >= comboDisplayState.value.comboDisplay.moves.size)
+                    comboDisplayState.value.comboDisplay.moves.size - 1
+                else itemIndexState.value
+            currentMoves.removeAt(index)
+
+            Timber.d("Move removed from temp list, preparing to copy and update.")
+            val updatedCombo = comboDisplayState.value.comboDisplay.copy(moves = ImmutableList(currentMoves.toList()))
+            updateComboDetails(ComboDisplayUiState(updatedCombo))
+
+            itemIndexState.update { if (itemIndexState.value != 0) itemIndexState.value - 1 else itemIndexState.value }
+            Timber.d("Index: ${itemIndexState.value}")
+        } else {
+            Timber.d("No moves found, cannot delete move.")
+        }
+    }
+
+    fun clearMoveList() {
+        Timber.d("Clearing move list...")
+        comboDisplayState.update { ComboDisplayUiState() }
+        comboAsStringState.update { "" }
+        Timber.d("Cleared move list: ${comboAsStringState.value}")
+        itemIndexState.update { 0 }
+    }
+
+    suspend fun saveCombo() {
+        Timber.d("Checking if combo details valid")
+        Timber.d("ComboDisplay Character: ${comboDisplayState.value.comboDisplay.character}")
+        Timber.d("ComboDisplay Moves: ${comboDisplayState.value.comboDisplay.moves}")
+        if (
+            comboDisplayState.value.comboDisplay.character.isNotEmpty() &&
+            comboDisplayState.value.comboDisplay.moves.isNotEmpty()
+            ) {
+            Timber.d("Preparing to add combo to Db, checking if edit mode...")
+            if (editingState.value) {
+                Timber.d("Edit mode true, updating existing combo...")
+                updateComboInDb()
+            } else {
+                Timber.d("Edit mode false, adding new combo...")
+                insertComboIntoDb()
+            }
+        } else {
+            Timber.d("Cannot save Combo, please make sure a Character is selected and the Move List is not empty.")
+        }
+    }
+
+    // Datastore Functions
+    private fun updateComboIdInDs(comboDisplay: ComboDisplayUiState = ComboDisplayUiState()) {
+        Timber.d("Saving combo details to datastore...")
+        Timber.d("Combo to save: ${comboDisplay.comboDisplay}")
+        viewModelScope.launch {
+            Timber.d("Checking if combo empty...")
+            if (comboDisplay.comboDisplay == emptyComboDisplay) {
+                Timber.d("Combo empty, adding empty combo to datastore...")
+                comboDsRepository.updateComboIdState(comboDisplay.comboDisplay)
+            } else {
+                Timber.d("Combo details found, saving them to datastore...")
+                comboDsRepository.updateComboIdState(comboDisplayState.value.comboDisplay)
             }
         }
+        Timber.d("Combo saved to datastore.")
+    }
+
+    suspend fun updateControlType(controlType: Int) =
+        settingsDsRepository.updateConsoleType(controlType)
+
+    // Room Db Functions
+    private suspend fun insertComboIntoDb() {
+        val comboEntry = comboDisplayState.value.comboDisplay.toEntry(characterState.value.character)
+            .copy(createdBy = profileNameState.value)
+        flowRepository.insertCombo(comboEntry)
+        Timber.d("Combo added to Db.")
+        Timber.d("Clearing move list...")
+        resetCombo()
+        resetComboId()
+        resetItemIndex()
+        updateComboIdInDs(ComboDisplayUiState())
+        Timber.d("Move list cleared.")
+    }
+
+    private suspend fun updateComboInDb() {
+        Timber.d("Preparing to update combo in database...")
+        val updatedCombo = comboDisplayState.value.comboDisplay.toEntry(characterState.value.character)
+        Timber.d("Move List: ${updatedCombo.moves}")
+        flowRepository.updateCombo(updatedCombo)
+        resetCombo()
+        resetComboId()
+        resetItemIndex()
+        updateComboIdInDs(ComboDisplayUiState())
+        Timber.d("Existing combo updated in Db.")
+    }
+
+    fun updateItemIndex(index: Int) {
+        itemIndexState.update { index }
+    }
+
+    fun resetItemIndex() {
+        itemIndexState.update { comboDisplayState.value.comboDisplay.moves.size }
+    }
+
+    fun resetComboId() {
+        comboIdState.intValue = 0
+    }
+
+    fun resetCombo() {
+        comboDisplayState.update {
+            ComboDisplayUiState(emptyComboDisplay.copy(dateCreated = LocalDate.now().toString()))
+        }
+    }
+
+    // State Functions
+    private fun getGameState() = settingsDsRepository.getGame()
+        .map { when (it) {
+            Game.MK1.title -> Game.MK1
+            Game.SF6.title -> Game.SF6
+            Game.T8.title -> Game.T8
+            else -> null
+        } }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(TIME_MILLIS),
             initialValue = null
         )
 
-    private val controlTypeState = settingsDsRepository.getConsoleType()
+    private fun getControlTypeState() = settingsDsRepository.getConsoleType()
         .map { when (it) {
             1 -> Console.STANDARD
             2 -> Console.PLAYSTATION
@@ -93,7 +271,7 @@ class ComboCreationViewModel(
             initialValue = Console.STANDARD
         )
 
-    private val sF6ControlType = settingsDsRepository.getSF6ControlType()
+    private fun getSF6ControlTypeState() = settingsDsRepository.getSF6ControlType()
         .map { if (it == 0) SF6ControlType.Classic else SF6ControlType.Modern }
         .stateIn(
             scope = viewModelScope,
@@ -101,19 +279,11 @@ class ComboCreationViewModel(
             initialValue = SF6ControlType.Classic
         )
 
-    fun updateItemIndex(index: Int) {
-        itemIndexState.update { index }
-    }
-
-    fun resetItemIndex() {
-        itemIndexState.update { comboDisplayState.value.comboDisplay.moves.size }
-    }
-
     private fun getComboIdFromDs() = viewModelScope.launch {
         comboDsRepository.getComboId()
             .map { comboId -> comboId }
             .collect { comboId ->
-                comboIdState.value = comboId
+                comboIdState.intValue = comboId
             }
     }
 
@@ -136,7 +306,7 @@ class ComboCreationViewModel(
     fun getExistingCombo() {
         viewModelScope.launch {
             Timber.d("Getting existing combo from DB...")
-            flowRepository.getCombo(comboIdState.value)
+            flowRepository.getCombo(comboIdState.intValue)
                 .map { combo -> ComboEntryUiState(combo ?: emptyComboEntry) }
                 .collect { combo ->
                     val existingCombo = ComboDisplayUiState(
@@ -167,7 +337,7 @@ class ComboCreationViewModel(
             flowRepository.getAllMovesByCharacter(character)
                 .map {moveList -> moveList}
                 .collect { characterMoveList ->
-                   characterMoveEntryList.update { MoveEntryListUiState(characterMoveList) }
+                    characterMoveEntryList.update { MoveEntryListUiState(characterMoveList) }
                 }
         }
     }
@@ -180,164 +350,5 @@ class ComboCreationViewModel(
                     gameMoveEntryList.update { MoveEntryListUiState(gameMoves) }
                 }
         }
-    }
-
-    // Combo Processing Functions
-    private fun processComboAsString(): String {
-        Timber.d("Processing combo as string...")
-        val comboIterator = comboDisplayState.value.comboDisplay.moves.iterator()
-        var moveAsString = ""
-        while (comboIterator.hasNext()) {
-            val move = comboIterator.next().notation
-            if (move == "Break") {
-                moveAsString += " $move "
-            }
-            moveAsString += move
-            if (comboIterator.hasNext()) {
-                moveAsString += ", "
-            }
-        }
-        Timber.d("Processed combo: $moveAsString")
-        return moveAsString
-    }
-
-    fun updateComboDetails(comboDisplay: ComboDisplayUiState) {
-        Timber.d("Updating combo details...")
-        val comboDisplayWithCharacterData = comboDisplay.comboDisplay.copy(
-                character = characterState.value.character.name)
-
-        Timber.d("Combo Display with Character: $comboDisplayWithCharacterData")
-        comboDisplayState.update { ComboDisplayUiState(comboDisplayWithCharacterData) }
-
-        Timber.d("Combo Display Ui State: ")
-        comboAsStringState.update { processComboAsString() }
-
-        Timber.d("Saving updated combo to datastore...")
-        saveComboDetailsToDs(comboDisplayState.value)
-    }
-
-    fun updateMoveList(
-        moveName: String,
-        moveListUiState: MoveEntryListUiState,
-        game: Game? = null,
-        console: Console? = null
-    ) {
-        Timber.d("Adding $moveName to combo...")
-        Timber.d("Move List: ${moveListUiState.moveList.size} moves")
-        Timber.d("Game: ${gameState.value}, Console: ${controlTypeState.value}")
-        var moveToAdd = moveEntryListUiState.value.moveList.first { it.moveName == moveName}
-        Timber.d("MoveToAdd: $moveToAdd")
-        if (moveToAdd.moveName in consoleInputs) {
-            Timber.d("Converting console input to standard...")
-            moveToAdd = convertInputToStandard(
-                move = moveToAdd,
-                game = game,
-                console = console,
-                classic = sF6ControlType.value == SF6ControlType.Classic,
-            )
-        } else {
-            moveListUiState.moveList.first { it.moveName == moveName }
-        }
-        Timber.d("${moveToAdd.moveName} found.")
-        val updatedList = comboDisplayState.value.comboDisplay.moves.toMutableList()
-        Timber.d("Index: $itemIndexState")
-        val index =
-            if (itemIndexState.value == comboDisplayState.value.comboDisplay.moves.size)
-                itemIndexState.value else itemIndexState.value + 1
-        updatedList.add(index, moveToAdd)
-        val updatedCombo = comboDisplayState.value.comboDisplay.copy(moves = ImmutableList(list = updatedList))
-        Timber.d("Updated Combo: $updatedCombo")
-        updateComboDetails(ComboDisplayUiState(updatedCombo))
-        itemIndexState.update { itemIndexState.value + 1 }
-        Timber.d("Index: ${itemIndexState.value}")
-    }
-
-    fun deleteMove() {
-        Timber.d("Deleting last move...")
-        if (itemIndexState.value > 0) {
-            val currentMoves: MutableList<MoveEntry> =
-                comboDisplayState.value.comboDisplay.moves.toMutableList()
-            Timber.d("Temporary move list created, move to delete: ${currentMoves.last()}")
-            val index =
-                if (itemIndexState.value >= comboDisplayState.value.comboDisplay.moves.size)
-                    comboDisplayState.value.comboDisplay.moves.size - 1
-                else itemIndexState.value
-            currentMoves.removeAt(index)
-            Timber.d("Move removed from temp list, preparing to copy and update.")
-            val updatedCombo =
-                comboDisplayState.value.comboDisplay.copy(moves = ImmutableList(currentMoves.toList()))
-            updateComboDetails(ComboDisplayUiState(updatedCombo))
-            itemIndexState.update { if (itemIndexState.value != 0) itemIndexState.value - 1 else itemIndexState.value }
-            Timber.d("Index: ${itemIndexState.value}")
-        } else {
-            Timber.d("No moves found, cannot delete move.")
-        }
-    }
-
-    fun clearMoveList() {
-        Timber.d("Clearing move list...")
-        comboDisplayState.update { ComboDisplayUiState() }
-        comboAsStringState.update { "" }
-        Timber.d("Cleared move list: ${comboAsStringState.value}")
-        itemIndexState.update { 0 }
-    }
-
-    suspend fun saveCombo() {
-        Timber.d("Checking if combo details valid")
-        Timber.d("ComboDisplay Character: ${comboDisplayState.value.comboDisplay.character}")
-        Timber.d("ComboDisplay Moves: ${comboDisplayState.value.comboDisplay.moves}")
-        if (
-        comboDisplayState.value.comboDisplay.character.isNotEmpty() &&
-            comboDisplayState.value.comboDisplay.moves.isNotEmpty()
-            ) {
-            Timber.d("Preparing to add combo to Db, checking if edit mode...")
-            if (editingState.value) {
-                Timber.d("Edit mode true, updating existing combo...")
-                updateComboInDb()
-            } else {
-                Timber.d("Edit mode false, adding new combo...")
-                insertComboToDb()
-            }
-        } else {
-            Timber.d("Cannot save Combo, please make sure a Character is selected and the Move List is not empty.")
-        }
-    }
-
-    // Datastore Functions
-    private fun saveComboDetailsToDs(comboDisplay: ComboDisplayUiState = ComboDisplayUiState()) {
-        Timber.d("Saving combo details to datastore...")
-        Timber.d("Combo to save: ${comboDisplay.comboDisplay}")
-        viewModelScope.launch {
-            Timber.d("Checking if combo empty...")
-            if (comboDisplay.comboDisplay == emptyComboDisplay) {
-                Timber.d("Combo empty, adding empty combo to datastore...")
-                comboDsRepository.updateComboState(comboDisplay.comboDisplay)
-            } else {
-                Timber.d("Combo details found, saving them to datastore...")
-                comboDsRepository.updateComboState(comboDisplayState.value.comboDisplay)
-            }
-        }
-        Timber.d("Combo saved to datastore.")
-    }
-
-    suspend fun updateControlType(controlType: Int) = settingsDsRepository.updateConsoleType(controlType)
-
-    // Room Db Functions
-    private suspend fun insertComboToDb() {
-        val comboEntry = comboDisplayState.value.comboDisplay.toEntry(characterState.value.character)
-            .copy(createdBy = profileNameState.value)
-        flowRepository.insertCombo(comboEntry)
-        Timber.d("Combo added to Db.")
-        Timber.d("Clearing move list...")
-        clearMoveList()
-        Timber.d("Move list cleared.")
-    }
-
-    private suspend fun updateComboInDb() {
-        Timber.d("Preparing to update combo in database...")
-        val updatedCombo = comboDisplayState.value.comboDisplay.toEntry(characterState.value.character)
-        Timber.d("Move List: ${updatedCombo.moves}")
-        flowRepository.updateCombo(updatedCombo)
-        Timber.d("Existing combo updated in Db.")
     }
 }

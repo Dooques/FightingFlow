@@ -105,7 +105,7 @@ class DatastoreTest {
     private val testComboRepository: ComboDsRepository = ComboDatastoreRepository(testDataStore)
 
     private val combo = ComboDisplay(
-        comboId = UUID.randomUUID().toString(),
+        id = 0,
         description = "Combo",
         character = "Reina",
         damage = 60,
@@ -131,14 +131,14 @@ class DatastoreTest {
     @Throws(IOException::class)
     fun firstTimeDataValue_ReturnDefaultValues() = testScope.runTest {
         val comboID = testComboRepository.getComboId().first()
-        assertEquals("", comboID)
+        assertEquals(0, comboID)
     }
 
     @Test
     @Throws(IOException::class)
     fun updateComboIF_ReturnComboID() = testScope.runTest {
-        testComboRepository.updateComboState(combo)
+        testComboRepository.updateComboIdState(combo)
         val comboID = testComboRepository.getComboId().first()
-        assertEquals(combo.comboId, comboID)
+        assertEquals(combo.id, comboID)
     }
 }

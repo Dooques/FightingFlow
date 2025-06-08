@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -39,18 +40,22 @@ fun ComboInfoTop(
     modifier: Modifier = Modifier
 ) {
     val fontSize = if (uiScale == 2f) 20.sp else 16.sp
-    Box(Modifier.fillMaxWidth()) {
-        Row(
-            modifier = modifier.align(alignment = Alignment.CenterStart)
-        ) {
-            Text(text = combo.description, fontSize = fontSize)
+    Column {
+        Box(Modifier.fillMaxWidth()) {
+            Row(modifier.align(Alignment.CenterEnd)) {
+                Text(text = combo.character, fontSize = fontSize)
+                Spacer(modifier.width((4 * uiScale).dp))
+                Text(text = "|")
+                Spacer(modifier.width((4 * uiScale).dp))
+                Text(text = combo.dateCreated, fontSize = fontSize)
+            }
         }
-        Row(modifier.align(Alignment.CenterEnd)) {
-            Text(text = combo.character, fontSize = fontSize)
-            Spacer(modifier.width((4 * uiScale).dp))
-            Text(text = "|")
-            Spacer(modifier.width((4 * uiScale).dp))
-            Text(text = combo.dateCreated, fontSize = fontSize)
+        Box(Modifier.fillMaxWidth()) {
+            Row(
+                modifier = modifier.align(alignment = Alignment.CenterStart)
+            ) {
+                Text(text = combo.description, fontSize = fontSize)
+            }
         }
     }
 }
@@ -132,8 +137,8 @@ fun TextMove(
                 else -> move.moveName },
 
             style = MaterialTheme.typography.bodyLarge.copy(
-                fontSize = (12 * uiScale).sp,
-                lineHeight = 14.sp,
+                fontSize = (14 * uiScale).sp,
+                lineHeight = 15.sp,
                 fontWeight = FontWeight.ExtraBold,
                 color = if (color == Color.White || color == Color.Green) Color.Black else Color.White,
                 shadow = if (color != Color.White)

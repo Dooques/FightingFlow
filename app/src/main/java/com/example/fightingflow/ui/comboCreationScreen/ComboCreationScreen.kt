@@ -79,7 +79,7 @@ fun ComboCreationScreen(
     val characterMoveListState by comboCreationViewModel.characterMoveEntryList.collectAsStateWithLifecycle()
     val gameMoveListState by comboCreationViewModel.gameMoveEntryList.collectAsStateWithLifecycle()
     val textComboState by comboDisplayViewModel.textComboState.collectAsStateWithLifecycle()
-    val game by comboCreationViewModel.gameState.collectAsStateWithLifecycle()
+    val game by comboCreationViewModel.gameTypeState.collectAsStateWithLifecycle()
     val selectedItem by comboCreationViewModel.itemIndexState.collectAsStateWithLifecycle()
 
     // Datastore Flows
@@ -114,7 +114,7 @@ fun ComboCreationScreen(
 
     Timber.d("Checking if in editing state & existing combo list contains data...")
     if (editingState) {
-        if (comboIdState.isNotEmpty()) {
+        if (comboIdState != 0) {
             if (!comboReceived) {
                 Timber.d("Combo found and editing mode is true...")
                 comboCreationViewModel.getExistingCombo()
@@ -160,6 +160,7 @@ fun ComboCreationScreen(
                         onClick = {
                             comboCreationViewModel.clearMoveList()
                             comboCreationViewModel.resetItemIndex()
+                            comboCreationViewModel.resetComboId()
                             navigateBack()
                                   },
                         modifier.fillMaxHeight()) {

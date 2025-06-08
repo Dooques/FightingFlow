@@ -17,7 +17,7 @@ interface FlowRepository {
     suspend fun insertCharacter(characterEntry: CharacterEntry)
 
     // Combo
-    fun getCombo(comboId: String): Flow<ComboEntry?>
+    fun getCombo(id: Int): Flow<ComboEntry?>
     fun getAllCombos(): Flow<List<ComboEntry>>
     fun getAllCombosByCharacter(characterEntry: CharacterEntry): Flow<List<ComboEntry>?>
     fun getAllCombosByProfile(username: String): Flow<List<ComboEntry>?>
@@ -54,8 +54,8 @@ class FlowDataRepository(
 
 
     // Get Combo
-    override fun getCombo(comboId: String): Flow<ComboEntry?> =
-        comboDao.getCombo(comboId)
+    override fun getCombo(id: Int): Flow<ComboEntry?> =
+        comboDao.getCombo(id)
 
     override fun getAllCombos(): Flow<List<ComboEntry>> =
         comboDao.getAllCombos()

@@ -117,6 +117,7 @@ fun ComboForm(
                 sf6ControlType = sF6ControlType,
                 fontColor = MaterialTheme.colorScheme.onBackground,
                 iconDisplayState = iconDisplayState,
+                textComboState = textComboDisplay,
                 comboAsText = comboAsString,
                 uiScale = 1f,
                 setSelectedItem = setSelectedItem,
@@ -218,7 +219,9 @@ fun InputDivider(modifier: Modifier = Modifier) {
 
 @Composable
 fun SectionTitle(title: String, modifier: Modifier = Modifier) {
-    val titleCheck = if (title == "Fatal Blow Title") "Fatal Blow" else title
+    val titleCheck =
+        if (title == "Fatal Blow Title") "Fatal Blow"
+        else title
     Text(titleCheck, modifier = modifier.padding(start = 16.dp))
 }
 
@@ -316,6 +319,7 @@ fun MoveModifiers(modifier: Modifier = Modifier) {
 
 @Composable
 fun IconMoves(
+    modifier: Modifier = Modifier,
     moveType: String,
     moveList: MoveEntryListUiState,
     updateMoveList: KFunction4<String, MoveEntryListUiState, Game?, Console?, Unit>,
@@ -323,7 +327,6 @@ fun IconMoves(
     sF6ControlType: SF6ControlType? = SF6ControlType.Invalid,
     context: Context,
     maxItemsPerRow: Int = 5,
-    modifier: Modifier = Modifier
 ) {
     FlowRow(
         horizontalArrangement = Arrangement.SpaceEvenly,
@@ -333,7 +336,6 @@ fun IconMoves(
         Timber.d("Loading Input Icons")
         Timber.d("MoveType: $moveType")
         Timber.d("Move List: $moveList")
-
 
         moveList.moveList.forEach {
             val game = when (it.game) {
@@ -391,12 +393,12 @@ fun IconMoves(
 
 @Composable
 fun TextMoves(
+    modifier: Modifier = Modifier,
     moveType: String,
     moveList: MoveEntryListUiState,
     maxItems: Int = 5,
     console: Console?,
     updateMoveList: KFunction4<String, MoveEntryListUiState, Game?, Console?, Unit>,
-    modifier: Modifier = Modifier
 ) {
     FlowRow(
         horizontalArrangement = Arrangement.SpaceEvenly,
@@ -493,11 +495,11 @@ fun TextMoves(
 
 @Composable
 fun CharacterMoves(
+    modifier: Modifier = Modifier,
     characterMoveList: MoveEntryListUiState,
     moveType: String,
     updateMoveList: KFunction4<String, MoveEntryListUiState, Game?, Console?, Unit>,
     maxItems: Int = 5,
-    modifier: Modifier = Modifier
 ) {
     Timber.d("Moves: $characterMoveList")
     FlowRow(
