@@ -40,21 +40,34 @@ fun ComboInfoTop(
     modifier: Modifier = Modifier
 ) {
     val fontSize = if (uiScale == 2f) 20.sp else 16.sp
+    val font = MaterialTheme.typography.bodySmall
     Column {
         Box(Modifier.fillMaxWidth()) {
-            Row(modifier.align(Alignment.CenterEnd)) {
+            Row(
+                modifier = modifier.align(Alignment.CenterEnd)
+            ) {
+
                 Text(text = combo.character, fontSize = fontSize)
                 Spacer(modifier.width((4 * uiScale).dp))
                 Text(text = "|")
                 Spacer(modifier.width((4 * uiScale).dp))
                 Text(text = combo.dateCreated, fontSize = fontSize)
+                Spacer(modifier.width((4 * uiScale).dp))
+                Text(text = "|")
+                Spacer(modifier.width((4 * uiScale).dp))
+                Text(
+                    text = "★".repeat(combo.difficulty.toInt()),
+                    color = Color.Yellow,
+                    fontSize = fontSize,
+                    style = font
+                )
             }
         }
         Box(Modifier.fillMaxWidth()) {
             Row(
                 modifier = modifier.align(alignment = Alignment.CenterStart)
             ) {
-                Text(text = combo.description, fontSize = fontSize)
+                Text(text = combo.title, fontSize = fontSize)
             }
         }
     }
@@ -72,6 +85,7 @@ fun ComboInfoBottom(
             Text(text = "Damage: ", color = fontColor)
             Text(text = combo.damage.toString(), color = Color.Red)
         }
+
         Row {
             Text(text = "Created by: ", color = fontColor)
             Text(text = combo.createdBy.ifEmpty { profile }, color = fontColor)

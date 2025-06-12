@@ -33,6 +33,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
 import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayViewModel
 import com.example.fightingflow.ui.components.ActionIcon
 import com.example.fightingflow.ui.components.SettingsMenu
@@ -134,11 +135,19 @@ fun ComboCreationScreen(
                     )
                 },
                 actions = {
-                    Image(
-                        painter = painterResource(characterState.character.imageId),
-                        contentDescription = "",
-                        modifier = modifier.size(60.dp)
-                    )
+                    if (characterState.character.mutable) {
+                        AsyncImage(
+                            model = characterState.character.characterImageUri,
+                            contentDescription = null,
+                            modifier.size(60.dp)
+                        )
+                    } else {
+                        Image(
+                            painter = painterResource(characterState.character.imageId),
+                            contentDescription = "",
+                            modifier = modifier.size(60.dp)
+                        )
+                    }
                     ActionIcon(
                             onclick = {
                                 Timber.d("Configuring Layout")

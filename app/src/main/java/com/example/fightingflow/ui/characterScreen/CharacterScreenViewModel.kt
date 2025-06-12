@@ -2,6 +2,7 @@ package com.example.fightingflow.ui.characterScreen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.fightingflow.data.datastore.CharacterDsRepository
 import com.example.fightingflow.data.datastore.SettingsDsRepository
 import com.example.fightingflow.model.Game
 import com.example.fightingflow.model.SF6ControlType
@@ -10,23 +11,17 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import timber.log.Timber
 
-class CharacterScreenViewModel(private val settingsDsRepository: SettingsDsRepository): ViewModel() {
+class CharacterScreenViewModel(
+    private val settingsDsRepository: SettingsDsRepository,
+    private val characterDsRepository: CharacterDsRepository
+): ViewModel() {
 
     companion object {
         const val TIME_MILLIS = 5_000L
     }
 
     val gameSelected = settingsDsRepository.getGame()
-        .map { game ->
-            Timber.d("Getting game from DS...")
-            Timber.d("Game: $game")
-            when (game) {
-                Game.T8.title -> Game.T8
-                Game.MK1.title -> Game.MK1
-                Game.SF6.title -> Game.SF6
-                else -> null
-            }
-        }
+        .map { it }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(TIME_MILLIS),
@@ -47,6 +42,14 @@ class CharacterScreenViewModel(private val settingsDsRepository: SettingsDsRepos
             initialValue = SF6ControlType.Invalid
         )
 
+    val customGameList = characterDsRepository.getCustomGameList()
+        .map { it.split(", ") }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(TIME_MILLIS),
+            initialValue = listOf()
+        )
+
     suspend fun updateGameInDs(selectedGame: String) {
         Timber.d("Updating game in DS...")
         Timber.d("GameSelected: $selectedGame")
@@ -57,5 +60,11 @@ class CharacterScreenViewModel(private val settingsDsRepository: SettingsDsRepos
         Timber.d("Updating SF6 Control Type...")
         Timber.d("Type: ${controlType.name}")
         settingsDsRepository.updateSf6ControlType(controlType.type)
+    }
+
+    suspend fun updateCustomGameList(gameList: String) {
+        Timber.d("Updating list of custom games...")
+        Timber.d("Game List: $gameList")
+        characterDsRepository.updateCustomGameList(gameList)
     }
 }

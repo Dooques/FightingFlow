@@ -313,7 +313,6 @@ class ComboCreationViewModel(
                         getMoveEntryDataForComboDisplay(
                             combo = combo.comboEntry.toDisplay(moveEntryListUiState.value),
                             moveEntryList = moveEntryListUiState.value,
-                            controlType = controlTypeState.value.let { Console.STANDARD }
                         )
                     )
                     comboDisplayState.update { existingCombo }

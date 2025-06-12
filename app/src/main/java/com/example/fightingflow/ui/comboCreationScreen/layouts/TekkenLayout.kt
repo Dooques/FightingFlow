@@ -15,7 +15,7 @@ import com.example.fightingflow.model.Console
 import com.example.fightingflow.model.Game
 import com.example.fightingflow.ui.comboCreationScreen.CharacterMoves
 import com.example.fightingflow.ui.comboCreationScreen.ComboDescription
-import com.example.fightingflow.ui.comboCreationScreen.DamageAndConfirm
+import com.example.fightingflow.ui.comboCreationScreen.DamageAndDifficulty
 import com.example.fightingflow.ui.comboCreationScreen.IconMoves
 import com.example.fightingflow.ui.comboCreationScreen.InputDivider
 import com.example.fightingflow.ui.comboCreationScreen.MoveModifiers
@@ -35,22 +35,13 @@ import kotlin.reflect.KSuspendFunction0
 @Composable
 fun TekkenLayout(
     context: Context,
-    scope: CoroutineScope,
-    snackbarHostState: SnackbarHostState,
-    editingState: Boolean,
     comboDisplay: ComboDisplay,
-    originalCombo: ComboDisplay,
     character: CharacterEntry,
     characterName: String,
     combo: ComboDisplay,
     console: Console?,
     updateComboData: (ComboDisplayUiState) -> Unit,
     updateMoveList: KFunction4<String, MoveEntryListUiState, Game?, Console?, Unit>,
-    comboAsString: String,
-    saveCombo: KSuspendFunction0<Unit>,
-    deleteMove: KFunction0<Unit>,
-    clearMoveList: () -> Unit,
-    onNavigateToComboDisplay: () -> Unit,
     moveList: MoveEntryListUiState,
     characterMoveList: MoveEntryListUiState,
     gameMoveList: MoveEntryListUiState,
@@ -75,15 +66,9 @@ fun TekkenLayout(
                     updateComboData = updateComboData
                 )
 
-                "Damage" -> DamageAndConfirm(
-                    scope = scope,
-                    snackbarHostState = snackbarHostState,
-                    editingState = editingState,
+                "Damage" -> DamageAndDifficulty(
                     comboDisplay = comboDisplay,
-                    originalCombo = originalCombo,
-                    saveCombo = saveCombo,
                     updateComboData = updateComboData,
-                    onNavigateToComboDisplay = onNavigateToComboDisplay,
                 )
 
                 "Movement" -> IconMoves(
@@ -114,7 +99,7 @@ fun TekkenLayout(
                     moveType = moveType,
                     moveList = moveList,
                     updateMoveList = updateMoveList,
-                    maxItemsPerRow = 6,
+                    maxItems = 6,
                     context = context,
                     console = console
                 )

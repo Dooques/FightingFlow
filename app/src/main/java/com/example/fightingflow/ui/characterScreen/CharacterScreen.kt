@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -36,9 +37,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
+import coil.compose.AsyncImagePainter
 import com.example.fightingflow.model.CharacterEntry
-import com.example.fightingflow.model.Game
 import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayViewModel
 import com.example.fightingflow.ui.components.GameSelectedMenu
 import com.example.fightingflow.ui.components.SettingsMenu
@@ -58,24 +61,34 @@ fun CharacterScreen(
     navigateToAddCharacter: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Timber.d("\nLoading Character Screen")
+    Timber.d("-- Loading Character Screen --")
 
     val characterListState by comboDisplayViewModel.characterEntryListState.collectAsStateWithLifecycle()
     val gameSelectedState by characterScreenViewModel.gameSelected.collectAsStateWithLifecycle()
     val modernOrClassicState by characterScreenViewModel.modernOrClassicState.collectAsStateWithLifecycle()
+    val customGameList by characterScreenViewModel.customGameList.collectAsStateWithLifecycle()
 
-    Timber.d("Flows Collected")
+    Timber.d("-- Flows Collected --")
     Timber.d("Character List: ${characterListState.characterList}")
-    Timber.d("Game Selected From DS: ${gameSelectedState?.title}")
+    Timber.d("Game Selected From DS: $gameSelectedState")
+    Timber.d("Custom Game List: $customGameList")
 
-
-    var gameSelected by remember { mutableStateOf<Game?>(null) }
+    var gameSelected by remember { mutableStateOf<String?>(null) }
 
     gameSelectedState?.let {
         Timber.d("Getting characters by game...")
         gameSelected = gameSelectedState
         Timber.d("Game selected: $gameSelected")
-        gameSelected?.let { game -> comboDisplayViewModel.getCharacterEntryListByGame(game) }
+        gameSelected?.let { game ->
+            if (game == "All") {
+                Timber.d("Getting all custom characters")
+                comboDisplayViewModel.getCustomCharacters()
+            }
+            else {
+                Timber.d("Getting characters for $game")
+                comboDisplayViewModel.getCharacterEntryListByGame(game)
+            }
+        }
     }
 
     Scaffold(
@@ -91,11 +104,11 @@ fun CharacterScreen(
                             }
                         }
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = "Add Combo",
-                            modifier = modifier.size(80.dp)
-                        )
+//                        Icon(
+//                            imageVector = Icons.Default.Add,
+//                            contentDescription = "Add Combo",
+//                            modifier = modifier.size(80.dp)
+//                        )
                     }
                     SettingsMenu(
                         navigate = navigateToProfiles,
@@ -114,9 +127,11 @@ fun CharacterScreen(
                     characterScreenViewModel = characterScreenViewModel,
                     gameSelected = gameSelected,
                     sf6Option = modernOrClassicState,
-                    changeSelectedGame = {gameSelected = it },
+                    changeSelectedGame = { gameSelected = it },
+                    customGameList = customGameList
                 )
             }
+            Timber.d("-- Loading Character Grid --")
             LazyVerticalGrid(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly,
@@ -166,12 +181,23 @@ fun CharacterCard(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = modifier.fillMaxWidth()
         ) {
-            Image(
-                painter = painterResource(characterState.character.imageId),
-                contentDescription = characterState.character.name,
-                contentScale = ContentScale.Fit,
-                modifier = modifier.size(150.dp)
-            )
+            if (characterState.character.mutable) {
+                Timber.d("Loading image from files...")
+                Timber.d("Uri: ${characterState.character.characterImageUri}")
+                AsyncImage(
+                    model = characterState.character.characterImageUri?.toUri(),
+                    contentDescription = null,
+                    contentScale = ContentScale.Fit,
+                    modifier = modifier.size(150.dp)
+                )
+            } else {
+                Image(
+                    painter = painterResource(characterState.character.imageId),
+                    contentDescription = characterState.character.name,
+                    contentScale = ContentScale.Fit,
+                    modifier = modifier.size(150.dp)
+                )
+            }
             Text(
                 text = characterState.character.name,
                 style = MaterialTheme.typography.bodyLarge,

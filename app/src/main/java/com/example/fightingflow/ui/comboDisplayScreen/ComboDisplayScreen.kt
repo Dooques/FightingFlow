@@ -44,7 +44,9 @@ import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
 import com.example.fightingflow.data.mediastore.MediaStoreUtil
 import com.example.fightingflow.ui.comboCreationScreen.ComboCreationViewModel
 import com.example.fightingflow.ui.comboItem.ComboItemDisplay
@@ -71,7 +73,7 @@ fun ComboDisplayScreen(
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Timber.d("Opening Combo Screen...")
+    Timber.d("-- Opening Combo Screen --")
 
     val context = LocalContext.current
     (context as? Activity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
@@ -106,6 +108,7 @@ fun ComboDisplayScreen(
     val comboEntryListState by comboDisplayViewModel.comboEntryListUiState.collectAsStateWithLifecycle()
 
     Timber.d("Console: $consoleTypeState")
+    Timber.d("Combo List: ${comboDisplayListState.comboDisplayList}")
 
     Timber.d("Updating character data")
     if (characterNameState.name.isNotEmpty()) {
@@ -132,7 +135,11 @@ fun ComboDisplayScreen(
                 title = {
                     Text(
                         text = characterState.character.name,
-                        style = MaterialTheme.typography.displayMedium,
+                        style =
+                            if (characterState.character.name.length > 12)
+                                MaterialTheme.typography.displaySmall
+                            else
+                                MaterialTheme.typography.displayMedium,
                         modifier = modifier.padding(start = 16.dp)
                     )
                 },
@@ -146,11 +153,19 @@ fun ComboDisplayScreen(
                     }
                 },
                 actions = {
-                    Image(
-                        painter = painterResource(characterState.character.imageId),
-                        contentDescription = "",
-                        modifier = modifier.size(60.dp)
-                    )
+                    if (characterState.character.mutable) {
+                        AsyncImage(
+                            model = characterState.character.characterImageUri,
+                            contentDescription = null,
+                            modifier.size(60.dp)
+                        )
+                    } else {
+                        Image(
+                            painter = painterResource(characterState.character.imageId),
+                            contentDescription = "",
+                            modifier = modifier.size(60.dp)
+                        )
+                    }
                     IconButton(onClick = {
                         scope.launch {
                             comboDisplayViewModel.updateEditingState(false)

@@ -15,7 +15,7 @@ import com.example.fightingflow.model.Console
 import com.example.fightingflow.model.Game
 import com.example.fightingflow.ui.comboCreationScreen.CharacterMoves
 import com.example.fightingflow.ui.comboCreationScreen.ComboDescription
-import com.example.fightingflow.ui.comboCreationScreen.DamageAndConfirm
+import com.example.fightingflow.ui.comboCreationScreen.DamageAndDifficulty
 import com.example.fightingflow.ui.comboCreationScreen.IconMoves
 import com.example.fightingflow.ui.comboCreationScreen.InputDivider
 import com.example.fightingflow.ui.comboCreationScreen.MoveModifiers
@@ -36,21 +36,10 @@ import kotlin.reflect.KSuspendFunction0
 @Composable
 fun MortalKombatLayout(
     context: Context,
-    scope: CoroutineScope,
-    snackbarHostState: SnackbarHostState,
-    editingState: Boolean,
-    originalCombo: ComboDisplay,
-    character: CharacterEntry,
-    characterName: String,
     combo: ComboDisplay,
     console: Console?,
     updateComboData: (ComboDisplayUiState) -> Unit,
     updateMoveList: KFunction4<String, MoveEntryListUiState, Game?, Console?, Unit>,
-    comboAsString: String,
-    saveCombo: KSuspendFunction0<Unit>,
-    deleteMove: KFunction0<Unit>,
-    clearMoveList: () -> Unit,
-    onNavigateToComboDisplay: () -> Unit,
     moveList: MoveEntryListUiState,
     characterMoveList: MoveEntryListUiState,
     gameMoveList: MoveEntryListUiState,
@@ -64,22 +53,16 @@ fun MortalKombatLayout(
 
                 "Move Modifiers" -> MoveModifiers()
 
-                "Damage" -> DamageAndConfirm(
+                "Damage" -> DamageAndDifficulty(
                     comboDisplay = combo,
                     updateComboData = updateComboData,
-                    scope = scope,
-                    snackbarHostState = snackbarHostState,
-                    editingState = editingState,
-                    originalCombo = originalCombo,
-                    saveCombo = saveCombo,
-                    onNavigateToComboDisplay = onNavigateToComboDisplay,
                 )
 
                 "Input" -> if (console == Console.STANDARD) IconMoves(
                     moveType = moveType,
                     moveList = gameMoveList,
                     updateMoveList = updateMoveList,
-                    maxItemsPerRow = 5,
+                    maxItems = 5,
                     context = context,
                     console = console
                 )
@@ -88,7 +71,7 @@ fun MortalKombatLayout(
                     moveType = moveType,
                     moveList = gameMoveList,
                     updateMoveList = updateMoveList,
-                    maxItemsPerRow = 5,
+                    maxItems = 5,
                     context = context,
                     console = console
                 )
@@ -97,7 +80,7 @@ fun MortalKombatLayout(
                     moveType = moveType,
                     moveList = moveList,
                     updateMoveList = updateMoveList,
-                    maxItemsPerRow = 6,
+                    maxItems = 6,
                     context = context,
                     console = console
                 )

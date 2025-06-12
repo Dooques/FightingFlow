@@ -8,6 +8,9 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
+import androidx.compose.runtime.Composable
 import androidx.core.content.FileProvider
 import java.io.File
 import kotlinx.coroutines.Dispatchers
@@ -15,6 +18,9 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.io.InputStream
+import java.io.OutputStream
+import java.util.UUID
 
 data class ImageObject(
     val uri: Uri? = null,
@@ -88,4 +94,33 @@ class MediaStoreUtil(private val context: Context) {
             }
         }
     }
+
+    fun copyImageToAppStorage(originalUri: Uri, characterName: String): Uri? {
+        Timber.d("-- Copying image to app storage. --")
+        var inputStream: InputStream? = null
+        var outputStream: OutputStream? = null
+        try {
+            inputStream = context.contentResolver.openInputStream(originalUri)
+            if (inputStream == null) return null
+
+            // Using getExternalFiles for debugging, but getFilesDir is more private
+            val imageDir = File(context.getExternalFilesDir(null), "CharacterImages")
+            if (!imageDir.exists()) {
+                imageDir.mkdirs()
+            }
+            val outputFile = File(imageDir, "${characterName}.png")
+
+            outputStream = FileOutputStream(outputFile)
+            inputStream.copyTo(outputStream)
+
+            return Uri.fromFile(outputFile)
+        } catch (e: Exception) {
+            Timber.e(e, "Error copying image to app storage.")
+            return null
+        } finally {
+            inputStream?.close()
+            outputStream?.close()
+        }
+    }
+
 }

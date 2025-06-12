@@ -21,7 +21,7 @@ class CharacterAndMoveData {
             nintendoInputs,
             tekken8CharacterMoves,
             mk1MoveList,
-            streetFighterVIMoves
+            streetFighter6Moves
         )
     )
 }

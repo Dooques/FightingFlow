@@ -141,27 +141,27 @@ class FlowDaoTest {
 
     /* ComboDaoTests */
     private val combo1 = ComboEntry(
-        comboId = UUID.randomUUID().toString(),
-        description = "Combo",
-        character = reina,
+        id = 1,
+        title = "Combo",
+        character = "reina",
         damage = 60,
         createdBy = "Sam",
         dateCreated = "19/05/2025",
         moves = "1, 2, 1",
     )
     private val combo2 = ComboEntry(
-        comboId = UUID.randomUUID().toString(),
-        description = "Combo",
-        character = asuka,
+        id = 2,
+        title = "Combo",
+        character = "asuka",
         damage = 60,
         createdBy = "Sam",
         dateCreated = "19/05/2025",
         moves = "1, 2, 1",
     )
     private val combo3 = ComboEntry(
-        comboId = UUID.randomUUID().toString(),
-        description = "Combo",
-        character = reina,
+        id = 3,
+        title = "Combo",
+        character = "reina",
         damage = 60,
         createdBy = "Dave",
         dateCreated = "19/05/2025",
@@ -178,7 +178,7 @@ class FlowDaoTest {
     @Throws(IOException::class)
     fun getComboByUUID() = runBlocking {
         addAllCombosToDb()
-        val combo = comboDao.getCombo(combo1.comboId).first()
+        val combo = comboDao.getCombo(combo1.id).first()
         assertEquals(combo1, combo)
     }
 
@@ -194,7 +194,7 @@ class FlowDaoTest {
     @Throws(IOException::class)
     fun getComboByCharacter() = runBlocking {
         addAllCombosToDb()
-        val combos = comboDao.getAllCombosByCharacter(reina).first()
+        val combos = comboDao.getAllCombosByCharacter("reina").first()
         assertEquals(combo1, combos?.get(0) ?: emptyComboEntry)
         assertEquals(combo3, combos?.get(1) ?: emptyComboEntry)
     }
@@ -235,9 +235,6 @@ class FlowDaoTest {
         moveName = "forward",
         notation = "f",
         moveType = "Movement",
-        counterHit = false,
-        hold = false,
-        justFrame = false,
         character = "Generic"
     )
     private val move2 = MoveEntry(
@@ -245,9 +242,6 @@ class FlowDaoTest {
         moveName = "one",
         notation = "1",
         moveType = "Input",
-        counterHit = false,
-        hold = false,
-        justFrame = false,
         character = "Generic"
     )
     private suspend fun insertAllMoves() {

@@ -7,7 +7,6 @@ import com.example.fightingflow.model.ComboEntry
 import com.example.fightingflow.model.MoveEntry
 import com.example.fightingflow.model.ProfileCreation
 import com.example.fightingflow.model.ProfileEntry
-import java.util.UUID
 
 val emptyCharacter = CharacterEntry(
     id = 0,
@@ -20,7 +19,7 @@ val emptyCharacter = CharacterEntry(
 
 val emptyComboDisplay = ComboDisplay(
     id = 0,
-    description = "",
+    title = "",
     character = "",
     damage = 0,
     createdBy = "",
@@ -30,8 +29,8 @@ val emptyComboDisplay = ComboDisplay(
 
 val emptyComboEntry = ComboEntry(
     id = 0,
-    description = "",
-    character = emptyCharacter,
+    title = "",
+    character = "",
     damage = 0,
     createdBy = "",
     dateCreated = "",
@@ -42,9 +41,6 @@ val emptyMove = MoveEntry(
     moveName = "",
     notation = "",
     moveType = "",
-    counterHit = false,
-    hold = false,
-    justFrame = false,
     character = ""
 )
 

@@ -114,7 +114,7 @@ fun ComboItemEditor(
                                 }
                             }
 
-                            "Input", "Movement", "Complex Movement", "Console" -> {
+                            "SF Modern", "SF Classic", "Input", "Movement", "Complex Movement", "Console" -> {
                                 SelectableItem(
                                     color = if (index == selectedIndex) Color.Gray else Color.Transparent,
                                     changeColor = {
@@ -138,37 +138,37 @@ fun ComboItemEditor(
                                 }
                             }
 
-                            "SF Classic", "SF Modern" -> {
-                                SelectableItem(
-                                    color = if (index == selectedIndex) Color.Gray else Color.Transparent,
-                                    changeColor = {
-                                        if (index != selectedIndex) {
-                                        selectedIndex = index
-                                        setSelectedItem(index)
-                                        } else {
-                                        selectedIndex = mutableMoveList.size
-                                        setSelectedItem(mutableMoveList.size)
-                                        }
-                                    }
-                                ) {
-                                    TextMove(
-                                        move = move,
-                                        color = if (move.moveName.contains("L")) {
-                                            Color(0xFFf0c027)
-                                        } else if (move.moveName.contains("M")) {
-                                            Color(0xFFe23a10)
-                                        } else if (move.moveName.contains("H")) {
-                                            Color(0xFFff0000)
-                                        } else {
-                                            Color(0xFF7ed957)
-                                        },
-                                        uiScale = uiScale,
-                                        modifier = modifier
-                                            .align(Alignment.CenterVertically)
-                                            .padding(4.dp)
-                                    )
-                                }
-                            }
+//                            -> {
+//                                SelectableItem(
+//                                    color = if (index == selectedIndex) Color.Gray else Color.Transparent,
+//                                    changeColor = {
+//                                        if (index != selectedIndex) {
+//                                        selectedIndex = index
+//                                        setSelectedItem(index)
+//                                        } else {
+//                                        selectedIndex = mutableMoveList.size
+//                                        setSelectedItem(mutableMoveList.size)
+//                                        }
+//                                    }
+//                                ) {
+//                                    TextMove(
+//                                        move = move,
+//                                        color = if (move.moveName.contains("L")) {
+//                                            Color(0xFFf0c027)
+//                                        } else if (move.moveName.contains("M")) {
+//                                            Color(0xFFe23a10)
+//                                        } else if (move.moveName.contains("H")) {
+//                                            Color(0xFFff0000)
+//                                        } else {
+//                                            Color(0xFF7ed957)
+//                                        },
+//                                        uiScale = uiScale,
+//                                        modifier = modifier
+//                                            .align(Alignment.CenterVertically)
+//                                            .padding(4.dp)
+//                                    )
+//                                }
+//                            }
 
                             "Common", "Console Text" -> SelectableItem(
                                 color = if (index == selectedIndex) Color.Gray else Color.Transparent,

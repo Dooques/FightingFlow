@@ -1,5 +1,10 @@
 package com.example.fightingflow.ui.comboDisplayScreen
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fightingflow.data.database.FlowRepository
@@ -9,7 +14,7 @@ import com.example.fightingflow.data.datastore.SettingsDsRepository
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.Console
-import com.example.fightingflow.model.Game
+import com.example.fightingflow.model.MoveEntry
 import com.example.fightingflow.model.SF6ControlType
 import com.example.fightingflow.model.getMoveEntryDataForComboDisplay
 import com.example.fightingflow.model.toDisplay
@@ -25,10 +30,13 @@ import com.example.fightingflow.util.emptyCharacter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import okhttp3.internal.wait
 import timber.log.Timber
 
 class ComboDisplayViewModel(
@@ -182,39 +190,54 @@ class ComboDisplayViewModel(
             }
     }
 
-    fun getCharacterEntryListByGame(game: Game) = viewModelScope.launch {
+    fun getCharacterEntryListByGame(game: String) = viewModelScope.launch {
         Timber.d("Updating character entry list state")
-        Timber.d("Game selected: ${game.title}")
-            flowRepository.getCharactersByGame(game.title)
-                .map { characterList ->
-                    Timber.d("CharacterList: $characterList")
-                    CharacterEntryListUiState(characterList)
-                }
-                .collect { characterList ->
-                    _characterEntryListState.update { characterList }
-                }
+        Timber.d("Game selected: $game")
+        flowRepository.getCharactersByGame(game)
+            .map { characterList ->
+                Timber.d("CharacterList: $characterList")
+                CharacterEntryListUiState(characterList)
+            }
+            .collect { characterList ->
+                _characterEntryListState.update { characterList }
+            } }
 
+    fun getCustomCharacters() = viewModelScope.launch {
+        flowRepository.getCustomCharacters()
+            .mapNotNull { characterList ->
+                CharacterEntryListUiState(characterList ?: emptyList())
+            }
+            .collect { characterList ->
+                _characterEntryListState.update { characterList }
+            }
     }
 
     fun getComboDisplayListByCharacter() = viewModelScope.launch {
-        Timber.d("Getting combos from database...")
-        flowRepository.getAllCombosByCharacter(characterState.value.character)
+        Timber.d("-- Getting combos from database... --")
+        flowRepository.getAllCombosByCharacter(characterState.value.character.name)
             .map { comboEntryList ->
                 Timber.d("Combo List: $comboEntryList")
                 ComboEntryListUiState(comboEntryList ?: emptyList())
             }
             .collect { comboEntryList ->
-                _comboEntryListState.update { comboEntryList }
-                _comboDisplayListState.update {
-                    ComboDisplayListUiState(
-                        comboDisplayList = comboEntryList.comboEntryList.map { combo ->
-                            getMoveEntryDataForComboDisplay(
-                                combo = combo.toDisplay(moveEntryListUiState.value),
-                                moveEntryList = moveEntryListUiState.value,
-                                controlType = consoleTypeState.value.let { Console.STANDARD }
-                            )
-                        }
-                    )
+                _comboEntryListState.update {
+                    Timber.d("Collecting Combo Entry List: ${comboEntryList.comboEntryList}")
+                    comboEntryList
+                }
+                try {
+                    _comboDisplayListState.update {
+                        Timber.d("Updating comboDisplayListState: $comboEntryList")
+                        val comboDisplay = ComboDisplayListUiState(
+                            comboDisplayList = comboEntryList.comboEntryList.map { combo ->
+                                Timber.d("Combo: $combo")
+                                combo.toDisplay(
+                                    MoveEntryListUiState(moveEntryListUiState.value.moveList)) })
+
+                        Timber.d("Combo Display List: ${comboDisplay.comboDisplayList}")
+                        comboDisplay
+                    }
+                } catch (e: Exception) {
+                    Timber.e(e, "An error occurred converting move list to move entry list.")
                 }
             }
     }

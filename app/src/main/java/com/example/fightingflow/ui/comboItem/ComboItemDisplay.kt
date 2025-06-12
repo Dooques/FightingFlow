@@ -46,7 +46,7 @@ fun ComboItemDisplay(
     fontColor: Color,
     modifier: Modifier = Modifier,
 ) {
-    Timber.d("Loading Combo Moves Composable...")
+    Timber.d("-- Loading Combo Moves Composable... --")
     Box(modifier.fillMaxWidth().capturable(captureController)) {
         if (toShare) {
             Image(
@@ -73,13 +73,14 @@ fun ComboItemDisplay(
                     verticalArrangement = Arrangement.Center,
                     horizontalArrangement = Arrangement.Start,
                     itemVerticalAlignment = Alignment.CenterVertically,
-                    modifier = modifier
-                        .fillMaxWidth()
+                    modifier = modifier.fillMaxWidth()
                 ) {
                     Timber.d("Loading moves from combo...")
                     combo.moves.forEach {
                         Timber.d("$it from ${it.game}")
-                        val move = convertInputsToConsole(
+                        Timber.d("Console Type: $console")
+                        Timber.d("If not Standard, converting to console input.")
+                        val move = if (console != Console.STANDARD) convertInputsToConsole(
                             move = it,
                             game = when (it.game) {
                                 "Tekken 8" -> Game.T8
@@ -89,7 +90,7 @@ fun ComboItemDisplay(
                             },
                             console = console,
                             classic = sf6ControlType == SF6ControlType.Classic
-                        )
+                        ) else it
 
                         Timber.d(move.moveName)
                         when (move.moveType) {
@@ -100,29 +101,30 @@ fun ComboItemDisplay(
 
                             "Misc" -> MiscInput(move)
 
-                            "Input", "Movement", "Complex Movement", "Console" -> InputMove(
-                                context = context,
-                                input = move,
-                                uiScale = uiScale,
-                                modifier = modifier
-                                    .align(Alignment.CenterVertically)
-                                    .padding(4.dp)
-                            )
+                            "SF Modern", "SF Classic", "Input", "Movement", "Complex Movement", "Console" ->
+                                InputMove(
+                                    context = context,
+                                    input = move,
+                                    uiScale = uiScale,
+                                    modifier = modifier
+                                        .align(Alignment.CenterVertically)
+                                        .padding(4.dp)
+                                )
 
-                            "SF Classic", "SF Modern" -> TextMove(
-                                move = move,
-                                color = if (move.moveName.contains("L")) {
-                                    Color(0xFFf0c027)
-                                } else if (move.moveName.contains("M")) {
-                                    Color(0xFFe23a10)
-                                } else if (move.moveName.contains("H")) {
-                                    Color(0xFFff0000)
-                                } else { Color(0xFF7ed957) },
-                                uiScale = uiScale,
-                                modifier = modifier
-                                    .align(Alignment.CenterVertically)
-                                    .padding(4.dp)
-                            )
+//                             -> TextMove(
+//                                move = move,
+//                                color = if (move.moveName.contains("L")) {
+//                                    Color(0xFFf0c027)
+//                                } else if (move.moveName.contains("M")) {
+//                                    Color(0xFFe23a10)
+//                                } else if (move.moveName.contains("H")) {
+//                                    Color(0xFFff0000)
+//                                } else { Color(0xFF7ed957) },
+//                                uiScale = uiScale,
+//                                modifier = modifier
+//                                    .align(Alignment.CenterVertically)
+//                                    .padding(4.dp)
+//                            )
 
                             "Common", "Console Text" ->
                                 TextMove(
@@ -154,7 +156,7 @@ fun ComboItemDisplay(
                                         .padding(4.dp)
                                 )
 
-                            "Mishima" ->
+                            "Mishima", "Mechanic" ->
                                 TextMove(
                                     move = move,
                                     color = Color(0xFF8155BA),
@@ -174,7 +176,7 @@ fun ComboItemDisplay(
                                         .padding(4.dp)
                                 )
 
-                            "Modifier", "Mechanic", "MK Input" ->
+                            "Modifier", "MK Input" ->
                                 TextMove(
                                     move = move,
                                     color = Color.White,

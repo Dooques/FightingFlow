@@ -79,7 +79,7 @@ val viewModelModule = module {
     viewModel { InitViewModel(get()) }
     viewModel { ComboDisplayViewModel(get(), get(), get(), get()) }
     viewModel { ComboCreationViewModel(get(), get(), get(), get()) }
-    viewModel { CharacterScreenViewModel(get()) }
+    viewModel { CharacterScreenViewModel(get(), get()) }
     viewModel { ComboItemViewModel() }
-    viewModel { AddCharacterViewModel(get()) }
+    viewModel { AddCharacterViewModel(get(), get()) }
 }

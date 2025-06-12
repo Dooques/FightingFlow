@@ -120,16 +120,17 @@ fun ConsoleInputsMenu(
 fun GameSelectedMenu(
     scope: CoroutineScope,
     characterScreenViewModel: CharacterScreenViewModel,
-    gameSelected: Game?,
+    gameSelected: String?,
     sf6Option: SF6ControlType?,
-    changeSelectedGame: (Game) -> Unit,
+    changeSelectedGame: (String) -> Unit,
+    customGameList: List<String>,
     modifier: Modifier = Modifier
 ) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier.fillMaxWidth()
     ) {
-        gameSelected?.title?.let { game ->
+        gameSelected?.let { game ->
             GameSelectedHeader(
                 gameSelected = game,
                 modifier = modifier.align(Alignment.CenterStart)
@@ -137,53 +138,78 @@ fun GameSelectedMenu(
         }
 
         var gameMenuExpanded by remember { mutableStateOf(false) }
-        var subMenuExpanded by remember { mutableStateOf(false) }
+        var sf6OptionsExpanded by remember { mutableStateOf(false) }
+        var customGameListExpanded by remember { mutableStateOf(false) }
 
         IconButton(
             onClick = { gameMenuExpanded = !gameMenuExpanded },
-            modifier = modifier.fillMaxWidth(0.4f).align(Alignment.Center)
+            modifier = modifier
+                .fillMaxWidth(0.4f)
+                .align(Alignment.Center)
         ) {
             DropdownMenu(
                 expanded = gameMenuExpanded,
                 onDismissRequest = { gameMenuExpanded = false },
                 modifier = modifier.align(Alignment.Center)
             ) {
+                // Select MK1
                 DropdownMenuItem(
                     text = { Text("Mortal Kombat 1") },
                     onClick = {
                         gameMenuExpanded = false
-                        changeSelectedGame(Game.MK1)
+                        changeSelectedGame(Game.MK1.title)
                         scope.launch {
                             characterScreenViewModel.updateGameInDs(Game.MK1.title)
                         }
                     }
                 )
+
+                // Select SF6
                 DropdownMenuItem(
                     text = { Text("Street Fighter VI") },
                     onClick = {
-                        subMenuExpanded = true
-                        changeSelectedGame(Game.SF6)
-                        scope.launch {
-                            characterScreenViewModel.updateGameInDs(Game.SF6.title)
-                        }
+                        sf6OptionsExpanded = true
                     }
                 )
+
+                // Select Tekken 8
                 DropdownMenuItem(
                     text = { Text("Tekken 8") },
                     onClick = {
                         gameMenuExpanded = false
-                        changeSelectedGame(Game.T8)
+                        changeSelectedGame(Game.T8.title)
                         scope.launch {
                             characterScreenViewModel.updateGameInDs(Game.T8.title)
                         }
                     }
                 )
-                if (subMenuExpanded) {
+
+//                // Select Custom
+//                DropdownMenuItem(
+//                    text = { Text("Custom") },
+//                    onClick = {
+//                        customGameListExpanded = true
+//                    }
+//                )
+
+                if (sf6OptionsExpanded) {
                     SF6ModernOrClassicMenu(
                         scope = scope,
                         characterScreenViewModel = characterScreenViewModel,
                         option = sf6Option,
-                        onDismiss = { subMenuExpanded = false },
+                        onDismiss = { sf6OptionsExpanded = false },
+                        changeSelectedGame = { changeSelectedGame(it) },
+                        onDismissParent = { gameMenuExpanded = false },
+                    )
+                }
+
+                if (customGameListExpanded) {
+                    CustomGameListMenu(
+                        scope = scope,
+                        characterScreenViewModel = characterScreenViewModel,
+                        customGameList = customGameList,
+                        changeSelectedGame = changeSelectedGame,
+                        onDismiss = { customGameListExpanded = false },
                         onDismissParent = { gameMenuExpanded = false },
                     )
                 }
@@ -191,11 +217,14 @@ fun GameSelectedMenu(
         }
     }
 }
+
+
 @Composable
 fun SF6ModernOrClassicMenu(
     scope: CoroutineScope,
     characterScreenViewModel: CharacterScreenViewModel,
     option: SF6ControlType?,
+    changeSelectedGame: (String) -> Unit,
     onDismiss: () -> Unit,
     onDismissParent: () -> Unit,
     offset: DpOffset = DpOffset(5.dp, 0.dp)
@@ -207,42 +236,76 @@ fun SF6ModernOrClassicMenu(
     ) {
         DropdownMenuItem(
             text = { Text("Modern") },
-            trailingIcon = {
-                if (option == SF6ControlType.Modern) Icon(
-                    imageVector = Icons.Default.Check,
-                    contentDescription = null)
-                else Icon(
-                        imageVector = Icons.Default.Clear,
-                        contentDescription = null
-                    )
-            },
             onClick = {
                 Timber.d("Setting input type to ${SF6ControlType.Classic}...")
                 scope.launch {
+                    characterScreenViewModel.updateGameInDs(Game.SF6.title)
                     characterScreenViewModel.updateSF6ControlType(SF6ControlType.Classic)
                 }
+                changeSelectedGame(Game.SF6.title)
                 onDismiss()
                 onDismissParent()
             }
         )
         DropdownMenuItem(
             text = { Text("Classic") },
-            trailingIcon = {
-                if (option == SF6ControlType.Classic) Icon(
-                    imageVector = Icons.Default.Check,
-                    contentDescription = null)
-                else Icon(
-                    imageVector = Icons.Default.Clear,
-                    contentDescription = null)
-            },
             onClick = {
                 Timber.d("Setting input type to ${SF6ControlType.Modern}...")
                 scope.launch {
+                    characterScreenViewModel.updateGameInDs(Game.SF6.title)
                     characterScreenViewModel.updateSF6ControlType(SF6ControlType.Modern)
                 }
+                changeSelectedGame(Game.SF6.title)
                 onDismiss()
                 onDismissParent()
             }
         )
+    }
+}
+
+@Composable
+fun CustomGameListMenu(
+    scope: CoroutineScope,
+    characterScreenViewModel: CharacterScreenViewModel,
+    customGameList: List<String>,
+    changeSelectedGame: (String) -> Unit,
+    onDismiss: () -> Unit,
+    onDismissParent: () -> Unit,
+    offset: DpOffset = DpOffset(5.dp, 0.dp)
+) {
+    DropdownMenu(
+        expanded = true,
+        onDismissRequest = {
+            onDismiss()
+            onDismissParent()
+        },
+        offset = offset
+    ) {
+        DropdownMenuItem(
+            text = { Text("All Characters") },
+            onClick = {
+                scope.launch {
+                    characterScreenViewModel.updateGameInDs("All")
+                }
+                changeSelectedGame(Game.CUSTOM.title)
+                onDismiss()
+                onDismissParent()
+            }
+        )
+        customGameList.forEach { game ->
+            if (game != "Invalid List") {
+                DropdownMenuItem(
+                    text = { Text(game) },
+                    onClick = {
+                        scope.launch {
+                            characterScreenViewModel.updateGameInDs(game)
+                        }
+                        changeSelectedGame(Game.CUSTOM.title)
+                        onDismiss()
+                        onDismissParent()
+                    }
+                )
+            }
+        }
     }
 }

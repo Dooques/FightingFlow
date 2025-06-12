@@ -1,5 +1,6 @@
 package com.example.fightingflow.model
 
+import android.net.Uri
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import kotlin.String
@@ -10,6 +11,7 @@ data class CharacterEntry(
     val id: Int = 0,
     val name: String,
     val imageId: Int,
+    val characterImageUri: String? = null,
     val fightingStyle: String,
     val combosById: String = "",
     val game: String,

@@ -25,7 +25,6 @@ import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import org.junit.runner.RunWith
 import java.io.IOException
-import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -105,8 +104,7 @@ class DatastoreTest {
     private val testComboRepository: ComboDsRepository = ComboDatastoreRepository(testDataStore)
 
     private val combo = ComboDisplay(
-        id = 0,
-        description = "Combo",
+        title = "Combo",
         character = "Reina",
         damage = 60,
         createdBy = "Sam",
@@ -118,9 +116,6 @@ class DatastoreTest {
                     moveName = "forward",
                     notation = "f",
                     moveType = "Movement",
-                    counterHit = false,
-                    hold = false,
-                    justFrame = false,
                     character = "Generic"
                 )
             )

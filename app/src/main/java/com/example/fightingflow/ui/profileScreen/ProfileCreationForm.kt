@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -20,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -44,6 +46,7 @@ fun ProfileCreationForm(
                     ProfileCreationUiState(
                         profileCreation = profile.profileCreation.copy(username = username)
                     )) },
+            onConfirm = onConfirm,
             modifier = modifier.padding(4.dp))
 
 //        Timber.d("Loading password field...")
@@ -87,6 +90,7 @@ fun ProfileCreationForm(
 fun TextInputField(
     type: String,
     updateProfileState: (String) -> Unit,
+    onConfirm: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val typeCap = type.replaceFirstChar { it.uppercaseChar() }
@@ -111,6 +115,7 @@ fun TextInputField(
                 visualTransformation = PasswordVisualTransformation(),
                 maxLines = 1,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+
                 modifier = modifier.fillMaxWidth(0.8f)
             )
         } else {
@@ -122,7 +127,12 @@ fun TextInputField(
                 },
                 label = { Text(typeCap) },
                 maxLines = 1,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        onConfirm()
+                    }
+                ),
                 modifier = modifier.fillMaxWidth(0.8f)
             )
         }

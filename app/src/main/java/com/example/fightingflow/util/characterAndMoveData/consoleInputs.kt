@@ -44,7 +44,7 @@ val nintendoInputs = listOf(
 val convertibleInputs = listOf(
     "one", "two", "three", "four", "two_plus_three", "three_plus_four", "Heat Burst", "one_plus_four",
     "one_plus_two", "Rage Art", "one", "two", "three", "four", "Kameo", "Block", "Throw", "Stance",
-    "LP", "MP", "LK", "MK", "HP", "HK", "L", "S", "M", "H", "Parry", "Assist", "Drive Impact",
+    "lp", "mp", "lk", "mk", "hp", "hk", "l", "s", "m", "h", "Parry", "Assist", "Drive Impact",
     "Throw"
 )
 

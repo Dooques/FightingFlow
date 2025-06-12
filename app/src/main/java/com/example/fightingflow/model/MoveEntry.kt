@@ -14,11 +14,6 @@ data class MoveEntry(
     val notation: String,
     @ColumnInfo(name = "move_type")
     val moveType: String,
-    @ColumnInfo(name = "counter_hit")
-    val counterHit: Boolean = false,
-    val hold: Boolean = false,
-    @ColumnInfo(name = "just_frame")
-    val justFrame: Boolean = false,
     @ColumnInfo(name = "character")
     val character: String,
     val game: String? = null,

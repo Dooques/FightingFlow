@@ -17,4 +17,7 @@ interface CharacterDao: BaseDao<CharacterEntry> {
 
     @Query("select * from character_table where game = :game and name = :name")
     fun getCharacterByGameAndName(name: String, game: String): Flow<CharacterEntry?>
+
+    @Query("select * from character_table where mutable == 1")
+    fun getAllCustomCharacters(): Flow<List<CharacterEntry>?>
 }

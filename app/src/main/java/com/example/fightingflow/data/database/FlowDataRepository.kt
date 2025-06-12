@@ -13,13 +13,14 @@ interface FlowRepository {
     fun getCharacter(name: String): Flow<CharacterEntry?>
     fun getCharactersByGame(game: String): Flow<List<CharacterEntry>>
     fun getCharacterByGameAndName(name: String, game: String): Flow<CharacterEntry?>
+    fun getCustomCharacters(): Flow<List<CharacterEntry>?>
     suspend fun updateCharacter(characterEntry: CharacterEntry)
     suspend fun insertCharacter(characterEntry: CharacterEntry)
 
     // Combo
     fun getCombo(id: Int): Flow<ComboEntry?>
     fun getAllCombos(): Flow<List<ComboEntry>>
-    fun getAllCombosByCharacter(characterEntry: CharacterEntry): Flow<List<ComboEntry>?>
+    fun getAllCombosByCharacter(character: String): Flow<List<ComboEntry>?>
     fun getAllCombosByProfile(username: String): Flow<List<ComboEntry>?>
     suspend fun updateCombo(comboEntry: ComboEntry)
     suspend fun deleteCombo(comboEntry: ComboEntry)
@@ -52,6 +53,9 @@ class FlowDataRepository(
     override fun getCharacterByGameAndName(name: String, game: String) =
         characterDao.getCharacterByGameAndName(name, game)
 
+    override fun getCustomCharacters(): Flow<List<CharacterEntry>?> =
+        characterDao.getAllCustomCharacters()
+
 
     // Get Combo
     override fun getCombo(id: Int): Flow<ComboEntry?> =
@@ -60,8 +64,8 @@ class FlowDataRepository(
     override fun getAllCombos(): Flow<List<ComboEntry>> =
         comboDao.getAllCombos()
 
-    override fun getAllCombosByCharacter(characterEntry: CharacterEntry): Flow<List<ComboEntry>?> =
-        comboDao.getAllCombosByCharacter(characterEntry)
+    override fun getAllCombosByCharacter(character: String): Flow<List<ComboEntry>?> =
+        comboDao.getAllCombosByCharacter(character)
 
     override fun getAllCombosByProfile(username: String): Flow<List<ComboEntry>?> =
         comboDao.getAllCombosByProfile(username)
