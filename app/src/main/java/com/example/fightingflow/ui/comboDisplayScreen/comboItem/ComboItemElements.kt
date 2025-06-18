@@ -1,4 +1,4 @@
-package com.example.fightingflow.ui.comboItem
+package com.example.fightingflow.ui.comboDisplayScreen.comboItem
 
 import android.content.Context
 import androidx.compose.foundation.Image
@@ -134,6 +134,7 @@ fun TextMove(
         modifier
             .clip(RoundedCornerShape(100.dp))
             .background(color)
+            .padding(4.dp)
     ) {
         Text(
             text =

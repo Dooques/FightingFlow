@@ -31,31 +31,55 @@ fun processComboAsStringAbstract(moveList: ImmutableList<MoveEntry>): String {
 fun updateMoveListAbstract(
     moveName: String,
     comboDisplayState: ComboDisplayUiState,
-    game: Game? = null,
+    game: String,
     console: Console? = null,
     sf6ControlTypeState: SF6ControlType? = null,
     itemIndexState: Int,
     moveList: List<MoveEntry>
 ): ComboDisplay {
+    Timber.d("-- Adding move to Combo --")
     var moveToAdd = moveList.first { it.moveName == moveName}
-    Timber.d("MoveToAdd: $moveToAdd")
+    Timber.d("MoveToAdd: $moveToAdd " +
+            "\n Game: $game " +
+            "\n MoveName: $moveName"
+    )
+    val gameSelected = if (game.contains("Tekken")) { Game.T8 }
+    else if (game.contains("Mortal Kombat")) { Game.MK1 }
+    else if (game.contains("Street Fighter")) { Game.SF6 }
+    else { Game.CUSTOM }
     if (moveToAdd.moveName in consoleInputs) {
         Timber.d("Converting console input to standard...")
         moveToAdd = convertInputToStandard(
             move = moveToAdd,
-            game = game,
+            game = gameSelected,
             console = console,
             classic = sf6ControlTypeState == SF6ControlType.Classic,
         )
+    } else if (
+        moveToAdd.moveType == "Break" ||
+        moveToAdd.moveType == "Misc" ||
+        moveToAdd.moveType == "Movement"
+        ) {
+        Timber.d("Adding Break to Combo")
+        moveToAdd = moveList.first { it.moveName == moveName}
     } else {
-        moveList.first { it.moveName == moveName }
+        Timber.d("Adding $moveName to Combo")
+        if (moveToAdd.moveType == "Unique Move") {
+            moveToAdd = moveList.first {
+                it.moveName == moveName && it.game == game
+            }
+        } else {
+            moveToAdd = moveList.first {
+                it.moveName == moveName && it.game == gameSelected.title
+            }
+        }
     }
-    Timber.d("${moveToAdd.moveName} found.")
+
+    Timber.d("$moveToAdd found.")
     val updatedList = comboDisplayState.comboDisplay.moves.toMutableList()
     Timber.d("Index: $itemIndexState")
-    val index =
-        if (itemIndexState == comboDisplayState.comboDisplay.moves.size)
-            itemIndexState else itemIndexState + 1
+    val index = if (itemIndexState == comboDisplayState.comboDisplay.moves.size)
+        itemIndexState else itemIndexState + 1
     updatedList.add(index, moveToAdd)
     return comboDisplayState.comboDisplay.copy(moves = ImmutableList(list = updatedList))
 }

@@ -1,5 +1,6 @@
 package com.example.fightingflow.util.characterAndMoveData
 
+import androidx.compose.runtime.Immutable
 import com.example.fightingflow.R
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.MoveEntry
@@ -7,47 +8,47 @@ import com.example.fightingflow.util.ImmutableList
 
 val tekken8Characters: ImmutableList<CharacterEntry> = ImmutableList(
     listOf(
-        CharacterEntry(name = "Alisa", imageId = R.drawable.alisa, fightingStyle = "Thruster-Based High-Mobility Fighting Style", game = "Tekken 8"),
-        CharacterEntry(name = "Anna", imageId = R.drawable.anna, fightingStyle = "Aikido based techniques and Koppojutsu based Assassination Arts", game = "Tekken 8"),
-        CharacterEntry(name = "Asuka", imageId = R.drawable.asuka, fightingStyle = "Kazama Style Traditional Martial Arts", game = "Tekken 8"),
-        CharacterEntry(name = "Azucena", imageId = R.drawable.azucena, fightingStyle = "Mixed Martial Arts (Striker)", game = "Tekken 8"),
-        CharacterEntry(name = "Bryan", imageId = R.drawable.bryan, fightingStyle = "Kickboxing", game = "Tekken 8"),
-        CharacterEntry(name = "Claudio", imageId = R.drawable.claudio, fightingStyle = "Sirius Exorcist Arts", game = "Tekken 8"),
-        CharacterEntry(name = "Clive", imageId = R.drawable.clive, fightingStyle = "Dominant", game = "Tekken 8"),
-        CharacterEntry(name = "Devil Jin", imageId = R.drawable.devil_jin, fightingStyle = "Unknown", game = "Tekken 8"),
-        CharacterEntry(name = "Dragunov", imageId = R.drawable.dragunov, fightingStyle = "White Reaper", game = "Tekken 8"),
-        CharacterEntry(name = "Eddy", imageId = R.drawable.eddy, fightingStyle = "Capoeira", game = "Tekken 8"),
-        CharacterEntry(name = "Feng", imageId = R.drawable.feng, fightingStyle = "Taijiquan", game = "Tekken 8"),
-        CharacterEntry(name = "Heihachi", imageId = R.drawable.heihachi, fightingStyle = "Mishima Style Fighting Karate", game = "Tekken 8"),
-        CharacterEntry(name = "Hwoarang", imageId = R.drawable.hwoarang, fightingStyle = "Taekwondo", game = "Tekken 8"),
-        CharacterEntry(name = "Jack-8", imageId = R.drawable.jack_8, fightingStyle = "High Tech Annihilator", game = "Tekken 8"),
-        CharacterEntry(name = "Jin", imageId = R.drawable.jin, fightingStyle = "Karate based on Kyokushin style infused with Devil Gene", game = "Tekken 8"),
-        CharacterEntry(name = "Jun", imageId = R.drawable.jun, fightingStyle = "Kazama Style Traditional Martial Arts", game = "Tekken 8"),
-        CharacterEntry(name = "Kazuya", imageId = R.drawable.kazuya, fightingStyle = "Mishima Style Fighting Karate", game = "Tekken 8"),
-        CharacterEntry(name = "King", imageId = R.drawable.king, fightingStyle = "Pro Wrestling", game = "Tekken 8"),
-        CharacterEntry(name = "Kuma", imageId = R.drawable.kuma, fightingStyle = "Heihachi-style Improved Kuma Shinken", game = "Tekken 8"),
-        CharacterEntry(name = "Lars", imageId = R.drawable.lars, fightingStyle = "Tekken Forces Martial Arts", game = "Tekken 8"),
-        CharacterEntry(name = "Law", imageId = R.drawable.law, fightingStyle = "Martial Arts", game = "Tekken 8"),
-        CharacterEntry(name = "Lee", imageId = R.drawable.lee, fightingStyle = "Martial Arts", game = "Tekken 8"),
-        CharacterEntry(name = "Leo", imageId = R.drawable.leo, fightingStyle = "Baji Quan", game = "Tekken 8"),
-        CharacterEntry(name = "Leroy", imageId = R.drawable.leroy, fightingStyle = "Wing Chun", game = "Tekken 8"),
-        CharacterEntry(name = "Lidia", imageId = R.drawable.lidia, fightingStyle = "Traditional Karate", game = "Tekken 8"),
-        CharacterEntry(name = "Lili", imageId = R.drawable.lili, fightingStyle = "Self-Taught Style", game = "Tekken 8"),
-        CharacterEntry(name = "Nina", imageId = R.drawable.nina, fightingStyle = "Assassination Arts", game = "Tekken 8"),
-        CharacterEntry(name = "Panda", imageId = R.drawable.panda, fightingStyle = "Heihachi-style Improved Kuma Shinken", game = "Tekken 8"),
-        CharacterEntry(name = "Paul", imageId = R.drawable.paul, fightingStyle = "Integrated Martial Arts", game = "Tekken 8"),
-        CharacterEntry(name = "Raven", imageId = R.drawable.raven, fightingStyle = "Ninjutsu", game = "Tekken 8"),
-        CharacterEntry(name = "Reina", imageId = R.drawable.reina, fightingStyle = "Taido and Mishima-Style Karate", game = "Tekken 8"),
-        CharacterEntry(name = "Shaheen", imageId = R.drawable.shaheen, fightingStyle = "Close Quarters Combat", game = "Tekken 8"),
-        CharacterEntry(name = "Steve", imageId = R.drawable.steve, fightingStyle = "Boxing", game = "Tekken 8"),
-        CharacterEntry(name = "Victor", imageId = R.drawable.victor, fightingStyle = "Super Spy CQB", game = "Tekken 8"),
-        CharacterEntry(name = "Xiaoyu", imageId = R.drawable.xiaoyu, fightingStyle = "Chinese Martial Arts", game = "Tekken 8"),
-        CharacterEntry(name = "Yoshimitsu", imageId = R.drawable.yoshimitsu, fightingStyle = "Advanced Manji Ninjutsu", game = "Tekken 8"),
-        CharacterEntry(name = "Zafina", imageId = R.drawable.zafina, fightingStyle = "Ancient Assassination Arts", game = "Tekken 8")
+        CharacterEntry(name = "Alisa", imageId = R.drawable.alisa, fightingStyle = "Thruster-Based High-Mobility Fighting Style", controlType = "Tekken", game = "Tekken 8"),
+        CharacterEntry(name = "Anna", imageId = R.drawable.anna, fightingStyle = "Aikido based techniques and Koppojutsu based Assassination Arts", controlType = "Tekken", game = "Tekken 8"),
+        CharacterEntry(name = "Asuka", imageId = R.drawable.asuka, fightingStyle = "Kazama Style Traditional Martial Arts", controlType = "Tekken", game = "Tekken 8"),
+        CharacterEntry(name = "Azucena", imageId = R.drawable.azucena, fightingStyle = "Mixed Martial Arts (Striker)", controlType = "Tekken", game = "Tekken 8"),
+        CharacterEntry(name = "Bryan", imageId = R.drawable.bryan, fightingStyle = "Kickboxing", controlType = "Tekken", game = "Tekken 8"),
+        CharacterEntry(name = "Claudio", imageId = R.drawable.claudio, fightingStyle = "Sirius Exorcist Arts", controlType = "Tekken", game = "Tekken 8"),
+        CharacterEntry(name = "Clive", imageId = R.drawable.clive, fightingStyle = "Dominant", controlType = "Tekken", game = "Tekken 8"),
+        CharacterEntry(name = "Devil Jin", imageId = R.drawable.devil_jin, fightingStyle = "Unknown", controlType = "Tekken", game = "Tekken 8"),
+        CharacterEntry(name = "Dragunov", imageId = R.drawable.dragunov, fightingStyle = "White Reaper", controlType = "Tekken", game = "Tekken 8"),
+        CharacterEntry(name = "Eddy", imageId = R.drawable.eddy, fightingStyle = "Capoeira", controlType = "Tekken", game = "Tekken 8"),
+        CharacterEntry(name = "Feng", imageId = R.drawable.feng, fightingStyle = "Taijiquan", controlType = "Tekken", game = "Tekken 8"),
+        CharacterEntry(name = "Heihachi", imageId = R.drawable.heihachi, fightingStyle = "Mishima Style Fighting Karate", controlType = "Tekken", game = "Tekken 8"),
+        CharacterEntry(name = "Hwoarang", imageId = R.drawable.hwoarang, fightingStyle = "Taekwondo", controlType = "Tekken", game = "Tekken 8"),
+        CharacterEntry(name = "Jack-8", imageId = R.drawable.jack_8, fightingStyle = "High Tech Annihilator", controlType = "Tekken", game = "Tekken 8"),
+        CharacterEntry(name = "Jin", imageId = R.drawable.jin, fightingStyle = "Karate based on Kyokushin style infused with Devil Gene", controlType = "Tekken", game = "Tekken 8"),
+        CharacterEntry(name = "Jun", imageId = R.drawable.jun, fightingStyle = "Kazama Style Traditional Martial Arts", controlType = "Tekken", game = "Tekken 8"),
+        CharacterEntry(name = "Kazuya", imageId = R.drawable.kazuya, fightingStyle = "Mishima Style Fighting Karate", controlType = "Tekken", game = "Tekken 8"),
+        CharacterEntry(name = "King", imageId = R.drawable.king, fightingStyle = "Pro Wrestling", controlType = "Tekken", game = "Tekken 8"),
+        CharacterEntry(name = "Kuma", imageId = R.drawable.kuma, fightingStyle = "Heihachi-style Improved Kuma Shinken", controlType = "Tekken", game = "Tekken 8"),
+        CharacterEntry(name = "Lars", imageId = R.drawable.lars, fightingStyle = "Tekken Forces Martial Arts", controlType = "Tekken", game = "Tekken 8"),
+        CharacterEntry(name = "Law", imageId = R.drawable.law, fightingStyle = "Martial Arts", controlType = "Tekken", game = "Tekken 8"),
+        CharacterEntry(name = "Lee", imageId = R.drawable.lee, fightingStyle = "Martial Arts", controlType = "Tekken", game = "Tekken 8"),
+        CharacterEntry(name = "Leo", imageId = R.drawable.leo, fightingStyle = "Baji Quan", controlType = "Tekken", game = "Tekken 8"),
+        CharacterEntry(name = "Leroy", imageId = R.drawable.leroy, fightingStyle = "Wing Chun", controlType = "Tekken", game = "Tekken 8"),
+        CharacterEntry(name = "Lidia", imageId = R.drawable.lidia, fightingStyle = "Traditional Karate", controlType = "Tekken", game = "Tekken 8"),
+        CharacterEntry(name = "Lili", imageId = R.drawable.lili, fightingStyle = "Self-Taught Style", controlType = "Tekken", game = "Tekken 8"),
+        CharacterEntry(name = "Nina", imageId = R.drawable.nina, fightingStyle = "Assassination Arts", controlType = "Tekken", game = "Tekken 8"),
+        CharacterEntry(name = "Panda", imageId = R.drawable.panda, fightingStyle = "Heihachi-style Improved Kuma Shinken", controlType = "Tekken", game = "Tekken 8"),
+        CharacterEntry(name = "Paul", imageId = R.drawable.paul, fightingStyle = "Integrated Martial Arts", controlType = "Tekken", game = "Tekken 8"),
+        CharacterEntry(name = "Raven", imageId = R.drawable.raven, fightingStyle = "Ninjutsu", controlType = "Tekken", game = "Tekken 8"),
+        CharacterEntry(name = "Reina", imageId = R.drawable.reina, fightingStyle = "Taido and Mishima-Style Karate", controlType = "Tekken", game = "Tekken 8"),
+        CharacterEntry(name = "Shaheen", imageId = R.drawable.shaheen, fightingStyle = "Close Quarters Combat", controlType = "Tekken", game = "Tekken 8"),
+        CharacterEntry(name = "Steve", imageId = R.drawable.steve, fightingStyle = "Boxing", controlType = "Tekken", game = "Tekken 8"),
+        CharacterEntry(name = "Victor", imageId = R.drawable.victor, fightingStyle = "Super Spy CQB", controlType = "Tekken", game = "Tekken 8"),
+        CharacterEntry(name = "Xiaoyu", imageId = R.drawable.xiaoyu, fightingStyle = "Chinese Martial Arts", controlType = "Tekken", game = "Tekken 8"),
+        CharacterEntry(name = "Yoshimitsu", imageId = R.drawable.yoshimitsu, fightingStyle = "Advanced Manji Ninjutsu", controlType = "Tekken", game = "Tekken 8"),
+        CharacterEntry(name = "Zafina", imageId = R.drawable.zafina, fightingStyle = "Ancient Assassination Arts", controlType = "Tekken", game = "Tekken 8")
     )
 )
 
-val tekken8CharacterMoves = ImmutableList(
+val tekken8Moves = ImmutableList(
     listOf(
 
         // Movements
@@ -109,7 +110,10 @@ val tekken8CharacterMoves = ImmutableList(
         MoveEntry(moveName = "Floor Break", notation = "f/break", moveType = "Stage", character = "Generic", game = "Tekken 8"),
         MoveEntry(moveName = "Floor Blast", notation = "f/blast", moveType = "Stage", character = "Generic", game = "Tekken 8"),
         MoveEntry(moveName = "Balcony Break", notation = "b/break", moveType = "Stage", character = "Generic", game = "Tekken 8"),
-
+    )
+)
+val tekken8CharacterMoves = ImmutableList(
+    listOf(
         // Alisa
         MoveEntry(moveName = "Destructive Form", notation = "Destructive Form", moveType = "Character", character = "Alisa", game = "Tekken 8"),
         MoveEntry(moveName = "Boot", notation = "Boot", moveType = "Character", character = "Alisa", game = "Tekken 8"),

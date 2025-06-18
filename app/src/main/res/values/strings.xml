@@ -300,4 +300,7 @@
     <string name="profile_details">Profile Details</string>
     <string name="open_menu">Open Menu</string>
     <string name="add_character">Add Character</string>
+    <string name="edit_character">Edit Character</string>
+    <string name="delete_character">Delete Character</string>
+    <string name="clear_current_value">clear current value</string>
 </resources>

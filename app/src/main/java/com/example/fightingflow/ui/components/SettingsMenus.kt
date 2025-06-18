@@ -4,13 +4,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -19,12 +20,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import com.example.fightingflow.R
+import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.Console
 import com.example.fightingflow.model.Game
 import com.example.fightingflow.model.SF6ControlType
-import com.example.fightingflow.ui.characterScreen.CharacterScreenViewModel
+import com.example.fightingflow.ui.characterScreen.CharacterViewModel
 import com.example.fightingflow.ui.characterScreen.GameSelectedHeader
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -119,7 +123,7 @@ fun ConsoleInputsMenu(
 @Composable
 fun GameSelectedMenu(
     scope: CoroutineScope,
-    characterScreenViewModel: CharacterScreenViewModel,
+    characterScreenViewModel: CharacterViewModel,
     gameSelected: String?,
     sf6Option: SF6ControlType?,
     changeSelectedGame: (String) -> Unit,
@@ -184,13 +188,13 @@ fun GameSelectedMenu(
                     }
                 )
 
-//                // Select Custom
-//                DropdownMenuItem(
-//                    text = { Text("Custom") },
-//                    onClick = {
-//                        customGameListExpanded = true
-//                    }
-//                )
+                // Select Custom
+                DropdownMenuItem(
+                    text = { Text("Custom") },
+                    onClick = {
+                        customGameListExpanded = true
+                    }
+                )
 
                 if (sf6OptionsExpanded) {
                     SF6ModernOrClassicMenu(
@@ -222,7 +226,7 @@ fun GameSelectedMenu(
 @Composable
 fun SF6ModernOrClassicMenu(
     scope: CoroutineScope,
-    characterScreenViewModel: CharacterScreenViewModel,
+    characterScreenViewModel: CharacterViewModel,
     option: SF6ControlType?,
     changeSelectedGame: (String) -> Unit,
     onDismiss: () -> Unit,
@@ -266,7 +270,7 @@ fun SF6ModernOrClassicMenu(
 @Composable
 fun CustomGameListMenu(
     scope: CoroutineScope,
-    characterScreenViewModel: CharacterScreenViewModel,
+    characterScreenViewModel: CharacterViewModel,
     customGameList: List<String>,
     changeSelectedGame: (String) -> Unit,
     onDismiss: () -> Unit,
@@ -293,7 +297,7 @@ fun CustomGameListMenu(
             }
         )
         customGameList.forEach { game ->
-            if (game != "Invalid List") {
+            if (game.isNotEmpty()) {
                 DropdownMenuItem(
                     text = { Text(game) },
                     onClick = {
@@ -307,5 +311,54 @@ fun CustomGameListMenu(
                 )
             }
         }
+    }
+}
+
+@Composable
+fun CharacterOptionsMenu(
+    scope: CoroutineScope,
+    snackbarHostState: SnackbarHostState,
+    characterScreenViewModel: CharacterViewModel,
+    characterOptionsMenuExpanded: Boolean,
+    characterEntry: CharacterEntry,
+    navigateToAddCharacter: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    DropdownMenu(
+        expanded = characterOptionsMenuExpanded,
+        onDismissRequest = { onDismiss() }
+    ) {
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.edit_character)) },
+            onClick = navigateToAddCharacter
+        )
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.delete_character)) },
+            onClick = {
+                scope.launch {
+                    snackbarHostState.showSnackbar(
+                        message = "Are you sure you want to delete this character?",
+                        actionLabel = "Yes",
+                        withDismissAction = true,
+                        duration = SnackbarDuration.Indefinite
+                    ).run {
+                        when (this) {
+                            SnackbarResult.ActionPerformed -> {
+                                scope.launch {
+                                    characterScreenViewModel.deleteCustomCharacter(characterEntry)
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar(
+                                            "${characterEntry.name} has been deleted."
+                                        )
+                                    }
+                                }
+                            }
+                            SnackbarResult.Dismissed -> Timber.d("Character deletion cancelled.")
+                        }
+                    }
+                }
+                onDismiss()
+            }
+        )
     }
 }

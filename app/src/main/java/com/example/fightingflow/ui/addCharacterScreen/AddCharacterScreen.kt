@@ -1,8 +1,6 @@
 package com.example.fightingflow.ui.addCharacterScreen
 
-import android.content.Context
 import android.net.Uri
-import android.provider.ContactsContract.Contacts.Photo
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
@@ -20,9 +18,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
@@ -36,7 +34,6 @@ import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -50,62 +47,108 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.fightingflow.R
 import com.example.fightingflow.data.mediastore.MediaStoreUtil
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ControlType
+import com.example.fightingflow.ui.characterScreen.CharacterViewModel
+import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayViewModel
+import com.example.fightingflow.util.emptyCharacter
 import com.example.fightingflow.util.featureColor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import timber.log.Timber
-import java.net.URL
+import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddCharacterScreen(
+    addCharacterViewModel: AddCharacterViewModel,
+    characterViewModel: CharacterViewModel,
+    comboDisplayViewModel: ComboDisplayViewModel,
     navigateBack: () -> Unit,
     scope: CoroutineScope,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier
 ) {
     Timber.d("-- Loading Custom Character Screen --")
-    val addCharacterViewModel = koinInject<AddCharacterViewModel>()
 
-    var character by remember {
-        mutableStateOf(
-            CharacterEntry(
-                name = "",
-                fightingStyle = "",
-                imageId = R.drawable.mokujin,
-                game = "Custom",
-                controlType = "Tekken",
-                mutable = true
-            )
-        )
-    }
+    val mediaStoreUtil = koinInject<MediaStoreUtil>()
 
-    var gameDropdownExpanded by remember { mutableStateOf(false) }
+    var character by remember { mutableStateOf(
+        CharacterEntry(
+        name = "",
+        fightingStyle = "",
+        imageId = R.drawable.mokujin,
+        game = "Custom",
+        controlType = "Tekken",
+        uniqueMoves = "",
+        mutable = true
+    )) }
+
+    val customGameList by addCharacterViewModel.customGameList.collectAsStateWithLifecycle()
+    val characterUiState by addCharacterViewModel.characterUiState.collectAsStateWithLifecycle()
+    val characterNameFromDs by addCharacterViewModel.characterNameState.collectAsStateWithLifecycle()
+    val gameSelectedState by addCharacterViewModel.gameSelectedState.collectAsStateWithLifecycle()
+    val editState = addCharacterViewModel.editState
+
     var controlTypeDropdownExpanded by remember { mutableStateOf(false) }
+    var characterCollected by remember { mutableStateOf(false) }
+    var characterUpdated by remember { mutableStateOf(false) }
 
-    var uniqueMoves by remember { mutableStateOf("") }
-    var controlTypeValue by remember { mutableStateOf(ControlType.Tekken) }
-    var game by remember { mutableStateOf("") }
-    var imageUri by remember { mutableStateOf(character.characterImageUri?.toUri()) }
+    Timber.d("Checking if in editing state")
+    if (editState) { Timber.d(message = "Editing state true" +
+            "\nChecking character matches datastore..." +
+            "\nExisting Character: ${characterUiState.character.name}" +
+            "\nCharacter Name DS: $characterNameFromDs")
 
-    Timber.d("-- Character --")
-    Timber.d("Character: $character")
-    Timber.d("-- Mutable Values --")
-    Timber.d("Unique Moves: $uniqueMoves")
-    Timber.d("Control Type: $controlTypeValue")
-    Timber.d("Game: $game")
-    Timber.d("Image URI: $imageUri")
+        if (characterUiState.character.name != characterNameFromDs && !characterCollected) {
+                Timber.d("Collecting character from DB")
+                addCharacterViewModel.getCharacterToEdit()
+                characterCollected = true
+
+        } else { Timber.d("Character already matches datastore.") }
+    } else { Timber.d("Editing State False.") }
+
+    Timber.d("Checking if character has been collected")
+    if (characterUiState.character.name == characterNameFromDs && editState && !characterUpdated) {
+        Timber.d("Character collected, updating character state")
+        character = characterUiState.character
+        characterUpdated = true
+    } else { Timber.d("Character has not been collected.") }
+
+    Timber.d("-- Flows --" +
+            "\n Custom Game List: $customGameList" +
+            "\n -- Character --" +
+            "\n Char to Edit Name: $characterNameFromDs" +
+            "\n Game: $gameSelectedState" +
+            "\n New Character Values: $character" +
+            "\n Name: ${character.name}" +
+            "\n Fighting Style: ${character.fightingStyle}" +
+            "\n Control Type: ${character.controlType}" +
+            "\n Game: ${character.game}" +
+            "\n Unique Moves: ${character.uniqueMoves}" +
+            "\n Image URI: ${character.imageUri}" +
+            "\n Mutable: ${character.mutable}" +
+            "\n Existing Character: ${characterUiState.character}" +
+            "\n Name: ${characterUiState.character.fightingStyle}" +
+            "\n Fighting Style: ${characterUiState.character.controlType}" +
+            "\n Control Type: ${characterUiState.character.game}" +
+            "\n Game: ${characterUiState.character.uniqueMoves}" +
+            "\n Unique Moves: ${characterUiState.character.imageUri}" +
+            "\n Image URI: ${characterUiState.character.mutable}" +
+            "\n Editing State: $editState" +
+            "\n Character collected: $characterCollected" +
+            "\n Character updated: $characterUpdated"
+    )
 
     Scaffold(
         topBar = {
@@ -113,7 +156,10 @@ fun AddCharacterScreen(
                 title = { Text("Add Character", style = MaterialTheme.typography.displaySmall) },
                 actions = {
                     IconButton(
-                        onClick = { navigateBack() },
+                        onClick = { scope.launch {
+                            comboDisplayViewModel.updateCharacterInDS(emptyCharacter)
+                            navigateBack()
+                        } },
                         modifier.fillMaxHeight()
                     ) {
                         Icon(
@@ -128,7 +174,6 @@ fun AddCharacterScreen(
             )
         },
     ) { innerPadding ->
-
         LazyColumn {
             item {
                 Column(
@@ -141,7 +186,10 @@ fun AddCharacterScreen(
                 ) {
                     OutlinedTextField(
                         value = character.name,
-                        onValueChange = { character = character.copy(name = it) },
+                        onValueChange = {
+                            Timber.d("Updating character name...")
+                            character = character.copy(name = it)
+                        },
                         label = { Text("Character Name") },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
@@ -149,22 +197,29 @@ fun AddCharacterScreen(
 
                     OutlinedTextField(
                         value = character.fightingStyle,
-                        onValueChange = { character = character.copy(fightingStyle = it) },
+                        onValueChange = {
+                            Timber.d("Updating character fighting style...")
+                            character = character.copy(fightingStyle = it)
+                                        },
                         label = { Text("Fighting Style") },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
                     )
 
                     OutlinedTextField(
-                        value = game,
+                        value = character.game,
                         onValueChange = {
                             character = character.copy(game = it)
-                            game = it
                         },
                         label = { Text("Game") },
-                        placeholder = { Text("Custom") },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
+                        trailingIcon = { IconButton(
+                            onClick = { character = character.copy(game = "") }
+                        ) { Icon(
+                            imageVector = Icons.Default.Clear,
+                            contentDescription = stringResource(R.string.clear_current_value)
+                        ) } },
                         supportingText = {
                             Text(
                                 text = "Keep game titles consistent if adding multiple characters from one game.",
@@ -182,7 +237,7 @@ fun AddCharacterScreen(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         OutlinedTextField(
-                            value = controlTypeValue.type,
+                            value = character.controlType,
                             onValueChange = {},
                             readOnly = true,
                             label = { Text("Control Type") },
@@ -200,7 +255,6 @@ fun AddCharacterScreen(
                                     text = { Text(controlType.type) },
                                     onClick = {
                                         character = character.copy(controlType = controlType.type)
-                                        controlTypeValue = controlType
                                         controlTypeDropdownExpanded = false
                                     }
                                 )
@@ -210,10 +264,9 @@ fun AddCharacterScreen(
 
                     Box(modifier.padding(bottom = 4.dp)) {
                         OutlinedTextField(
-                            value = uniqueMoves,
+                            value = character.uniqueMoves ?: "",
                             onValueChange = {
                                 character = character.copy(uniqueMoves = it)
-                                uniqueMoves = it
                             },
                             label = { Text("Unique Moves") },
                             supportingText = {
@@ -229,11 +282,11 @@ fun AddCharacterScreen(
                     }
 
                     CharacterImagePicker(
-                        imageUri = imageUri,
+                        mediaStoreUtil = mediaStoreUtil,
+                        imageUri = character.imageUri?.toUri() ?: Uri.EMPTY,
                         character = character,
                         updateImageId = {
-                            imageUri = it
-                            character = character.copy(characterImageUri = it.toString())
+                            character = character.copy(imageUri = it.toString())
                         }
                     )
 
@@ -243,7 +296,9 @@ fun AddCharacterScreen(
                         addCharacterViewModel = addCharacterViewModel,
                         scope = scope,
                         snackbarHostState = snackbarHostState,
+                        editState = editState,
                         character = character,
+                        characterUiState = characterUiState.character,
                         navigateBack = navigateBack
                     )
                 }
@@ -254,18 +309,19 @@ fun AddCharacterScreen(
 
 @Composable
 fun CharacterImagePicker(
+    mediaStoreUtil: MediaStoreUtil,
     imageUri: Uri?,
     character: CharacterEntry,
     updateImageId: (Uri?) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var setBuffer by remember { mutableStateOf(false) }
-    val mediaStoreUtil = koinInject<MediaStoreUtil>()
 
     val pickMedia = rememberLauncherForActivityResult(
         contract = PickVisualMedia(),
         onResult = { uri: Uri? ->
             Timber.d("-- Launching Photo Picker --")
+            Timber.d("")
             if (uri != null) {
                 Timber.d("URI: $uri")
                 val savedUri = mediaStoreUtil.copyImageToAppStorage(uri, character.name)
@@ -277,7 +333,7 @@ fun CharacterImagePicker(
     )
 
     Box(
-        Modifier.fillMaxWidth()
+        modifier.fillMaxWidth()
     ) {
         if (imageUri != null) {
             AsyncImage(
@@ -303,7 +359,8 @@ fun CharacterImagePicker(
                 .align(Alignment.CenterEnd)
         ) {
             Box(
-                modifier = modifier.fillMaxWidth()
+                modifier = modifier
+                    .fillMaxWidth()
                     .padding(bottom = 16.dp)
             ) {
                 Column(
@@ -345,72 +402,75 @@ fun ConfirmButton(
     addCharacterViewModel: AddCharacterViewModel,
     scope: CoroutineScope,
     snackbarHostState: SnackbarHostState,
+    editState: Boolean,
     character: CharacterEntry,
+    characterUiState: CharacterEntry,
     navigateBack: () -> Unit
 ) {
     var setBuffer by remember { mutableStateOf(false) }
+    val mediaStoreUtil = koinInject<MediaStoreUtil>()
+    var imageFile: File?
+    var imageUri: Uri? = null
 
     Button(
         onClick = {
-            addCharacterViewModel.updateCharacterUiState(character)
-            scope.launch { addCharacterViewModel.updateCustomGameList(character.game) }
-            scope.launch {
-                var result = addCharacterViewModel.saveCharacter(false)
-                setBuffer = true
-                when (result) {
-                    "Success" -> {
-                        snackbarHostState.showSnackbar(
-                            message = "Successfully added character to database.",
-                            duration = SnackbarDuration.Short,
-                            withDismissAction = true
-                        )
+            Timber.d("-- Updating Database with Character values --")
+            Timber.d("Checking if ImageURI value is empty...")
+            Timber.d("URI: ${character.imageUri}")
+            if (!character.imageUri.isNullOrBlank()) {
+                Timber.d("Image URI string is valid, converting to File")
+                imageFile =
+                    character.imageUri.let { mediaStoreUtil.getFileFromUri(uri = it.toUri()) }
+                Timber.d("imageFile: $imageFile")
+
+                    imageUri = imageFile?.let { mediaStoreUtil.finalizeImage(it, character.name) }
+                    Timber.d("ImageURI: $imageUri")
+            }
+
+            Timber.d("Checking if imageURI is null...")
+            if (character.imageUri != null ) {
+                Timber.d("Image URI not null, ")
+                val updatedCharacter = character.copy(imageUri = imageUri.toString())
+
+                scope.launch {
+                    val result = addCharacterViewModel.saveCharacter(updatedCharacter)
+                    setBuffer = true
+                    Timber.d("Result: $result")
+                    if (result is CharacterDbResult.Success) {
+                        if (!editState) {
+                            addCharacterViewModel.updateCustomGameList(character.game)
+                            snackbarHostState.showSnackbar(
+                                message = "Successfully added character to database.",
+                                withDismissAction = true
+                            )
+                            setBuffer = false
+                            navigateBack()
+                        } else {
+                            snackbarHostState.showSnackbar(
+                                message = "Successfully updated character in database.",
+                                withDismissAction = true,
+                            )
+                            setBuffer = false
+                            navigateBack()
+                        }
+                    } else if (result is CharacterDbResult.Error) {
+                            snackbarHostState.showSnackbar(
+                                message = result.e.toString(),
+                                withDismissAction = true
+                            )
                         setBuffer = false
-                        navigateBack()
+                        }
                     }
-                    "Character Exists" -> {
-                        snackbarHostState.showSnackbar(
-                            message = "Character exists, would you like to update existing data?",
-                            duration = SnackbarDuration.Indefinite,
-                            withDismissAction = true,
-                            actionLabel =  "Update"
-                        ).run {
-                            result = addCharacterViewModel.saveCharacter(true)
-                            when (result) {
-                                "Success" -> {
-                                    snackbarHostState.showSnackbar(
-                                        message = "Successfully updated character in database.",
-                                        duration = SnackbarDuration.Short,
-                                        withDismissAction = true
-                                    )
-                                    setBuffer = false
-                                    navigateBack()
-                                }
-                                "Character Immutable" -> {
-                                    snackbarHostState.showSnackbar(
-                                        message = "Cannot edit this character.",
-                                        duration = SnackbarDuration.Short,
-                                        withDismissAction = true
-                                    )
-                                }
-                                else -> {
-                                    snackbarHostState.showSnackbar(
-                                        message = "Error entering character into database",
-                                        duration = SnackbarDuration.Short,
-                                        withDismissAction = true
-                                    )
-                                    setBuffer = false
-                                } } } }
-                    else -> {
-                        snackbarHostState.showSnackbar(
-                            message = result,
-                            duration = SnackbarDuration.Short,
-                            withDismissAction = true
-                        )
-                        setBuffer = false
-                    } } } },
+                } else {
+                    scope.launch {
+                        snackbarHostState.showSnackbar("Please add an image for your character.")
+                    }
+                    Timber.d("Image URI is null")
+                }
+        },
         enabled = character.game.isNotEmpty() ||
                 character.name.isNotEmpty() ||
-                !character.controlType.isNullOrBlank() ||
+                character.controlType.isNotBlank() ||
                 !character.uniqueMoves.isNullOrBlank(),
         colors = ButtonDefaults.buttonColors().copy(
             containerColor = featureColor,

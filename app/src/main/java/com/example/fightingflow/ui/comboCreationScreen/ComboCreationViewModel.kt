@@ -81,7 +81,7 @@ class ComboCreationViewModel(
      fun updateMoveList(
             moveName: String,
             moveListUiState: MoveEntryListUiState,
-            game: Game? = null,
+            game: Game,
             console: Console? = null
         ) {
             Timber.d("Adding $moveName to combo...")
@@ -91,7 +91,7 @@ class ComboCreationViewModel(
             val updatedCombo = updateMoveListAbstract(
                 moveName = moveName,
                 comboDisplayState = comboDisplayState.value,
-                game = game,
+                game = characterState.value.character.game,
                 console = console,
                 sf6ControlTypeState = sf6ControlTypeState.value,
                 itemIndexState = itemIndexState.value,
@@ -237,7 +237,7 @@ class ComboCreationViewModel(
         comboIdState.intValue = 0
     }
 
-    fun resetCombo() {
+    private fun resetCombo() {
         comboDisplayState.update {
             ComboDisplayUiState(emptyComboDisplay.copy(dateCreated = LocalDate.now().toString()))
         }
@@ -249,12 +249,12 @@ class ComboCreationViewModel(
             Game.MK1.title -> Game.MK1
             Game.SF6.title -> Game.SF6
             Game.T8.title -> Game.T8
-            else -> null
+            else -> Game.CUSTOM
         } }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(TIME_MILLIS),
-            initialValue = null
+            initialValue = Game.CUSTOM
         )
 
     private fun getControlTypeState() = settingsDsRepository.getConsoleType()

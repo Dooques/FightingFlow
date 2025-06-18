@@ -21,7 +21,7 @@ interface SettingsDsRepository {
     suspend fun updateIconDisplayState(showIcons: Boolean)
     suspend fun updateShowComboTextState(showText: Boolean)
     suspend fun updateSf6ControlType(type: Int)
-    suspend fun updateGame(selectedGame: String)
+    suspend fun updateGameSelected(selectedGame: String)
 
     fun getGame(): Flow<String>
     fun getConsoleType(): Flow<Int>
@@ -59,7 +59,7 @@ class SettingsDatastoreRepository(private val dataStore: DataStore<Preferences>)
             preference[showComboTextState] = showText
         }
     }
-    override suspend fun updateGame(selectedGame: String) {
+    override suspend fun updateGameSelected(selectedGame: String) {
         dataStore.edit { preference ->
             preference[game] = selectedGame
         }

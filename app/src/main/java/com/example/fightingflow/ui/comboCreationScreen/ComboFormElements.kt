@@ -3,7 +3,6 @@ package com.example.fightingflow.ui.comboCreationScreen
 import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,7 +16,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -47,12 +45,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.Console
 import com.example.fightingflow.model.Game
 import com.example.fightingflow.model.SF6ControlType
 import com.example.fightingflow.ui.comboDisplayScreen.inputConverter.convertInputsToConsole
-import com.example.fightingflow.ui.comboItem.ComboItemViewModel
+import com.example.fightingflow.ui.comboDisplayScreen.comboItem.ComboItemViewModel
 import com.example.fightingflow.util.ComboDisplayUiState
 import com.example.fightingflow.util.MoveEntryListUiState
 import com.example.fightingflow.util.characterAndMoveData.convertibleInputs
@@ -174,7 +173,7 @@ fun IconMoves(
     modifier: Modifier = Modifier,
     moveType: String,
     moveList: MoveEntryListUiState,
-    updateMoveList: KFunction4<String, MoveEntryListUiState, Game?, Console?, Unit>,
+    updateMoveList: KFunction4<String, MoveEntryListUiState, Game, Console?, Unit>,
     console: Console?,
     sF6ControlType: SF6ControlType? = SF6ControlType.Invalid,
     context: Context,
@@ -185,19 +184,18 @@ fun IconMoves(
         maxItemsInEachRow = maxItems,
         modifier = modifier.fillMaxWidth().padding(4.dp)
     ) {
-        Timber.d("Loading Input Icons")
-        Timber.d("MoveType: $moveType")
-        Timber.d("Move List: $moveList")
+        Timber.d("Loading Input Icons " +
+                "\n MoveType: $moveType")
 
         moveList.moveList.forEach {
             val game = when (it.game) {
                 "Tekken 8" -> Game.T8
                 "Street Fighter VI" -> Game.SF6
                 "Mortal Kombat 1" -> Game.MK1
-                else -> null
+                else -> Game.CUSTOM
             }
 
-            val move = if (it.moveName in convertibleInputs) convertInputsToConsole(
+            val move = if (it.moveName in convertibleInputs && game != Game.CUSTOM) convertInputsToConsole(
                 move = it,
                 game = game,
                 console = console,
@@ -225,15 +223,22 @@ fun IconMoves(
                                 enabled = true,
                                 onClick = {
                                     Timber.d("${move.moveName} selected, preparing to add combo to list...")
-                                    if (game == null && moveType == "Misc") {
-                                        updateMoveList(move.moveName, moveList, null, null)
-                                    }
-                                    console?.let { outerConsole ->
-                                        game?.let { innerGame ->
-                                            updateMoveList(move.moveName, moveList, innerGame, outerConsole)
+                                    Timber.d("Move: $move")
+                                    if (moveType == "Misc") {
+                                        updateMoveList(move.moveName, moveList, game, null)
+                                    } else {
+                                        console?.let { outerConsole ->
+                                            Timber.d("Console: $outerConsole")
+                                            Timber.d("Game: $game")
+                                            updateMoveList(
+                                                move.moveName,
+                                                moveList,
+                                                game,
+                                                outerConsole
+                                            )
                                         }
+                                        Timber.d("Added ${move.moveName} to combo move list.")
                                     }
-                                    Timber.d("Added ${move.moveName} to combo move list.")
                                 }
                             )
                     )
@@ -250,15 +255,15 @@ fun TextMoves(
     moveList: MoveEntryListUiState,
     maxItems: Int = 5,
     console: Console?,
-    updateMoveList: KFunction4<String, MoveEntryListUiState, Game?, Console?, Unit>,
+    updateMoveList: KFunction4<String, MoveEntryListUiState, Game, Console?, Unit>,
 ) {
     FlowRow(
         horizontalArrangement = Arrangement.SpaceEvenly,
         maxItemsInEachRow = maxItems,
         modifier = modifier.fillMaxWidth().padding(vertical = 4.dp, horizontal = 4.dp)
     ) {
-        Timber.d("Loading $moveType text moves")
-        Timber.d("Console: $console")
+        Timber.d("Loading $moveType text moves" +
+                " \n Console: $console")
         moveList.moveList.forEach { move ->
 
             if (move.moveType == moveType) Timber.d("Move: $move")
@@ -267,15 +272,13 @@ fun TextMoves(
                 "Tekken 8" -> Game.T8
                 "Street Fighter VI" -> Game.SF6
                 "Mortal Kombat 1" -> Game.MK1
-                else -> null
+                else -> Game.CUSTOM
             }
 
             val booleanStatement = move.moveType == moveType && move.moveName != "move_break"
 
             val color: Color = when (moveType) {
-                "Mishima" -> {
-                    Color(0xFF000c66)
-                }
+                "Mishima" -> { Color(0xFF000c66) }
 
                 "SF Classic", "SF Modern" ->
                     if (move.moveName.contains("L")) {
@@ -286,21 +289,16 @@ fun TextMoves(
                         Color(0xFFff0000)
                     } else { Color(0xFF7ed957) }
 
-                "Character" -> {
-                    Color.Red
-                }
+                "Character" -> { Color.Red }
 
-                "Mechanic" -> {
-                    Color(0xFF8155BA)
-                }
+                "Mechanic" -> { Color(0xFF8155BA) }
 
-                "Common" -> {
-                    Color(0xFF444444)
-                }
+                "Common" -> { Color(0xFF444444) }
 
-                "Stage" -> {
-                    Color(0xFF2f5233)
-                }
+                "Stage" -> { Color(0xFF2f5233) }
+
+                "Unique Move" -> { Color(0xFF0067B3) }
+
                 else -> Color.White
 
             }
@@ -323,16 +321,12 @@ fun TextMoves(
                             modifier = modifier.padding(1.dp).clickable(
                                 enabled = true,
                                 onClick = {
-                                    Timber.d("$move selected, preparing to add combo to list...")
-                                    Timber.d("$console")
-                                    Timber.d("$game")
-
-                                    if (game == null && move.moveType == moveType) { updateMoveList(move.moveName, moveList, null, null)}
+                                    Timber.d("$move selected, preparing to add combo to list..." +
+                                            "\n $console \n $game")
 
                                     console?.let { outerConsole ->
-                                        game?.let { innerGame ->
-                                            updateMoveList(move.moveName, moveList, innerGame, outerConsole)
-                                        }
+
+                                        updateMoveList(move.moveName, moveList, game, outerConsole)
                                     }
                                     Timber.d("Added ${move.moveName} to combo move list.")
                                 }
@@ -349,8 +343,9 @@ fun TextMoves(
 fun CharacterMoves(
     modifier: Modifier = Modifier,
     characterMoveList: MoveEntryListUiState,
+    character: CharacterEntry,
     moveType: String,
-    updateMoveList: KFunction4<String, MoveEntryListUiState, Game?, Console?, Unit>,
+    updateMoveList: KFunction4<String, MoveEntryListUiState, Game, Console?, Unit>,
     maxItems: Int = 5,
 ) {
     Timber.d("Moves: $characterMoveList")
@@ -363,6 +358,13 @@ fun CharacterMoves(
         val color =
             if (moveType == "Special") Color(0xFF0067B3)
             else Color(0xFFDC143C)
+
+        val game = when (character.game) {
+            Game.T8.title -> Game.T8
+            Game.SF6.title -> Game.SF6
+            Game.MK1.title -> Game.MK1
+            else -> Game.CUSTOM
+        }
 
         characterMoveList.moveList.forEach { move ->
 
@@ -385,7 +387,7 @@ fun CharacterMoves(
                                 enabled = true,
                                 onClick = {
                                     Timber.d("${move.moveName} selected, preparing to add combo to list...")
-                                    updateMoveList(move.moveName, characterMoveList, null, null)
+                                    updateMoveList(move.moveName, characterMoveList, game, null)
                                     Timber.d("Added ${move.moveName} to combo move list.")
                                 }
                             )
@@ -489,6 +491,7 @@ fun ConfirmButton(
                         scope.launch {
                             Timber.d("Saving combo")
                             saveCombo()
+                            onNavigateToComboDisplay()
                         }
                     }
                 } else {
@@ -537,6 +540,7 @@ fun ConfirmButton(
 fun EditingButtons(
     scope: CoroutineScope,
     snackbarHostState: SnackbarHostState,
+    game: Game,
     comboDisplay: ComboDisplay,
     saveCombo: KSuspendFunction0<Unit>,
     editingState: Boolean,
@@ -545,7 +549,7 @@ fun EditingButtons(
     moveList: MoveEntryListUiState,
     deleteMove: () -> Unit,
     clearMoveList: () -> Unit,
-    updateMoveList: KFunction4<String, MoveEntryListUiState, Game?, Console?, Unit>,
+    updateMoveList: KFunction4<String, MoveEntryListUiState, Game, Console?, Unit>,
     modifier: Modifier = Modifier
 ) {
     Timber.d("Loading confirm and clear buttons")
@@ -556,7 +560,7 @@ fun EditingButtons(
         // Add Break
         OutlinedButton(
             onClick = {
-                updateMoveList("break", moveList, null, null)
+                updateMoveList("break", moveList, game, null)
                 Timber.d("Adding break to combo move list.")
             },
             colors = ButtonDefaults.buttonColors().copy(

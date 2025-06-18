@@ -25,6 +25,7 @@ data class ComboEntry (
     val dateCreated: String,
     val difficulty: Float = 0f,
     val likes: Int = 0,
+    val tags: String? = null,
     val moves: String,
 )
 
@@ -40,6 +41,7 @@ data class ComboDisplay(
     val pinned: Boolean = false,
     val difficulty: Float = 0f,
     val likes: Int = 0,
+    val tags: String? = null,
     val moves: ImmutableList<MoveEntry>
 )
 

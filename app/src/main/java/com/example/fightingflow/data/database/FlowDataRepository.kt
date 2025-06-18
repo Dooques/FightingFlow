@@ -12,7 +12,7 @@ interface FlowRepository {
     // Character
     fun getCharacter(name: String): Flow<CharacterEntry?>
     fun getCharactersByGame(game: String): Flow<List<CharacterEntry>>
-    fun getCharacterByGameAndName(name: String, game: String): Flow<CharacterEntry?>
+    fun getCharacterByNameAndGame(name: String, game: String): Flow<CharacterEntry?>
     fun getCustomCharacters(): Flow<List<CharacterEntry>?>
     suspend fun updateCharacter(characterEntry: CharacterEntry)
     suspend fun insertCharacter(characterEntry: CharacterEntry)
@@ -23,7 +23,6 @@ interface FlowRepository {
     fun getAllCombosByCharacter(character: String): Flow<List<ComboEntry>?>
     fun getAllCombosByProfile(username: String): Flow<List<ComboEntry>?>
     suspend fun updateCombo(comboEntry: ComboEntry)
-    suspend fun deleteCombo(comboEntry: ComboEntry)
 
     // Move
     fun getMove(name: String): Flow<MoveEntry?>
@@ -31,10 +30,15 @@ interface FlowRepository {
     fun getAllMovesByCharacter(character: String): Flow<List<MoveEntry>>
     fun getAllMovesByGame(game: String): Flow<List<MoveEntry>>
 
-    // InsertData
+    // Insert Data
     suspend fun insertAllCharacters(characterList: List<CharacterEntry>)
     suspend fun insertMoves(moveList: List<MoveEntry>)
     suspend fun insertCombo(comboEntry: ComboEntry)
+
+    // Delete
+    suspend fun deleteCombo(comboEntry: ComboEntry)
+    suspend fun deleteCharacter(characterEntry: CharacterEntry)
+    suspend fun deleteMove(moveEntry: MoveEntry)
 }
 
 class FlowDataRepository(
@@ -50,7 +54,7 @@ class FlowDataRepository(
     override fun getCharactersByGame(game: String): Flow<List<CharacterEntry>> =
         characterDao.getCharactersFromGame(game)
 
-    override fun getCharacterByGameAndName(name: String, game: String) =
+    override fun getCharacterByNameAndGame(name: String, game: String) =
         characterDao.getCharacterByGameAndName(name, game)
 
     override fun getCustomCharacters(): Flow<List<CharacterEntry>?> =
@@ -110,4 +114,10 @@ class FlowDataRepository(
     // Delete
     override suspend fun deleteCombo(comboEntry: ComboEntry) =
         comboDao.delete(comboEntry)
+
+    override suspend fun deleteCharacter(characterEntry: CharacterEntry) =
+        characterDao.delete(characterEntry)
+
+    override suspend fun deleteMove(moveEntry: MoveEntry) =
+        moveDao.delete(moveEntry)
 }

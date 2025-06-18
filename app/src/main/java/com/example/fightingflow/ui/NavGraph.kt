@@ -1,6 +1,5 @@
 package com.example.fightingflow.ui
 
-import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
@@ -21,8 +20,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.fightingflow.R
 import com.example.fightingflow.ui.addCharacterScreen.AddCharacterScreen
+import com.example.fightingflow.ui.addCharacterScreen.AddCharacterViewModel
 import com.example.fightingflow.ui.characterScreen.CharacterScreen
-import com.example.fightingflow.ui.characterScreen.CharacterScreenViewModel
+import com.example.fightingflow.ui.characterScreen.CharacterViewModel
 import com.example.fightingflow.ui.comboCreationScreen.ComboCreationScreen
 import com.example.fightingflow.ui.comboCreationScreen.ComboCreationViewModel
 import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayScreen
@@ -30,7 +30,6 @@ import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayViewModel
 import com.example.fightingflow.ui.profileScreen.ProfileList
 import com.example.fightingflow.ui.profileScreen.ProfileViewModel
 import com.example.fightingflow.ui.profileScreen.TitleScreen
-import kotlinx.coroutines.withContext
 import org.koin.compose.koinInject
 import timber.log.Timber
 
@@ -54,7 +53,8 @@ fun NavGraph(
     val comboDisplayViewModel = koinInject<ComboDisplayViewModel>()
     val comboCreationViewModel = koinInject<ComboCreationViewModel>()
     val profileViewModel = koinInject<ProfileViewModel>()
-    val characterScreenViewModel = koinInject<CharacterScreenViewModel>()
+    val characterViewModel = koinInject<CharacterViewModel>()
+    val addCharacterViewModel = koinInject<AddCharacterViewModel>()
 
     // ProfileViewModel Flows
     val loggedInState by profileViewModel.loggedInState.collectAsStateWithLifecycle()
@@ -106,9 +106,11 @@ fun NavGraph(
                 Timber.d("Loading Character Screen...")
                 CharacterScreen(
                     scope = scope,
+                    snackbarHostState = snackBarHostState,
                     comboDisplayViewModel = comboDisplayViewModel,
-                    characterScreenViewModel = characterScreenViewModel,
-                    onClick = { navController.navigate(FlowScreen.Combos.name) },
+                    characterScreenViewModel = characterViewModel,
+                    addCharacterViewModel = addCharacterViewModel,
+                    navigateToComboDisplayScreen = { navController.navigate(FlowScreen.Combos.name) },
                     navigateToProfiles = { navController.navigate(FlowScreen.ProfileList.name) },
                     navigateToAddCharacter = { navController.navigate(FlowScreen.AddCharacter.name) }
                 )
@@ -117,6 +119,9 @@ fun NavGraph(
             composable(route = FlowScreen.AddCharacter.name) {
                 Timber.d("Loading Add Character Screen...")
                 AddCharacterScreen(
+                    addCharacterViewModel = addCharacterViewModel,
+                    characterViewModel = characterViewModel,
+                    comboDisplayViewModel = comboDisplayViewModel,
                     navigateBack = { navController.navigateUp() },
                     scope = scope,
                     snackbarHostState = snackBarHostState

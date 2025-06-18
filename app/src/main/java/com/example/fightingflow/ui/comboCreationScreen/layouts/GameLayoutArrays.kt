@@ -4,14 +4,14 @@ val mishima = listOf("Reina", "Heihachi", "Jin", "Kazuya", "Devil Jin")
 
 val customGameLayout = listOf(
     "Text Combo", "Description", "Damage", "Buttons", "Divider", "Misc Inputs", "Misc", "Divider",
-    "Movements", "Movement", "Divider", "Inputs", "Console", "Console Text", "Input", "Divider",
-    "Unique Moves", "Special", "Divider",
+    "Movements", "Movement", "Divider", "Inputs", "Console", "Console Text", "Input", "SF Classic",
+    "Text Input", "Divider", "Mechanics", "Mechanic", "Mechanic Divider", "Unique Moves", "Unique Move",
 )
 
 val mortalKombatLayout = listOf(
     "Text Combo", "Description", "Damage", "Buttons", "Divider", "Misc Inputs", "Misc", "Divider",
-    "Movements", "Movement", "Divider", "Inputs", "Console", "Console Text", "Input", "Divider",
-    "Block and Stance", "MK Input", "Divider", "Special Moves", "Special", "Divider",
+    "Movements", "Movement", "Divider", "Inputs", "Console", "Console Text", "Input", "Text Input",
+    "Divider", "Block and Stance", "Text Mechanic", "Divider", "Special Moves", "Special", "Divider",
     "Fatal Blow Title", "Fatal Blow",
 )
 

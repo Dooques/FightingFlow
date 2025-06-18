@@ -59,6 +59,6 @@ class CharacterDatastoreRepository(private val dataStore: DataStore<Preferences>
 
     override fun getCustomGameList(): Flow<String> = dataStore.data
         .map { preference ->
-            preference[customGameList] ?: "Invalid List"
+            preference[customGameList] ?: ""
         }
 }

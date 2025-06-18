@@ -1,4 +1,4 @@
-package com.example.fightingflow.ui.comboItem
+package com.example.fightingflow.ui.comboDisplayScreen.comboItem
 
 import android.content.Context
 import androidx.compose.foundation.background
@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.Console
 import com.example.fightingflow.model.Game
@@ -30,6 +31,7 @@ fun ComboItemEditor(
     comboAsText: String,
     username: String,
     console: Console?,
+    characterEntry: CharacterEntry,
     sf6ControlType: SF6ControlType?,
     iconDisplayState: Boolean,
     textComboState: Boolean,
@@ -170,7 +172,7 @@ fun ComboItemEditor(
 //                                }
 //                            }
 
-                            "Common", "Console Text" -> SelectableItem(
+                            "Common", "Console Text"  -> SelectableItem(
                                 color = if (index == selectedIndex) Color.Gray else Color.Transparent,
                                 changeColor = {
                                     if (index != selectedIndex) {
@@ -192,7 +194,7 @@ fun ComboItemEditor(
                                 )
                             }
 
-                            "Special" -> {
+                            "Special", "Unique Move"-> {
                                 SelectableItem(
                                     color = if (index == selectedIndex) Color.Gray else Color.Transparent,
                                     changeColor = {
@@ -288,7 +290,7 @@ fun ComboItemEditor(
                                 }
                             }
 
-                            "Modifier", "MK Input" -> {
+                            "Modifier", "MK Input", "Text Input" -> {
                                 SelectableItem(
                                     color = if (index == selectedIndex) Color.Gray else Color.Transparent,
                                     changeColor = {

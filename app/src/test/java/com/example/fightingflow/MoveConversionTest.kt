@@ -1,7 +1,7 @@
 package com.example.fightingflow
 
-import com.example.fightingflow.data.datastore.Console
-import com.example.fightingflow.data.datastore.Game
+import com.example.fightingflow.model.Console
+import com.example.fightingflow.model.Game
 import com.example.fightingflow.ui.comboDisplayScreen.inputConverter.convertInputsToConsole
 import com.example.fightingflow.ui.comboDisplayScreen.inputConverter.convertInputToStandard
 import com.example.fightingflow.util.characterAndMoveData.playstationInputs

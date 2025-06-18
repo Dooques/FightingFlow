@@ -8,7 +8,7 @@ import com.example.fightingflow.util.ImmutableList
 val virtuaFighterMoves = ImmutableList<MoveEntry>(
     listOf(
         MoveEntry(
-            moveName = "P",
+            moveName = "p",
             notation = "p",
             moveType = "Input",
             character = "Generic",
@@ -16,7 +16,7 @@ val virtuaFighterMoves = ImmutableList<MoveEntry>(
             controlType = SF6ControlType.Invalid
         ),
         MoveEntry(
-            moveName = "K",
+            moveName = "k",
             notation = "k",
             moveType = "Input",
             character = "Generic",
@@ -24,7 +24,7 @@ val virtuaFighterMoves = ImmutableList<MoveEntry>(
             controlType = SF6ControlType.Invalid
         ),
         MoveEntry(
-            moveName = "G",
+            moveName = "g",
             notation = "g",
             moveType = "Input",
             character = "Generic",

@@ -97,10 +97,11 @@ fun ComboCreationScreen(
         comboCreationViewModel.getCharacterMoveEntryList(characterState.character.name)
     }
 
-    game?.title?.let { comboCreationViewModel.getGameMoveEntryList(it) }
+    comboCreationViewModel.getGameMoveEntryList(game.title)
 
     Timber.d("Flows Collected: ")
     Timber.d("Character Name: ${characterNameState.name} ")
+    Timber.d("Game: $game")
     Timber.d("ComboDisplayState: ${comboDisplay.comboDisplay}")
     Timber.d("ComboString: $comboAsString")
     Timber.d("ComboId from DS: $comboIdState")
@@ -137,7 +138,7 @@ fun ComboCreationScreen(
                 actions = {
                     if (characterState.character.mutable) {
                         AsyncImage(
-                            model = characterState.character.characterImageUri,
+                            model = characterState.character.imageUri,
                             contentDescription = null,
                             modifier.size(60.dp)
                         )

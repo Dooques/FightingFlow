@@ -25,10 +25,10 @@ import com.example.fightingflow.data.datastore.SettingsDsRepository
 import com.example.fightingflow.data.mediastore.MediaStoreUtil
 import com.example.fightingflow.ui.InitViewModel
 import com.example.fightingflow.ui.addCharacterScreen.AddCharacterViewModel
-import com.example.fightingflow.ui.characterScreen.CharacterScreenViewModel
+import com.example.fightingflow.ui.characterScreen.CharacterViewModel
 import com.example.fightingflow.ui.comboCreationScreen.ComboCreationViewModel
 import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayViewModel
-import com.example.fightingflow.ui.comboItem.ComboItemViewModel
+import com.example.fightingflow.ui.comboDisplayScreen.comboItem.ComboItemViewModel
 import com.example.fightingflow.ui.profileScreen.ProfileViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -79,7 +79,7 @@ val viewModelModule = module {
     viewModel { InitViewModel(get()) }
     viewModel { ComboDisplayViewModel(get(), get(), get(), get()) }
     viewModel { ComboCreationViewModel(get(), get(), get(), get()) }
-    viewModel { CharacterScreenViewModel(get(), get()) }
+    viewModel { CharacterViewModel(get(), get(), get()) }
     viewModel { ComboItemViewModel() }
-    viewModel { AddCharacterViewModel(get(), get()) }
+    viewModel { AddCharacterViewModel(get(), get(), get()) }
 }

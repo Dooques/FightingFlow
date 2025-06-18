@@ -1,6 +1,5 @@
 package com.example.fightingflow.model
 
-import android.net.Uri
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import kotlin.String
@@ -11,11 +10,11 @@ data class CharacterEntry(
     val id: Int = 0,
     val name: String,
     val imageId: Int,
-    val characterImageUri: String? = null,
+    val imageUri: String? = null,
     val fightingStyle: String,
     val combosById: String = "",
     val game: String,
-    val controlType: String? = null,
+    val controlType: String,
     val uniqueMoves: String? = null,
     val mutable: Boolean = false
 )
@@ -42,6 +41,5 @@ enum class ControlType(val type: String) {
     StreetFighter("Street Fighter"),
     TagFighter("Tag Fighter"),
     Tekken("Tekken"),
-    TekkenTag("Tekken Tag"),
     VirtuaFighter("Virtua Fighter"),
 }

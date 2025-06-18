@@ -44,12 +44,11 @@ import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.fightingflow.data.mediastore.MediaStoreUtil
 import com.example.fightingflow.ui.comboCreationScreen.ComboCreationViewModel
-import com.example.fightingflow.ui.comboItem.ComboItemDisplay
+import com.example.fightingflow.ui.comboDisplayScreen.comboItem.ComboItemDisplay
 import com.example.fightingflow.ui.components.SettingsMenu
 import com.example.fightingflow.ui.profileScreen.ProfileViewModel
 import com.example.fightingflow.ui.components.ActionIcon
@@ -100,6 +99,8 @@ fun ComboDisplayScreen(
     val characterNameState by comboDisplayViewModel.characterNameState.collectAsStateWithLifecycle()
     val characterImageState by comboDisplayViewModel.characterImageState.collectAsStateWithLifecycle()
     val iconDisplayState by comboDisplayViewModel.showIconState.collectAsStateWithLifecycle()
+    val gameSelectedState by comboDisplayViewModel.gameSelectedState.collectAsStateWithLifecycle()
+
     val textComboState by comboDisplayViewModel.textComboState.collectAsStateWithLifecycle()
     val consoleTypeState by comboDisplayViewModel.consoleTypeState.collectAsStateWithLifecycle()
     val sF6ControlType by comboDisplayViewModel.modernOrClassicState.collectAsStateWithLifecycle()
@@ -114,7 +115,7 @@ fun ComboDisplayScreen(
     if (characterNameState.name.isNotEmpty()) {
         try {
             Timber.d("Getting ${characterNameState.name} from database...")
-            comboDisplayViewModel.updateCharacterState(characterNameState.name)
+            comboDisplayViewModel.updateCharacterState(characterNameState.name, gameSelectedState)
             Timber.d("Character returned: $characterState")
         } catch (e: NoSuchElementException) {
             Timber.e(e, "Character Error, no element found in character list.")
@@ -128,6 +129,11 @@ fun ComboDisplayScreen(
         Timber.d("Character has been selected, getting combos...")
         comboDisplayViewModel.getComboDisplayListByCharacter()
     }
+    Timber.d("Character Details " +
+            "\n Name: ${characterNameState.name} " +
+            "\n Image: ${characterImageState.image}" +
+            "\n CharacterState: ${characterState.character}")
+    Timber.d("Checking details valid...")
 
     Scaffold(
         topBar = {
@@ -155,7 +161,7 @@ fun ComboDisplayScreen(
                 actions = {
                     if (characterState.character.mutable) {
                         AsyncImage(
-                            model = characterState.character.characterImageUri,
+                            model = characterState.character.imageUri,
                             contentDescription = null,
                             modifier.size(60.dp)
                         )
@@ -183,8 +189,7 @@ fun ComboDisplayScreen(
         }
     ) { contentPadding ->
         Column(Modifier.padding(contentPadding)) {
-            Timber.d("Character Details \n Name: ${characterNameState.name} \n Image: ${characterImageState.image}")
-            Timber.d("Checking details valid...")
+
             LazyColumn(modifier.padding(
                 start = if (uiScale == 1.5f) 40.dp else 4.dp,
                 end = if (uiScale == 1.5f) 16.dp else 0.dp

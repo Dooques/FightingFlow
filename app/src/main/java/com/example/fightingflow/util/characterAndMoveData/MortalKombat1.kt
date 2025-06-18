@@ -11,210 +11,245 @@ val mortalKombat1Characters = ImmutableList(
             name = "Ashrah",
             imageId = R.drawable.ashrah, // Replace with actual image resource ID
             fightingStyle = "Krabi-Krabong",
+            controlType = "Mortal Kombat",
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
             name = "Baraka",
             imageId = R.drawable.baraka, // Replace with actual image resource ID
             fightingStyle = "Silat, Hung Gar",
+            controlType = "Mortal Kombat",
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
             name = "Conan",
             imageId = R.drawable.conan, // Replace with actual image ID
             fightingStyle = "Barbarian",
+            controlType = "Mortal Kombat",
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
             name = "Cyrax",
             imageId = R.drawable.cyrax,  // Replace with actual image ID
             fightingStyle = "Tekunin",
+            controlType = "Mortal Kombat",
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
             name = "Ermac", // DLC
             imageId = R.drawable.ermac, // Replace with actual image resource ID
             fightingStyle = "Telekinesis",
+            controlType = "Mortal Kombat",
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
             name = "General Shao",
             imageId = R.drawable.generalshao, // Replace with actual image resource ID
             fightingStyle = "Axe Fighting",
+            controlType = "Mortal Kombat",
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
             name = "Geras",
             imageId = R.drawable.geras, // Replace with actual image ID
             fightingStyle = "Temporal",
+            controlType = "Mortal Kombat",
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
             name = "Ghostface",
             imageId = R.drawable.ghostface,
             fightingStyle = "Stealth",
+            controlType = "Mortal Kombat",
             game = "Mortal Kombat 1"
         ),
         CharacterEntry(
             name = "Havik",
             imageId = R.drawable.havik, // Replace with actual image resource ID
             fightingStyle = "Agonizing Style",
+            controlType = "Mortal Kombat",
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
             name = "Homelander", // DLC
             imageId = R.drawable.homelander, // Replace with actual image resource ID
             fightingStyle = "Viltrumite-like Abilities",
+            controlType = "Mortal Kombat",
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
             name = "Johnny Cage",
             imageId = R.drawable.johnnycage, // Replace with actual image resource ID
             fightingStyle = "Jeet Kune Do, Shorin-Ryu Karate",
+            controlType = "Mortal Kombat",
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
             name = "Kenshi",
             imageId = R.drawable.kenshi, // Replace with actual image resource ID
             fightingStyle = "Tai Chi Chuan",
+            controlType = "Mortal Kombat",
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
             name = "Kitana",
             imageId = R.drawable.kitana, // Replace with actual image resource ID
             fightingStyle = "Eagle Claw, Ba Gua Zhang",
+            controlType = "Mortal Kombat",
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
             name = "Kung Lao",
             imageId = R.drawable.kunglao, // Replace with actual image resource ID
             fightingStyle = "Shaolin Kung Fu, Wing Chun",
+            controlType = "Mortal Kombat",
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
             name = "Li Mei",
             imageId = R.drawable.limei, // Replace with actual image resource ID
             fightingStyle = "Shuai Jiao, Lui He Ba Fa",
+            controlType = "Mortal Kombat",
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
             name = "Liu Kang",
             imageId = R.drawable.liukang, // Replace with actual image resource ID
             fightingStyle = "Jun Fan Gung Fu, Pao Chui",
+            controlType = "Mortal Kombat",
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
             name = "Mileena",
             imageId = R.drawable.mileena, // Replace with actual image resource ID
             fightingStyle = "Tarkatan Fighting Style",
+            controlType = "Mortal Kombat",
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
             name = "Nitara",
             imageId = R.drawable.nitara, // Replace with actual image resource ID
             fightingStyle = "Vampire Fighting Style",
+            controlType = "Mortal Kombat",
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
             name = "Noob Saibot",
             imageId = R.drawable.noobsaibot, // Replace with actual image ID
             fightingStyle = "Shadow",
+            controlType = "Mortal Kombat",
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
             name = "Omni-Man", // DLC
             imageId = R.drawable.omniman, // Replace with actual image resource ID
             fightingStyle = "Viltrumite Martial Arts",
+            controlType = "Mortal Kombat",
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
             name = "Peacemaker", // DLC
             imageId = R.drawable.peacemaker, // Replace with actual image resource ID
             fightingStyle = "Hand-to-Hand Combat, Firearms",
+            controlType = "Mortal Kombat",
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
             name = "Quan Chi", // DLC
             imageId = R.drawable.quanchi, // Replace with actual image resource ID
             fightingStyle = "Netherealm Sorcery",
+            controlType = "Mortal Kombat",
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
             name = "Raiden",
             imageId = R.drawable.raiden, // Replace with actual image resource ID
             fightingStyle = "Nan Chuan, Staff Fighting",
+            controlType = "Mortal Kombat",
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
             name = "Rain",
             imageId = R.drawable.rain, // Replace with actual image resource ID
             fightingStyle = "Jeet Kune Do, Tae Kwon Do",
+            controlType = "Mortal Kombat",
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
             name = "Reiko",
             imageId = R.drawable.reiko, // Replace with actual image resource ID
             fightingStyle = "Commando",
+            controlType = "Mortal Kombat",
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
             name = "Reptile",
             imageId = R.drawable.reptile, // Replace with actual image resource ID
             fightingStyle = "Hung Gar, Lizard Style",
+            controlType = "Mortal Kombat",
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
             name = "Scorpion",
             imageId = R.drawable.scorpion, // Replace with actual image resource ID
             fightingStyle = "Hapkido, Pi Gua Quan",
+            controlType = "Mortal Kombat",
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
             name = "Sektor",
             imageId = R.drawable.sektor, // Replace with actual image resource ID
             fightingStyle = "Tekunin",
+            controlType = "Mortal Kombat",
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
             name = "Shang Tsung",
             imageId = R.drawable.shangtsung, // Replace with actual image resource ID
             fightingStyle = "Snake Fist, Crane Style",
+            controlType = "Mortal Kombat",
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
             name = "Sindel",
             imageId = R.drawable.sindel, // Replace with actual image resource ID
             fightingStyle = "Zha Quan",
+            controlType = "Mortal Kombat",
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
             name = "Smoke",
             imageId = R.drawable.smoke, // Replace with actual image resource ID
             fightingStyle = "Mime", // Subject to change/variation
+            controlType = "Mortal Kombat",
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
             name = "Sub-Zero",
             imageId = R.drawable.subzero, // Replace with actual image resource ID
             fightingStyle = "Shotokan Karate, Cryomancy",
+            controlType = "Mortal Kombat",
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
             name = "Takeda", // DLC
             imageId = R.drawable.takeda, // Replace with actual image resource ID
             fightingStyle = "Lasher, Ronin",
+            controlType = "Mortal Kombat",
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
             name = "T-1000",
             imageId = R.drawable.t1000, // Replace with actual image ID
             fightingStyle = "Mimicry",
+            controlType = "Mortal Kombat",
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
             name = "Tanya",
             imageId = R.drawable.tanya, // Replace with actual image resource ID
             fightingStyle = "Zi Ran Men",
+            controlType = "Mortal Kombat",
             game = "Mortal Kombat 1",
         ),
     )
@@ -240,15 +275,18 @@ val mk1MoveList = ImmutableList(
         MoveEntry(moveName = "down_back", notation = "d/b", moveType = "Movement", character = "Generic", game = "Mortal Kombat 1"),
 
         // Mechanics
-        MoveEntry(moveName = "Block", notation = "block", moveType = "MK Input", character = "Generic", game = "Mortal Kombat 1"),
-        MoveEntry(moveName = "Stance", notation = "stance", moveType = "MK Input", character = "Generic", game = "Mortal Kombat 1"),
-        MoveEntry(moveName = "Throw", notation = "throw", moveType = "MK Input", character = "Generic", game = "Mortal Kombat 1"),
-        MoveEntry(moveName = "Boost", notation = "air", moveType = "MK Input", character = "Generic", game = "Mortal Kombat 1"),
-        MoveEntry(moveName = "Kameo", notation = "kameo", moveType = "MK Input", character = "Generic", game = "Mortal Kombat 1"),
-        MoveEntry(moveName = "Air", notation = "air", moveType = "MK Input", character = "Generic", game = "Mortal Kombat 1"),
-        MoveEntry(moveName = "Hold", notation = "hold", moveType = "MK Input", character = "Generic", game = "Mortal Kombat 1"),
+        MoveEntry(moveName = "Block", notation = "block", moveType = "Text Input", character = "Generic", game = "Mortal Kombat 1"),
+        MoveEntry(moveName = "Stance", notation = "stance", moveType = "Text Input", character = "Generic", game = "Mortal Kombat 1"),
+        MoveEntry(moveName = "Throw", notation = "throw", moveType = "Mechanic", character = "Generic", game = "Mortal Kombat 1"),
+        MoveEntry(moveName = "Boost", notation = "air", moveType = "Mechanic", character = "Generic", game = "Mortal Kombat 1"),
+        MoveEntry(moveName = "Kameo", notation = "kameo", moveType = "Mechanic", character = "Generic", game = "Mortal Kombat 1"),
+        MoveEntry(moveName = "Air", notation = "air", moveType = "Mechanic", character = "Generic", game = "Mortal Kombat 1"),
+        MoveEntry(moveName = "Hold", notation = "hold", moveType = "Mechanic", character = "Generic", game = "Mortal Kombat 1"),
+    )
+)
 
-
+val mk1CharacterMoves = ImmutableList(
+    listOf(
         // Ashrah
         MoveEntry(moveName = "Invoking The Light", notation = "d, b, 1", moveType = "Special", character = "Ashrah", game = "Mortal Kombat 1"),
         MoveEntry(moveName = "Heaven's Beacon", notation = "d, f, 1", moveType = "Special", character = "Ashrah", game = "Mortal Kombat 1"),

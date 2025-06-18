@@ -1,4 +1,4 @@
-package com.example.fightingflow.ui.comboItem
+package com.example.fightingflow.ui.comboDisplayScreen.comboItem
 
 import androidx.lifecycle.ViewModel
 import timber.log.Timber

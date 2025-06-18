@@ -1,4 +1,4 @@
-package com.example.fightingflow.ui.comboItem
+package com.example.fightingflow.ui.comboDisplayScreen.comboItem
 
 import android.content.Context
 import androidx.compose.foundation.Image
@@ -70,10 +70,12 @@ fun ComboItemDisplay(
             }
             if (iconDisplayState) {
                 FlowRow(
-                    verticalArrangement = Arrangement.Center,
-                    horizontalArrangement = Arrangement.Start,
+                    verticalArrangement = Arrangement.spacedBy((4 * uiScale).dp),
+                    horizontalArrangement = Arrangement.spacedBy((4 * uiScale).dp),
                     itemVerticalAlignment = Alignment.CenterVertically,
-                    modifier = modifier.fillMaxWidth()
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .padding(4.dp)
                 ) {
                     Timber.d("Loading moves from combo...")
                     combo.moves.forEach {
@@ -96,10 +98,9 @@ fun ComboItemDisplay(
                         when (move.moveType) {
                             "Break" -> MoveBreak(
                                 uiScale,
-                                modifier.align(Alignment.CenterVertically)
                             )
 
-                            "Misc" -> MiscInput(move)
+                            "Misc" -> MiscInput(move, modifier)
 
                             "SF Modern", "SF Classic", "Input", "Movement", "Complex Movement", "Console" ->
                                 InputMove(
@@ -108,42 +109,20 @@ fun ComboItemDisplay(
                                     uiScale = uiScale,
                                     modifier = modifier
                                         .align(Alignment.CenterVertically)
-                                        .padding(4.dp)
                                 )
-
-//                             -> TextMove(
-//                                move = move,
-//                                color = if (move.moveName.contains("L")) {
-//                                    Color(0xFFf0c027)
-//                                } else if (move.moveName.contains("M")) {
-//                                    Color(0xFFe23a10)
-//                                } else if (move.moveName.contains("H")) {
-//                                    Color(0xFFff0000)
-//                                } else { Color(0xFF7ed957) },
-//                                uiScale = uiScale,
-//                                modifier = modifier
-//                                    .align(Alignment.CenterVertically)
-//                                    .padding(4.dp)
-//                            )
 
                             "Common", "Console Text" ->
                                 TextMove(
                                     move = move,
                                     color = Color(0xFF444444),
                                     uiScale = uiScale,
-                                    modifier = modifier
-                                        .align(Alignment.CenterVertically)
-                                        .padding(4.dp)
                                 )
 
-                            "Special" ->
+                            "Special", "Unique Move" ->
                                 TextMove(
                                     move = move,
                                     color = Color(0xFF0067B3),
                                     uiScale = uiScale,
-                                    modifier = modifier
-                                        .align(Alignment.CenterVertically)
-                                        .padding(4.dp)
                                 )
 
                             "Stage" ->
@@ -151,9 +130,6 @@ fun ComboItemDisplay(
                                     move = move,
                                     color = Color(0xFF2f5233),
                                     uiScale = uiScale,
-                                    modifier = modifier
-                                        .align(Alignment.CenterVertically)
-                                        .padding(4.dp)
                                 )
 
                             "Mishima", "Mechanic" ->
@@ -161,9 +137,6 @@ fun ComboItemDisplay(
                                     move = move,
                                     color = Color(0xFF8155BA),
                                     uiScale = uiScale,
-                                    modifier = modifier
-                                        .align(Alignment.CenterVertically)
-                                        .padding(4.dp)
                                 )
 
                             "Character", "Fatal Blow", "Drive", "Super Art"->
@@ -171,19 +144,13 @@ fun ComboItemDisplay(
                                     move = move,
                                     color = Color(0xFFDC143C),
                                     uiScale = uiScale,
-                                    modifier = modifier
-                                        .align(Alignment.CenterVertically)
-                                        .padding(4.dp)
                                 )
 
-                            "Modifier", "MK Input" ->
+                            "Modifier", "MK Input", "Text Input" ->
                                 TextMove(
                                     move = move,
                                     color = Color.White,
                                     uiScale = uiScale,
-                                    modifier = modifier
-                                        .align(Alignment.CenterVertically)
-                                        .padding(4.dp)
                                 )
                         }
                     }

@@ -1,10 +1,5 @@
 package com.example.fightingflow.ui.comboDisplayScreen
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fightingflow.data.database.FlowRepository
@@ -14,9 +9,7 @@ import com.example.fightingflow.data.datastore.SettingsDsRepository
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.Console
-import com.example.fightingflow.model.MoveEntry
 import com.example.fightingflow.model.SF6ControlType
-import com.example.fightingflow.model.getMoveEntryDataForComboDisplay
 import com.example.fightingflow.model.toDisplay
 import com.example.fightingflow.model.toEntry
 import com.example.fightingflow.util.CharImageUiState
@@ -30,13 +23,11 @@ import com.example.fightingflow.util.emptyCharacter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import okhttp3.internal.wait
 import timber.log.Timber
 
 class ComboDisplayViewModel(
@@ -89,6 +80,14 @@ class ComboDisplayViewModel(
                 initialValue = CharImageUiState()
             )
 
+    val gameSelectedState = settingsDsRepository.getGame()
+        .map { it }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(TIME_MILLIS),
+            initialValue = ""
+        )
+
     val showIconState = settingsDsRepository.getIconDisplayState()
         .map { it }
         .stateIn(
@@ -133,10 +132,12 @@ class ComboDisplayViewModel(
         )
 
     // Datastore
-    fun updateCharacterState(name: String) {
+    fun updateCharacterState(name: String, game: String) {
         viewModelScope.launch {
-            Timber.d("Getting character from Database")
-            flowRepository.getCharacter(name)
+            Timber.d("-- Getting character from Database --" +
+                    "\n Character: $name" +
+                    "\n Game: $game")
+            flowRepository.getCharacterByNameAndGame(name, game)
                 .map { it ?: emptyCharacter }
                 .collect { characterEntry ->
                     Timber.d("Character: $characterEntry")
@@ -145,11 +146,9 @@ class ComboDisplayViewModel(
         }
     }
 
-    fun updateCharacterInDS(character: CharacterEntry) {
-        viewModelScope.launch {
+    suspend fun updateCharacterInDS(character: CharacterEntry) {
             Timber.d("Setting ${character.name} to Character Datastore")
             characterDsRepository.updateCharacter(character)
-        }
     }
 
     fun updateShowIconDisplayState(iconState: Boolean) = viewModelScope.launch {

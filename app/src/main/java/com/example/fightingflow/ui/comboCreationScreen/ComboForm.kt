@@ -1,51 +1,20 @@
 package com.example.fightingflow.ui.comboCreationScreen
 
-import android.content.Context
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
@@ -56,29 +25,26 @@ import com.example.fightingflow.ui.comboCreationScreen.layouts.CustomGameLayout
 import com.example.fightingflow.ui.comboCreationScreen.layouts.MortalKombatLayout
 import com.example.fightingflow.ui.comboCreationScreen.layouts.StreetFighterLayout
 import com.example.fightingflow.ui.comboCreationScreen.layouts.TekkenLayout
-import com.example.fightingflow.ui.comboItem.ComboItemEditor
-import com.example.fightingflow.ui.comboDisplayScreen.inputConverter.convertInputsToConsole
-import com.example.fightingflow.ui.comboItem.ComboInfoBottom
-import com.example.fightingflow.ui.comboItem.ComboItemViewModel
+import com.example.fightingflow.ui.comboDisplayScreen.comboItem.ComboItemEditor
+import com.example.fightingflow.ui.comboDisplayScreen.comboItem.ComboInfoBottom
 import com.example.fightingflow.util.ComboDisplayUiState
 import com.example.fightingflow.util.MoveEntryListUiState
-import com.example.fightingflow.util.characterAndMoveData.convertibleInputs
 import com.example.fightingflow.util.emptyComboDisplay
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import org.koin.compose.koinInject
 import timber.log.Timber
 import kotlin.reflect.KFunction0
 import kotlin.reflect.KFunction4
 import kotlin.reflect.KSuspendFunction0
 
 @Composable
+/* The form used to display the moves in the combo along with the inputs to add more moves to a
+    combo */
 fun ComboForm(
     scope: CoroutineScope,
     snackbarHostState: SnackbarHostState,
     editingState: Boolean,
     username: String,
-    game: Game?,
+    game: Game,
     consoleTypeState: Console?,
     sF6ControlType: SF6ControlType?,
     comboDisplay: ComboDisplay,
@@ -86,7 +52,7 @@ fun ComboForm(
     updateComboData: (ComboDisplayUiState) -> Unit,
     setSelectedItem: (Int) -> Unit,
     selectedItem: Int,
-    updateMoveList: KFunction4<String, MoveEntryListUiState, Game?, Console?, Unit>,
+    updateMoveList: KFunction4<String, MoveEntryListUiState, Game, Console?, Unit>,
     character: CharacterEntry,
     characterName: String,
     comboAsString: String,
@@ -104,8 +70,8 @@ fun ComboForm(
     val context = LocalContext.current
 
     Column {
-        Timber.d("Loading Combo Form")
-        Timber.d("Combo Move List exists, populating with moves...")
+        Timber.d("-- Loading Combo Form --")
+        /* Placeholder composable for creating a new combo */
         if (comboDisplay.moves.isEmpty()) {
             Column {
                 Row(
@@ -132,9 +98,12 @@ fun ComboForm(
                 }
             }
         } else {
+            Timber.d("Combo Move List exists, populating form with moves...")
+            /* Shows moves added to combo once a move has been added */
             ComboItemEditor(
                 context = context,
                 combo = comboDisplay,
+                characterEntry = character,
                 username = username,
                 console = consoleTypeState,
                 sf6ControlType = sF6ControlType,
@@ -148,6 +117,7 @@ fun ComboForm(
                 modifier = modifier.padding(vertical = 4.dp),
             )
         }
+        /* The buttons used to edit the moves in the combo */
         EditingButtons(
             deleteMove = deleteMove,
             clearMoveList = clearMoveList,
@@ -156,6 +126,7 @@ fun ComboForm(
             scope = scope,
             snackbarHostState = snackbarHostState,
             comboDisplay = comboDisplay,
+            game = game,
             saveCombo = saveCombo,
             editingState = editingState,
             originalCombo = originalCombo,
@@ -184,6 +155,7 @@ fun ComboForm(
                 Game.SF6 -> StreetFighterLayout(
                     context = context,
                     comboDisplay = comboDisplay,
+                    character = character,
                     combo = comboDisplay,
                     updateComboData = updateComboData,
                     updateMoveList = updateMoveList,
@@ -198,6 +170,7 @@ fun ComboForm(
                     context = context,
                     combo = comboDisplay,
                     console = consoleTypeState,
+                    character = character,
                     updateComboData = updateComboData,
                     updateMoveList = updateMoveList,
                     moveList = moveList,
@@ -205,15 +178,14 @@ fun ComboForm(
                     gameMoveList = gameMoveList
                 )
 
-                else -> CustomGameLayout(
+                Game.CUSTOM -> CustomGameLayout(
                     context = context,
                     combo = comboDisplay,
-                    console = consoleTypeState,
                     updateComboData = updateComboData,
                     updateMoveList = updateMoveList,
+                    character = character,
                     moveList = moveList,
                     characterMoveList = characterMoveList,
-                    gameMoveList = gameMoveList
                 )
             }
         }
