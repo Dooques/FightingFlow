@@ -18,6 +18,7 @@ import com.example.fightingflow.util.emptyMove
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.forEach
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.stateIn
@@ -74,6 +75,9 @@ class AddCharacterViewModel(
             .collect { existingCharacter -> characterUiState.update { existingCharacter } }
         }
     }
+    fun clearCharacterState() {
+        characterUiState.update { CharacterEntryUiState() }
+    }
 
     private fun getExistingCharacterEntry(character: CharacterEntry) { viewModelScope.launch {
         Timber.d("Name: ${character.name} \n Game: ${character.game}")
@@ -98,18 +102,21 @@ class AddCharacterViewModel(
 
     private suspend fun cleanupCustomGames(character: CharacterEntry) {
         Timber.d("Checking for other characters in changed game...")
-        val charactersByGame =
-            flowRepository.getCharactersByGame(character.game).map { it }.first()
-        Timber.d("Characters in related game: $charactersByGame")
+        val gameList = customGameList.value.split(", ").toMutableList()
+        gameList.forEach { game ->
+            val charactersByGame = flowRepository.getCharactersByGame(game).map { it }.first()
+            Timber.d("Characters in related game: $charactersByGame")
 
-        if (charactersByGame.isEmpty()) {
-            Timber.d("No characters found for ${character.game}, deleting game from DS")
-            val currentGameList = customGameList.value.split(", ").toMutableList()
-            Timber.d("Current List: $currentGameList")
-            currentGameList.remove(character.game)
-            val currentGameListString = if (currentGameList.isNotEmpty()) currentGameList.toList().joinToString() else ""
-            Timber.d("Current List as String: $currentGameListString")
-            characterDsRepository.updateCustomGameList(currentGameListString)
+            if (charactersByGame.isEmpty()) {
+                Timber.d("No characters found for ${character.game}, deleting game from DS" +
+                        "\n Current List: $gameList")
+                gameList.remove(game)
+                val  gameListString =
+                    if (gameList.isNotEmpty()) gameList.toList().joinToString()
+                    else ""
+                Timber.d("Current List as String: $gameListString")
+                characterDsRepository.updateCustomGameList(gameListString)
+            }
         }
     }
 
@@ -210,7 +217,7 @@ class AddCharacterViewModel(
             addUniqueMovesToDb(character)
             Timber.d("Character saved: $character")
 
-            if (!customGameList.value.contains(character.game)) {
+            if (!customGameList.value.contains(existingCharacterState.value.character.game)) {
                 updateCustomGameList(character.game)
                 cleanupCustomGames(existingCharacterState.value.character)
             }
@@ -218,6 +225,7 @@ class AddCharacterViewModel(
             Timber.d("Updating datastore with Character and Game")
             characterDsRepository.updateCharacter(character)
             settingsDsRepository.updateGameSelected(character.game)
+            clearCharacterState()
             editState = false
             Timber.d("Datastores updated.")
 
@@ -238,6 +246,7 @@ class AddCharacterViewModel(
             Timber.d("Updating datastore with Character and Game")
             characterDsRepository.updateCharacter(character)
             settingsDsRepository.updateGameSelected(character.game)
+            clearCharacterState()
             editState = false
             Timber.d("Datastores updated.")
 

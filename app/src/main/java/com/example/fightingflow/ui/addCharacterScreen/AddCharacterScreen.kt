@@ -38,6 +38,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -80,11 +81,9 @@ fun AddCharacterScreen(
     modifier: Modifier = Modifier
 ) {
     Timber.d("-- Loading Custom Character Screen --")
-
     val mediaStoreUtil = koinInject<MediaStoreUtil>()
 
-    var character by remember { mutableStateOf(
-        CharacterEntry(
+    var character by remember { mutableStateOf(CharacterEntry(
         name = "",
         fightingStyle = "",
         imageId = R.drawable.mokujin,
@@ -95,41 +94,41 @@ fun AddCharacterScreen(
     )) }
 
     val customGameList by addCharacterViewModel.customGameList.collectAsStateWithLifecycle()
-    val characterUiState by addCharacterViewModel.characterUiState.collectAsStateWithLifecycle()
+    val characterUiStateVM by addCharacterViewModel.characterUiState.collectAsStateWithLifecycle()
     val characterNameFromDs by addCharacterViewModel.characterNameState.collectAsStateWithLifecycle()
     val gameSelectedState by addCharacterViewModel.gameSelectedState.collectAsStateWithLifecycle()
+
     val editState = addCharacterViewModel.editState
-
     var controlTypeDropdownExpanded by remember { mutableStateOf(false) }
-    var characterCollected by remember { mutableStateOf(false) }
-    var characterUpdated by remember { mutableStateOf(false) }
 
-    Timber.d("Checking if in editing state")
-    if (editState) { Timber.d(message = "Editing state true" +
-            "\nChecking character matches datastore..." +
-            "\nExisting Character: ${characterUiState.character.name}" +
-            "\nCharacter Name DS: $characterNameFromDs")
-
-        if (characterUiState.character.name != characterNameFromDs && !characterCollected) {
+    Timber.d("Loading Launched effect to update character state...")
+    LaunchedEffect(editState, characterUiStateVM) {
+        if (editState) {
+            Timber.d("Checking character name matches DS...")
+            if (character.name != characterNameFromDs && character.game != gameSelectedState) {
+                character = characterUiStateVM.character
                 Timber.d("Collecting character from DB")
                 addCharacterViewModel.getCharacterToEdit()
-                characterCollected = true
+            }
+        } else {
+            Timber.d("Not in editing mode")
+        }
+    }
 
-        } else { Timber.d("Character already matches datastore.") }
-    } else { Timber.d("Editing State False.") }
-
-    Timber.d("Checking if character has been collected")
-    if (characterUiState.character.name == characterNameFromDs && editState && !characterUpdated) {
-        Timber.d("Character collected, updating character state")
-        character = characterUiState.character
-        characterUpdated = true
-    } else { Timber.d("Character has not been collected.") }
+    Timber.d("Loading launched effect to get existing character")
+    LaunchedEffect(editState, characterNameFromDs) {
+        if (editState && characterNameFromDs.isNotBlank() &&
+            characterUiStateVM.character.name != characterNameFromDs) {
+            Timber.d("Getting character to edit...")
+            addCharacterViewModel.getCharacterToEdit()
+        }
+    }
 
     Timber.d("-- Flows --" +
             "\n Custom Game List: $customGameList" +
             "\n -- Character --" +
-            "\n Char to Edit Name: $characterNameFromDs" +
-            "\n Game: $gameSelectedState" +
+            "\n Char to Edit Name: $characterNameFromDs " +
+            "\n Game: $gameSelectedState\n " +
             "\n New Character Values: $character" +
             "\n Name: ${character.name}" +
             "\n Fighting Style: ${character.fightingStyle}" +
@@ -137,17 +136,17 @@ fun AddCharacterScreen(
             "\n Game: ${character.game}" +
             "\n Unique Moves: ${character.uniqueMoves}" +
             "\n Image URI: ${character.imageUri}" +
-            "\n Mutable: ${character.mutable}" +
-            "\n Existing Character: ${characterUiState.character}" +
-            "\n Name: ${characterUiState.character.fightingStyle}" +
-            "\n Fighting Style: ${characterUiState.character.controlType}" +
-            "\n Control Type: ${characterUiState.character.game}" +
-            "\n Game: ${characterUiState.character.uniqueMoves}" +
-            "\n Unique Moves: ${characterUiState.character.imageUri}" +
-            "\n Image URI: ${characterUiState.character.mutable}" +
-            "\n Editing State: $editState" +
-            "\n Character collected: $characterCollected" +
-            "\n Character updated: $characterUpdated"
+            "\n Mutable: ${character.mutable}\n " +
+
+            "\n Existing Character: ${characterUiStateVM.character}" +
+            "\n Name: ${characterUiStateVM.character.fightingStyle}" +
+            "\n Fighting Style: ${characterUiStateVM.character.controlType}" +
+            "\n Control Type: ${characterUiStateVM.character.game}" +
+            "\n Game: ${characterUiStateVM.character.uniqueMoves}" +
+            "\n Unique Moves: ${characterUiStateVM.character.imageUri}" +
+            "\n Image URI: ${characterUiStateVM.character.mutable}\n " +
+            "\n Other values:" +
+            "\n Editing State: $editState"
     )
 
     Scaffold(
@@ -158,6 +157,7 @@ fun AddCharacterScreen(
                     IconButton(
                         onClick = { scope.launch {
                             comboDisplayViewModel.updateCharacterInDS(emptyCharacter)
+                            addCharacterViewModel.clearCharacterState()
                             navigateBack()
                         } },
                         modifier.fillMaxHeight()
@@ -298,7 +298,6 @@ fun AddCharacterScreen(
                         snackbarHostState = snackbarHostState,
                         editState = editState,
                         character = character,
-                        characterUiState = characterUiState.character,
                         navigateBack = navigateBack
                     )
                 }
@@ -404,7 +403,6 @@ fun ConfirmButton(
     snackbarHostState: SnackbarHostState,
     editState: Boolean,
     character: CharacterEntry,
-    characterUiState: CharacterEntry,
     navigateBack: () -> Unit
 ) {
     var setBuffer by remember { mutableStateOf(false) }

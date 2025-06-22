@@ -254,9 +254,14 @@ fun CharacterCard(
                     characterEntry = characterState.character,
                     navigateToAddCharacter = {
                         scope.launch {
+                            Timber.d("-- Preparing to launch Add Character Screen --" +
+                                    "\n Updating character state to: ${characterState.character.name}")
                             setCharacterToDS(characterState.character)
+                            Timber.d("Updating selected game to: ${characterState.character.game}")
                             characterScreenViewModel.updateGameInDs(characterState.character.game)
+                            Timber.d("Setting edit state to True")
                             addCharacterViewModel.editState = true
+                            Timber.d("Navigating to Add Character Screen")
                             navigateToAddCharacterScreen()
                         }
                     },
