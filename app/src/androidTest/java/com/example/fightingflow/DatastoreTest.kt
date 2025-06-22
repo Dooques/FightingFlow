@@ -79,6 +79,7 @@ class DatastoreTest {
         imageId = 1,
         fightingStyle = "Mishima",
         combosById = "",
+        controlType = "",
         game = "Tekken",
     )
 
