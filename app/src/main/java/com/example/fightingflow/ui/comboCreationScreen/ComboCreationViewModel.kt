@@ -8,6 +8,7 @@ import com.example.fightingflow.data.database.FlowRepository
 import com.example.fightingflow.data.datastore.ComboDsRepository
 import com.example.fightingflow.data.datastore.ProfileDsRepository
 import com.example.fightingflow.data.datastore.SettingsDsRepository
+import com.example.fightingflow.data.firebase.FirebaseRepository
 import com.example.fightingflow.model.Console
 import com.example.fightingflow.model.Game
 import com.example.fightingflow.model.MoveEntry
@@ -36,7 +37,8 @@ class ComboCreationViewModel(
     private val flowRepository: FlowRepository,
     private val comboDsRepository: ComboDsRepository,
     private val profileDsRepository: ProfileDsRepository,
-    private val settingsDsRepository: SettingsDsRepository
+    private val settingsDsRepository: SettingsDsRepository,
+    private val firebaseRepository: FirebaseRepository
 ): ViewModel() {
 
     companion object {

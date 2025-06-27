@@ -32,7 +32,9 @@ import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayViewModel
 import com.example.fightingflow.ui.comboDisplayScreen.comboItem.ComboItemViewModel
 import com.example.fightingflow.ui.profileScreen.ProfileViewModel
 import org.koin.android.ext.koin.androidContext
-import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.core.module.dsl.bind
+import org.koin.core.module.dsl.singleOf
+import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 private const val USER_SETTINGS = "settings"
@@ -44,8 +46,7 @@ fun provideMoveDao(flowDatabase: FlowDatabase): MoveDao = flowDatabase.getMoveDa
 fun provideComboDao(flowDatabase: FlowDatabase): ComboDao = flowDatabase.getComboDao()
 
 fun provideDatabase(context: Context) =
-    Room.databaseBuilder(
-        context,
+    Room.databaseBuilder(context,
         FlowDatabase::class.java,
         "fighting_flow"
     )
@@ -53,20 +54,17 @@ fun provideDatabase(context: Context) =
         .build()
 
 val databaseModule = module {
-    single { provideDatabase(get()) }
-    single { provideUserDao(get()) }
-    single { provideCharacterDao(get()) }
-    single { provideComboDao(get()) }
-    single { provideMoveDao(get()) }
+    singleOf(::provideDatabase)
+    singleOf(::provideUserDao)
+    singleOf(::provideCharacterDao)
+    singleOf(::provideComboDao)
+    singleOf(::provideMoveDao)
 }
 
 val repositoryModule = module {
     // Database
     single<ProfileDbRepository> { ProfileDatabaseRepository(get()) }
     single<FlowRepository> { FlowDataRepository(get(), get(), get()) }
-
-    // Firebase
-    single<FirebaseRepository> { FirebaseRepository() }
 
     // DataStore
     single<ProfileDsRepository> { ProfileDatastoreRepository(androidContext().dataStore) }
@@ -75,15 +73,19 @@ val repositoryModule = module {
     single<SettingsDsRepository> { SettingsDatastoreRepository(androidContext().dataStore) }
 
     // MediaStore
-    single<MediaStoreUtil> { MediaStoreUtil(androidContext())}
+    singleOf(::MediaStoreUtil)
+
+    // Firebase
+    singleOf(::FirebaseRepository)
+
 }
 
 val viewModelModule = module {
-    viewModel { ProfileViewModel(get(), get(), get()) }
-    viewModel { InitViewModel(get()) }
-    viewModel { ComboDisplayViewModel(get(), get(), get(), get()) }
-    viewModel { ComboCreationViewModel(get(), get(), get(), get()) }
-    viewModel { CharacterViewModel(get(), get(), get()) }
-    viewModel { ComboItemViewModel() }
-    viewModel { AddCharacterViewModel(get(), get(), get()) }
+    viewModelOf(::ProfileViewModel)
+    viewModelOf(::InitViewModel)
+    viewModelOf(::ComboDisplayViewModel)
+    viewModelOf(::ComboCreationViewModel)
+    viewModelOf(::CharacterViewModel)
+    viewModelOf(::ComboItemViewModel)
+    viewModelOf(::AddCharacterViewModel)
 }
