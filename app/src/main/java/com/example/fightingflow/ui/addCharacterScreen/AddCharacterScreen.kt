@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -78,6 +79,7 @@ fun AddCharacterScreen(
     navigateBack: () -> Unit,
     scope: CoroutineScope,
     snackbarHostState: SnackbarHostState,
+    navigateToSchemeInfo: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Timber.d("-- Loading Custom Character Screen --")
@@ -154,12 +156,19 @@ fun AddCharacterScreen(
             TopAppBar(
                 title = { Text("Add Character", style = MaterialTheme.typography.displaySmall) },
                 actions = {
-                    IconButton(
-                        onClick = { scope.launch {
-                            comboDisplayViewModel.updateCharacterInDS(emptyCharacter)
-                            addCharacterViewModel.clearCharacterState()
-                            navigateBack()
-                        } },
+                    IconButton(onClick = { navigateToSchemeInfo() }) {
+                        Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = "See Control Schemes",
+                            tint = Color.White,
+                            modifier = modifier.size(100.dp)
+                        )
+                    }
+                    IconButton(onClick = { scope.launch {
+                        comboDisplayViewModel.updateCharacterInDS(emptyCharacter)
+                        addCharacterViewModel.clearCharacterState()
+                        navigateBack()
+                    } },
                         modifier.fillMaxHeight()
                     ) {
                         Icon(

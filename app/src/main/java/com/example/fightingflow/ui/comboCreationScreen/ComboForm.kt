@@ -136,7 +136,7 @@ fun ComboForm(
 
     if (moveList.moveList.isNotEmpty()) {
         Timber.d("Move Entry List exists, populating Input Selector Column...")
-        game?.let { innerGame ->
+        game.let { innerGame ->
             when (innerGame) {
                 Game.T8 -> TekkenLayout(
                     context = context,

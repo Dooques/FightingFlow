@@ -255,7 +255,7 @@ val mortalKombat1Characters = ImmutableList(
     )
 )
 
-val mk1MoveList = ImmutableList(
+val mk1Moves = ImmutableList(
     listOf(
         // Inputs
         MoveEntry(moveName = "one", notation = "1", moveType = "Input", character = "Generic", game = "Mortal Kombat 1"),

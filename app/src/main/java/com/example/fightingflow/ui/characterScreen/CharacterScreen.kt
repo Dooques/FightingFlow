@@ -45,7 +45,7 @@ import com.example.fightingflow.ui.addCharacterScreen.AddCharacterViewModel
 import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayViewModel
 import com.example.fightingflow.ui.components.CharacterOptionsMenu
 import com.example.fightingflow.ui.components.GameSelectedMenu
-import com.example.fightingflow.ui.components.SettingsMenu
+import com.example.fightingflow.ui.components.ProfileAndConsoleInputMenu
 import com.example.fightingflow.util.CharacterEntryUiState
 import com.example.fightingflow.util.emptyCharacter
 import kotlinx.coroutines.CoroutineScope
@@ -107,7 +107,6 @@ fun CharacterScreen(
                             scope.launch {
                                 comboDisplayViewModel.updateEditingState(false)
                                 comboDisplayViewModel.updateCharacterInDS(emptyCharacter)
-                                characterScreenViewModel.updateGameInDs("")
                                 navigateToAddCharacter()
                             }
                         }
@@ -118,7 +117,7 @@ fun CharacterScreen(
                             modifier = modifier.size(80.dp)
                         )
                     }
-                    SettingsMenu(
+                    ProfileAndConsoleInputMenu(
                         navigate = navigateToProfiles,
                         updateConsoleInput = { comboDisplayViewModel.updateConsoleType(it) }
                     )

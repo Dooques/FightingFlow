@@ -1,7 +1,7 @@
 package com.example.fightingflow.ui.comboDisplayScreen.inputConverter
 
 import com.example.fightingflow.model.MoveEntry
-import com.example.fightingflow.util.characterAndMoveData.mk1MoveList
+import com.example.fightingflow.util.characterAndMoveData.mk1Moves
 import com.example.fightingflow.util.characterAndMoveData.nintendoInputs
 import com.example.fightingflow.util.characterAndMoveData.playstationInputs
 import com.example.fightingflow.util.characterAndMoveData.streetFighter6Moves
@@ -267,37 +267,37 @@ fun nintendoToSF6Modern(move: MoveEntry) = when (move.moveName) {
 }
 
 fun playStationToMK1(move: MoveEntry) = when (move.moveName) {
-    "square" -> mk1MoveList.first{ it.moveName == "one" }
-    "triangle" -> mk1MoveList.first{ it.moveName == "two" }
-    "cross" -> mk1MoveList.first{ it.moveName == "three" }
-    "circle" -> mk1MoveList.first{ it.moveName == "four" }
-    "R1" -> mk1MoveList.first{ it.moveName == "Kameo" }
-    "R2" -> mk1MoveList.first{ it.moveName == "Block" }
-    "L1" -> mk1MoveList.first{ it.moveName == "Throw" }
-    "L2" -> mk1MoveList.first{ it.moveName == "Stance" }
+    "square" -> mk1Moves.first{ it.moveName == "one" }
+    "triangle" -> mk1Moves.first{ it.moveName == "two" }
+    "cross" -> mk1Moves.first{ it.moveName == "three" }
+    "circle" -> mk1Moves.first{ it.moveName == "four" }
+    "R1" -> mk1Moves.first{ it.moveName == "Kameo" }
+    "R2" -> mk1Moves.first{ it.moveName == "Block" }
+    "L1" -> mk1Moves.first{ it.moveName == "Throw" }
+    "L2" -> mk1Moves.first{ it.moveName == "Stance" }
     else -> move
 }
 
 fun xboxToMK1(move: MoveEntry) = when (move.moveName) {
-    "x_xbox" -> mk1MoveList.first{ it.moveName == "one" }
-    "y_xbox" -> mk1MoveList.first{ it.moveName == "two" }
-    "a_xbox" -> mk1MoveList.first{ it.moveName == "three" }
-    "b_xbox" -> mk1MoveList.first{ it.moveName == "four" }
-    "RB" -> mk1MoveList.first{ it.moveName == "Kameo" }
-    "RT" -> mk1MoveList.first{ it.moveName == "Block" }
-    "LB" -> mk1MoveList.first{ it.moveName == "Throw" }
-    "LT" -> mk1MoveList.first{ it.moveName == "Stance" }
+    "x_xbox" -> mk1Moves.first{ it.moveName == "one" }
+    "y_xbox" -> mk1Moves.first{ it.moveName == "two" }
+    "a_xbox" -> mk1Moves.first{ it.moveName == "three" }
+    "b_xbox" -> mk1Moves.first{ it.moveName == "four" }
+    "RB" -> mk1Moves.first{ it.moveName == "Kameo" }
+    "RT" -> mk1Moves.first{ it.moveName == "Block" }
+    "LB" -> mk1Moves.first{ it.moveName == "Throw" }
+    "LT" -> mk1Moves.first{ it.moveName == "Stance" }
     else -> move
 }
 
 fun nintendoToMK1(move: MoveEntry) = when (move.moveName) {
-    "y_nintendo" -> mk1MoveList.first{ it.moveName == "one" }
-    "x_nintendo" -> mk1MoveList.first{ it.moveName == "two" }
-    "b_nintendo" -> mk1MoveList.first{ it.moveName == "three" }
-    "a_nintendo" -> mk1MoveList.first{ it.moveName == "four" }
-    "R" -> mk1MoveList.first{ it.moveName == "Kameo" }
-    "ZR" -> mk1MoveList.first{ it.moveName == "Block" }
-    "L" -> mk1MoveList.first{ it.moveName == "Throw" }
-    "ZL" -> mk1MoveList.first{ it.moveName == "Stance" }
+    "y_nintendo" -> mk1Moves.first{ it.moveName == "one" }
+    "x_nintendo" -> mk1Moves.first{ it.moveName == "two" }
+    "b_nintendo" -> mk1Moves.first{ it.moveName == "three" }
+    "a_nintendo" -> mk1Moves.first{ it.moveName == "four" }
+    "R" -> mk1Moves.first{ it.moveName == "Kameo" }
+    "ZR" -> mk1Moves.first{ it.moveName == "Block" }
+    "L" -> mk1Moves.first{ it.moveName == "Throw" }
+    "ZL" -> mk1Moves.first{ it.moveName == "Stance" }
     else -> move
 }

@@ -35,7 +35,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @Composable
-fun SettingsMenu(
+fun ProfileAndConsoleInputMenu(
     navigate: () -> Unit,
     updateConsoleInput: (Console) -> Unit,
     modifier: Modifier = Modifier

@@ -22,6 +22,7 @@ import com.example.fightingflow.data.datastore.ProfileDatastoreRepository
 import com.example.fightingflow.data.datastore.ProfileDsRepository
 import com.example.fightingflow.data.datastore.SettingsDatastoreRepository
 import com.example.fightingflow.data.datastore.SettingsDsRepository
+import com.example.fightingflow.data.firebase.FirebaseRepository
 import com.example.fightingflow.data.mediastore.MediaStoreUtil
 import com.example.fightingflow.ui.InitViewModel
 import com.example.fightingflow.ui.addCharacterScreen.AddCharacterViewModel
@@ -63,6 +64,9 @@ val repositoryModule = module {
     // Database
     single<ProfileDbRepository> { ProfileDatabaseRepository(get()) }
     single<FlowRepository> { FlowDataRepository(get(), get(), get()) }
+
+    // Firebase
+    single<FirebaseRepository> { FirebaseRepository() }
 
     // DataStore
     single<ProfileDsRepository> { ProfileDatastoreRepository(androidContext().dataStore) }

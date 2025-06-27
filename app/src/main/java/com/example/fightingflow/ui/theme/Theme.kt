@@ -272,9 +272,9 @@ fun FightingFlowTheme(
   }
 
   MaterialTheme(
-    colorScheme = colorScheme,
-    typography = AppTypography,
-    content = content
+      colorScheme = colorScheme,
+      typography = AppTypography,
+      content = content
   )
 }
 

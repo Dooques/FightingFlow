@@ -4,7 +4,7 @@ import com.example.fightingflow.model.Game
 import com.example.fightingflow.model.MoveEntry
 import com.example.fightingflow.util.ImmutableList
 
-val numpadNotation = ImmutableList(
+val numpadNotationMoves = ImmutableList(
     listOf(
         MoveEntry(moveName = "one_m", notation = "1", moveType = "Movement", character = "Generic", game = Game.CUSTOM.title),
         MoveEntry(moveName = "two_m", notation = "2", moveType = "Movement", character = "Generic", game = Game.CUSTOM.title),

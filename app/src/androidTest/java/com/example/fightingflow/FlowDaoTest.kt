@@ -18,10 +18,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
+import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.IOException
-import java.util.UUID
-import kotlin.test.Test
 import kotlin.test.assertEquals
 
 @RunWith(AndroidJUnit4::class)
@@ -33,22 +32,24 @@ class FlowDaoTest {
     private lateinit var flowDatabase: FlowDatabase
 
     private val asuka = CharacterEntry(
-            id = 2,
-            name = "Asuka",
-            imageId = 1,
-            fightingStyle = "Kazama",
-            combosById = "",
-            game = "Tekken",
-        )
+        id = 2,
+        name = "Asuka",
+        imageId = 1,
+        fightingStyle = "Kazama",
+        combosById = "",
+        controlType = "",
+        game = "Tekken",
+    )
 
     private val reina = CharacterEntry(
-            id = 1,
-            name = "Reina",
-            imageId = 1,
-            fightingStyle = "Mishima",
-            combosById = "",
-            game = "Tekken",
-        )
+        id = 1,
+        name = "Reina",
+        imageId = 1,
+        fightingStyle = "Mishima",
+        combosById = "",
+        controlType = "",
+        game = "Tekken",
+    )
 
     @Before
     fun createDb() {

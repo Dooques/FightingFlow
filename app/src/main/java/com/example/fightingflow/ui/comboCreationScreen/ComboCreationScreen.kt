@@ -36,7 +36,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayViewModel
 import com.example.fightingflow.ui.components.ActionIcon
-import com.example.fightingflow.ui.components.SettingsMenu
+import com.example.fightingflow.ui.components.ProfileAndConsoleInputMenu
 import com.example.fightingflow.ui.profileScreen.ProfileViewModel
 import com.example.fightingflow.util.emptyCharacter
 import com.example.fightingflow.util.emptyComboDisplay
@@ -158,7 +158,7 @@ fun ComboCreationScreen(
                     icon = Icons.Default.Settings,
                     modifier = modifier.fillMaxHeight()
                     )
-                    SettingsMenu(
+                    ProfileAndConsoleInputMenu(
                         settingsMenuExpanded = settingsMenuExpanded,
                         onDismissRequest = { settingsMenuExpanded = !settingsMenuExpanded },
                         updateIconSetting = { comboDisplayViewModel.updateShowIconDisplayState(!iconDisplayState) },

@@ -303,4 +303,5 @@
     <string name="edit_character">Edit Character</string>
     <string name="delete_character">Delete Character</string>
     <string name="clear_current_value">clear current value</string>
+    <string name="control_scheme_demo">Control Scheme Demo</string>
 </resources>

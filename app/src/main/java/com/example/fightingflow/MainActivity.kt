@@ -14,11 +14,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import com.example.fightingflow.data.firebase.FirebaseRepository
 import com.example.fightingflow.ui.InitViewModel
 import com.example.fightingflow.ui.NavGraph
 import com.example.fightingflow.ui.theme.FightingFlowTheme
-import org.koin.androidx.compose.KoinAndroidContext
+import com.example.fightingflow.util.emptyComboEntry
+import com.example.fightingflow.util.emptyProfile
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 import org.koin.core.annotation.KoinExperimentalAPI
 import timber.log.Timber
 
@@ -31,11 +34,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             FightingFlowTheme {
-                KoinAndroidContext {
-                    Timber.d("Starting Application")
-                    val deviceType = calculateWindowSizeClass(this)
-                    FightingFlowApp(deviceType = deviceType)
-                }
+                Timber.d("Starting Application")
+                val deviceType = calculateWindowSizeClass(this)
+                FightingFlowApp(deviceType = deviceType)
             }
         }
     }

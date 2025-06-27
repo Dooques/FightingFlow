@@ -24,15 +24,12 @@ import com.example.fightingflow.util.ComboDisplayUiState
 import com.example.fightingflow.util.MoveEntryListUiState
 import com.example.fightingflow.util.characterAndMoveData.customInputLayouts.arcSysMoves
 import com.example.fightingflow.util.characterAndMoveData.customInputLayouts.movement
-import com.example.fightingflow.util.characterAndMoveData.customInputLayouts.numpadNotation
+import com.example.fightingflow.util.characterAndMoveData.customInputLayouts.numpadNotationMoves
 import com.example.fightingflow.util.characterAndMoveData.customInputLayouts.tagFighterMoves
 import com.example.fightingflow.util.characterAndMoveData.customInputLayouts.virtuaFighterMoves
-import com.example.fightingflow.util.characterAndMoveData.mk1MoveList
-import com.example.fightingflow.util.characterAndMoveData.nintendoInputs
-import com.example.fightingflow.util.characterAndMoveData.playstationInputs
+import com.example.fightingflow.util.characterAndMoveData.mk1Moves
 import com.example.fightingflow.util.characterAndMoveData.streetFighter6Moves
 import com.example.fightingflow.util.characterAndMoveData.tekken8Moves
-import com.example.fightingflow.util.characterAndMoveData.xboxInputs
 import timber.log.Timber
 import kotlin.reflect.KFunction4
 
@@ -52,8 +49,8 @@ fun CustomGameLayout(
     val moveSet = MoveEntryListUiState(
         when (character.controlType) {
             ControlType.ArcSys.type -> arcSysMoves
-            ControlType.MortalKombat.type -> mk1MoveList
-            ControlType.NumpadNotation.type -> numpadNotation
+            ControlType.MortalKombat.type -> mk1Moves
+            ControlType.NumpadNotation.type -> numpadNotationMoves
             ControlType.StreetFighter.type -> streetFighter6Moves
             ControlType.TagFighter.type -> tagFighterMoves
             ControlType.Tekken.type -> tekken8Moves
@@ -68,7 +65,7 @@ fun CustomGameLayout(
         layoutFilter = layoutFilter.filter {category -> category != "Unique Moves" && category != "Unique Move"}
     }
 
-    if (moveSet.moveList != tekken8Moves || moveSet.moveList != streetFighter6Moves || moveSet.moveList != mk1MoveList) {
+    if (moveSet.moveList != tekken8Moves || moveSet.moveList != streetFighter6Moves || moveSet.moveList != mk1Moves) {
         layoutFilter =
             layoutFilter.filter { category -> category != "Mechanics" && category != "Mechanic" && category != "Mechanic Divider" }
     }
@@ -99,7 +96,7 @@ fun CustomGameLayout(
 
                 "Movement" -> IconMoves(
                     moveType = moveType,
-                    moveList = if (moveSet.moveList == numpadNotation) MoveEntryListUiState(numpadNotation) else MoveEntryListUiState(movement),
+                    moveList = if (moveSet.moveList == numpadNotationMoves) MoveEntryListUiState(numpadNotationMoves) else MoveEntryListUiState(movement),
                     updateMoveList = updateMoveList,
                     maxItems = 5,
                     context = context,

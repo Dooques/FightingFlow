@@ -4,7 +4,7 @@ import androidx.compose.runtime.Immutable
 import com.example.fightingflow.util.ImmutableList
 import com.example.fightingflow.util.characterAndMoveData.customInputLayouts.arcSysMoves
 import com.example.fightingflow.util.characterAndMoveData.customInputLayouts.movement
-import com.example.fightingflow.util.characterAndMoveData.customInputLayouts.numpadNotation
+import com.example.fightingflow.util.characterAndMoveData.customInputLayouts.numpadNotationMoves
 import com.example.fightingflow.util.characterAndMoveData.customInputLayouts.tagFighterMoves
 import com.example.fightingflow.util.characterAndMoveData.customInputLayouts.virtuaFighterMoves
 
@@ -27,12 +27,12 @@ class CharacterAndMoveData {
             nintendoInputs,
             tekken8Moves,
             tekken8CharacterMoves,
-            mk1MoveList,
+            mk1Moves,
             mk1CharacterMoves,
             streetFighter6Moves,
             streetFighter6CharacterMoves,
             arcSysMoves,
-            numpadNotation,
+            numpadNotationMoves,
             tagFighterMoves,
             virtuaFighterMoves
         )

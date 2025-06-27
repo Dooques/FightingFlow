@@ -173,7 +173,7 @@ fun IconMoves(
     modifier: Modifier = Modifier,
     moveType: String,
     moveList: MoveEntryListUiState,
-    updateMoveList: KFunction4<String, MoveEntryListUiState, Game, Console?, Unit>,
+    updateMoveList: KFunction4<String, MoveEntryListUiState, Game, Console?, Unit>? = null,
     console: Console?,
     sF6ControlType: SF6ControlType? = SF6ControlType.Invalid,
     context: Context,
@@ -224,20 +224,22 @@ fun IconMoves(
                                 onClick = {
                                     Timber.d("${move.moveName} selected, preparing to add combo to list...")
                                     Timber.d("Move: $move")
-                                    if (moveType == "Misc") {
-                                        updateMoveList(move.moveName, moveList, game, null)
-                                    } else {
-                                        console?.let { outerConsole ->
-                                            Timber.d("Console: $outerConsole")
-                                            Timber.d("Game: $game")
-                                            updateMoveList(
-                                                move.moveName,
-                                                moveList,
-                                                game,
-                                                outerConsole
-                                            )
+                                    if (updateMoveList != null) {
+                                        if (moveType == "Misc") {
+                                            updateMoveList(move.moveName, moveList, game, null)
+                                        } else {
+                                            console?.let { outerConsole ->
+                                                Timber.d("Console: $outerConsole")
+                                                Timber.d("Game: $game")
+                                                updateMoveList(
+                                                    move.moveName,
+                                                    moveList,
+                                                    game,
+                                                    outerConsole
+                                                )
+                                            }
+                                            Timber.d("Added ${move.moveName} to combo move list.")
                                         }
-                                        Timber.d("Added ${move.moveName} to combo move list.")
                                     }
                                 }
                             )
@@ -255,7 +257,7 @@ fun TextMoves(
     moveList: MoveEntryListUiState,
     maxItems: Int = 5,
     console: Console?,
-    updateMoveList: KFunction4<String, MoveEntryListUiState, Game, Console?, Unit>,
+    updateMoveList: KFunction4<String, MoveEntryListUiState, Game, Console?, Unit>? = null,
 ) {
     FlowRow(
         horizontalArrangement = Arrangement.SpaceEvenly,
@@ -325,8 +327,14 @@ fun TextMoves(
                                             "\n $console \n $game")
 
                                     console?.let { outerConsole ->
-
-                                        updateMoveList(move.moveName, moveList, game, outerConsole)
+                                        if (updateMoveList != null) {
+                                            updateMoveList(
+                                                move.moveName,
+                                                moveList,
+                                                game,
+                                                outerConsole
+                                            )
+                                        }
                                     }
                                     Timber.d("Added ${move.moveName} to combo move list.")
                                 }

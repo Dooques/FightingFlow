@@ -19,8 +19,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.fightingflow.R
+import com.example.fightingflow.data.firebase.FirebaseRepository
 import com.example.fightingflow.ui.addCharacterScreen.AddCharacterScreen
 import com.example.fightingflow.ui.addCharacterScreen.AddCharacterViewModel
+import com.example.fightingflow.ui.addCharacterScreen.ControlSchemeDemoScreen
 import com.example.fightingflow.ui.characterScreen.CharacterScreen
 import com.example.fightingflow.ui.characterScreen.CharacterViewModel
 import com.example.fightingflow.ui.comboCreationScreen.ComboCreationScreen
@@ -39,7 +41,8 @@ enum class FlowScreen(@StringRes val title: Int) {
     CharSelect(title = R.string.char_select),
     Combos(title = R.string.combos),
     ComboCreation(title = R.string.combo_creation),
-    AddCharacter(title = R.string.add_character)
+    AddCharacter(title = R.string.add_character),
+    ControlSchemeDemo(title = R.string.control_scheme_demo)
 }
 
 @RequiresApi(Build.VERSION_CODES.Q)
@@ -48,8 +51,8 @@ fun NavGraph(
     navController: NavHostController = rememberNavController(),
     deviceType: WindowSizeClass
 ) {
-    Timber.d("Initializing NavController...")
-    Timber.d("Initializing ViewModels...")
+    Timber.d("Initializing NavController..." +
+            "\n Initializing ViewModels...")
     val comboDisplayViewModel = koinInject<ComboDisplayViewModel>()
     val comboCreationViewModel = koinInject<ComboCreationViewModel>()
     val profileViewModel = koinInject<ProfileViewModel>()
@@ -116,15 +119,26 @@ fun NavGraph(
                 )
             }
 
+            // Add Character Screen
             composable(route = FlowScreen.AddCharacter.name) {
                 Timber.d("Loading Add Character Screen...")
                 AddCharacterScreen(
                     addCharacterViewModel = addCharacterViewModel,
                     characterViewModel = characterViewModel,
                     comboDisplayViewModel = comboDisplayViewModel,
-                    navigateBack = { navController.navigateUp() },
+                    navigateBack =  navController::navigateUp,
                     scope = scope,
-                    snackbarHostState = snackBarHostState
+                    snackbarHostState = snackBarHostState,
+                    navigateToSchemeInfo = { navController.navigate(FlowScreen.ControlSchemeDemo.name) }
+                )
+            }
+
+            // Control Scheme Demo
+            composable(route = FlowScreen.ControlSchemeDemo.name) {
+                Timber.d("-- Loading Control Scheme Demo Screen --")
+                ControlSchemeDemoScreen(
+                    comboDisplayViewModel = comboDisplayViewModel,
+                    navigateBack = navController::navigateUp
                 )
             }
 
