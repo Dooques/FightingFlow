@@ -13,6 +13,7 @@ import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.Console
 import com.example.fightingflow.model.Game
 import com.example.fightingflow.ui.comboCreationScreen.CharacterMoves
+import com.example.fightingflow.ui.comboCreationScreen.ComboCreationViewModel
 import com.example.fightingflow.ui.comboCreationScreen.ComboDescription
 import com.example.fightingflow.ui.comboCreationScreen.DamageAndDifficulty
 import com.example.fightingflow.ui.comboCreationScreen.IconMoves
@@ -32,11 +33,11 @@ import kotlin.reflect.KFunction4
 @Composable
 fun MortalKombatLayout(
     context: Context,
+    comboCreationViewModel: ComboCreationViewModel,
     combo: ComboDisplay,
     character: CharacterEntry,
     console: Console?,
     updateComboData: (ComboDisplayUiState) -> Unit,
-    updateMoveList: KFunction4<String, MoveEntryListUiState, Game, Console?, Unit>,
     moveList: MoveEntryListUiState,
     characterMoveList: MoveEntryListUiState,
     gameMoveList: MoveEntryListUiState,
@@ -56,40 +57,41 @@ fun MortalKombatLayout(
                 )
 
                 "Input" -> if (console == Console.STANDARD) IconMoves(
+                    comboCreationViewModel = comboCreationViewModel,
                     moveType = moveType,
                     moveList = gameMoveList,
-                    updateMoveList = updateMoveList,
                     maxItems = 5,
                     context = context,
                     console = console
                 )
 
                 "Movement", "Console" -> IconMoves(
+                    comboCreationViewModel = comboCreationViewModel,
                     moveType = moveType,
                     moveList = gameMoveList,
-                    updateMoveList = updateMoveList,
                     maxItems = 5,
                     context = context,
                     console = console
                 )
 
                 "Misc" -> IconMoves(
+                    comboCreationViewModel = comboCreationViewModel,
                     moveType = moveType,
                     moveList = moveList,
-                    updateMoveList = updateMoveList,
                     maxItems = 6,
                     context = context,
                     console = console
                 )
 
                 "Special", "Fatal Blow" -> CharacterMoves(
+                    comboCreationViewModel = comboCreationViewModel,
                     characterMoveList = characterMoveList,
                     character = character,
                     moveType = moveType,
-                    updateMoveList = updateMoveList,
                 )
 
                 "Console Text" -> TextMoves(
+                    comboCreationViewModel = comboCreationViewModel,
                     moveType = moveType,
                     moveList = when (console) {
                         Console.PLAYSTATION -> MoveEntryListUiState(playstationInputs)
@@ -97,15 +99,14 @@ fun MortalKombatLayout(
                         Console.NINTENDO -> MoveEntryListUiState(nintendoInputs)
                         else -> MoveEntryListUiState()
                     },
-                    updateMoveList = updateMoveList,
                     console = console,
                     maxItems = 6
                 )
 
                 "MK Input" -> TextMoves(
+                    comboCreationViewModel = comboCreationViewModel,
                     moveType = moveType,
                     moveList = gameMoveList,
-                    updateMoveList = updateMoveList,
                     console = console,
                     maxItems = 4
                 )

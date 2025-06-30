@@ -320,7 +320,7 @@ fun ComboItemEditor(
             if (textComboState) {
                 ComboAsText(comboAsText)
             }
-            ComboInfoBottom(combo, username, fontColor)
+            ComboInfoBottom(combo, fontColor)
         }
     }
 }

@@ -10,28 +10,30 @@ import com.example.fightingflow.util.MoveEntryListUiState
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import timber.log.Timber
+import java.util.UUID
 
 @Entity(tableName = "combo_table")
 data class ComboEntry (
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey
     @ColumnInfo(name = "id")
-    val id: Int = 0,
+    val id: String = UUID.randomUUID().toString(),
     val title: String = "",
-    val character: String,
+    val character: String = "",
     val damage: Int = 0,
     @ColumnInfo(name = "created_by")
     val createdBy: String = "",
     @ColumnInfo(name = "date_created")
-    val dateCreated: String,
+    val dateCreated: String = "",
     val difficulty: Float = 0f,
     val likes: Int = 0,
     val tags: String? = null,
-    val moves: String,
+    val private: Boolean = false,
+    val moves: String = "",
 )
 
 @Immutable
 data class ComboDisplay(
-    val id: Int = 0,
+    val id: String = "",
     val title: String = "",
     val character: String,
     val damage: Int = 0,
@@ -42,6 +44,7 @@ data class ComboDisplay(
     val difficulty: Float = 0f,
     val likes: Int = 0,
     val tags: String? = null,
+    val private: Boolean = false,
     val moves: ImmutableList<MoveEntry>
 )
 
@@ -55,7 +58,7 @@ fun ComboEntry.toDisplay(moveEntryList: MoveEntryListUiState): ComboDisplay =
         dateCreated = dateCreated,
         difficulty = difficulty,
         likes = likes,
-        areOptionsRevealed = false,
+        tags = tags,
         moves = ImmutableList(moveListStringToMoveEntryList(moves, moveEntryList))
     )
 
@@ -69,6 +72,7 @@ fun ComboDisplay.toEntry(character: CharacterEntry): ComboEntry =
         dateCreated = dateCreated,
         difficulty = difficulty,
         likes = likes,
+        tags = tags,
         moves = moveEntryListToMoveListString(moves)
     )
 

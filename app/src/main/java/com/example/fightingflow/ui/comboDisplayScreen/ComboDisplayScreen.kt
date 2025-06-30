@@ -7,9 +7,14 @@ import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,6 +27,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -33,16 +39,20 @@ import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ExperimentalComposeApi
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
@@ -52,8 +62,8 @@ import com.example.fightingflow.ui.comboDisplayScreen.comboItem.ComboItemDisplay
 import com.example.fightingflow.ui.components.ProfileAndConsoleInputMenu
 import com.example.fightingflow.ui.profileScreen.ProfileViewModel
 import com.example.fightingflow.ui.components.ActionIcon
+import com.example.fightingflow.ui.components.ShowPublicCombosMenu
 import com.example.fightingflow.ui.components.SwipeableItem
-import com.example.fightingflow.util.emptyCharacter
 import dev.shreyaspatil.capturable.controller.rememberCaptureController
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -88,14 +98,16 @@ fun ComboDisplayScreen(
     var capturedImage by remember { mutableStateOf<Uri?>(null) }
     var capturedImageFile by remember { mutableStateOf<File?>(null) }
     var shareDataOn by remember { mutableStateOf(false) }
+    var offlineMode by remember { mutableStateOf(false) }
 
     // Room Flows
     val characterState by comboDisplayViewModel.characterState.collectAsStateWithLifecycle()
     val characterListState by comboDisplayViewModel.characterEntryListState.collectAsStateWithLifecycle()
-    val comboDisplayListState by comboDisplayViewModel.comboDisplayListState.collectAsStateWithLifecycle()
+    val comboDisplayListRoom by comboDisplayViewModel.databaseComboDisplayFlow.collectAsStateWithLifecycle()
+    val comboEntryListRoom by comboDisplayViewModel.databaseComboEntryFlow.collectAsStateWithLifecycle()
 
     // Datastore Flows
-    val username by profileViewModel.username.collectAsStateWithLifecycle()
+    val showPublicCombos by comboDisplayViewModel.publicCombosDisplayState.collectAsStateWithLifecycle()
     val characterNameState by comboDisplayViewModel.characterNameState.collectAsStateWithLifecycle()
     val characterImageState by comboDisplayViewModel.characterImageState.collectAsStateWithLifecycle()
     val iconDisplayState by comboDisplayViewModel.showIconState.collectAsStateWithLifecycle()
@@ -105,34 +117,52 @@ fun ComboDisplayScreen(
     val consoleTypeState by comboDisplayViewModel.consoleTypeState.collectAsStateWithLifecycle()
     val sF6ControlType by comboDisplayViewModel.modernOrClassicState.collectAsStateWithLifecycle()
 
-    // ComboCreationViewModel
-    val comboEntryListState by comboDisplayViewModel.comboEntryListUiState.collectAsStateWithLifecycle()
+    // Firebase Flows
+    val comboDisplayListFirebase by comboDisplayViewModel.fireStoreComboDisplayFlow.collectAsStateWithLifecycle()
+    val comboEntryListFirebase by comboDisplayViewModel.fireStoreComboEntryFlow.collectAsStateWithLifecycle()
 
     Timber.d("Console: $consoleTypeState")
-    Timber.d("Combo List: ${comboDisplayListState.comboDisplayList}")
+    Timber.d("Combo List: ${comboDisplayListFirebase.comboDisplayList}")
 
     Timber.d("Updating character data")
-    if (characterNameState.name.isNotEmpty()) {
-        try {
-            Timber.d("Getting ${characterNameState.name} from database...")
-            comboDisplayViewModel.updateCharacterState(characterNameState.name, gameSelectedState)
-            Timber.d("Character returned: $characterState")
-        } catch (e: NoSuchElementException) {
-            Timber.e(e, "Character Error, no element found in character list.")
+    LaunchedEffect(characterNameState.name) {
+        if (characterNameState.name.isNotEmpty()) {
+            try {
+                Timber.d("Getting ${characterNameState.name} from database...")
+                comboDisplayViewModel.updateCharacterState(
+                    characterNameState.name,
+                    gameSelectedState
+                )
+                Timber.d("Character returned: $characterState")
+            } catch (e: NoSuchElementException) {
+                Timber.e(e, "Character Error, no element found in character list.")
+            }
         }
     }
 
     Timber.d("Getting combos by character...")
-    val comboEntryList = comboEntryListState.comboEntryList.toMutableList()
-    val comboDisplayList = comboDisplayListState.comboDisplayList.toMutableList()
-    if (characterState.character != emptyCharacter) {
-        Timber.d("Character has been selected, getting combos...")
-        comboDisplayViewModel.getComboDisplayListByCharacter()
+
+    var comboEntryList = comboEntryListFirebase.comboEntryList.toMutableList()
+    var comboDisplayList = comboDisplayListFirebase.comboDisplayList.toMutableList()
+
+    LaunchedEffect(comboEntryList, comboDisplayList) {
+        if (comboEntryList.isEmpty() && comboDisplayList.isEmpty() &&
+            comboEntryListRoom.comboEntryList.isNotEmpty() && comboDisplayListRoom.comboDisplayList.isNotEmpty()) {
+            offlineMode = true
+            comboEntryList = comboEntryListRoom.comboEntryList.toMutableList()
+            comboDisplayList = comboDisplayListRoom.comboDisplayList.toMutableList()
+        } else {
+            offlineMode = false
+        }
     }
-    Timber.d("Character Details " +
-            "\n Name: ${characterNameState.name} " +
-            "\n Image: ${characterImageState.image}" +
-            "\n CharacterState: ${characterState.character}")
+
+    Timber.d(
+        "Character Details \n Name: %s \n Image: %s \n CharacterState: %s \n Combo List: %s",
+        characterNameState.name,
+        characterImageState.image,
+        characterState.character,
+        comboDisplayList
+    )
     Timber.d("Checking details valid...")
 
     Scaffold(
@@ -176,25 +206,68 @@ fun ComboDisplayScreen(
                         scope.launch {
                             comboDisplayViewModel.updateEditingState(false)
                             onNavigateToComboEditor()
-                        }
-                    }) {
+                        } }
+                    ) {
                         Icon(
                             imageVector = Icons.Default.Add,
                             contentDescription = "Add Combo",
                             modifier = modifier.size(80.dp)
                         )
-                    } },
+                    }
+                    ShowPublicCombosMenu(
+                        showPublicComboState = showPublicCombos,
+                        updatePublicComboState = {
+                            scope.launch {
+                                comboDisplayViewModel.updateShowComboDisplayState(!showPublicCombos)
+                            }
+                        }
+                    )
+                },
                 windowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp)
             )
         }
     ) { contentPadding ->
         Column(Modifier.padding(contentPadding)) {
+            if (!showPublicCombos) {
+                Row(modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)) {
+                    Text("Your Combos", style = MaterialTheme.typography.bodyLarge)
+                }
+            } else {
+                Row(modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)) {
+                    Text("All Combos", style = MaterialTheme.typography.bodyLarge)
+                }
+            }
 
-            LazyColumn(modifier.padding(
-                start = if (uiScale == 1.5f) 40.dp else 4.dp,
-                end = if (uiScale == 1.5f) 16.dp else 0.dp
-            )
+            HorizontalDivider()
+
+            if (offlineMode) {
+                Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
+                    Text(
+                        "Offline Mode: \nUsing internal storage, changes will not be saved to network.",
+                        style = MaterialTheme.typography.bodySmall
+                            .copy(shadow = Shadow(color = Color.Green))
+                    )
+                }
+            }
+
+            LazyColumn(modifier
+                .fillMaxSize()
+                .padding(
+                    start = if (uiScale == 1.5f) 40.dp else 4.dp,
+                    end = if (uiScale == 1.5f) 16.dp else 0.dp
+                )
             ) {
+                if (comboEntryList.isEmpty() && comboDisplayList.isEmpty()) {
+                    item {
+                        Row(
+                            modifier = modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 32.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Text("Nothing to see here, press the plus icon to create a combo!", textAlign = TextAlign.Center)
+                        }
+                    }
+                }
                 Timber.d("Getting display combos as lazy column with swipeable actions.")
                 itemsIndexed(items = comboDisplayList) { index, combo ->
                     val captureController = rememberCaptureController()
@@ -303,7 +376,6 @@ fun ComboDisplayScreen(
                             characterEntryListUiState = characterListState,
                             combo = combo,
                             comboAsText = comboEntryList[index].moves,
-                            username = username,
                             console = consoleTypeState,
                             sf6ControlType = sF6ControlType,
                             iconDisplayState = iconDisplayState,

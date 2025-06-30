@@ -76,7 +76,6 @@ fun ComboInfoTop(
 @Composable
 fun ComboInfoBottom(
     combo: ComboDisplay,
-    profile: String,
     fontColor: Color,
     modifier: Modifier = Modifier
 ) {
@@ -85,10 +84,9 @@ fun ComboInfoBottom(
             Text(text = "Damage: ", color = fontColor)
             Text(text = combo.damage.toString(), color = Color.Red)
         }
-
         Row {
             Text(text = "Created by: ", color = fontColor)
-            Text(text = combo.createdBy.ifEmpty { profile }, color = fontColor)
+            Text(text = combo.createdBy, color = fontColor)
         }
     }
 }

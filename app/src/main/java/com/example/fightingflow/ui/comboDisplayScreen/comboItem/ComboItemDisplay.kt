@@ -37,7 +37,6 @@ fun ComboItemDisplay(
     characterEntryListUiState: CharacterEntryListUiState,
     combo: ComboDisplay,
     comboAsText: String,
-    username: String,
     console: Console?,
     sf6ControlType: SF6ControlType?,
     iconDisplayState: Boolean,
@@ -52,19 +51,15 @@ fun ComboItemDisplay(
             Image(
                 painterResource(
                     characterEntryListUiState.characterList.first { it.name == combo.character }
-                        .imageId
-                ),
+                        .imageId),
                 null,
-                modifier
-                    .size(50.dp)
-                    .align(Alignment.BottomEnd)
+                modifier.size(50.dp).align(Alignment.BottomEnd)
             )
         }
         Column(
             modifier.padding(horizontal = (4 * uiScale).dp, vertical = (4 * uiScale).dp)
         ) {
-            Timber.d("Loading flow row...")
-            Timber.d("Move List: ${combo.moves}")
+            Timber.d("Loading flow row... \n Move List: %s", combo.moves)
             if (display) {
                 ComboInfoTop(combo, uiScale)
             }
@@ -159,7 +154,7 @@ fun ComboItemDisplay(
             if (textComboState) {
                 ComboAsText(comboAsText)
             }
-            ComboInfoBottom(combo, username, fontColor)
+            ComboInfoBottom(combo, fontColor)
         }
     }
 }

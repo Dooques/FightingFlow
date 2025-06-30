@@ -34,7 +34,6 @@ import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
 import kotlin.reflect.KFunction0
 import kotlin.reflect.KFunction4
-import kotlin.reflect.KSuspendFunction0
 
 @Composable
 /* The form used to display the moves in the combo along with the inputs to add more moves to a
@@ -43,16 +42,14 @@ fun ComboForm(
     scope: CoroutineScope,
     snackbarHostState: SnackbarHostState,
     editingState: Boolean,
+    comboCreationViewModel: ComboCreationViewModel,
     username: String,
     game: Game,
     consoleTypeState: Console?,
     sF6ControlType: SF6ControlType?,
     comboDisplay: ComboDisplay,
     originalCombo: ComboDisplay,
-    updateComboData: (ComboDisplayUiState) -> Unit,
-    setSelectedItem: (Int) -> Unit,
     selectedItem: Int,
-    updateMoveList: KFunction4<String, MoveEntryListUiState, Game, Console?, Unit>,
     character: CharacterEntry,
     characterName: String,
     comboAsString: String,
@@ -61,7 +58,8 @@ fun ComboForm(
     gameMoveList: MoveEntryListUiState,
     iconDisplayState: Boolean,
     textComboDisplay: Boolean,
-    saveCombo: KSuspendFunction0<Unit>,
+    setSelectedItem: (Int) -> Unit,
+    updateComboData: (ComboDisplayUiState) -> Unit,
     deleteMove: KFunction0<Unit>,
     clearMoveList: () -> Unit,
     onNavigateToComboDisplay: () -> Unit,
@@ -87,12 +85,12 @@ fun ComboForm(
                 if (textComboDisplay) {
                     ComboAsText("", modifier.padding(horizontal = 4.dp))
                     Box(modifier.padding(horizontal = 4.dp)) {
-                        ComboInfoBottom(emptyComboDisplay, username, Color.White)
+                        ComboInfoBottom(comboDisplay, Color.White)
                     }
                     Spacer(modifier.height(12.dp))
                 } else {
                     Box(modifier.padding(horizontal = 4.dp)) {
-                        ComboInfoBottom(emptyComboDisplay, username, Color.White)
+                        ComboInfoBottom(comboDisplay, Color.White)
                     }
                     Spacer(modifier.height(12.dp))
                 }
@@ -119,15 +117,14 @@ fun ComboForm(
         }
         /* The buttons used to edit the moves in the combo */
         EditingButtons(
+            comboCreationViewModel = comboCreationViewModel,
             deleteMove = deleteMove,
             clearMoveList = clearMoveList,
-            updateMoveList = updateMoveList,
             moveList = moveList,
             scope = scope,
             snackbarHostState = snackbarHostState,
             comboDisplay = comboDisplay,
             game = game,
-            saveCombo = saveCombo,
             editingState = editingState,
             originalCombo = originalCombo,
             onNavigateToComboDisplay = onNavigateToComboDisplay,
@@ -140,13 +137,13 @@ fun ComboForm(
             when (innerGame) {
                 Game.T8 -> TekkenLayout(
                     context = context,
+                    comboCreationViewModel = comboCreationViewModel,
                     comboDisplay = comboDisplay,
                     character = character,
                     characterName = characterName,
                     combo = comboDisplay,
                     console = consoleTypeState,
                     updateComboData = updateComboData,
-                    updateMoveList = updateMoveList,
                     moveList = moveList,
                     characterMoveList = characterMoveList,
                     gameMoveList = gameMoveList
@@ -154,11 +151,11 @@ fun ComboForm(
 
                 Game.SF6 -> StreetFighterLayout(
                     context = context,
+                    comboCreationViewModel = comboCreationViewModel,
                     comboDisplay = comboDisplay,
                     character = character,
                     combo = comboDisplay,
                     updateComboData = updateComboData,
-                    updateMoveList = updateMoveList,
                     console = consoleTypeState,
                     sF6ControlType = sF6ControlType,
                     moveList = moveList,
@@ -168,11 +165,11 @@ fun ComboForm(
 
                 Game.MK1 -> MortalKombatLayout(
                     context = context,
+                    comboCreationViewModel = comboCreationViewModel,
                     combo = comboDisplay,
                     console = consoleTypeState,
                     character = character,
                     updateComboData = updateComboData,
-                    updateMoveList = updateMoveList,
                     moveList = moveList,
                     characterMoveList = characterMoveList,
                     gameMoveList = gameMoveList
@@ -180,12 +177,11 @@ fun ComboForm(
 
                 Game.CUSTOM -> CustomGameLayout(
                     context = context,
+                    comboCreationViewModel = comboCreationViewModel,
                     combo = comboDisplay,
                     updateComboData = updateComboData,
-                    updateMoveList = updateMoveList,
                     character = character,
                     moveList = moveList,
-                    characterMoveList = characterMoveList,
                 )
             }
         }

@@ -32,7 +32,6 @@ import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayViewModel
 import com.example.fightingflow.ui.comboDisplayScreen.comboItem.ComboItemViewModel
 import com.example.fightingflow.ui.profileScreen.ProfileViewModel
 import org.koin.android.ext.koin.androidContext
-import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module

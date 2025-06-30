@@ -171,9 +171,9 @@ fun MoveModifiers(modifier: Modifier = Modifier) {
 @Composable
 fun IconMoves(
     modifier: Modifier = Modifier,
+    comboCreationViewModel: ComboCreationViewModel,
     moveType: String,
     moveList: MoveEntryListUiState,
-    updateMoveList: KFunction4<String, MoveEntryListUiState, Game, Console?, Unit>? = null,
     console: Console?,
     sF6ControlType: SF6ControlType? = SF6ControlType.Invalid,
     context: Context,
@@ -195,12 +195,16 @@ fun IconMoves(
                 else -> Game.CUSTOM
             }
 
-            val move = if (it.moveName in convertibleInputs && game != Game.CUSTOM) convertInputsToConsole(
-                move = it,
-                game = game,
-                console = console,
-                classic = sF6ControlType == SF6ControlType.Classic
-            ) else it
+            var move = it
+
+            if (console != Console.STANDARD) {
+                move = if (it.moveName in convertibleInputs && game != Game.CUSTOM) convertInputsToConsole(
+                    move = it,
+                    game = game,
+                    console = console,
+                    classic = sF6ControlType == SF6ControlType.Classic
+                ) else it
+            }
 
             if (move.moveType == moveType) {
                 val moveId =
@@ -224,23 +228,23 @@ fun IconMoves(
                                 onClick = {
                                     Timber.d("${move.moveName} selected, preparing to add combo to list...")
                                     Timber.d("Move: $move")
-                                    if (updateMoveList != null) {
                                         if (moveType == "Misc") {
-                                            updateMoveList(move.moveName, moveList, game, null)
+                                            comboCreationViewModel.updateMoveList(
+                                                move.moveName,
+                                                moveList
+                                            )
                                         } else {
                                             console?.let { outerConsole ->
                                                 Timber.d("Console: $outerConsole")
                                                 Timber.d("Game: $game")
-                                                updateMoveList(
+                                                comboCreationViewModel.updateMoveList(
                                                     move.moveName,
                                                     moveList,
-                                                    game,
-                                                    outerConsole
+                                                    outerConsole,
                                                 )
                                             }
                                             Timber.d("Added ${move.moveName} to combo move list.")
                                         }
-                                    }
                                 }
                             )
                     )
@@ -253,11 +257,11 @@ fun IconMoves(
 @Composable
 fun TextMoves(
     modifier: Modifier = Modifier,
+    comboCreationViewModel: ComboCreationViewModel,
     moveType: String,
     moveList: MoveEntryListUiState,
     maxItems: Int = 5,
     console: Console?,
-    updateMoveList: KFunction4<String, MoveEntryListUiState, Game, Console?, Unit>? = null,
 ) {
     FlowRow(
         horizontalArrangement = Arrangement.SpaceEvenly,
@@ -327,14 +331,11 @@ fun TextMoves(
                                             "\n $console \n $game")
 
                                     console?.let { outerConsole ->
-                                        if (updateMoveList != null) {
-                                            updateMoveList(
-                                                move.moveName,
-                                                moveList,
-                                                game,
-                                                outerConsole
-                                            )
-                                        }
+                                        comboCreationViewModel.updateMoveList(
+                                            move.moveName,
+                                            moveList,
+                                            outerConsole
+                                        )
                                     }
                                     Timber.d("Added ${move.moveName} to combo move list.")
                                 }
@@ -349,11 +350,11 @@ fun TextMoves(
 
 @Composable
 fun CharacterMoves(
+    comboCreationViewModel: ComboCreationViewModel,
     modifier: Modifier = Modifier,
     characterMoveList: MoveEntryListUiState,
     character: CharacterEntry,
     moveType: String,
-    updateMoveList: KFunction4<String, MoveEntryListUiState, Game, Console?, Unit>,
     maxItems: Int = 5,
 ) {
     Timber.d("Moves: $characterMoveList")
@@ -395,7 +396,7 @@ fun CharacterMoves(
                                 enabled = true,
                                 onClick = {
                                     Timber.d("${move.moveName} selected, preparing to add combo to list...")
-                                    updateMoveList(move.moveName, characterMoveList, game, null)
+                                    comboCreationViewModel.updateMoveList(move.moveName, characterMoveList)
                                     Timber.d("Added ${move.moveName} to combo move list.")
                                 }
                             )
@@ -459,8 +460,8 @@ fun DamageAndDifficulty(
 fun ConfirmButton(
     scope: CoroutineScope,
     snackbarHostState: SnackbarHostState,
+    comboCreationViewModel: ComboCreationViewModel,
     comboDisplay: ComboDisplay,
-    saveCombo: KSuspendFunction0<Unit>,
     editingState: Boolean,
     originalCombo: ComboDisplay,
     onNavigateToComboDisplay: () -> Unit,
@@ -490,16 +491,14 @@ fun ConfirmButton(
                             ).run { when (this) {
                                 SnackbarResult.Dismissed -> Timber.d("Snackbar Dismissed")
                                 SnackbarResult.ActionPerformed -> {
-                                    saveCombo()
-                                    onNavigateToComboDisplay()
+                                    saveLogic(comboCreationViewModel, onNavigateToComboDisplay)
                                 }
                             } }
                         }
                     } else {
                         scope.launch {
                             Timber.d("Saving combo")
-                            saveCombo()
-                            onNavigateToComboDisplay()
+                            saveLogic(comboCreationViewModel, onNavigateToComboDisplay)
                         }
                     }
                 } else {
@@ -516,16 +515,16 @@ fun ConfirmButton(
                             ).run { when (this) {
                                 SnackbarResult.Dismissed -> Timber.d("Snackbar Dismissed")
                                 SnackbarResult.ActionPerformed -> {
-                                    saveCombo()
-                                    onNavigateToComboDisplay()
+                                    Timber.d("Saving Combo")
+                                    saveLogic(comboCreationViewModel, onNavigateToComboDisplay)
                                 }
-                            } }
+                            }
+                            }
                         }
                     } else {
                         scope.launch {
                             Timber.d("Saving combo")
-                            saveCombo()
-                            onNavigateToComboDisplay()
+                            saveLogic(comboCreationViewModel, onNavigateToComboDisplay)
                         }
                     }
                 }
@@ -548,16 +547,15 @@ fun ConfirmButton(
 fun EditingButtons(
     scope: CoroutineScope,
     snackbarHostState: SnackbarHostState,
+    comboCreationViewModel: ComboCreationViewModel,
     game: Game,
     comboDisplay: ComboDisplay,
-    saveCombo: KSuspendFunction0<Unit>,
     editingState: Boolean,
     originalCombo: ComboDisplay,
     onNavigateToComboDisplay: () -> Unit,
     moveList: MoveEntryListUiState,
     deleteMove: () -> Unit,
     clearMoveList: () -> Unit,
-    updateMoveList: KFunction4<String, MoveEntryListUiState, Game, Console?, Unit>,
     modifier: Modifier = Modifier
 ) {
     Timber.d("Loading confirm and clear buttons")
@@ -568,7 +566,7 @@ fun EditingButtons(
         // Add Break
         OutlinedButton(
             onClick = {
-                updateMoveList("break", moveList, game, null)
+                comboCreationViewModel.updateMoveList("break", moveList)
                 Timber.d("Adding break to combo move list.")
             },
             colors = ButtonDefaults.buttonColors().copy(
@@ -600,11 +598,24 @@ fun EditingButtons(
         ConfirmButton(
             scope = scope,
             snackbarHostState = snackbarHostState,
+            comboCreationViewModel = comboCreationViewModel,
             comboDisplay = comboDisplay,
-            saveCombo = saveCombo,
             editingState = editingState,
             originalCombo = originalCombo,
             onNavigateToComboDisplay = onNavigateToComboDisplay,
         )
+    }
+}
+
+suspend fun saveLogic(
+    comboCreationViewModel: ComboCreationViewModel,
+    onNavigateToComboDisplay: () -> Unit
+) {
+    val result = comboCreationViewModel.saveCombo()
+    if (result is ComboResult.Success) {
+        onNavigateToComboDisplay()
+    } else {
+        if (result is ComboResult.Error)
+            Timber.e(result.e, "An error occured while trying to save the combo: ")
     }
 }

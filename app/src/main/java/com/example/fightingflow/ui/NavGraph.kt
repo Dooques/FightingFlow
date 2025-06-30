@@ -137,6 +137,7 @@ fun NavGraph(
             composable(route = FlowScreen.ControlSchemeDemo.name) {
                 Timber.d("-- Loading Control Scheme Demo Screen --")
                 ControlSchemeDemoScreen(
+                    comboCreationViewModel = comboCreationViewModel,
                     comboDisplayViewModel = comboDisplayViewModel,
                     navigateBack = navController::navigateUp
                 )

@@ -20,11 +20,11 @@ interface ComboDsRepository {
     suspend fun updateComboIdState(comboDisplay: ComboDisplay)
     suspend fun updateEditingState(editingStateValue: Boolean)
 
-    fun getComboId(): Flow<Int>
+    fun getComboId(): Flow<String>
     fun getEditingState(): Flow<Boolean>
 
     companion object {
-        val comboId = intPreferencesKey("combo_id")
+        val comboId = stringPreferencesKey("combo_id")
         val editingState = booleanPreferencesKey("editing_state")
     }
 }
@@ -50,7 +50,7 @@ class ComboDatastoreRepository(private val dataStore: DataStore<Preferences>): C
 
     override fun getComboId() = dataStore.data
         .map { preference ->
-            preference[comboId] ?: 0
+            preference[comboId] ?: ""
         }
 
     override fun getEditingState(): Flow<Boolean> = dataStore.data

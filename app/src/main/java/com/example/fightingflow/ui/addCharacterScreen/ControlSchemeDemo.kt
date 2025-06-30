@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.fightingflow.model.Console
 import com.example.fightingflow.model.MoveEntry
+import com.example.fightingflow.ui.comboCreationScreen.ComboCreationViewModel
 import com.example.fightingflow.ui.comboCreationScreen.IconMoves
 import com.example.fightingflow.ui.comboCreationScreen.TextMoves
 import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayViewModel
@@ -48,11 +49,13 @@ import com.example.fightingflow.util.characterAndMoveData.customInputLayouts.mov
 import com.example.fightingflow.util.characterAndMoveData.customInputLayouts.numpadNotationMoves
 import com.example.fightingflow.util.characterAndMoveData.customInputLayouts.tagFighterMoves
 import com.example.fightingflow.util.characterAndMoveData.customInputLayouts.virtuaFighterMoves
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ControlSchemeDemoScreen(
     comboDisplayViewModel: ComboDisplayViewModel,
+    comboCreationViewModel: ComboCreationViewModel,
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -120,6 +123,7 @@ fun ControlSchemeDemoScreen(
                 items(items = controlDemoLayout, key = { it }) { scheme ->
                     SchemeDisplay(
                         context = context,
+                        comboCreationViewModel = comboCreationViewModel,
                         schemeName = scheme,
                         movementInputs = MoveEntryListUiState(
                             schemeList.first { it.name == scheme }
@@ -143,6 +147,7 @@ fun ControlSchemeDemoScreen(
 @Composable
 fun SchemeDisplay(
     context: Context,
+    comboCreationViewModel: ComboCreationViewModel,
     schemeName: String,
     movementInputs: MoveEntryListUiState,
     iconInputs: MoveEntryListUiState,
@@ -159,6 +164,7 @@ fun SchemeDisplay(
             )
         Text(text = "Movement", style = MaterialTheme.typography.bodyLarge, modifier = modifier.padding(horizontal = 16.dp))
         IconMoves(
+            comboCreationViewModel = comboCreationViewModel,
             moveType = "Movement",
             moveList = if (schemeName == "Numpad Notation") movementInputs else MoveEntryListUiState(movement),
             console = console,
@@ -168,6 +174,7 @@ fun SchemeDisplay(
         HorizontalDivider(modifier.padding(vertical = 8.dp))
         Text(text = "Inputs", style = MaterialTheme.typography.bodyLarge, modifier = modifier.padding(horizontal = 16.dp))
         IconMoves(
+            comboCreationViewModel = comboCreationViewModel,
             moveType = "Input",
             moveList = iconInputs,
             console = console,
@@ -176,6 +183,7 @@ fun SchemeDisplay(
         )
         if (textInputs.moveList.isNotEmpty()) {
             TextMoves(
+                comboCreationViewModel = comboCreationViewModel,
                 moveType = "Text Input",
                 moveList = textInputs,
                 maxItems = 6,

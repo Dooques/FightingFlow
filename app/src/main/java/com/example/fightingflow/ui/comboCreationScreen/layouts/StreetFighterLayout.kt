@@ -14,6 +14,7 @@ import com.example.fightingflow.model.Console
 import com.example.fightingflow.model.Game
 import com.example.fightingflow.model.SF6ControlType
 import com.example.fightingflow.ui.comboCreationScreen.CharacterMoves
+import com.example.fightingflow.ui.comboCreationScreen.ComboCreationViewModel
 import com.example.fightingflow.ui.comboCreationScreen.ComboDescription
 import com.example.fightingflow.ui.comboCreationScreen.DamageAndDifficulty
 import com.example.fightingflow.ui.comboCreationScreen.IconMoves
@@ -33,11 +34,11 @@ import kotlin.reflect.KFunction4
 @Composable
 fun StreetFighterLayout(
     context: Context,
+    comboCreationViewModel: ComboCreationViewModel,
     comboDisplay: ComboDisplay,
     character: CharacterEntry,
     combo: ComboDisplay,
     updateComboData: (ComboDisplayUiState) -> Unit,
-    updateMoveList: KFunction4<String, MoveEntryListUiState, Game, Console?, Unit>,
     console: Console?,
     sF6ControlType: SF6ControlType?,
     moveList: MoveEntryListUiState,
@@ -62,9 +63,9 @@ fun StreetFighterLayout(
                 )
 
                 "Misc" -> IconMoves(
+                    comboCreationViewModel = comboCreationViewModel,
                     moveType = moveType,
                     moveList = moveList,
-                    updateMoveList = updateMoveList,
                     maxItems = 6,
                     context = context,
                     console = console,
@@ -72,9 +73,9 @@ fun StreetFighterLayout(
                 )
 
                 "Movement" -> IconMoves(
+                    comboCreationViewModel = comboCreationViewModel,
                     moveType = moveType,
                     moveList = gameMoveList,
-                    updateMoveList = updateMoveList,
                     maxItems = 5,
                     context = context,
                     console = console,
@@ -82,17 +83,17 @@ fun StreetFighterLayout(
                 )
 
                 "Console" -> IconMoves(
+                    comboCreationViewModel = comboCreationViewModel,
                     moveType = moveType,
                     moveList = gameMoveList,
-                    updateMoveList = updateMoveList,
                     context = context,
                     console = console,
                 )
 
                 "Complex Movement" -> IconMoves(
+                    comboCreationViewModel = comboCreationViewModel,
                     moveType = moveType,
                     moveList = gameMoveList,
-                    updateMoveList = updateMoveList,
                     maxItems = 3,
                     context = context,
                     console = console,
@@ -101,22 +102,23 @@ fun StreetFighterLayout(
 
                 "SF Modern", "SF Classic" -> if (console == Console.STANDARD)
                     IconMoves(
+                        comboCreationViewModel = comboCreationViewModel,
                         context = context,
                         moveType = moveType,
                         moveList = gameMoveList,
-                        updateMoveList = updateMoveList,
                         console = console,
                         maxItems = if (moveType == "SF Modern") 4 else 3
                     )
 
                 "Mechanic" -> TextMoves(
+                    comboCreationViewModel = comboCreationViewModel,
                     moveType = moveType,
                     moveList = gameMoveList,
-                    updateMoveList = updateMoveList,
                     console = console
                 )
 
                 "Console Text" -> TextMoves(
+                    comboCreationViewModel = comboCreationViewModel,
                     moveType = moveType,
                     moveList = when (console) {
                         Console.PLAYSTATION -> MoveEntryListUiState(playstationInputs)
@@ -124,16 +126,15 @@ fun StreetFighterLayout(
                         Console.NINTENDO -> MoveEntryListUiState(nintendoInputs)
                         else -> MoveEntryListUiState()
                     },
-                    updateMoveList = updateMoveList,
                     console = console,
                     maxItems = 6
                 )
 
                 "Special", "Super Art" -> CharacterMoves(
+                    comboCreationViewModel = comboCreationViewModel,
                     characterMoveList = characterMoveList,
                     character = character,
                     moveType = moveType,
-                    updateMoveList = updateMoveList
                 )
 
                 "Divider" ->

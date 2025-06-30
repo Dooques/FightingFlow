@@ -1,28 +1,39 @@
 package com.example.fightingflow.ui.characterScreen
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,16 +41,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.example.fightingflow.R
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.ui.addCharacterScreen.AddCharacterViewModel
 import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayViewModel
@@ -69,15 +85,15 @@ fun CharacterScreen(
 ) {
     Timber.d("-- Loading Character Screen --")
 
+
     val characterListState by comboDisplayViewModel.characterEntryListState.collectAsStateWithLifecycle()
     val gameSelectedState by characterScreenViewModel.gameSelected.collectAsStateWithLifecycle()
     val modernOrClassicState by characterScreenViewModel.modernOrClassicState.collectAsStateWithLifecycle()
     val customGameList by characterScreenViewModel.customGameList.collectAsStateWithLifecycle()
 
-    Timber.d("-- Flows Collected --")
-    Timber.d("Character List: ${characterListState.characterList}")
-    Timber.d("Game Selected From DS: $gameSelectedState")
-    Timber.d("Custom Game List: $customGameList")
+    Timber.d("-- Flows Collected -- \n Character List: %s " +
+            "\n Game Selected From DS: %s \n Custom Game List: %s",
+        characterListState.characterList, gameSelectedState, customGameList)
 
     var gameSelected by remember { mutableStateOf<String?>(null) }
 
@@ -89,8 +105,7 @@ fun CharacterScreen(
             if (game == "All") {
                 Timber.d("Getting all custom characters")
                 comboDisplayViewModel.getCustomCharacters()
-            }
-            else {
+            } else {
                 Timber.d("Getting characters for $game")
                 comboDisplayViewModel.getCharacterEntryListByGame(game)
             }
@@ -101,6 +116,7 @@ fun CharacterScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Characters", style = MaterialTheme.typography.displaySmall) },
+                colors = TopAppBarDefaults.largeTopAppBarColors().copy(containerColor = Color.Transparent),
                 actions = {
                     IconButton(
                         onClick = {
@@ -122,13 +138,24 @@ fun CharacterScreen(
                         updateConsoleInput = { comboDisplayViewModel.updateConsoleType(it) }
                     )
                 },
-                windowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp),
+                windowInsets = WindowInsets(0.dp),
             )
         },
+        modifier = modifier
     ) { contentPadding ->
-
-        Column(Modifier.padding(contentPadding)) {
-            Row(modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier
+                .padding(
+                    start = contentPadding.calculateStartPadding(LayoutDirection.Ltr),
+                    top = contentPadding.calculateTopPadding(),
+                    end = contentPadding.calculateEndPadding(LayoutDirection.Ltr)
+                )
+                .fillMaxSize()
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Start
+            ) {
                 GameSelectedMenu(
                     scope = scope,
                     characterScreenViewModel = characterScreenViewModel,
@@ -138,11 +165,15 @@ fun CharacterScreen(
                     customGameList = customGameList
                 )
             }
+            HorizontalDivider()
             Timber.d("-- Loading Character Grid --")
             LazyVerticalGrid(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly,
-                columns = GridCells.Fixed(3)
+                columns = GridCells.Fixed(3),
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
             ) {
                 Timber.d("Loading Character Grid...")
                 items(items = characterListState.characterList.sortedBy { it.name }) { character ->
@@ -156,7 +187,7 @@ fun CharacterScreen(
                         navigateToComboDisplayScreen = navigateToComboDisplayScreen,
                         navigateToAddCharacterScreen = navigateToAddCharacter,
                         characterState = CharacterEntryUiState(character),
-                        modifier = modifier
+                        modifier = Modifier
                     )
                 }
                 Timber.d("Character Grid Finished.")
@@ -186,7 +217,10 @@ fun CharacterCard(
                 onClick = {
                     scope.launch {
                         Timber.d("Preparing to open Combo Screen...")
-                        updateCharacterState(characterState.character.name, characterState.character.game)
+                        updateCharacterState(
+                            characterState.character.name,
+                            characterState.character.game
+                        )
                         Timber.d("Updated Character State in Combo View Model")
                         Timber.d("Preparing to add ${characterState.character.name} to datastore")
                         setCharacterToDS(characterState.character)
@@ -212,9 +246,9 @@ fun CharacterCard(
             if (characterState.character.mutable) {
                 val currentImageUri = currentCharacter.imageUri
                 if (!currentImageUri.isNullOrBlank()) {
-                    Timber.d(message = "Character is Custom and URI is not null" +
-                            "\nLoading image from files..." +
-                            "\n Uri: $currentImageUri")
+                    Timber.d("Character is Custom and URI is not null " +
+                            "\n Loading image from files... \n Uri: %s",
+                        currentImageUri)
                     AsyncImage(
                         model = currentImageUri.toUri(),
                         contentDescription = null,
@@ -253,8 +287,10 @@ fun CharacterCard(
                     characterEntry = characterState.character,
                     navigateToAddCharacter = {
                         scope.launch {
-                            Timber.d("-- Preparing to launch Add Character Screen --" +
-                                    "\n Updating character state to: ${characterState.character.name}")
+                            Timber.d(
+                                "-- Preparing to launch Add Character Screen --" +
+                                        "\n Updating character state to: ${characterState.character.name}"
+                            )
                             setCharacterToDS(characterState.character)
                             Timber.d("Updating selected game to: ${characterState.character.game}")
                             characterScreenViewModel.updateGameInDs(characterState.character.game)
@@ -272,7 +308,7 @@ fun CharacterCard(
 }
 
 @Composable
-fun GameSelectedHeader(gameSelected: String, modifier: Modifier = Modifier) {
+fun GameSelectedHeader(gameSelected: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth()
@@ -289,20 +325,29 @@ fun GameSelectedHeader(gameSelected: String, modifier: Modifier = Modifier) {
             style = MaterialTheme.typography.bodyLarge,
             modifier = modifier.padding(start = 16.dp)
         )
-        Text(
-            text = gameSelected,
-            style = MaterialTheme.typography.bodyLarge
-                .copy(
-                    shadow = Shadow(
-                        color = gameColor,
-                        offset = Offset(10f, 10f),
-                        blurRadius = 30f,
-                    )
-                ),
-            color = Color.White,
-            fontWeight = FontWeight.ExtraBold,
-            modifier = modifier
-                .padding(horizontal = 8.dp, vertical = 4.dp)
-        )
+
+        Box {
+            Text(
+                text = gameSelected,
+                style = MaterialTheme.typography.bodyLarge
+                    .copy(
+                        shadow = Shadow(
+                            color = gameColor,
+                            offset = Offset(10f, 10f),
+                            blurRadius = 30f,
+                        )
+                    ),
+                color = Color.White,
+                fontWeight = FontWeight.ExtraBold,
+                modifier = modifier
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
+            )
+            Box(
+                modifier
+                    .padding(4.dp)
+                    .clip(RoundedCornerShape(25.dp))
+                    .clickable(onClick = onClick)
+            )
+        }
     }
 }

@@ -19,7 +19,7 @@ val emptyCharacter = CharacterEntry(
 )
 
 val emptyComboDisplay = ComboDisplay(
-    id = 0,
+    id = "",
     title = "",
     character = "",
     damage = 0,
@@ -29,7 +29,7 @@ val emptyComboDisplay = ComboDisplay(
 )
 
 val emptyComboEntry = ComboEntry(
-    id = 0,
+    id = "",
     title = "",
     character = "",
     damage = 0,

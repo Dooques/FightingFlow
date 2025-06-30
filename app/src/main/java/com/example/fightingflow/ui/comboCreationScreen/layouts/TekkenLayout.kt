@@ -13,6 +13,7 @@ import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.Console
 import com.example.fightingflow.model.Game
 import com.example.fightingflow.ui.comboCreationScreen.CharacterMoves
+import com.example.fightingflow.ui.comboCreationScreen.ComboCreationViewModel
 import com.example.fightingflow.ui.comboCreationScreen.ComboDescription
 import com.example.fightingflow.ui.comboCreationScreen.DamageAndDifficulty
 import com.example.fightingflow.ui.comboCreationScreen.IconMoves
@@ -31,13 +32,13 @@ import kotlin.reflect.KFunction4
 @Composable
 fun TekkenLayout(
     context: Context,
+    comboCreationViewModel: ComboCreationViewModel,
     comboDisplay: ComboDisplay,
     character: CharacterEntry,
     characterName: String,
     combo: ComboDisplay,
     console: Console?,
     updateComboData: (ComboDisplayUiState) -> Unit,
-    updateMoveList: KFunction4<String, MoveEntryListUiState, Game, Console?, Unit>,
     moveList: MoveEntryListUiState,
     characterMoveList: MoveEntryListUiState,
     gameMoveList: MoveEntryListUiState,
@@ -68,46 +69,47 @@ fun TekkenLayout(
                 )
 
                 "Movement" -> IconMoves(
+                    comboCreationViewModel = comboCreationViewModel,
                     moveType = moveType,
                     moveList = gameMoveList,
-                    updateMoveList = updateMoveList,
                     context = context,
                     console = console,
                 )
 
                 "Console" -> IconMoves(
+                    comboCreationViewModel = comboCreationViewModel,
                     moveType = moveType,
                     moveList = gameMoveList,
-                    updateMoveList = updateMoveList,
                     context = context,
                     console = console,
                 )
 
                 "Input" -> if (console == Console.STANDARD) IconMoves(
+                    comboCreationViewModel = comboCreationViewModel,
                     moveType = moveType,
                     moveList = gameMoveList,
-                    updateMoveList = updateMoveList,
                     context = context,
                     console = console,
                 )
 
                 "Misc" -> IconMoves(
+                    comboCreationViewModel = comboCreationViewModel,
                     moveType = moveType,
                     moveList = moveList,
-                    updateMoveList = updateMoveList,
                     maxItems = 6,
                     context = context,
                     console = console
                 )
 
                 "Common", "Mechanic", "Stage" -> TextMoves(
+                    comboCreationViewModel = comboCreationViewModel,
                     moveType = moveType,
                     moveList = gameMoveList,
-                    updateMoveList = updateMoveList,
                     console = console,
                 )
 
                 "Console Text" -> TextMoves(
+                    comboCreationViewModel = comboCreationViewModel,
                     moveType = moveType,
                     moveList = when (console) {
                         Console.PLAYSTATION -> MoveEntryListUiState(playstationInputs)
@@ -115,24 +117,23 @@ fun TekkenLayout(
                         Console.NINTENDO -> MoveEntryListUiState(nintendoInputs)
                         else -> MoveEntryListUiState()
                     },
-                    updateMoveList = updateMoveList,
                     console = console,
                     maxItems = 6
                 )
 
                 "Mishima" -> if (character.name in mishima) TextMoves(
+                    comboCreationViewModel = comboCreationViewModel,
                     moveType = moveType,
                     moveList = characterMoveList,
-                    updateMoveList = updateMoveList,
                     maxItems = if (characterMoveList.moveList.size <= 4) 4 else 5,
                     console = console
                 )
 
                 "Character" -> CharacterMoves(
+                    comboCreationViewModel = comboCreationViewModel,
                     characterMoveList = characterMoveList,
                     moveType = moveType,
                     character = character,
-                    updateMoveList = updateMoveList,
                 )
 
                 "Divider" -> InputDivider()

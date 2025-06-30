@@ -13,6 +13,7 @@ import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.Console
 import com.example.fightingflow.model.ControlType
 import com.example.fightingflow.model.Game
+import com.example.fightingflow.ui.comboCreationScreen.ComboCreationViewModel
 import com.example.fightingflow.ui.comboCreationScreen.ComboDescription
 import com.example.fightingflow.ui.comboCreationScreen.DamageAndDifficulty
 import com.example.fightingflow.ui.comboCreationScreen.IconMoves
@@ -36,12 +37,11 @@ import kotlin.reflect.KFunction4
 @Composable
 fun CustomGameLayout(
     context: Context,
+    comboCreationViewModel: ComboCreationViewModel,
     combo: ComboDisplay,
     character: CharacterEntry,
     moveList: MoveEntryListUiState,
-    characterMoveList: MoveEntryListUiState,
     updateComboData: (ComboDisplayUiState) -> Unit,
-    updateMoveList: KFunction4<String, MoveEntryListUiState, Game, Console?, Unit>,
     modifier: Modifier = Modifier
 ) {
     Timber.d("-- Loading Input Selector --")
@@ -86,18 +86,18 @@ fun CustomGameLayout(
                 )
 
                 "Input", "SF Classic" -> if (console == Console.STANDARD) IconMoves(
+                    comboCreationViewModel = comboCreationViewModel,
                     moveType = moveType,
                     moveList = moveSet,
-                    updateMoveList = updateMoveList,
                     maxItems = if (moveType == "SF Classic") 3 else 5,
                     context = context,
                     console = console
                 )
 
                 "Movement" -> IconMoves(
+                    comboCreationViewModel = comboCreationViewModel,
                     moveType = moveType,
                     moveList = if (moveSet.moveList == numpadNotationMoves) MoveEntryListUiState(numpadNotationMoves) else MoveEntryListUiState(movement),
-                    updateMoveList = updateMoveList,
                     maxItems = 5,
                     context = context,
                     console = console
@@ -113,28 +113,28 @@ fun CustomGameLayout(
 //                )
 
                 "Misc" -> IconMoves(
+                    comboCreationViewModel = comboCreationViewModel,
                     moveType = moveType,
                     moveList = moveList,
-                    updateMoveList = updateMoveList,
                     maxItems = 6,
                     context = context,
                     console = console
                 )
 
                 "Mechanic", "Text Input" -> TextMoves(
+                    comboCreationViewModel = comboCreationViewModel,
                     moveList = moveSet,
                     moveType = moveType,
                     console = console,
-                    updateMoveList = updateMoveList,
                 )
 
                 "Unique Move" -> TextMoves(
+                    comboCreationViewModel = comboCreationViewModel,
                     moveType = moveType,
                     moveList = MoveEntryListUiState(moveList.moveList.filter {
                         it.game == character.game && it.character == character.name
                     }),
                     console = console,
-                    updateMoveList = updateMoveList
                 )
 
 //                "Console Text" -> TextMoves(

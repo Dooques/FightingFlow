@@ -3,7 +3,7 @@ package com.example.fightingflow.util.characterAndMoveData.customInputLayouts
 import com.example.fightingflow.model.MoveEntry
 import com.example.fightingflow.util.ImmutableList
 
-val movement = ImmutableList<MoveEntry> (
+val movement = ImmutableList (
     listOf(
         MoveEntry(moveName = "forward", notation = "f", moveType = "Movement", character = "Generic", game = "Tekken 8"),
         MoveEntry(moveName = "up", notation = "u", moveType = "Movement", character = "Generic", game = "Tekken 8"),

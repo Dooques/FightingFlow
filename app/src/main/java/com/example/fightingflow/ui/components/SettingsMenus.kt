@@ -71,6 +71,39 @@ fun ProfileAndConsoleInputMenu(
 }
 
 @Composable
+fun ShowPublicCombosMenu(
+    updatePublicComboState: () -> Unit,
+    showPublicComboState: Boolean,
+    modifier: Modifier = Modifier
+) {
+    var menuExpanded by remember { mutableStateOf(false) }
+    IconButton(onClick = {menuExpanded = !menuExpanded}) {
+        Icon(
+            imageVector = Icons.Default.Settings,
+            contentDescription = "Settings"
+        )
+        Box(modifier = modifier.fillMaxSize()) {
+            DropdownMenu(
+                expanded = menuExpanded,
+                onDismissRequest = { menuExpanded = false }
+            ) {
+                DropdownMenuItem(
+                    text = { Text(
+                        if (showPublicComboState) "Show Your Combos"
+                        else "Show All Combos"
+                    ) },
+                    onClick = {
+                        menuExpanded = !menuExpanded
+                        updatePublicComboState()
+                    }
+
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun ConsoleInputsMenu(
     optionSelected: (Console) -> Unit,
     onDismiss: () -> Unit,
@@ -134,19 +167,18 @@ fun GameSelectedMenu(
         contentAlignment = Alignment.Center,
         modifier = modifier.fillMaxWidth()
     ) {
-        gameSelected?.let { game ->
-            GameSelectedHeader(
-                gameSelected = game,
-                modifier = modifier.align(Alignment.CenterStart)
-            )
-        }
-
         var gameMenuExpanded by remember { mutableStateOf(false) }
         var sf6OptionsExpanded by remember { mutableStateOf(false) }
         var customGameListExpanded by remember { mutableStateOf(false) }
 
-        IconButton(
-            onClick = { gameMenuExpanded = !gameMenuExpanded },
+        gameSelected?.let { game ->
+            GameSelectedHeader(
+                gameSelected = game,
+                onClick = { gameMenuExpanded = !gameMenuExpanded },
+                modifier = modifier.align(Alignment.CenterStart)
+            )
+        }
+        Box(
             modifier = modifier
                 .fillMaxWidth(0.4f)
                 .align(Alignment.Center)

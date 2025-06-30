@@ -126,30 +126,22 @@ fun AddCharacterScreen(
         }
     }
 
-    Timber.d("-- Flows --" +
-            "\n Custom Game List: $customGameList" +
-            "\n -- Character --" +
-            "\n Char to Edit Name: $characterNameFromDs " +
-            "\n Game: $gameSelectedState\n " +
-            "\n New Character Values: $character" +
-            "\n Name: ${character.name}" +
-            "\n Fighting Style: ${character.fightingStyle}" +
-            "\n Control Type: ${character.controlType}" +
-            "\n Game: ${character.game}" +
-            "\n Unique Moves: ${character.uniqueMoves}" +
-            "\n Image URI: ${character.imageUri}" +
-            "\n Mutable: ${character.mutable}\n " +
+    Timber.d("-- Flows -- " +
+            "\n Custom Game List: %s \n Existing Character Values \n Char to Edit Name: %s \n Game: %s \n ",
+        customGameList, characterNameFromDs, gameSelectedState)
 
-            "\n Existing Character: ${characterUiStateVM.character}" +
-            "\n Name: ${characterUiStateVM.character.fightingStyle}" +
-            "\n Fighting Style: ${characterUiStateVM.character.controlType}" +
-            "\n Control Type: ${characterUiStateVM.character.game}" +
-            "\n Game: ${characterUiStateVM.character.uniqueMoves}" +
-            "\n Unique Moves: ${characterUiStateVM.character.imageUri}" +
-            "\n Image URI: ${characterUiStateVM.character.mutable}\n " +
-            "\n Other values:" +
-            "\n Editing State: $editState"
-    )
+    Timber.d("\n New Character Values: %s \n Name: %s \n Fighting Style: %s Control Type: %s \n Game: %s" +
+            "\n Unique Moves: %s \n Image URI: %s \n Mutable: %s \n ",
+        character, character.name, character.fightingStyle, character.controlType, character.game,
+        character.uniqueMoves, character.imageUri, character.mutable)
+
+    Timber.d(
+        "\n Existing Character: %s \n Name: %s \n Fighting Style: %s \n Control Type: %s" +
+                "\n Game: %s \n Unique Moves: %s \n Image URI: %s \n ",
+        characterUiStateVM.character, characterUiStateVM.character.fightingStyle,
+        characterUiStateVM.character.controlType, characterUiStateVM.character.game,
+        characterUiStateVM.character.uniqueMoves, characterUiStateVM.character.imageUri,
+        characterUiStateVM.character.mutable)
 
     Scaffold(
         topBar = {

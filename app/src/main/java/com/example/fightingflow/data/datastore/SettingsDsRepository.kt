@@ -11,6 +11,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.example.fightingflow.data.datastore.SettingsDsRepository.Companion.controlType
 import com.example.fightingflow.data.datastore.SettingsDsRepository.Companion.game
 import com.example.fightingflow.data.datastore.SettingsDsRepository.Companion.modernOrClassicState
+import com.example.fightingflow.data.datastore.SettingsDsRepository.Companion.publicCombosDisplayState
 import com.example.fightingflow.data.datastore.SettingsDsRepository.Companion.showComboTextState
 import com.example.fightingflow.data.datastore.SettingsDsRepository.Companion.showIconState
 import kotlinx.coroutines.flow.Flow
@@ -22,12 +23,14 @@ interface SettingsDsRepository {
     suspend fun updateShowComboTextState(showText: Boolean)
     suspend fun updateSf6ControlType(type: Int)
     suspend fun updateGameSelected(selectedGame: String)
+    suspend fun updatePublicComboDisplayState(boolean: Boolean)
 
     fun getGame(): Flow<String>
     fun getConsoleType(): Flow<Int>
     fun getIconDisplayState(): Flow<Boolean>
     fun getComboTextState(): Flow<Boolean>
     fun getSF6ControlType(): Flow<Int>
+    fun getPublicComboDisplayState(): Flow<Boolean>
 
     companion object {
         val controlType = intPreferencesKey(name = "control_type")
@@ -35,6 +38,7 @@ interface SettingsDsRepository {
         val showComboTextState = booleanPreferencesKey(name = "show_combo_text")
         val game = stringPreferencesKey(name = "game_name")
         val modernOrClassicState = intPreferencesKey(name = "modern_or_classic")
+        val publicCombosDisplayState = booleanPreferencesKey(name = "show_public_combos")
     }
 }
 
@@ -71,6 +75,12 @@ class SettingsDatastoreRepository(private val dataStore: DataStore<Preferences>)
         }
     }
 
+    override suspend fun updatePublicComboDisplayState(boolean: Boolean) {
+        dataStore.edit { preference ->
+            preference[publicCombosDisplayState] = boolean
+        }
+    }
+
     /* Get Values */
     override fun getConsoleType(): Flow<Int> = dataStore.data
         .map { preference ->
@@ -96,6 +106,12 @@ class SettingsDatastoreRepository(private val dataStore: DataStore<Preferences>)
         .map { preference ->
             preference[modernOrClassicState] ?: 0
         }
+
+    override fun getPublicComboDisplayState(): Flow<Boolean> =
+        dataStore.data
+            .map { preference ->
+                preference[publicCombosDisplayState] ?: false
+            }
 }
 
 
