@@ -8,29 +8,29 @@ import androidx.room.Room
 import com.example.fightingflow.data.database.FlowDataRepository
 import com.example.fightingflow.data.database.FlowDatabase
 import com.example.fightingflow.data.database.FlowRepository
-import com.example.fightingflow.data.database.ProfileDatabaseRepository
-import com.example.fightingflow.data.database.ProfileDbRepository
 import com.example.fightingflow.data.database.dao.CharacterDao
 import com.example.fightingflow.data.database.dao.ComboDao
 import com.example.fightingflow.data.database.dao.MoveDao
-import com.example.fightingflow.data.database.dao.ProfileDao
 import com.example.fightingflow.data.datastore.CharacterDatastoreRepository
 import com.example.fightingflow.data.datastore.CharacterDsRepository
 import com.example.fightingflow.data.datastore.ComboDatastoreRepository
 import com.example.fightingflow.data.datastore.ComboDsRepository
 import com.example.fightingflow.data.datastore.ProfileDatastoreRepository
-import com.example.fightingflow.data.datastore.ProfileDsRepository
+import com.example.fightingflow.data.datastore.UserDsRepository
 import com.example.fightingflow.data.datastore.SettingsDatastoreRepository
 import com.example.fightingflow.data.datastore.SettingsDsRepository
 import com.example.fightingflow.data.firebase.FirebaseRepository
+import com.example.fightingflow.data.firebase.GoogleAuthRepository
+import com.example.fightingflow.data.firebase.GoogleAuthService
 import com.example.fightingflow.data.mediastore.MediaStoreUtil
 import com.example.fightingflow.ui.InitViewModel
-import com.example.fightingflow.ui.addCharacterScreen.AddCharacterViewModel
-import com.example.fightingflow.ui.characterScreen.CharacterViewModel
-import com.example.fightingflow.ui.comboCreationScreen.ComboCreationViewModel
-import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayViewModel
+import com.example.fightingflow.viewmodels.AddCharacterViewModel
+import com.example.fightingflow.viewmodels.CharacterViewModel
+import com.example.fightingflow.viewmodels.ComboCreationViewModel
+import com.example.fightingflow.viewmodels.ComboDisplayViewModel
 import com.example.fightingflow.ui.comboDisplayScreen.comboItem.ComboItemViewModel
-import com.example.fightingflow.ui.profileScreen.ProfileViewModel
+import com.example.fightingflow.viewmodels.AuthViewModel
+import com.example.fightingflow.viewmodels.UserViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
@@ -39,7 +39,6 @@ import org.koin.dsl.module
 private const val USER_SETTINGS = "settings"
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = USER_SETTINGS)
 
-fun provideUserDao(flowDatabase: FlowDatabase): ProfileDao = flowDatabase.getUserDao()
 fun provideCharacterDao(flowDatabase: FlowDatabase): CharacterDao = flowDatabase.getCharacterDao()
 fun provideMoveDao(flowDatabase: FlowDatabase): MoveDao = flowDatabase.getMoveDao()
 fun provideComboDao(flowDatabase: FlowDatabase): ComboDao = flowDatabase.getComboDao()
@@ -54,7 +53,6 @@ fun provideDatabase(context: Context) =
 
 val databaseModule = module {
     singleOf(::provideDatabase)
-    singleOf(::provideUserDao)
     singleOf(::provideCharacterDao)
     singleOf(::provideComboDao)
     singleOf(::provideMoveDao)
@@ -62,11 +60,10 @@ val databaseModule = module {
 
 val repositoryModule = module {
     // Database
-    single<ProfileDbRepository> { ProfileDatabaseRepository(get()) }
     single<FlowRepository> { FlowDataRepository(get(), get(), get()) }
 
     // DataStore
-    single<ProfileDsRepository> { ProfileDatastoreRepository(androidContext().dataStore) }
+    single<UserDsRepository> { ProfileDatastoreRepository(androidContext().dataStore) }
     single<CharacterDsRepository> { CharacterDatastoreRepository(androidContext().dataStore) }
     single<ComboDsRepository> { ComboDatastoreRepository(androidContext().dataStore) }
     single<SettingsDsRepository> { SettingsDatastoreRepository(androidContext().dataStore) }
@@ -76,15 +73,17 @@ val repositoryModule = module {
 
     // Firebase
     singleOf(::FirebaseRepository)
+    single<GoogleAuthService> { GoogleAuthRepository(get()) }
 
 }
 
 val viewModelModule = module {
-    viewModelOf(::ProfileViewModel)
+    viewModelOf(::UserViewModel)
     viewModelOf(::InitViewModel)
     viewModelOf(::ComboDisplayViewModel)
     viewModelOf(::ComboCreationViewModel)
     viewModelOf(::CharacterViewModel)
     viewModelOf(::ComboItemViewModel)
     viewModelOf(::AddCharacterViewModel)
+    viewModelOf(::AuthViewModel)
 }

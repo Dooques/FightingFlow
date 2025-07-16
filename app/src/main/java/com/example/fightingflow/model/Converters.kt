@@ -38,10 +38,10 @@ class UserConverter {
     private val jsonAdapter = Moshi.Builder()
         .addLast(KotlinJsonAdapterFactory())
         .build()
-        .adapter(ProfileEntry::class.java)
+        .adapter(UserEntry::class.java)
 
     @TypeConverter
-    fun userToString(user: ProfileEntry?) =
+    fun userToString(user: UserEntry?) =
         user?.let { jsonAdapter.toJson(it) } ?: ""
 
     @TypeConverter

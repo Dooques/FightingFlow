@@ -60,10 +60,12 @@ import com.example.fightingflow.R
 import com.example.fightingflow.data.mediastore.MediaStoreUtil
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ControlType
-import com.example.fightingflow.ui.characterScreen.CharacterViewModel
-import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayViewModel
+import com.example.fightingflow.viewmodels.CharacterViewModel
+import com.example.fightingflow.viewmodels.ComboDisplayViewModel
 import com.example.fightingflow.util.emptyCharacter
 import com.example.fightingflow.util.featureColor
+import com.example.fightingflow.viewmodels.AddCharacterViewModel
+import com.example.fightingflow.viewmodels.CharacterDbResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject

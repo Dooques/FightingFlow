@@ -7,7 +7,6 @@ import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,7 +26,6 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -57,13 +55,14 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.fightingflow.data.mediastore.MediaStoreUtil
-import com.example.fightingflow.ui.comboCreationScreen.ComboCreationViewModel
+import com.example.fightingflow.viewmodels.ComboCreationViewModel
 import com.example.fightingflow.ui.comboDisplayScreen.comboItem.ComboItemDisplay
 import com.example.fightingflow.ui.components.ProfileAndConsoleInputMenu
-import com.example.fightingflow.ui.profileScreen.ProfileViewModel
+import com.example.fightingflow.viewmodels.UserViewModel
 import com.example.fightingflow.ui.components.ActionIcon
 import com.example.fightingflow.ui.components.ShowPublicCombosMenu
 import com.example.fightingflow.ui.components.SwipeableItem
+import com.example.fightingflow.viewmodels.ComboDisplayViewModel
 import dev.shreyaspatil.capturable.controller.rememberCaptureController
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -88,7 +87,7 @@ fun ComboDisplayScreen(
     (context as? Activity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
 
     val mediaStoreUtil = koinInject<MediaStoreUtil>()
-    val profileViewModel = koinInject<ProfileViewModel>()
+    val profileViewModel = koinInject<UserViewModel>()
 
     val fontColor = MaterialTheme.colorScheme.onBackground
     val scope = rememberCoroutineScope()
@@ -112,6 +111,7 @@ fun ComboDisplayScreen(
     val characterImageState by comboDisplayViewModel.characterImageState.collectAsStateWithLifecycle()
     val iconDisplayState by comboDisplayViewModel.showIconState.collectAsStateWithLifecycle()
     val gameSelectedState by comboDisplayViewModel.gameSelectedState.collectAsStateWithLifecycle()
+    val userState by profileViewModel.username.collectAsStateWithLifecycle()
 
     val textComboState by comboDisplayViewModel.textComboState.collectAsStateWithLifecycle()
     val consoleTypeState by comboDisplayViewModel.consoleTypeState.collectAsStateWithLifecycle()
@@ -121,8 +121,8 @@ fun ComboDisplayScreen(
     val comboDisplayListFirebase by comboDisplayViewModel.fireStoreComboDisplayFlow.collectAsStateWithLifecycle()
     val comboEntryListFirebase by comboDisplayViewModel.fireStoreComboEntryFlow.collectAsStateWithLifecycle()
 
-    Timber.d("Console: $consoleTypeState")
-    Timber.d("Combo List: ${comboDisplayListFirebase.comboDisplayList}")
+    Timber.d("Console: %s \nCombo List: %s",
+        consoleTypeState, comboDisplayListFirebase.comboDisplayList)
 
     Timber.d("Updating character data")
     LaunchedEffect(characterNameState.name) {
@@ -238,8 +238,6 @@ fun ComboDisplayScreen(
                 }
             }
 
-            HorizontalDivider()
-
             if (offlineMode) {
                 Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
                     Text(
@@ -313,6 +311,7 @@ fun ComboDisplayScreen(
                                 icon = Icons.Default.Share,
                                 modifier = modifier.fillMaxHeight()
                             )
+                            if (userState == combo.createdBy) {
                             // Edit Combo
                             ActionIcon(
                                 onclick = {
@@ -329,24 +328,25 @@ fun ComboDisplayScreen(
                                 modifier = modifier.fillMaxHeight()
                             )
                             // Delete Combo
-                            ActionIcon(
-                                onclick = {
-                                    scope.launch {
-                                        comboDisplayViewModel.deleteCombo(
-                                            combo,
-                                        )
-                                        Timber.d("UI deleted: $combo")
-                                    }
-                                    Toast.makeText(
-                                        context,
-                                        "Combo ${combo.id} was deleted.",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                },
-                                tint = Color.Red,
-                                icon = Icons.Default.Delete,
-                                modifier = modifier.fillMaxHeight()
-                            )
+                                ActionIcon(
+                                    onclick = {
+                                        scope.launch {
+                                            comboDisplayViewModel.deleteCombo(
+                                                combo,
+                                            )
+                                            Timber.d("UI deleted: $combo")
+                                        }
+                                        Toast.makeText(
+                                            context,
+                                            "Combo ${combo.id} was deleted.",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    },
+                                    tint = Color.Red,
+                                    icon = Icons.Default.Delete,
+                                    modifier = modifier.fillMaxHeight()
+                                )
+                            }
                             var settingsMenuExpanded by remember { mutableStateOf(false) }
                             ActionIcon(
                                 onclick = {

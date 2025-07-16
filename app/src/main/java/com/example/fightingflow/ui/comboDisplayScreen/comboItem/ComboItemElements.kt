@@ -46,28 +46,33 @@ fun ComboInfoTop(
             Row(
                 modifier = modifier.align(Alignment.CenterEnd)
             ) {
-
                 Text(text = combo.character, fontSize = fontSize)
                 Spacer(modifier.width((4 * uiScale).dp))
-                Text(text = "|")
-                Spacer(modifier.width((4 * uiScale).dp))
-                Text(text = combo.dateCreated, fontSize = fontSize)
-                Spacer(modifier.width((4 * uiScale).dp))
-                Text(text = "|")
-                Spacer(modifier.width((4 * uiScale).dp))
-                Text(
-                    text = "★".repeat(combo.difficulty.toInt()),
-                    color = Color.Yellow,
-                    fontSize = fontSize,
-                    style = font
-                )
+                if (combo.dateCreated.isNotBlank()) {
+                    Text(text = "|")
+                    Spacer(modifier.width((4 * uiScale).dp))
+                    Text(text = combo.dateCreated, fontSize = fontSize)
+                    Spacer(modifier.width((4 * uiScale).dp))
+                }
+                if (combo.difficulty != 0f) {
+                    Text(text = "|")
+                    Spacer(modifier.width((4 * uiScale).dp))
+                    Text(
+                        text = "★".repeat(combo.difficulty.toInt()),
+                        color = Color.Yellow,
+                        fontSize = fontSize,
+                        style = font
+                    )
+                }
             }
         }
-        Box(Modifier.fillMaxWidth()) {
-            Row(
-                modifier = modifier.align(alignment = Alignment.CenterStart)
-            ) {
-                Text(text = combo.title, fontSize = fontSize)
+        if (combo.title.isNotBlank()) {
+            Box(Modifier.fillMaxWidth()) {
+                Row(
+                    modifier = modifier.align(alignment = Alignment.CenterStart)
+                ) {
+                    Text(text = combo.title, fontSize = fontSize)
+                }
             }
         }
     }

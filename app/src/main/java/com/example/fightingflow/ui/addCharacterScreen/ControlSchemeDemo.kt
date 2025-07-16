@@ -15,7 +15,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -26,10 +25,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -38,18 +33,16 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.fightingflow.model.Console
 import com.example.fightingflow.model.MoveEntry
-import com.example.fightingflow.ui.comboCreationScreen.ComboCreationViewModel
+import com.example.fightingflow.viewmodels.ComboCreationViewModel
 import com.example.fightingflow.ui.comboCreationScreen.IconMoves
 import com.example.fightingflow.ui.comboCreationScreen.TextMoves
-import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayViewModel
-import com.example.fightingflow.ui.components.ConsoleInputsMenu
+import com.example.fightingflow.viewmodels.ComboDisplayViewModel
 import com.example.fightingflow.util.MoveEntryListUiState
 import com.example.fightingflow.util.characterAndMoveData.customInputLayouts.arcSysMoves
 import com.example.fightingflow.util.characterAndMoveData.customInputLayouts.movement
 import com.example.fightingflow.util.characterAndMoveData.customInputLayouts.numpadNotationMoves
 import com.example.fightingflow.util.characterAndMoveData.customInputLayouts.tagFighterMoves
 import com.example.fightingflow.util.characterAndMoveData.customInputLayouts.virtuaFighterMoves
-import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

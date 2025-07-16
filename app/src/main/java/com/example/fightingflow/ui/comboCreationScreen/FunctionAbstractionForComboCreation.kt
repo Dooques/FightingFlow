@@ -39,10 +39,8 @@ fun updateMoveListAbstract(
 ): ComboDisplay {
     Timber.d("-- Adding move to Combo --")
     var moveToAdd = moveList.first { it.moveName == moveName}
-    Timber.d("MoveToAdd: $moveToAdd " +
-            "\n Game: $game " +
-            "\n MoveName: $moveName"
-    )
+
+    Timber.d("MoveToAdd: %s \n Game: %s \n MoveName: %s", moveToAdd, game, moveName)
     val gameSelected = if (game.contains("Tekken")) { Game.T8 }
     else if (game.contains("Mortal Kombat")) { Game.MK1 }
     else if (game.contains("Street Fighter")) { Game.SF6 }

@@ -1,13 +1,12 @@
-package com.example.fightingflow.ui.comboDisplayScreen
+package com.example.fightingflow.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fightingflow.data.database.FlowRepository
 import com.example.fightingflow.data.datastore.CharacterDsRepository
 import com.example.fightingflow.data.datastore.ComboDsRepository
-import com.example.fightingflow.data.datastore.ProfileDatastoreRepository
-import com.example.fightingflow.data.datastore.ProfileDsRepository
 import com.example.fightingflow.data.datastore.SettingsDsRepository
+import com.example.fightingflow.data.datastore.UserDsRepository
 import com.example.fightingflow.data.firebase.FirebaseRepository
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
@@ -15,7 +14,6 @@ import com.example.fightingflow.model.Console
 import com.example.fightingflow.model.SF6ControlType
 import com.example.fightingflow.model.toDisplay
 import com.example.fightingflow.model.toEntry
-import com.example.fightingflow.ui.comboCreationScreen.ComboCreationViewModel
 import com.example.fightingflow.util.CharImageUiState
 import com.example.fightingflow.util.CharNameUiState
 import com.example.fightingflow.util.CharacterEntryListUiState
@@ -37,7 +35,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import kotlin.collections.emptyList
 
 class ComboDisplayViewModel(
     private val flowRepository: FlowRepository,
@@ -45,7 +42,7 @@ class ComboDisplayViewModel(
     private val comboDsRepository: ComboDsRepository,
     private val settingsDsRepository: SettingsDsRepository,
     private val firebaseRepository: FirebaseRepository,
-    private val profileDsRepository: ProfileDsRepository
+    private val profileDsRepository: UserDsRepository
 ): ViewModel() {
 
     companion object {
@@ -63,10 +60,10 @@ class ComboDisplayViewModel(
     val characterState: StateFlow<CharacterEntryUiState> = _characterState
 
     init {
-        Timber.d("Initializing Combo Display View Model...")
-        Timber.d("Getting move entry list...")
+        Timber.Forest.d("Initializing Combo Display View Model...")
+        Timber.Forest.d("Getting move entry list...")
         getAllMoveEntries()
-        Timber.d("Getting Combo Display List")
+        Timber.Forest.d("Getting Combo Display List")
     }
 
 
@@ -74,7 +71,7 @@ class ComboDisplayViewModel(
             .map { CharNameUiState(it) }
             .stateIn(
                 scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIME_MILLIS),
+                started = SharingStarted.Companion.WhileSubscribed(TIME_MILLIS),
                 initialValue = CharNameUiState()
             )
 
@@ -96,11 +93,11 @@ class ComboDisplayViewModel(
                                 })
                             }
                             .catch { exception ->
-                                Timber.e(exception, "Error collecting firestore combo flow: ")
+                                Timber.Forest.e(exception, "Error collecting firestore combo flow: ")
                                 emit(ComboDisplayListUiState())
                             }
                     } else {
-                        Timber.d("Character name is blank, emitting empty list.")
+                        Timber.Forest.d("Character name is blank, emitting empty list.")
                         flowOf(ComboDisplayListUiState())
                     }
                 }
@@ -108,7 +105,7 @@ class ComboDisplayViewModel(
         }
             .stateIn(
                 scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(ComboCreationViewModel.Companion.TIME_MILLIS * 6),
+                started = SharingStarted.Companion.WhileSubscribed(ComboCreationViewModel.Companion.TIME_MILLIS * 6),
                 initialValue = ComboDisplayListUiState()
             )
 
@@ -125,11 +122,11 @@ class ComboDisplayViewModel(
                         )
                             .map { entryList -> ComboEntryListUiState(entryList) }
                             .catch { exception ->
-                                Timber.e(exception, "Error collecting firestore combo flow: ")
+                                Timber.Forest.e(exception, "Error collecting firestore combo flow: ")
                                 emit(ComboEntryListUiState())
                             }
                     } else {
-                        Timber.d("Character name is blank, emitting empty list.")
+                        Timber.Forest.d("Character name is blank, emitting empty list.")
                         flowOf(ComboEntryListUiState())
                     }
                 }
@@ -137,7 +134,7 @@ class ComboDisplayViewModel(
         }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(ComboCreationViewModel.Companion.TIME_MILLIS * 6),
+            started = SharingStarted.Companion.WhileSubscribed(ComboCreationViewModel.Companion.TIME_MILLIS * 6),
             initialValue = ComboEntryListUiState()
         )
 
@@ -149,17 +146,17 @@ class ComboDisplayViewModel(
                     flowRepository.getAllCombosByCharacter(characterName.name)
                         .map { entryList -> ComboEntryListUiState(entryList ?: emptyList()) }
                         .catch { exception ->
-                            Timber.e(exception, "Error collecting combo entry list from database.")
+                            Timber.Forest.e(exception, "Error collecting combo entry list from database.")
                             emit(ComboEntryListUiState())
                         }
                 } else {
-                    Timber.d("Character name is blank, emitting empty list.")
+                    Timber.Forest.d("Character name is blank, emitting empty list.")
                     flowOf(ComboEntryListUiState())
                 }
             }
             .stateIn(
                 scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIME_MILLIS),
+                started = SharingStarted.Companion.WhileSubscribed(TIME_MILLIS),
                 initialValue = ComboEntryListUiState()
             )
 
@@ -168,20 +165,23 @@ class ComboDisplayViewModel(
         .flatMapLatest { characterName ->
             if (characterName.name.isNotBlank()) {
                 flowRepository.getAllCombosByCharacter(characterName.name)
-                    .map { entryList -> ComboDisplayListUiState(entryList?.map { entry ->
-                        entry.toDisplay(moveEntryListUiState.value) } ?: emptyList()) }
+                    .map { entryList ->
+                        ComboDisplayListUiState(entryList?.map { entry ->
+                            entry.toDisplay(moveEntryListUiState.value)
+                        } ?: emptyList())
+                    }
                     .catch { exception ->
-                        Timber.e(exception, "Error collecting combo entry list from database.")
+                        Timber.Forest.e(exception, "Error collecting combo entry list from database.")
                         emit(ComboDisplayListUiState())
                     }
             } else {
-                Timber.d("Character name is blank, emitting empty list.")
+                Timber.Forest.d("Character name is blank, emitting empty list.")
                 flowOf(ComboDisplayListUiState())
             }
         }
             .stateIn(
                 scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIME_MILLIS),
+                started = SharingStarted.Companion.WhileSubscribed(TIME_MILLIS),
                 initialValue = ComboDisplayListUiState()
             )
 
@@ -190,7 +190,7 @@ class ComboDisplayViewModel(
         .map { it }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(TIME_MILLIS),
+            started = SharingStarted.Companion.WhileSubscribed(TIME_MILLIS),
             initialValue = ""
         )
 
@@ -198,7 +198,7 @@ class ComboDisplayViewModel(
         .map { CharImageUiState(it) }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(TIME_MILLIS),
+            started = SharingStarted.Companion.WhileSubscribed(TIME_MILLIS),
             initialValue = CharImageUiState()
         )
 
@@ -206,7 +206,7 @@ class ComboDisplayViewModel(
         .map { it }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(TIME_MILLIS),
+            started = SharingStarted.Companion.WhileSubscribed(TIME_MILLIS),
             initialValue = ""
         )
 
@@ -214,7 +214,7 @@ class ComboDisplayViewModel(
         .map { it }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(TIME_MILLIS),
+            started = SharingStarted.Companion.WhileSubscribed(TIME_MILLIS),
             initialValue = true
         )
 
@@ -222,7 +222,7 @@ class ComboDisplayViewModel(
         .map { it }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(TIME_MILLIS),
+            started = SharingStarted.Companion.WhileSubscribed(TIME_MILLIS),
             initialValue = false
         )
 
@@ -235,7 +235,7 @@ class ComboDisplayViewModel(
         } }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(TIME_MILLIS),
+            started = SharingStarted.Companion.WhileSubscribed(TIME_MILLIS),
             initialValue = Console.STANDARD
         )
 
@@ -249,7 +249,7 @@ class ComboDisplayViewModel(
         }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(TIME_MILLIS),
+            started = SharingStarted.Companion.WhileSubscribed(TIME_MILLIS),
             initialValue = SF6ControlType.Invalid
         )
 
@@ -257,36 +257,36 @@ class ComboDisplayViewModel(
         .map { it }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(TIME_MILLIS),
+            started = SharingStarted.Companion.WhileSubscribed(TIME_MILLIS),
             initialValue = false
         )
 
     // Datastore Functions
     fun updateCharacterState(name: String, game: String) {
         viewModelScope.launch {
-            Timber.d("-- Getting character from Database -- \n Character: %s \n Game: %s",
+            Timber.Forest.d("-- Getting character from Database -- \n Character: %s \n Game: %s",
                 name, game)
             flowRepository.getCharacterByNameAndGame(name, game)
                 .map { it ?: emptyCharacter }
                 .collect { characterEntry ->
-                    Timber.d("Character: $characterEntry")
+                    Timber.Forest.d("Character: $characterEntry")
                     _characterState.update { CharacterEntryUiState(characterEntry) }
                 }
         }
     }
 
     suspend fun updateCharacterInDS(character: CharacterEntry) {
-            Timber.d("Setting ${character.name} to Character Datastore")
+            Timber.Forest.d("Setting ${character.name} to Character Datastore")
             characterDsRepository.updateCharacter(character)
     }
 
     fun updateShowIconDisplayState(iconState: Boolean) = viewModelScope.launch {
-        Timber.d("Updating Icon Display State...")
+        Timber.Forest.d("Updating Icon Display State...")
         settingsDsRepository.updateIconDisplayState(iconState)
     }
 
     fun updateShowComboTextState(textCombo: Boolean) = viewModelScope.launch {
-        Timber.d("Updating Combo Text State...")
+        Timber.Forest.d("Updating Combo Text State...")
         settingsDsRepository.updateShowComboTextState(textCombo)
     }
 
@@ -323,11 +323,11 @@ class ComboDisplayViewModel(
     }
 
     fun getCharacterEntryListByGame(game: String) = viewModelScope.launch {
-        Timber.d("Updating character entry list state")
-        Timber.d("Game selected: $game")
+        Timber.Forest.d("Updating character entry list state")
+        Timber.Forest.d("Game selected: $game")
         flowRepository.getCharactersByGame(game)
             .map { characterList ->
-                Timber.d("CharacterList: $characterList")
+                Timber.Forest.d("CharacterList: $characterList")
                 CharacterEntryListUiState(characterList)
             }
             .collect { characterList ->
@@ -345,12 +345,12 @@ class ComboDisplayViewModel(
     }
 
     suspend fun deleteCombo(combo: ComboDisplay) {
-        Timber.d("Deleting: $combo...")
+        Timber.Forest.d("Deleting: $combo...")
         flowRepository.deleteCombo(combo.toEntry(characterEntryListState.value.characterList.first {it.name == combo.character}))
-        Timber.d("Combo deleted from database.")
+        Timber.Forest.d("Combo deleted from database.")
         firebaseRepository.deleteCombo(combo.character, combo.id)
-        Timber.d("Combo deleted from firestore.")
-        Timber.d("Combo Deleted.")
+        Timber.Forest.d("Combo deleted from firestore.")
+        Timber.Forest.d("Combo Deleted.")
     }
 
 

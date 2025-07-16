@@ -29,11 +29,10 @@ import com.example.fightingflow.ui.comboDisplayScreen.comboItem.ComboItemEditor
 import com.example.fightingflow.ui.comboDisplayScreen.comboItem.ComboInfoBottom
 import com.example.fightingflow.util.ComboDisplayUiState
 import com.example.fightingflow.util.MoveEntryListUiState
-import com.example.fightingflow.util.emptyComboDisplay
+import com.example.fightingflow.viewmodels.ComboCreationViewModel
 import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
 import kotlin.reflect.KFunction0
-import kotlin.reflect.KFunction4
 
 @Composable
 /* The form used to display the moves in the combo along with the inputs to add more moves to a
@@ -101,8 +100,6 @@ fun ComboForm(
             ComboItemEditor(
                 context = context,
                 combo = comboDisplay,
-                characterEntry = character,
-                username = username,
                 console = consoleTypeState,
                 sf6ControlType = sF6ControlType,
                 fontColor = MaterialTheme.colorScheme.onBackground,

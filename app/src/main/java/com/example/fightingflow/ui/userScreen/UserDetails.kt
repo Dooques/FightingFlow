@@ -1,0 +1,249 @@
+package com.example.fightingflow.ui.userScreen
+
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterEnd
+import androidx.compose.ui.Alignment.Companion.CenterStart
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
+import com.example.fightingflow.data.firebase.GoogleAuthService
+import com.example.fightingflow.viewmodels.AuthViewModel
+import com.example.fightingflow.viewmodels.UserDetailsState
+import com.example.fightingflow.viewmodels.UserViewModel
+import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import timber.log.Timber
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun UserDetailsScreen(
+    scope: CoroutineScope,
+    userViewModel: UserViewModel,
+    authViewModel: AuthViewModel,
+    navigateBack: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Timber.d("--Loading user details--")
+
+    val currentUser by authViewModel.signInState.collectAsStateWithLifecycle()
+    val userDetails by userViewModel.userDetailsState.collectAsStateWithLifecycle()
+    var menuExpanded by remember { mutableStateOf(false) }
+
+    Timber.d("Flows Collected: \nCurrent User: %s\nUser Details: %s", currentUser, userDetails)
+
+    LaunchedEffect(currentUser) {
+        Timber.d("Getting user details from firestore.")
+        if (currentUser is GoogleAuthService.SignInState.Success) {
+            userViewModel.getUserFromFb((currentUser as GoogleAuthService.SignInState.Success).user.userId)
+        }
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "Your Details",
+                        style = MaterialTheme.typography.displayMedium,
+                        modifier = modifier.padding(start = 16.dp)
+                    ) },
+                navigationIcon = {
+                    IconButton(
+                        onClick = { navigateBack() }
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                            contentDescription = "Return to Character Select",
+                            modifier = modifier.size(50.dp)
+                        )
+                    } },) },
+        contentWindowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp)
+    ) { contentPadding ->
+
+        Column(
+            modifier
+                .fillMaxSize()
+                .padding(contentPadding)
+        ) {
+            Spacer(modifier.size(20.dp))
+            if (currentUser is GoogleAuthService.SignInState.Success) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                ) {
+                    Box(Modifier.fillMaxWidth().padding(horizontal = 32.dp)) {
+                        if (userDetails is UserDetailsState.Loaded) {
+                            Text(
+                                text = (userDetails as UserDetailsState.Loaded).user.username.toString(),
+                                style = MaterialTheme.typography.displayMedium,
+                                modifier = modifier.align(CenterStart)
+                            )
+                        }
+                        Box(
+                            modifier = modifier.align(CenterEnd)
+                        ) {
+                            AsyncImage(
+                                model = (currentUser as GoogleAuthService.SignInState.Success).user.photo,
+                                contentDescription = "User Image",
+                                modifier = modifier
+                                    .size(80.dp)
+                                    .clip(CircleShape)
+                                    .clickable(onClick = { menuExpanded = true })
+                            )
+                            ChangeProfileImage(
+                                menuExpanded,
+                                onDismissRequest = { menuExpanded = false })
+                        }
+                    }
+                }
+                Spacer(modifier.size(20.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start,
+                    modifier = modifier.fillMaxWidth().padding(vertical = 8.dp)
+                ) {
+                    Text(
+                        "Name: ${(currentUser as GoogleAuthService.SignInState.Success).user.displayName.toString()}",
+                        modifier = modifier.padding(horizontal = 32.dp)
+                    )
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start,
+                    modifier = modifier.fillMaxWidth().padding(vertical = 8.dp)
+                ) {
+                    Text(
+                        "Email: ${(currentUser as GoogleAuthService.SignInState.Success).user.email.toString()}",
+                        modifier = modifier.padding(horizontal = 32.dp)
+                    )
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start,
+                    modifier = modifier.fillMaxWidth().padding(vertical = 8.dp)
+                ) {
+                    Text(
+                        "UserId: ${(currentUser as GoogleAuthService.SignInState.Success).user.userId}",
+                        modifier = modifier.padding(horizontal = 32.dp)
+                    )
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start,
+                    modifier = modifier.fillMaxWidth().padding(vertical = 8.dp)
+                ) {
+                    if (userDetails is UserDetailsState.Loaded) {
+                        Text(
+                            "Date Created: ${(userDetails as UserDetailsState.Loaded).user.dateCreated}",
+                            modifier = modifier.padding(horizontal = 32.dp)
+                        )
+                    }
+                }
+                Spacer(modifier.size(20.dp))
+
+                OutlinedButton(
+                    onClick = {
+                        Timber.d("Logging out %s", (currentUser as GoogleAuthService.SignInState.Success).user.displayName)
+                        authViewModel.signOut()
+                        navigateBack()
+                    },
+                    modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 40.dp, vertical = 8.dp)
+                ) {
+                    Text("Log Out", color = Color.White)
+                }
+                OutlinedButton(
+                    onClick = {
+                        Timber.d("Deleting current User...")
+                        scope.launch {
+                            val result = authViewModel.deleteUser()
+                            if (result != null) {
+                                when {
+                                    result.isSuccess -> {
+                                        userViewModel.deleteUser((currentUser as GoogleAuthService.SignInState.Success).user.userId)
+                                        navigateBack()
+                                    }
+
+                                    result.isFailure -> {
+                                        val exception = result.exceptionOrNull()
+                                        if (exception is FirebaseAuthRecentLoginRequiredException) {
+                                            authViewModel.initiateGoogleSignIn()
+                                            val resultReauth = authViewModel.deleteUser()
+                                            if (resultReauth != null) {
+                                                when {
+                                                    resultReauth.isSuccess -> {
+                                                        userViewModel.deleteUser((currentUser as GoogleAuthService.SignInState.Success).user.userId)
+                                                        authViewModel.signOut()
+                                                        navigateBack()
+                                                    }
+                                                    resultReauth.isFailure -> Timber.e(
+                                                        resultReauth.exceptionOrNull(),
+                                                        "Error deleting user"
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                    },
+                    modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 40.dp, vertical = 8.dp)
+                ) {
+                    Text("Delete Account", color = Color.White)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ChangeProfileImage(menuExpanded: Boolean, onDismissRequest: () -> Unit) {
+    DropdownMenu(expanded = menuExpanded, onDismissRequest = onDismissRequest) {
+        DropdownMenuItem(
+            text = { Text("Change Profile Photo") },
+            onClick = {}
+        )
+    }
+}

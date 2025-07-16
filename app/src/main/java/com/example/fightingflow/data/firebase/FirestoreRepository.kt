@@ -1,7 +1,7 @@
 package com.example.fightingflow.data.firebase
 
 import com.example.fightingflow.model.ComboEntry
-import com.example.fightingflow.model.ProfileEntry
+import com.example.fightingflow.model.UserEntry
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentSnapshot
@@ -167,31 +167,88 @@ class FirebaseRepository() {
     }
 
     /* User Collection */
-    fun addUserToStore(profile: ProfileEntry) {
+    suspend fun addUserToStore(profile: UserEntry): UserFbResult {
+        Timber.d("--Adding new user entry to firestore--")
         val userHash = profile.toHashMap()
 
-        userCollection.document(profile.username)
-            .set(userHash)
-            .addOnSuccessListener { Timber.d("User added successfully") }
-            .addOnFailureListener { e -> Timber.e(e, "Error adding user: ") }
+        try {
+            Timber.d("Initiating the transaction")
+            val newDocument = firestore.runTransaction { transaction ->
+                val query = userCollection.document(profile.userId ?: "")
+                val snapshot = transaction.get(query)
+
+                if (snapshot.exists()) {
+                    // User exists
+                    val existingDocument = snapshot.get("username")
+                    Timber.w("$existingDocument already exists.")
+                    UserFbResult.Error(Exception("User Exists"))
+                } else {
+                    transaction.set(query, userHash)
+                    Timber.d("Transaction: Adding ${profile.username} as a new user to db.")
+                    UserFbResult.Success
+                }
+            }.await()
+            return newDocument
+        } catch (e: Exception) {
+            Timber.e("Error processing transaction to add ${profile.username} to db.")
+            return UserFbResult.Error(error = e)
+        }
     }
 
-    fun getUsersFromStore() {
-       userCollection
-            .get()
-            .addOnSuccessListener { result ->
-                result.forEach { document ->
-                    Timber.d("${document.id} => ${document.data}")
-                } }
-            .addOnFailureListener { e -> Timber.e(e, "Error getting documents: ") }
+    fun getUserDetailsById(userId: String): Flow<UserEntry?> = callbackFlow {
+        Timber.d("--Repo: Getting user details from the firestore.--")
+        val userDocumentReference = userCollection.document(userId)
+
+        val listenerRegistration = userDocumentReference
+            .addSnapshotListener { documentSnapshot: DocumentSnapshot?, e: FirebaseFirestoreException? ->
+                if (e != null) {
+                    Timber.e(e, "Error listening for combo document.")
+                    close(e)
+                    return@addSnapshotListener
+                }
+
+                if (documentSnapshot != null && documentSnapshot.exists()) {
+                    val user =
+                        try {
+                            documentSnapshot.toObject(UserEntry::class.java)
+                        } catch (e: Exception) {
+                            Timber.e(e, "Error converting user to User: $userId")
+                            null
+                    }
+                    trySend(user)
+                } else {
+                    Timber.d("User $userId does not exist or is null: $documentSnapshot")
+                    trySend(null)
+                }
+            }
+        awaitClose {
+            Timber.d("Closing firestore listener for User document: $userId")
+            listenerRegistration.remove()
+        }
+    }
+
+    fun deleteUser(userId: String): UserFbResult {
+        Timber.d("--Deleting user profile from firestore--")
+        val documentReference = userCollection.document(userId)
+
+        try {
+            documentReference.delete()
+            Timber.d("Successfully deleted $userId from firestore.")
+            return UserFbResult.Success
+        } catch (e: Exception) {
+            Timber.e(e, "Error deleting user profile from datastore")
+            return UserFbResult.Error(e)
+        }
     }
 }
 
-fun ProfileEntry.toHashMap(): HashMap<String, Any> =
+fun UserEntry.toHashMap(): HashMap<String, String?> =
     hashMapOf(
+        "userId" to userId,
         "username" to username,
+        "email" to email,
         "profile_pic" to profilePic,
-        "password" to password,
+        "date_created" to dateCreated
     )
 
 fun ComboEntry.toHashMap(): HashMap<String, Any> =
@@ -206,3 +263,8 @@ fun ComboEntry.toHashMap(): HashMap<String, Any> =
         "tags" to tags.let { "" },
         "moves" to moves
     )
+
+sealed class UserFbResult {
+    data object Success: UserFbResult()
+    data class Error(val error: Exception): UserFbResult()
+}

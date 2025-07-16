@@ -9,7 +9,7 @@ import com.example.fightingflow.data.datastore.CharacterDsRepository
 import com.example.fightingflow.data.datastore.ComboDatastoreRepository
 import com.example.fightingflow.data.datastore.ComboDsRepository
 import com.example.fightingflow.data.datastore.ProfileDatastoreRepository
-import com.example.fightingflow.data.datastore.ProfileDsRepository
+import com.example.fightingflow.data.datastore.UserDsRepository
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.MoveEntry
@@ -43,7 +43,7 @@ class DatastoreTest {
     )
 
     /* ProfileDataStore */
-    private val testProfileRepository: ProfileDsRepository = ProfileDatastoreRepository(testDataStore)
+    private val testProfileRepository: UserDsRepository = ProfileDatastoreRepository(testDataStore)
 
     @Test
     @Throws(IOException::class)

@@ -28,7 +28,7 @@ import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.Console
 import com.example.fightingflow.model.Game
 import com.example.fightingflow.model.SF6ControlType
-import com.example.fightingflow.ui.characterScreen.CharacterViewModel
+import com.example.fightingflow.viewmodels.CharacterViewModel
 import com.example.fightingflow.ui.characterScreen.GameSelectedHeader
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch

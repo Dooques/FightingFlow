@@ -8,11 +8,10 @@ import com.example.fightingflow.data.database.FlowDatabase
 import com.example.fightingflow.data.database.dao.CharacterDao
 import com.example.fightingflow.data.database.dao.ComboDao
 import com.example.fightingflow.data.database.dao.MoveDao
-import com.example.fightingflow.data.database.dao.ProfileDao
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboEntry
 import com.example.fightingflow.model.MoveEntry
-import com.example.fightingflow.model.ProfileEntry
+import com.example.fightingflow.model.UserEntry
 import com.example.fightingflow.util.emptyComboEntry
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -74,14 +73,14 @@ class FlowDaoTest {
     }
 
     /* Profile Dao Tests */
-    private var profile1 = ProfileEntry(
+    private var profile1 = UserEntry(
         id = 1,
         username = "Sam",
         profilePic = "",
         password = "D00ques",
         loggedIn = false
     )
-    private var profile2 = ProfileEntry(
+    private var profile2 = UserEntry(
         id = 2,
         username = "Dave",
         profilePic = "",
@@ -118,7 +117,7 @@ class FlowDaoTest {
     @Throws(IOException::class)
     fun updateProfile_UpdateProfileInDb() = runBlocking {
         addProfileToDatabase()
-        val profileUpdate = ProfileEntry(
+        val profileUpdate = UserEntry(
             id = 1,
             username = "Dooques",
             profilePic = "",

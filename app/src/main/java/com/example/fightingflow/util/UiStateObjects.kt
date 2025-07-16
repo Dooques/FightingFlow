@@ -4,10 +4,7 @@ import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.ComboEntry
 import com.example.fightingflow.model.MoveEntry
-import com.example.fightingflow.model.ProfileCreation
-import com.example.fightingflow.model.ProfileEntry
-
-
+import com.example.fightingflow.model.UserEntry
 
 data class CharacterEntryUiState(val character: CharacterEntry = emptyCharacter)
 
@@ -27,8 +24,7 @@ data class CharNameUiState(val name: String = "")
 
 data class CharImageUiState(val image: Int = 0)
 
-data class ProfileUiState(val profile: ProfileEntry = emptyProfile )
+data class ProfileUiState(val profile: UserEntry = emptyProfile )
 
-data class ProfileListUiState(val profileList: List<ProfileEntry> = listOf())
+data class ProfileListUiState(val profileList: List<UserEntry> = listOf())
 
-data class ProfileCreationUiState(val profileCreation: ProfileCreation = emptyProfileCreation)

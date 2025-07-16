@@ -1,4 +1,4 @@
-package com.example.fightingflow.ui.addCharacterScreen
+package com.example.fightingflow.viewmodels
 
 import com.example.fightingflow.data.database.FlowRepository
 import com.example.fightingflow.util.CharacterEntryUiState
@@ -11,14 +11,11 @@ import com.example.fightingflow.data.datastore.CharacterDsRepository
 import com.example.fightingflow.data.datastore.SettingsDsRepository
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.MoveEntry
-import com.example.fightingflow.ui.characterScreen.CharacterViewModel
-import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayViewModel
 import com.example.fightingflow.util.emptyCharacter
 import com.example.fightingflow.util.emptyMove
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.forEach
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.stateIn

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -31,7 +32,7 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerDocked(onValueChange: (String) -> Unit) {
-    var showDatePicker by remember {mutableStateOf(false)}
+    var showDatePicker by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
     val selectedDate = datePickerState.selectedDateMillis?.let { convertMillisToDate(it) } ?: ""
 
@@ -41,9 +42,9 @@ fun DatePickerDocked(onValueChange: (String) -> Unit) {
             onValueChange = {
                 onValueChange(selectedDate)
             },
-            label = { Text("DOB")},
+            label = { Text("DOB") },
             readOnly = true,
-            trailingIcon =  {
+            trailingIcon = {
                 IconButton(onClick = { showDatePicker = !showDatePicker }) {
                     Icon(
                         imageVector = Icons.Default.DateRange,
@@ -53,24 +54,25 @@ fun DatePickerDocked(onValueChange: (String) -> Unit) {
             },
         )
     }
-
-    if (showDatePicker) {
-        Popup(
-            onDismissRequest =  { showDatePicker = false },
-            alignment = TopStart
+}
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DatePickerUi(onDismiss: () -> Unit, datePickerState: DatePickerState) {
+    Popup(
+        onDismissRequest =  onDismiss,
+        alignment = TopStart
+    ) {
+        Box(
+            modifier = Modifier
+                .offset(y = 64.dp)
+                .shadow(elevation = 4.dp)
+                .background(MaterialTheme.colorScheme.surface)
+                .padding(16.dp)
         ) {
-            Box(
-                modifier = Modifier
-                    .offset(y = 64.dp)
-                    .shadow(elevation = 4.dp)
-                    .background(MaterialTheme.colorScheme.surface)
-                    .padding(16.dp)
-            ) {
-                DatePicker(
-                    state = datePickerState,
-                    showModeToggle = false
-                )
-            }
+            DatePicker(
+                state = datePickerState,
+                showModeToggle = false
+            )
         }
     }
 }

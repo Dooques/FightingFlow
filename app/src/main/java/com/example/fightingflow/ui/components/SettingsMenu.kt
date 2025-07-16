@@ -8,6 +8,9 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun ProfileAndConsoleInputMenu(
@@ -20,7 +23,8 @@ fun ProfileAndConsoleInputMenu(
 ) {
     DropdownMenu(
         expanded = settingsMenuExpanded,
-        onDismissRequest = { onDismissRequest() }
+        onDismissRequest = { onDismissRequest() },
+        offset = DpOffset(x = 16.dp, y = (-40).dp)
     ) {
         DropdownMenuItem(
             text = { Text( "Icons in Combos") },

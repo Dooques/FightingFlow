@@ -35,12 +35,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayViewModel
+import com.example.fightingflow.viewmodels.ComboDisplayViewModel
 import com.example.fightingflow.ui.components.ActionIcon
 import com.example.fightingflow.ui.components.ProfileAndConsoleInputMenu
-import com.example.fightingflow.ui.profileScreen.ProfileViewModel
+import com.example.fightingflow.viewmodels.UserViewModel
 import com.example.fightingflow.util.emptyCharacter
 import com.example.fightingflow.util.emptyComboDisplay
+import com.example.fightingflow.viewmodels.ComboCreationViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.update
 import org.koin.compose.koinInject
@@ -65,7 +66,7 @@ fun ComboCreationScreen(
     (context as? Activity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
     var comboReceived by remember { mutableStateOf(false) }
-    val profileViewModel = koinInject<ProfileViewModel>()
+    val profileViewModel = koinInject<UserViewModel>()
 
     var settingsMenuExpanded by remember { mutableStateOf(false) }
 

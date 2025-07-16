@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -83,7 +84,7 @@ fun SaveOrShareImageDialog(
                     modifier = modifier.padding(24.dp).fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("Save or Share Image")
+                    Text("Save or Share Combo as an Image", textAlign = TextAlign.Center)
                     Spacer(modifier.height(16.dp))
                     Row {
                         OutlinedButton(

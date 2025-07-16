@@ -1,11 +1,11 @@
-package com.example.fightingflow.ui.comboCreationScreen
+package com.example.fightingflow.viewmodels
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fightingflow.data.database.FlowRepository
 import com.example.fightingflow.data.datastore.ComboDsRepository
-import com.example.fightingflow.data.datastore.ProfileDsRepository
+import com.example.fightingflow.data.datastore.UserDsRepository
 import com.example.fightingflow.data.datastore.SettingsDsRepository
 import com.example.fightingflow.data.firebase.FirebaseRepository
 import com.example.fightingflow.model.Console
@@ -15,6 +15,8 @@ import com.example.fightingflow.model.SF6ControlType
 import com.example.fightingflow.model.getMoveEntryDataForComboDisplay
 import com.example.fightingflow.model.toDisplay
 import com.example.fightingflow.model.toEntry
+import com.example.fightingflow.ui.comboCreationScreen.processComboAsStringAbstract
+import com.example.fightingflow.ui.comboCreationScreen.updateMoveListAbstract
 import com.example.fightingflow.util.CharacterEntryUiState
 import com.example.fightingflow.util.ComboDisplayUiState
 import com.example.fightingflow.util.ComboEntryUiState
@@ -35,7 +37,7 @@ import java.time.LocalDate
 class ComboCreationViewModel(
     private val flowRepository: FlowRepository,
     private val comboDsRepository: ComboDsRepository,
-    private val profileDsRepository: ProfileDsRepository,
+    private val profileDsRepository: UserDsRepository,
     private val settingsDsRepository: SettingsDsRepository,
     private val firebaseRepository: FirebaseRepository
 ): ViewModel() {
@@ -181,7 +183,7 @@ class ComboCreationViewModel(
                     return insertComboIntoDb()
                 }
             } catch (e: Exception) {
-                return ComboResult.Error(e = Exception("An Error Occurred..."))
+                return ComboResult.Error(e = e)
             }
         } else {
             return ComboResult.Error(
@@ -200,14 +202,14 @@ class ComboCreationViewModel(
                 try {
                     comboDsRepository.updateComboIdState(comboDisplay.comboDisplay)
                 } catch (e: Exception) {
-                    Timber.e("An error occurred trying to update the datastore with Combo ID: ${comboDisplay.comboDisplay.id}.")
+                    Timber.e(e, "An error occurred trying to update the datastore with Combo ID: ${comboDisplay.comboDisplay.id}.")
                 }
             } else {
                 Timber.d("Combo details found, saving them to datastore...")
                 try {
                     comboDsRepository.updateComboIdState(comboDisplayState.value.comboDisplay)
                 } catch (e: Exception) {
-                    Timber.e("An error occurred trying to update the datastore with Combo ID: ${comboDisplayState.value.comboDisplay.id}.")
+                    Timber.e(e, "An error occurred trying to update the datastore with Combo ID: ${comboDisplayState.value.comboDisplay.id}.")
                 }
             }
         }
@@ -216,8 +218,7 @@ class ComboCreationViewModel(
 
     // Room Db Functions
     private suspend fun insertComboIntoDb(): ComboResult {
-        val comboEntry =
-            comboDisplayState.value.comboDisplay.toEntry(characterState.value.character)
+        val comboEntry = comboDisplayState.value.comboDisplay.toEntry(characterState.value.character)
                 .copy(createdBy = profileNameState.value)
         try {
             var comboIdResult = ""
@@ -242,8 +243,7 @@ class ComboCreationViewModel(
 
     private suspend fun updateComboInDb(): ComboResult {
         Timber.d("Preparing to update combo in database...")
-        val updatedCombo =
-            comboDisplayState.value.comboDisplay.toEntry(characterState.value.character)
+        val updatedCombo = comboDisplayState.value.comboDisplay.toEntry(characterState.value.character)
         Timber.d("Move List: ${updatedCombo.moves}")
         try {
             firebaseRepository.updateCombo(updatedCombo)

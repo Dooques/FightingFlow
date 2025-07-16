@@ -8,21 +8,21 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.example.fightingflow.data.datastore.ProfileDsRepository.Companion.IS_USER_LOGGED_IN
-import com.example.fightingflow.data.datastore.ProfileDsRepository.Companion.USERNAME
+import com.example.fightingflow.data.datastore.UserDsRepository.Companion.IS_USER_LOGGED_IN
+import com.example.fightingflow.data.datastore.UserDsRepository.Companion.USERNAME
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import timber.log.Timber
 import java.io.IOException
 
-interface ProfileDsRepository {
+interface UserDsRepository {
 
     fun profileLoggedInState(): Flow<Boolean>
     fun getUsername(): Flow<String>
 
     suspend fun updateLoggedInState(isUserLoggedIn: Boolean)
-    suspend fun updateUsername(username: String)
+    suspend fun updateUsername(username: String?)
 
     companion object {
         val IS_USER_LOGGED_IN = booleanPreferencesKey("is_user_logged_in")
@@ -30,7 +30,7 @@ interface ProfileDsRepository {
     }
 }
 
-class ProfileDatastoreRepository(private val dataStore: DataStore<Preferences>): ProfileDsRepository {
+class ProfileDatastoreRepository(private val dataStore: DataStore<Preferences>): UserDsRepository {
     val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
     override fun profileLoggedInState(): Flow<Boolean> = dataStore.data
@@ -55,17 +55,15 @@ class ProfileDatastoreRepository(private val dataStore: DataStore<Preferences>):
             }
         }
         .map { preference ->
-            Timber.d("")
-            Timber.d("Returning username from datastore...")
-            Timber.d("Username: ${preference[USERNAME]}")
+            Timber.d("Returning username from datastore \nUsername: %s", preference[USERNAME])
             preference[USERNAME] ?: "Invalid User"
     }
 
-    override suspend fun updateUsername(username: String) {
+    override suspend fun updateUsername(username: String?) {
         Timber.d("")
         Timber.d( "Saving username: $username")
         dataStore.edit { preference ->
-            preference[USERNAME] = username
+            preference[USERNAME] = username ?: ""
         }
         Timber.d("Username stored in datastore.")
     }

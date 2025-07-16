@@ -20,6 +20,7 @@ import com.example.fightingflow.ui.NavGraph
 import com.example.fightingflow.ui.theme.FightingFlowTheme
 import com.example.fightingflow.util.emptyComboEntry
 import com.example.fightingflow.util.emptyProfile
+import com.google.firebase.auth.FirebaseAuth
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import org.koin.core.annotation.KoinExperimentalAPI

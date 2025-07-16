@@ -14,7 +14,7 @@
     <string name="char_select">Character Select</string>
     <string name="back_button">Back Button</string>
     <string name="moves">Moves</string>
-    <string name="profile_select">Profile Select</string>
+    <string name="your_details">Your Details</string>
 
     <!-- Character Names -->
     <string name="kazuya">Kazuya</string>
@@ -304,4 +304,7 @@
     <string name="delete_character">Delete Character</string>
     <string name="clear_current_value">clear current value</string>
     <string name="control_scheme_demo">Control Scheme Demo</string>
+    <string name="please_create_a_profile">Welcome to Fighting Flow, please create a profile to start creating combos!</string>
+    <string name="fighting_flow_logo">Fighting Flow Logo</string>
+    <string name="google_signin">Google SignIn</string>
 </resources>

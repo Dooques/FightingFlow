@@ -55,12 +55,12 @@ import com.example.fightingflow.ui.comboDisplayScreen.comboItem.ComboItemViewMod
 import com.example.fightingflow.util.ComboDisplayUiState
 import com.example.fightingflow.util.MoveEntryListUiState
 import com.example.fightingflow.util.characterAndMoveData.convertibleInputs
+import com.example.fightingflow.viewmodels.ComboCreationViewModel
+import com.example.fightingflow.viewmodels.ComboResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import timber.log.Timber
-import kotlin.reflect.KFunction4
-import kotlin.reflect.KSuspendFunction0
 
 
 @Composable

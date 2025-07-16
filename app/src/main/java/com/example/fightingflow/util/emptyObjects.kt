@@ -5,8 +5,7 @@ import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.ComboEntry
 import com.example.fightingflow.model.MoveEntry
-import com.example.fightingflow.model.ProfileCreation
-import com.example.fightingflow.model.ProfileEntry
+import com.example.fightingflow.model.UserEntry
 
 val emptyCharacter = CharacterEntry(
     id = 0,
@@ -45,17 +44,8 @@ val emptyMove = MoveEntry(
     character = ""
 )
 
-val emptyProfile = ProfileEntry(
-    id = 0,
+val emptyProfile = UserEntry(
+    userId = "",
     username = "",
-    password = "",
     profilePic = "",
-    loggedIn = false
-)
-
-val emptyProfileCreation = ProfileCreation(
-    username = "",
-    password = "",
-    confirmPassword = "",
-    profilePic = ""
 )

@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -21,6 +23,23 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        val properties = Properties()
+        val localPropertiesFile = project.rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            properties.load(localPropertiesFile.inputStream())
+        } else {
+            println(
+                "WARNING: local.properties not found. " +
+                        "Ensure WEB_CLIENT_ID is set via environment variable or other " +
+                        "secure means for production/CI."
+            )
+        }
+        val webClientId = properties.getProperty("webClientId")
+        if (webClientId.isEmpty()) {
+            throw GradleException("webClientId not found in local.properties, please add it.")
+        }
+        buildConfigField("String", "WEB_CLIENT_ID", "$webClientId")
     }
 
     buildTypes {
@@ -41,6 +60,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -73,10 +93,13 @@ dependencies {
     implementation(libs.firebase.firestore)
     implementation(libs.kotlinx.coroutines.play.services)
     implementation(libs.firebase.firestore.ktx)
+    implementation(libs.firebase.auth)
+    implementation(libs.play.services.auth)
 
     // Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
+    implementation(libs.googleid)
     ksp(libs.androidx.room.compiler)
 
     // Retrofit2
