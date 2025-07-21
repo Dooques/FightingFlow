@@ -56,6 +56,7 @@ import com.example.fightingflow.R
 import com.example.fightingflow.data.firebase.GoogleAuthService
 import com.example.fightingflow.model.UserEntry
 import com.example.fightingflow.ui.components.convertMillisToDate
+import com.example.fightingflow.ui.userScreen.EmailAndPasswordDialog
 import com.example.fightingflow.ui.userScreen.UserCreationForm
 import com.example.fightingflow.viewmodels.AuthViewModel
 import com.example.fightingflow.viewmodels.UserDetailsState
@@ -63,13 +64,11 @@ import com.example.fightingflow.viewmodels.UserSaveResult
 import com.example.fightingflow.viewmodels.UserViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import org.koin.compose.koinInject
 import timber.log.Timber
 import java.time.LocalDate
 
 @Composable
 fun TitleScreen(
-    scope: CoroutineScope,
     userViewModel: UserViewModel,
     authViewModel: AuthViewModel,
     snackbarHostState: SnackbarHostState,
@@ -88,7 +87,14 @@ fun TitleScreen(
 
     val uiScale = if (deviceType.heightSizeClass == WindowHeightSizeClass.Compact) 2 else 1
     val scope = rememberCoroutineScope()
-    var showUserDialog by remember { mutableStateOf(false) }
+
+    var showUserDetailsDialog by remember { mutableStateOf(false) }
+    var showEmailPasswordDialog by remember { mutableStateOf(false) }
+    var createAccountState by remember {mutableStateOf(false)}
+
+    Timber.d("Flows Collected:\nshowUserDetailsDialog: %s" +
+            "\nshowEmailDialog: %s\ncreateAccountState: %s",
+        showUserDetailsDialog, showEmailPasswordDialog, createAccountState)
 
     Column(
         verticalArrangement = Arrangement.Center,
@@ -104,10 +110,10 @@ fun TitleScreen(
         )
 
         Timber.d("Checking if user is logged in...")
-        if (currentUser is GoogleAuthService.SignInState.Success) {
+        if (userDetails is UserDetailsState.Loaded && currentUser is GoogleAuthService.SignInState.Success) {
             Timber.d("User is logged in, loading greeting...")
-            val username = (currentUser as GoogleAuthService.SignInState.Success)
-                .user.displayName?.split(" ")[0] ?: "Invalid Username"
+            val username = (userDetails as UserDetailsState.Loaded)
+                .user.username?.replaceFirstChar { it.uppercase() } ?: "Invalid Username"
             Text(
                 text = "Welcome $username",
                 style = MaterialTheme.typography.bodyLarge,
@@ -155,23 +161,22 @@ fun TitleScreen(
                         LaunchedEffect(userDetails, currentUser) {
                             Timber.d(
                                 "User Details: %s\nCurrent User: %s",
-                                userDetails,
-                                currentUser
+                                userDetails, currentUser
                             )
                             when (userDetails) {
                                 is UserDetailsState.NotFound -> {
                                     Timber.d("User data is null, opening user details dialog.")
-                                    showUserDialog = true
+                                    showUserDetailsDialog = true
                                 }
 
                                 is UserDetailsState.Loaded -> {
                                     Timber.d("User data exists, logging in user as normal.")
-                                    showUserDialog = false
+                                    showUserDetailsDialog = false
                                 }
 
                                 is UserDetailsState.Loading -> {
                                     Timber.d("User Details are not loaded yet.")
-                                    showUserDialog = false
+                                    showUserDetailsDialog = false
                                 }
 
                                 is UserDetailsState.Error -> {
@@ -189,20 +194,32 @@ fun TitleScreen(
                     else -> {
                         Spacer(modifier.height(20.dp))
                         UserCreationForm(
-                            userViewModel = userViewModel,
                             authViewModel = authViewModel,
+                            showEmailPasswordDialog = { showEmailPasswordDialog = true },
+                            createAccountDialog = {
+                                showEmailPasswordDialog = true; createAccountState = true
+                            }
                         )
                     }
                 }
             }
         }
     }
-    if (showUserDialog) {
+    if (showUserDetailsDialog) {
         UsernameAndDobDialog(
             scope = scope,
             userViewModel = userViewModel,
             currentUser = currentUser,
-            dismissDialog = { showUserDialog = false }
+            dismissDialog = { showUserDetailsDialog = false }
+        )
+    }
+    if (showEmailPasswordDialog) {
+        EmailAndPasswordDialog(
+            userViewModel = userViewModel,
+            authViewModel = authViewModel,
+            createAccount = createAccountState,
+            snackbarHostState = snackbarHostState,
+            onDismissRequest = { showEmailPasswordDialog = false; createAccountState = false}
         )
     }
 }
@@ -242,7 +259,6 @@ fun UsernameAndDobDialog(
     val dob = rememberDatePickerState()
     val selectedDate = dob.selectedDateMillis?.let { convertMillisToDate(it) } ?: ""
     var showDatePicker by remember { mutableStateOf(false) }
-
 
     BasicAlertDialog(onDismissRequest = { dismissDialog }) {
         Card(

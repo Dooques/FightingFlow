@@ -11,5 +11,6 @@ data class UserEntry(
     var profilePic: String = "",
     @get:PropertyName("date_created")
     @set:PropertyName("date_created")
+    var dob: String = "",
     var dateCreated: String = "",
 )

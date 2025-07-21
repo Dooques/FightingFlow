@@ -75,7 +75,6 @@ fun NavGraph(
             composable(route = FlowScreen.Start.name) {
                 Timber.d("Loading Title Screen...")
                 TitleScreen(
-                    scope = scope,
                     authViewModel = authViewModel,
                     userViewModel = userViewModel,
                     snackbarHostState = snackBarHostState,
@@ -107,7 +106,8 @@ fun NavGraph(
                     addCharacterViewModel = addCharacterViewModel,
                     navigateToComboDisplayScreen = { navController.navigate(FlowScreen.Combos.name) },
                     navigateToProfiles = { navController.navigate(FlowScreen.ProfileList.name) },
-                    navigateToAddCharacter = { navController.navigate(FlowScreen.AddCharacter.name) }
+                    navigateToAddCharacter = { navController.navigate(FlowScreen.AddCharacter.name) },
+                    navigateToHome = { navController.navigate(FlowScreen.Start.name) }
                 )
             }
 

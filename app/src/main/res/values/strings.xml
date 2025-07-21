@@ -307,4 +307,5 @@
     <string name="please_create_a_profile">Welcome to Fighting Flow, please create a profile to start creating combos!</string>
     <string name="fighting_flow_logo">Fighting Flow Logo</string>
     <string name="google_signin">Google SignIn</string>
+    <string name="return_to_home">Return to home</string>
 </resources>

@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -42,12 +43,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.example.fightingflow.R
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.viewmodels.AddCharacterViewModel
 import com.example.fightingflow.viewmodels.ComboDisplayViewModel
@@ -74,6 +77,7 @@ fun CharacterScreen(
     navigateToComboDisplayScreen: () -> Unit,
     navigateToProfiles: () -> Unit,
     navigateToAddCharacter: () -> Unit,
+    navigateToHome: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Timber.d("-- Loading Character Screen --")
@@ -108,7 +112,7 @@ fun CharacterScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Characters", style = MaterialTheme.typography.displaySmall) },
+                title = { Text(text = "Characters", style = MaterialTheme.typography.displaySmall) },
                 colors = TopAppBarDefaults.largeTopAppBarColors().copy(containerColor = Color.Transparent),
                 actions = {
                     IconButton(
@@ -130,6 +134,15 @@ fun CharacterScreen(
                         navigate = navigateToProfiles,
                         updateConsoleInput = { comboDisplayViewModel.updateConsoleType(it) }
                     )
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navigateToHome() }) {
+                        Icon(
+                            imageVector = Icons.Default.Home,
+                            contentDescription = stringResource(R.string.return_to_home),
+                            modifier = modifier.size(50.dp)
+                        )
+                    }
                 },
                 windowInsets = WindowInsets(0.dp),
             )

@@ -9,7 +9,6 @@ import com.example.fightingflow.model.UserEntry
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -36,7 +35,7 @@ class UserViewModel(
     val userDetailsState = MutableStateFlow<UserDetailsState>(UserDetailsState.Idle)
     val newUserState = MutableStateFlow<UserEntry?>(null)
 
-    fun updateNewUserState(user: UserEntry) {
+    fun updateNewUserState(user: UserEntry?) {
         newUserState.update { user }
     }
 
@@ -69,7 +68,7 @@ class UserViewModel(
 
     suspend fun createUser(): UserSaveResult {
         Timber.d("-- Preparing to save profile to database --")
-        Timber.d("User Entry: $userDetailsState")
+        Timber.d("User Entry: $newUserState")
         if (newUserState.value?.username?.isBlank() == true) {
             return UserSaveResult.Error(Exception("No username entered."))
         }
@@ -95,15 +94,7 @@ class UserViewModel(
     fun deleteUser(userId: String): UserFbResult {
         Timber.d("--Preparing to delete user details--")
         try {
-            val result = firebaseRepository.deleteUser(userId)
-            return when (result) {
-                is UserFbResult.Success -> {
-                    result
-                }
-                is UserFbResult.Error -> {
-                    result
-                }
-            }
+            return firebaseRepository.deleteUser(userId)
         } catch (e: Exception) {
             Timber.e(e, "Error deleting user details.")
             return UserFbResult.Error(e)

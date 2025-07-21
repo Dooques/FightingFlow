@@ -133,16 +133,17 @@ fun UserDetailsScreen(
                         }
                     }
                 }
-                Spacer(modifier.size(20.dp))
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start,
-                    modifier = modifier.fillMaxWidth().padding(vertical = 8.dp)
-                ) {
-                    Text(
-                        "Name: ${(currentUser as GoogleAuthService.SignInState.Success).user.displayName.toString()}",
-                        modifier = modifier.padding(horizontal = 32.dp)
-                    )
+                if (!(currentUser as GoogleAuthService.SignInState.Success).user.displayName.isNullOrBlank()) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Start,
+                        modifier = modifier.fillMaxWidth().padding(vertical = 8.dp)
+                    ) {
+                        Text(
+                            "Name: ${(currentUser as GoogleAuthService.SignInState.Success).user.displayName.toString()}",
+                            modifier = modifier.padding(horizontal = 32.dp)
+                        )
+                    }
                 }
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
