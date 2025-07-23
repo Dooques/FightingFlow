@@ -173,9 +173,11 @@ class GoogleAuthRepository(
             Timber.e("Email is empty.")
             Result.failure(Exception("Missing username or password"))
         } else {
+            Timber.d("Email: $email\n Password: $password")
             try {
                 Timber.d("Attempting to sign in")
                 val result = auth.signInWithEmailAndPassword(email, password)
+                result.await()
                 if (result.isSuccessful) {
                     Result.success(Unit)
                 } else {

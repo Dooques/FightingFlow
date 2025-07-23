@@ -1,9 +1,7 @@
 package com.example.fightingflow.ui
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,23 +11,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.runtime.Composable
@@ -40,32 +26,23 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.TopStart
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Popup
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.fightingflow.R
 import com.example.fightingflow.data.firebase.GoogleAuthService
-import com.example.fightingflow.model.UserEntry
-import com.example.fightingflow.ui.components.convertMillisToDate
-import com.example.fightingflow.ui.userScreen.EmailAndPasswordDialog
 import com.example.fightingflow.ui.userScreen.UserCreationForm
+import com.example.fightingflow.ui.userScreen.dialogs.EmailAndPasswordDialog
+import com.example.fightingflow.ui.userScreen.dialogs.UserDetailsDialog
 import com.example.fightingflow.viewmodels.AuthViewModel
 import com.example.fightingflow.viewmodels.UserDetailsState
-import com.example.fightingflow.viewmodels.UserSaveResult
 import com.example.fightingflow.viewmodels.UserViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.time.LocalDate
 
 @Composable
 fun TitleScreen(
@@ -82,18 +59,16 @@ fun TitleScreen(
     val currentUser by authViewModel.signInState.collectAsStateWithLifecycle()
     val userDetails by userViewModel.userDetailsState.collectAsStateWithLifecycle()
 
-    Timber.d("Current User: $currentUser")
-    Timber.d("User Details: $userDetails")
+    Timber.d("Current User: %s\nUser Details: %s", currentUser, userDetails)
 
     val uiScale = if (deviceType.heightSizeClass == WindowHeightSizeClass.Compact) 2 else 1
     val scope = rememberCoroutineScope()
 
     var showUserDetailsDialog by remember { mutableStateOf(false) }
     var showEmailPasswordDialog by remember { mutableStateOf(false) }
-    var createAccountState by remember {mutableStateOf(false)}
+    var createAccountState by remember { mutableStateOf(false) }
 
-    Timber.d("Flows Collected:\nshowUserDetailsDialog: %s" +
-            "\nshowEmailDialog: %s\ncreateAccountState: %s",
+    Timber.d("Flows Collected:\nshowUserDetailsDialog: %s\nshowEmailDialog: %s\ncreateAccountState: %s",
         showUserDetailsDialog, showEmailPasswordDialog, createAccountState)
 
     Column(
@@ -150,15 +125,11 @@ fun TitleScreen(
                         LaunchedEffect(currentUser) {
                             if (currentUser is GoogleAuthService.SignInState.Success) {
                                 Timber.d("Launched Effect triggered on successful sign in.")
-
-                                userViewModel.getUserFromFb(
-                                    (currentUser as GoogleAuthService.SignInState.Success)
-                                        .user.userId
-                                )
+                                userViewModel.getUserDetailsFromFb((currentUser as GoogleAuthService.SignInState.Success).user.userId)
                             }
                         }
 
-                        LaunchedEffect(userDetails, currentUser) {
+                        LaunchedEffect(userDetails) {
                             Timber.d(
                                 "User Details: %s\nCurrent User: %s",
                                 userDetails, currentUser
@@ -194,23 +165,23 @@ fun TitleScreen(
                     else -> {
                         Spacer(modifier.height(20.dp))
                         UserCreationForm(
+                            scope = scope,
                             authViewModel = authViewModel,
-                            showEmailPasswordDialog = { showEmailPasswordDialog = true },
-                            createAccountDialog = {
-                                showEmailPasswordDialog = true; createAccountState = true
-                            }
+                            showEmailPasswordDialog = { showEmailPasswordDialog = true; createAccountState = false },
+                            createAccountDialog = { showEmailPasswordDialog = true; createAccountState = true },
                         )
                     }
                 }
             }
         }
     }
-    if (showUserDetailsDialog) {
-        UsernameAndDobDialog(
+    if (showUserDetailsDialog && !createAccountState) {
+        UserDetailsDialog(
             scope = scope,
             userViewModel = userViewModel,
             currentUser = currentUser,
-            dismissDialog = { showUserDetailsDialog = false }
+            userDetailsState = userDetails,
+            onDismissDialog = { showUserDetailsDialog = false }
         )
     }
     if (showEmailPasswordDialog) {
@@ -219,7 +190,10 @@ fun TitleScreen(
             authViewModel = authViewModel,
             createAccount = createAccountState,
             snackbarHostState = snackbarHostState,
-            onDismissRequest = { showEmailPasswordDialog = false; createAccountState = false}
+            onDismissRequest = {
+                showEmailPasswordDialog = false
+                createAccountState = false
+            }
         )
     }
 }
@@ -246,98 +220,3 @@ fun AccessButton(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun UsernameAndDobDialog(
-    scope: CoroutineScope,
-    userViewModel: UserViewModel,
-    currentUser: GoogleAuthService.SignInState,
-    dismissDialog: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var username by remember { mutableStateOf("") }
-    val dob = rememberDatePickerState()
-    val selectedDate = dob.selectedDateMillis?.let { convertMillisToDate(it) } ?: ""
-    var showDatePicker by remember { mutableStateOf(false) }
-
-    BasicAlertDialog(onDismissRequest = { dismissDialog }) {
-        Card(
-            colors = CardDefaults.cardColors().copy(containerColor = Color.Black),
-            border = CardDefaults.outlinedCardBorder(true)
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = modifier.padding(24.dp)
-            ) {
-                Text(
-                    "Your Details",
-                    textAlign = TextAlign.Center,
-                    modifier = modifier.padding(8.dp)
-                )
-                Spacer(Modifier.height(16.dp))
-
-                OutlinedTextField(
-                    value = username,
-                    onValueChange = { username = it },
-                    label = { Text("Username") },
-                    modifier = modifier.padding(vertical = 16.dp)
-                )
-
-                OutlinedTextField(
-                    value = selectedDate,
-                    onValueChange = { selectedDate },
-                    label = { Text("DOB") },
-                    readOnly = true,
-                    trailingIcon = {
-                        IconButton(onClick = { showDatePicker = !showDatePicker }) {
-                            Icon(
-                                imageVector = Icons.Default.DateRange,
-                                contentDescription = "Select Date"
-                            )
-                        }
-                    },
-                )
-                OutlinedButton(
-                    onClick = {
-                        dismissDialog()
-                        scope.launch {
-                            val currentUserState = (currentUser as GoogleAuthService.SignInState.Success)
-                            userViewModel.updateNewUserState(UserEntry(
-                                userId = currentUserState.user.userId,
-                                username = username,
-                                email = currentUserState.user.email,
-                                profilePic = currentUserState.user.photo.toString(),
-                                dateCreated = LocalDate.now().toString(),
-                            ))
-                            val result = userViewModel.createUser()
-                            when (result) {
-                                is UserSaveResult.Success -> { dismissDialog() }
-                                is UserSaveResult.Error -> { Timber.e(result.e, "Error saving user.") }
-                            } } },
-                    modifier.padding(top = 16.dp)
-                ) { Text("Confirm Details") }
-            }
-        }
-        if (showDatePicker) {
-            Popup(
-                onDismissRequest = { showDatePicker = false },
-                alignment = TopStart
-            ) {
-                Box(
-                    modifier = Modifier
-                        .shadow(elevation = 4.dp)
-                        .background(MaterialTheme.colorScheme.surface)
-                        .padding(16.dp)
-                ) {
-                    Column {
-                        DatePicker(
-                            state = dob,
-                            showModeToggle = false
-                        )
-                        Button(onClick = {showDatePicker = false }, modifier.padding(top = 8.dp)) { Text("Confirm")}
-                    }
-                }
-            }
-        }
-    }
-}

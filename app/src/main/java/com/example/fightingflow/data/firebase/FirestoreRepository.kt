@@ -167,14 +167,14 @@ class FirebaseRepository() {
     }
 
     /* User Collection */
-    suspend fun addUserToStore(profile: UserEntry): UserFbResult {
+    suspend fun addUserToStore(user: UserEntry): UserFbResult {
         Timber.d("--Adding new user entry to firestore--")
-        val userHash = profile.toHashMap()
+        val userHash = user.toHashMap()
 
         try {
             Timber.d("Initiating the transaction")
             val newDocument = firestore.runTransaction { transaction ->
-                val query = userCollection.document(profile.userId ?: "")
+                val query = userCollection.document(user.userId ?: "")
                 val snapshot = transaction.get(query)
 
                 if (snapshot.exists()) {
@@ -183,14 +183,15 @@ class FirebaseRepository() {
                     Timber.w("$existingDocument already exists.")
                     UserFbResult.Error(Exception("User Exists"))
                 } else {
+                    Timber.d("User Details: $userHash")
                     transaction.set(query, userHash)
-                    Timber.d("Transaction: Adding ${profile.username} as a new user to db.")
+                    Timber.d("Transaction: Adding ${user.username} as a new user to db.")
                     UserFbResult.Success
                 }
             }.await()
             return newDocument
         } catch (e: Exception) {
-            Timber.e("Error processing transaction to add ${profile.username} to db.")
+            Timber.e("Error processing transaction to add ${user.username} to db.")
             return UserFbResult.Error(error = e)
         }
     }
@@ -210,6 +211,7 @@ class FirebaseRepository() {
                 if (documentSnapshot != null && documentSnapshot.exists()) {
                     val user =
                         try {
+                            Timber.d("Document: %s", documentSnapshot)
                             documentSnapshot.toObject(UserEntry::class.java)
                         } catch (e: Exception) {
                             Timber.e(e, "Error converting user to User: $userId")
@@ -245,10 +247,12 @@ class FirebaseRepository() {
 fun UserEntry.toHashMap(): HashMap<String, String?> =
     hashMapOf(
         "userId" to userId,
+        "name" to name,
         "username" to username,
         "email" to email,
         "profile_pic" to profilePic,
-        "date_created" to dateCreated
+        "date_created" to dateCreated,
+        "dob" to dob
     )
 
 fun ComboEntry.toHashMap(): HashMap<String, Any> =

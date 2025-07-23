@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.fightingflow.data.datastore.UserDsRepository
 import com.example.fightingflow.data.firebase.FirebaseRepository
 import com.example.fightingflow.data.firebase.GoogleAuthService
+import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -35,16 +36,14 @@ class AuthViewModel(
         }
     }
 
-    fun initiateGoogleSignIn() {
-        viewModelScope.launch {
-            signInState.update { GoogleAuthService.SignInState.Loading }
-            val resultState = authRepository.signInWithGoogle()
-            signInState.update { resultState }
-            if (resultState is GoogleAuthService.SignInState.Success) {
-                Timber.i("Google Sign-In Successful: ${resultState.user.displayName} is signed in.")
-            } else if (resultState is GoogleAuthService.SignInState.Error) {
-                Timber.w(resultState.exception, "Google Sign-In Failed. Message: ${resultState.message}")
-            }
+    suspend fun initiateGoogleSignIn() {
+        signInState.update { GoogleAuthService.SignInState.Loading }
+        val resultState = authRepository.signInWithGoogle()
+        signInState.update { resultState }
+        if (resultState is GoogleAuthService.SignInState.Success) {
+            Timber.i("Google Sign-In Successful: ${resultState.user.displayName} is signed in.")
+        } else if (resultState is GoogleAuthService.SignInState.Error) {
+            Timber.w(resultState.exception, "Google Sign-In Failed. Message: ${resultState.message}")
         }
     }
 
@@ -58,6 +57,7 @@ class AuthViewModel(
             }
             .onFailure { result ->
                 Timber.e(result, "An error occurred during account creation.")
+                signInState.update { GoogleAuthService.SignInState.Error(result.message.toString(), result as Exception) }
                 Result.failure<Exception>(result)
                 return@onFailure
             }
@@ -93,24 +93,26 @@ class AuthViewModel(
             }
     }
 
-    fun signOut() {
-        viewModelScope.launch {
-            signInState.update { GoogleAuthService.SignInState.Loading }
-            authRepository.signOut()
-                .onSuccess {
-                    signInState.update { GoogleAuthService.SignInState.Idle }
-                    Timber.Forest.i("Sign out successful.")
+    suspend fun signOut(): Result<Unit> {
+        signInState.update { GoogleAuthService.SignInState.Loading }
+        return authRepository.signOut()
+            .onSuccess {
+                signInState.update { GoogleAuthService.SignInState.Idle }
+                Timber.Forest.i("Sign out successful.")
+                 Result.success(Unit)
+                return@onSuccess
+            }
+            .onFailure { error ->
+                signInState.update {
+                    GoogleAuthService.SignInState.Error(
+                        "Sign out failed: ${error.message}",
+                        error as? Exception
+                    )
                 }
-                .onFailure { error ->
-                    signInState.update {
-                        GoogleAuthService.SignInState.Error(
-                            "Sign out failed: ${error.message}",
-                            error as? Exception
-                        )
-                    }
-                    Timber.e(error, "Sign out failed.")
-                }
-        }
+                Timber.e(error, "Sign out failed.")
+                Result.failure<Exception>(error as Exception)
+                return@onFailure
+            }
     }
 
     suspend fun deleteUser(): Result<Unit>? {
@@ -121,10 +123,35 @@ class AuthViewModel(
 
             when {
                 result.isSuccess -> {
-                    profileDsRepository.updateUsername("")
-                    profileDsRepository.updateLoggedInState(false)
-                    firebaseRepository.deleteUser(currentUser.user.userId)
-                    return Result.success(Unit)
+                    try {
+                        Timber.d("Deleting user account.")
+                        firebaseRepository.deleteUser(currentUser.user.userId)
+                    } catch (e: Exception) {
+                        Timber.e(e, "An error occurred while deleting user account")
+                        return Result.failure(e)
+                    }
+                    try {
+                        Timber.d("Deleting local user information")
+                        profileDsRepository.updateUsername("")
+                        profileDsRepository.updateLoggedInState(false)
+                    } catch (e: Exception) {
+                        return Result.failure(e)
+                    }
+                    try {
+                        Timber.d("Signing out user.")
+                        signOut()
+                            .onSuccess {
+                                Timber.d("User is signed out.")
+                                return Result.success(Unit)
+                            }
+                            .onFailure { e ->
+                                Timber.d(e, "Error signing out.")
+                                return Result.failure(e)
+                            }
+                    } catch (e: Exception) {
+                        Timber.e(e, "Error signing out user")
+                        return Result.failure(e)
+                    }
                 }
 
                 result.isFailure -> {

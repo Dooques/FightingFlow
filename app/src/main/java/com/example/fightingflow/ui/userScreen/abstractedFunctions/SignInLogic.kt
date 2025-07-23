@@ -1,7 +1,6 @@
-package com.example.fightingflow.ui.userScreen
+package com.example.fightingflow.ui.userScreen.abstractedFunctions
 
 import androidx.compose.material3.SnackbarHostState
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.fightingflow.data.firebase.GoogleAuthService
 import com.example.fightingflow.model.UserEntry
 import com.example.fightingflow.viewmodels.AuthViewModel
@@ -11,6 +10,7 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.LocalDate
 
 fun signInOrCreateUserByEmail(
     userViewModel: UserViewModel,
@@ -19,6 +19,8 @@ fun signInOrCreateUserByEmail(
     snackbarHostState: SnackbarHostState,
     createAccount: Boolean,
     username: String,
+    name: String,
+    dob: String,
     email: String,
     password: String,
     confirmPassword: String,
@@ -37,6 +39,8 @@ fun signInOrCreateUserByEmail(
                userViewModel = userViewModel,
                snackbarHostState = snackbarHostState,
                username = username,
+               name = name,
+               dob = dob,
                email = email,
                password = password,
                confirmPassword = confirmPassword,
@@ -96,6 +100,8 @@ suspend fun createAccountByEmail(
     userViewModel: UserViewModel,
     snackbarHostState: SnackbarHostState,
     username: String,
+    name: String,
+    dob: String,
     email: String,
     password: String,
     confirmPassword: String,
@@ -117,25 +123,28 @@ suspend fun createAccountByEmail(
 
     if (username.isNotBlank() && email.isNotBlank() && password.isNotBlank() && confirmPassword.isNotBlank()) {
         Timber.d("Checking password is valid.")
-        if (password.length < 6) {
-            showShortPasswordError()
-            showPasswordError()
-            return
-        } else {
+        if (password.length >= 6) {
             if (password == confirmPassword) {
                 Timber.d("Passwords match, beginning sign-in attempt")
                 authViewModel.createAccountWithEmailAndPassword(email, password)
                     .onSuccess {
+                        onDismissRequest()
                         Timber.d("Successfully created account, saving user details to firestore.")
-                        val userId = (authViewModel.signInState.value as GoogleAuthService.SignInState.Success).user.userId
-                        userViewModel.updateNewUserState(currentUserState?.copy(userId = userId))
+                        val user = (authViewModel.signInState.value as GoogleAuthService.SignInState.Success).user
+                        userViewModel.updateNewUserState(
+                            currentUserState?.copy(
+                                userId = user.userId,
+                                name = name,
+                                dob = dob,
+                                dateCreated = LocalDate.now().toString()
+                            )
+                        )
                         val result = userViewModel.createUser()
                         Timber.d("Details result: $result")
                         when (result) {
                             is UserSaveResult.Success -> {
                                 Timber.d("User $username has been created.")
                                 snackbarHostState.showSnackbar(message = "User $username has been created")
-                                onDismissRequest()
                             }
 
                             is UserSaveResult.Error -> {
@@ -156,6 +165,10 @@ suspend fun createAccountByEmail(
                 snackbarHostState.showSnackbar(message = "Passwords do not match.")
                 return
             }
+        } else {
+            showShortPasswordError()
+            showPasswordError()
+            return
         }
     } else {
         snackbarHostState.showSnackbar("Please enter valid information.")

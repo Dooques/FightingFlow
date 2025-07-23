@@ -22,6 +22,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -40,6 +41,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.fightingflow.data.firebase.GoogleAuthService
+import com.example.fightingflow.ui.userScreen.dialogs.EmailAndPasswordDialog
+import com.example.fightingflow.ui.userScreen.dialogs.ReauthDialog
 import com.example.fightingflow.viewmodels.AuthViewModel
 import com.example.fightingflow.viewmodels.UserDetailsState
 import com.example.fightingflow.viewmodels.UserViewModel
@@ -52,12 +55,16 @@ import timber.log.Timber
 @Composable
 fun UserDetailsScreen(
     scope: CoroutineScope,
+    snackBarHostState: SnackbarHostState,
     userViewModel: UserViewModel,
     authViewModel: AuthViewModel,
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Timber.d("--Loading user details--")
+
+    var showReauthDialog by remember { mutableStateOf(false) }
+    var showEmailPasswordDialog by remember { mutableStateOf(false) }
 
     val currentUser by authViewModel.signInState.collectAsStateWithLifecycle()
     val userDetails by userViewModel.userDetailsState.collectAsStateWithLifecycle()
@@ -68,7 +75,7 @@ fun UserDetailsScreen(
     LaunchedEffect(currentUser) {
         Timber.d("Getting user details from firestore.")
         if (currentUser is GoogleAuthService.SignInState.Success) {
-            userViewModel.getUserFromFb((currentUser as GoogleAuthService.SignInState.Success).user.userId)
+            userViewModel.getUserDetailsFromFb((currentUser as GoogleAuthService.SignInState.Success).user.userId)
         }
     }
 
@@ -101,90 +108,131 @@ fun UserDetailsScreen(
         ) {
             Spacer(modifier.size(20.dp))
             if (currentUser is GoogleAuthService.SignInState.Success) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    modifier = modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp)
-                ) {
-                    Box(Modifier.fillMaxWidth().padding(horizontal = 32.dp)) {
-                        if (userDetails is UserDetailsState.Loaded) {
-                            Text(
-                                text = (userDetails as UserDetailsState.Loaded).user.username.toString(),
-                                style = MaterialTheme.typography.displayMedium,
-                                modifier = modifier.align(CenterStart)
-                            )
-                        }
-                        Box(
-                            modifier = modifier.align(CenterEnd)
-                        ) {
-                            AsyncImage(
-                                model = (currentUser as GoogleAuthService.SignInState.Success).user.photo,
-                                contentDescription = "User Image",
-                                modifier = modifier
-                                    .size(80.dp)
-                                    .clip(CircleShape)
-                                    .clickable(onClick = { menuExpanded = true })
-                            )
-                            ChangeProfileImage(
-                                menuExpanded,
-                                onDismissRequest = { menuExpanded = false })
+                if (userDetails is UserDetailsState.Loaded) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        modifier = modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                    ) {
+                        Box(Modifier.fillMaxWidth().padding(horizontal = 32.dp)) {
+                            if (userDetails is UserDetailsState.Loaded) {
+                                Text(
+                                    text = (userDetails as UserDetailsState.Loaded).user.username.toString(),
+                                    style = MaterialTheme.typography.displayMedium,
+                                    modifier = modifier.align(CenterStart)
+                                )
+                            }
+                            Box(
+                                modifier = modifier.align(CenterEnd)
+                            ) {
+                                AsyncImage(
+                                    model = (currentUser as GoogleAuthService.SignInState.Success).user.photo,
+                                    contentDescription = "User Image",
+                                    modifier = modifier
+                                        .size(80.dp)
+                                        .clip(CircleShape)
+                                        .clickable(onClick = { menuExpanded = true })
+                                )
+                                ChangeProfileImage(
+                                    menuExpanded,
+                                    onDismissRequest = { menuExpanded = false })
+                            }
                         }
                     }
-                }
-                if (!(currentUser as GoogleAuthService.SignInState.Success).user.displayName.isNullOrBlank()) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Start,
                         modifier = modifier.fillMaxWidth().padding(vertical = 8.dp)
                     ) {
                         Text(
-                            "Name: ${(currentUser as GoogleAuthService.SignInState.Success).user.displayName.toString()}",
+                            "Name: ${(userDetails as UserDetailsState.Loaded).user.name}",
                             modifier = modifier.padding(horizontal = 32.dp)
                         )
                     }
-                }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start,
-                    modifier = modifier.fillMaxWidth().padding(vertical = 8.dp)
-                ) {
-                    Text(
-                        "Email: ${(currentUser as GoogleAuthService.SignInState.Success).user.email.toString()}",
-                        modifier = modifier.padding(horizontal = 32.dp)
-                    )
-                }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start,
-                    modifier = modifier.fillMaxWidth().padding(vertical = 8.dp)
-                ) {
-                    Text(
-                        "UserId: ${(currentUser as GoogleAuthService.SignInState.Success).user.userId}",
-                        modifier = modifier.padding(horizontal = 32.dp)
-                    )
-                }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start,
-                    modifier = modifier.fillMaxWidth().padding(vertical = 8.dp)
-                ) {
-                    if (userDetails is UserDetailsState.Loaded) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Start,
+                        modifier = modifier.fillMaxWidth().padding(vertical = 8.dp)
+                    ) {
+                        Text(
+                            "Email: ${(currentUser as GoogleAuthService.SignInState.Success).user.email.toString()}",
+                            modifier = modifier.padding(horizontal = 32.dp)
+                        )
+                    }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Start,
+                        modifier = modifier.fillMaxWidth().padding(vertical = 8.dp)
+                    ) {
+                        Text(
+                            "UserId: ${(userDetails as UserDetailsState.Loaded).user.userId}",
+                            modifier = modifier.padding(horizontal = 32.dp)
+                        )
+                    }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Start,
+                        modifier = modifier.fillMaxWidth().padding(vertical = 8.dp)
+                    ) {
+                        Text(
+                            "Date of Birth: ${(userDetails as UserDetailsState.Loaded).user.dob}",
+                            modifier = modifier.padding(horizontal = 32.dp)
+                        )
+                    }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Start,
+                        modifier = modifier.fillMaxWidth().padding(vertical = 8.dp)
+                    ) {
                         Text(
                             "Date Created: ${(userDetails as UserDetailsState.Loaded).user.dateCreated}",
                             modifier = modifier.padding(horizontal = 32.dp)
                         )
                     }
+                    Spacer(modifier.size(20.dp))
+                } else {
+                    val currentUserState = currentUser as GoogleAuthService.SignInState.Success
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Start,
+                        modifier = modifier.fillMaxWidth().padding(vertical = 8.dp)
+                    ) {
+                        Text(
+                            "Name: ${currentUserState.user.displayName}",
+                            modifier = modifier.padding(horizontal = 32.dp)
+                        )
+                    }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Start,
+                        modifier = modifier.fillMaxWidth().padding(vertical = 8.dp)
+                    ) {
+                        Text(
+                            "Email: ${currentUserState.user.email.toString()}",
+                            modifier = modifier.padding(horizontal = 32.dp)
+                        )
+                    }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Start,
+                        modifier = modifier.fillMaxWidth().padding(vertical = 8.dp)
+                    ) {
+                        Text(
+                            "UserId: ${currentUserState.user.userId}",
+                            modifier = modifier.padding(horizontal = 32.dp)
+                        )
+                    }
                 }
-                Spacer(modifier.size(20.dp))
 
                 OutlinedButton(
                     onClick = {
                         Timber.d("Logging out %s", (currentUser as GoogleAuthService.SignInState.Success).user.displayName)
-                        authViewModel.signOut()
-                        navigateBack()
-                    },
+                        scope.launch {
+                            authViewModel.signOut()
+                            navigateBack()
+                        } },
                     modifier
                         .fillMaxWidth()
                         .padding(horizontal = 40.dp, vertical = 8.dp)
@@ -195,18 +243,18 @@ fun UserDetailsScreen(
                     onClick = {
                         Timber.d("Deleting current User...")
                         scope.launch {
+                            userViewModel.deleteUser((currentUser as GoogleAuthService.SignInState.Success).user.userId)
                             val result = authViewModel.deleteUser()
                             if (result != null) {
                                 when {
                                     result.isSuccess -> {
-                                        userViewModel.deleteUser((currentUser as GoogleAuthService.SignInState.Success).user.userId)
                                         navigateBack()
                                     }
 
                                     result.isFailure -> {
                                         val exception = result.exceptionOrNull()
                                         if (exception is FirebaseAuthRecentLoginRequiredException) {
-                                            authViewModel.initiateGoogleSignIn()
+                                            showReauthDialog = true
                                             val resultReauth = authViewModel.deleteUser()
                                             if (resultReauth != null) {
                                                 when {
@@ -234,7 +282,27 @@ fun UserDetailsScreen(
                 ) {
                     Text("Delete Account", color = Color.White)
                 }
+            } else {
+
             }
+        }
+        if (showReauthDialog) {
+            ReauthDialog(
+                scope = scope,
+                authViewModel = authViewModel,
+                userViewModel = userViewModel,
+                showEmailPasswordDialog = { showEmailPasswordDialog = true },
+                onDismissRequest = { showReauthDialog = false },
+            )
+        }
+        if (showEmailPasswordDialog) {
+            EmailAndPasswordDialog(
+                userViewModel = userViewModel,
+                authViewModel = authViewModel,
+                createAccount = false,
+                snackbarHostState = snackBarHostState,
+                onDismissRequest = { showEmailPasswordDialog = false },
+            )
         }
     }
 }

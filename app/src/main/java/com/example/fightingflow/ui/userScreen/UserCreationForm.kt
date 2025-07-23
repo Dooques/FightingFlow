@@ -50,18 +50,19 @@ import com.example.fightingflow.model.UserEntry
 import com.example.fightingflow.ui.components.convertMillisToDate
 import com.example.fightingflow.viewmodels.AuthViewModel
 import com.example.fightingflow.viewmodels.UserViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @Composable
 fun UserCreationForm(
+    scope: CoroutineScope,
     authViewModel: AuthViewModel,
     showEmailPasswordDialog: () -> Unit,
     createAccountDialog: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var emailSignIn by remember { mutableStateOf(false) }
-    var googleSignIn by remember { mutableStateOf(false) }
-
     val currentUser by authViewModel.signInState.collectAsStateWithLifecycle()
     Timber.d("Loading profile creation form...")
 
@@ -73,39 +74,29 @@ fun UserCreationForm(
         Timber.d("Loading confirm button...")
         when (val state = currentUser) {
             GoogleAuthService.SignInState.Idle -> {
+
+                // Google Sign In / Create
                 OutlinedButton(
-                    onClick = {
-                        authViewModel.initiateGoogleSignIn()
-                        googleSignIn = true
-                              },
+                    onClick = { scope.launch { authViewModel.initiateGoogleSignIn() } },
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp)
                 ) {
-                    Text(
-                        "Sign In With Google",
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
+                    Text("Sign In With Google", color = MaterialTheme.colorScheme.onBackground)
                 }
 
+                // Sign In With Email
                 OutlinedButton(
-                    onClick = {
-                        showEmailPasswordDialog()
-                        emailSignIn = true
-                              },
+                    onClick = { showEmailPasswordDialog() },
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp)
                 ) {
-                    Text(
-                        "Sign In With Email",
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
+                    Text("Sign In With Email", color = MaterialTheme.colorScheme.onBackground)
                 }
+
+                // Create with Email
                 OutlinedButton(
                     onClick = { createAccountDialog() },
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp)
                 ) {
-                    Text(
-                        "Create An Account With Email",
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
+                    Text("Create An Account With Email", color = MaterialTheme.colorScheme.onBackground)
                 }
             }
 
@@ -118,8 +109,6 @@ fun UserCreationForm(
             }
 
             is GoogleAuthService.SignInState.Success -> {
-                emailSignIn = false
-                googleSignIn = false
                 Timber.d("User successfully signed in.")
             }
 
@@ -134,27 +123,26 @@ fun UserCreationForm(
                         textAlign = TextAlign.Center
                     )
                     Spacer(modifier = Modifier.height(16.dp))
-                    if (googleSignIn) {
-                        OutlinedButton(
-                            onClick = { authViewModel.initiateGoogleSignIn() },
-                            modifier = modifier.fillMaxWidth()
-                        ) {
-                            Text("Retry Sign-In", color = MaterialTheme.colorScheme.onBackground)
-                        }
+                    OutlinedButton(
+                        onClick = {
+                            scope.launch {
+                                authViewModel.initiateGoogleSignIn()
+                            } },
+                        modifier = modifier.fillMaxWidth()
+                    ) {
+                        Text("Retry Google Sign-In", color = MaterialTheme.colorScheme.onBackground)
                     }
-                    if (emailSignIn) {
-                        OutlinedButton(
-                            onClick = { showEmailPasswordDialog() },
-                            modifier = modifier.fillMaxWidth()
-                        ) {
-                            Text("Retry Sign-In", color = MaterialTheme.colorScheme.onBackground)
-                        }
-                        OutlinedButton(
-                            onClick = { createAccountDialog() },
-                            modifier = modifier.fillMaxWidth()
-                        ) {
-                            Text("Create an Account", color = MaterialTheme.colorScheme.onBackground)
-                        }
+                    OutlinedButton(
+                        onClick = { showEmailPasswordDialog() },
+                        modifier = modifier.fillMaxWidth()
+                    ) {
+                        Text("Retry Email Sign-In", color = MaterialTheme.colorScheme.onBackground)
+                    }
+                    OutlinedButton(
+                        onClick = { createAccountDialog() },
+                        modifier = modifier.fillMaxWidth()
+                    ) {
+                        Text("Create an Account", color = MaterialTheme.colorScheme.onBackground)
                     }
                 }
             }
@@ -163,214 +151,5 @@ fun UserCreationForm(
         Spacer(modifier.size(height = 50.dp, width = 0.dp))
 
         Timber.d("Form Loaded.")
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun EmailAndPasswordDialog(
-    userViewModel: UserViewModel,
-    authViewModel: AuthViewModel,
-    createAccount: Boolean,
-    snackbarHostState: SnackbarHostState,
-    onDismissRequest: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val scope = rememberCoroutineScope()
-
-    var showDatePicker by remember { mutableStateOf(false) }
-
-    var username by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var confirmPassword by remember { mutableStateOf("") }
-    val dob = rememberDatePickerState()
-    val selectedDate = dob.selectedDateMillis?.let { convertMillisToDate(it) } ?: ""
-
-    var showUsernameError by remember { mutableStateOf(false) }
-    var showEmailError by remember { mutableStateOf(false) }
-    var showPasswordError by remember { mutableStateOf(false) }
-    var showShortPasswordError by remember {mutableStateOf(false) }
-    var showConfirmPasswordError by remember { mutableStateOf(false) }
-    var showDobError by remember { mutableStateOf(false) }
-
-    val newUserDetails by userViewModel.newUserState.collectAsStateWithLifecycle()
-
-    BasicAlertDialog(onDismissRequest = { onDismissRequest() }) {
-        Card(
-            colors = CardDefaults.cardColors().copy(containerColor = Color.Black),
-            border = CardDefaults.outlinedCardBorder(true)
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = modifier
-                    .padding(24.dp)
-            ) {
-                Text("Create an account", style = MaterialTheme.typography.displaySmall)
-
-                if (createAccount) {
-                    OutlinedTextField(
-                        value = username,
-                        onValueChange = { newValue ->
-                            if (newValue.length <= 20) {
-                                username = newValue
-                                showUsernameError = false
-                                if (createAccount) {
-                                    userViewModel.updateNewUserState(
-                                        newUserDetails?.copy(username = username) ?: UserEntry(username = username)
-                                    )
-                                }
-                            }
-                        },
-                        label = {
-                            Text(
-                                if (showUsernameError) "Please enter a username."
-                                else "Username"
-                            )
-                        },
-                        supportingText = { Text("Maximum 20 characters") },
-                        maxLines = 1,
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                        isError = showUsernameError,
-                        modifier = modifier.padding(4.dp)
-                    )
-                }
-
-                OutlinedTextField(
-                    value = email,
-                    onValueChange = { newValue ->
-                        if (newValue.length <= 30) {
-                            email = newValue
-                            showEmailError = false
-                            if (createAccount) {
-                                userViewModel.updateNewUserState(
-                                    newUserDetails?.copy(email = email) ?: UserEntry(email = email)
-                                )
-                            }
-                        } },
-                    label = { Text(
-                        if (showEmailError) "Please enter an email."
-                        else "Email") },
-                    maxLines = 2,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    isError = showEmailError,
-                    modifier = modifier.padding(4.dp)
-                )
-
-                if (createAccount) {
-                    Spacer(Modifier.height(10.dp))
-                }
-
-                OutlinedTextField(
-                    value = password,
-                    onValueChange = { newValue ->
-                        if (newValue.length <= 20) {
-                            password = newValue
-                            showPasswordError= false
-                        } },
-                    label = { Text(
-                        if (showPasswordError) "Please enter a valid password."
-                        else if (showShortPasswordError) "Password is less than 6 characters."
-                        else "Password") },
-                    supportingText = { Text("Minimum 6 characters") },
-                    maxLines = 1,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    isError = showPasswordError,
-                    modifier = modifier.padding(4.dp)
-                )
-
-                if (createAccount) {
-                    OutlinedTextField(
-                        value = confirmPassword,
-                        onValueChange = { newValue ->
-                            if (newValue.length <= 20) {
-                                confirmPassword = newValue
-                                showConfirmPasswordError = false
-                            }
-                        },
-                        label = {
-                            Text(
-                                if (showConfirmPasswordError) "Please confirm your password."
-                                else "Confirm Password"
-                            )
-                        },
-                        maxLines = 1,
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                        isError = showConfirmPasswordError,
-                        modifier = modifier.padding(4.dp)
-                    )
-
-                    Spacer(Modifier.height(10.dp))
-
-                    OutlinedTextField(
-                        value = selectedDate,
-                        onValueChange = {
-                            selectedDate
-                            userViewModel.updateNewUserState(
-                                newUserDetails?.copy(dob = selectedDate) ?: UserEntry(dob = selectedDate)
-                            ) },
-                        label = { Text("DOB") },
-                        readOnly = true,
-                        trailingIcon = {
-                            IconButton(onClick = { showDatePicker = !showDatePicker }) {
-                                Icon(
-                                    imageVector = Icons.Default.DateRange,
-                                    contentDescription = "Select Date"
-                                )
-                            }
-                        },
-                        modifier = modifier.padding(4.dp)
-                    )
-
-                    if (showDatePicker) {
-                        Popup(
-                            onDismissRequest = { showDatePicker = false },
-                            alignment = TopStart
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .shadow(elevation = 4.dp)
-                                    .background(MaterialTheme.colorScheme.surface)
-                                    .padding(16.dp)
-                            ) {
-                                Column {
-                                    DatePicker(
-                                        state = dob,
-                                        showModeToggle = false
-                                    )
-                                    Button(onClick = {showDatePicker = false }, modifier.padding(top = 8.dp)) { Text("Confirm")}
-                                }
-                            }
-                        }
-                    }
-                }
-
-                Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = modifier.fillMaxWidth().padding(top = 8.dp)) {
-                    OutlinedButton(onClick = {
-                        signInOrCreateUserByEmail(
-                            userViewModel = userViewModel,
-                            authViewModel = authViewModel,
-                            scope = scope,
-                            snackbarHostState = snackbarHostState,
-                            createAccount = createAccount,
-                            username = username,
-                            email = email,
-                            password = password,
-                            confirmPassword = confirmPassword,
-                            showUsernameError = { showUsernameError = true },
-                            showEmailError = { showEmailError = true },
-                            showPasswordError = { showPasswordError = true },
-                            showConfirmPasswordError = { showConfirmPasswordError = true },
-                            showShortPasswordError = { showShortPasswordError = true },
-                            onDismissRequest = onDismissRequest
-                        ) }) { Text("Confirm") }
-
-                    OutlinedButton(onClick = {
-                        onDismissRequest()
-                        userViewModel.updateNewUserState(UserEntry())
-                    }) { Text("Cancel") }
-                }
-            }
-        }
     }
 }

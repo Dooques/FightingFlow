@@ -89,6 +89,7 @@ fun NavGraph(
                 Timber.d("Loading Profile List Screen...")
                 UserDetailsScreen(
                     scope = scope,
+                    snackBarHostState = snackBarHostState,
                     userViewModel = userViewModel,
                     authViewModel = authViewModel,
                     navigateBack =  navController::navigateUp,
