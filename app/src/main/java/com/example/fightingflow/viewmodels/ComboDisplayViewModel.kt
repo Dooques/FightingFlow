@@ -8,6 +8,7 @@ import com.example.fightingflow.data.datastore.ComboDsRepository
 import com.example.fightingflow.data.datastore.SettingsDsRepository
 import com.example.fightingflow.data.datastore.UserDsRepository
 import com.example.fightingflow.data.firebase.FirebaseRepository
+import com.example.fightingflow.data.firebase.GoogleAuthRepository
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.Console
@@ -27,6 +28,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -42,7 +44,7 @@ class ComboDisplayViewModel(
     private val comboDsRepository: ComboDsRepository,
     private val settingsDsRepository: SettingsDsRepository,
     private val firebaseRepository: FirebaseRepository,
-    private val profileDsRepository: UserDsRepository
+    private val profileDsRepository: UserDsRepository,
 ): ViewModel() {
 
     companion object {
@@ -112,17 +114,20 @@ class ComboDisplayViewModel(
     @OptIn(ExperimentalCoroutinesApi::class)
     val fireStoreComboEntryFlow: StateFlow<ComboEntryListUiState> = characterNameState
         .flatMapLatest { characterName ->
-            user.flatMapLatest { currentUser ->
+            user.flatMapLatest { currentUserDetails ->
                 publicCombosDisplayState.flatMapLatest { publicCombosDisplayState ->
-                    if (characterName.name.isNotBlank() && currentUser.isNotBlank()) {
+                    if (characterName.name.isNotBlank() && currentUserDetails.isNotBlank()) {
                         firebaseRepository.getComboList(
                             characterName.name,
                             publicCombosDisplayState,
-                            currentUser
+                            currentUserDetails
                         )
                             .map { entryList -> ComboEntryListUiState(entryList) }
                             .catch { exception ->
-                                Timber.Forest.e(exception, "Error collecting firestore combo flow: ")
+                                Timber.Forest.e(
+                                    exception,
+                                    "Error collecting firestore combo flow: "
+                                )
                                 emit(ComboEntryListUiState())
                             }
                     } else {

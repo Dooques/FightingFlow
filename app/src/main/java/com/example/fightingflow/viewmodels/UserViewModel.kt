@@ -58,6 +58,7 @@ class UserViewModel(
                 .map { userEntry ->
                     if (userEntry != null) {
                         Timber.d("Mapping user entry to Loaded State")
+                        updateUsernameInDs(userEntry.username)
                         UserDetailsState.Loaded(userEntry)
                     } else {
                         Timber.d("Mapping null entry to Not Found State")

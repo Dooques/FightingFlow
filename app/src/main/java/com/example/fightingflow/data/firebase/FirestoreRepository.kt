@@ -24,7 +24,6 @@ class FirebaseRepository() {
 
     /* Combo Collection */
     suspend fun addCombo(combo: ComboEntry): String {
-
         return withContext(Dispatchers.IO) {
             val comboHash = combo.toHashMap()
 
@@ -58,12 +57,18 @@ class FirebaseRepository() {
     }
 
 
-    fun getComboList(character: String, publicComboDisplayState: Boolean, user: String): Flow<List<ComboEntry>> = callbackFlow {
+    fun getComboList(
+        character: String,
+        publicComboDisplayState: Boolean,
+        user: String
+    ): Flow<List<ComboEntry>> = callbackFlow {
+        Timber.d("--Initiating combo list flow from Firebase")
         if (character.isBlank() || character.contains("/")) {
             Timber.e("Invalid character name provided for Firestore query: $character")
             close(IllegalArgumentException("Invalid character name: $character"))
             return@callbackFlow
         }
+
         val listenerRegistration: ListenerRegistration =
             characterCollection.document(character)
                 .collection("combos")

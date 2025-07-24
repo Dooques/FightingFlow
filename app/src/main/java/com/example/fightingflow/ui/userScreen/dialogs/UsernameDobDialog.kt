@@ -40,6 +40,7 @@ import androidx.compose.ui.window.Popup
 import com.example.fightingflow.data.firebase.GoogleAuthService
 import com.example.fightingflow.model.UserEntry
 import com.example.fightingflow.ui.components.convertMillisToDate
+import com.example.fightingflow.ui.userScreen.abstractedFunctions.checkUserAge
 import com.example.fightingflow.viewmodels.UserDetailsState
 import com.example.fightingflow.viewmodels.UserSaveResult
 import com.example.fightingflow.viewmodels.UserViewModel
@@ -61,6 +62,7 @@ fun UserDetailsDialog(
     var username by remember { mutableStateOf("") }
     val dob = rememberDatePickerState()
     val selectedDob = dob.selectedDateMillis?.let { convertMillisToDate(it) } ?: ""
+    var showUserTooYoung by remember { mutableStateOf(false) }
     var showDatePicker by remember { mutableStateOf(false) }
 
     BasicAlertDialog(onDismissRequest = { onDismissDialog() }) {
@@ -88,9 +90,11 @@ fun UserDetailsDialog(
 
                 OutlinedTextField(
                     value = selectedDob,
-                    onValueChange = { selectedDob },
+                    onValueChange = { selectedDob; if (checkUserAge(selectedDob)) { showUserTooYoung = false } },
                     label = { Text("DOB") },
                     readOnly = true,
+                    isError = showUserTooYoung,
+                    supportingText = { Text("You must be at least 16 years old")},
                     trailingIcon = {
                         IconButton(onClick = { showDatePicker = !showDatePicker }) {
                             Icon(
@@ -100,12 +104,13 @@ fun UserDetailsDialog(
                         }
                     },
                 )
-                Row(
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    modifier = modifier.fillMaxWidth().padding(16.dp)
-                ) {
+                Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = modifier.fillMaxWidth().padding(16.dp)) {
                     OutlinedButton(
                         onClick = {
+                            if (!checkUserAge(selectedDob)) {
+                                showUserTooYoung = true
+                                return@OutlinedButton
+                            }
                             onDismissDialog()
                             scope.launch {
                                 when (userDetailsState) {
@@ -129,7 +134,7 @@ fun UserDetailsDialog(
                                             }
 
                                             is UserSaveResult.Error -> {
-                                                Timber.e(result.e, "Error saving user.")
+                                                Timber.e(result.e, "Error saving user")
                                             }
                                         }
                                     }

@@ -76,6 +76,7 @@ fun EmailAndPasswordDialog(
     var showShortPasswordError by remember {mutableStateOf(false) }
     var showConfirmPasswordError by remember { mutableStateOf(false) }
     var showDobError by remember { mutableStateOf(false) }
+    var showUserTooYoung by remember { mutableStateOf(false) }
 
     val newUserDetails by userViewModel.newUserState.collectAsStateWithLifecycle()
 
@@ -107,7 +108,7 @@ fun EmailAndPasswordDialog(
                         },
                         label = {
                             Text(
-                                if (showUsernameError) "Please enter a username."
+                                if (showUsernameError) "Please enter a username"
                                 else "Username"
                             )
                         },
@@ -153,7 +154,7 @@ fun EmailAndPasswordDialog(
                             }
                         } },
                     label = { Text(
-                        if (showEmailError) "Please enter an email."
+                        if (showEmailError) "Please enter an email"
                         else "Email") },
                     maxLines = 2,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
@@ -173,8 +174,8 @@ fun EmailAndPasswordDialog(
                             showPasswordError= false
                         } },
                     label = { Text(
-                        if (showPasswordError) "Please enter a valid password."
-                        else if (showShortPasswordError) "Password is less than 6 characters."
+                        if (showPasswordError) "Please enter a valid password"
+                        else if (showShortPasswordError) "Password is less than 6 characters"
                         else "Password") },
                     supportingText = { Text("Minimum 6 characters") },
                     maxLines = 1,
@@ -194,11 +195,12 @@ fun EmailAndPasswordDialog(
                         },
                         label = {
                             Text(
-                                if (showConfirmPasswordError) "Please confirm your password."
+                                if (showConfirmPasswordError) "Please confirm your password"
                                 else "Confirm Password"
                             )
                         },
                         maxLines = 1,
+                        supportingText = { Text("You must be at least 16 years old")},
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                         isError = showConfirmPasswordError,
                         modifier = modifier.padding(4.dp)
@@ -267,6 +269,7 @@ fun EmailAndPasswordDialog(
                             showPasswordError = { showPasswordError = true },
                             showConfirmPasswordError = { showConfirmPasswordError = true },
                             showShortPasswordError = { showShortPasswordError = true },
+                            showUserTooYoung = { showUserTooYoung = true },
                             onDismissRequest = onDismissRequest
                         ) }) { Text("Confirm") }
 

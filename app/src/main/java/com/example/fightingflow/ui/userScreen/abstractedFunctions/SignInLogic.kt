@@ -30,6 +30,7 @@ fun signInOrCreateUserByEmail(
     showConfirmPasswordError: () -> Unit,
     showShortPasswordError: () -> Unit,
     onDismissRequest: () -> Unit,
+    showUserTooYoung: () -> Unit
 ) {
     Timber.d("Confirming details and checking sign in state")
     scope.launch {
@@ -49,7 +50,8 @@ fun signInOrCreateUserByEmail(
                showPasswordError = showPasswordError,
                showShortPasswordError = showShortPasswordError,
                showConfirmPasswordError = showConfirmPasswordError,
-               onDismissRequest = onDismissRequest
+               onDismissRequest = onDismissRequest,
+               showUserTooYoung = showUserTooYoung,
            ) 
         } else {
             signInByEmail(
@@ -111,6 +113,7 @@ suspend fun createAccountByEmail(
     showShortPasswordError: () -> Unit,
     showConfirmPasswordError: () -> Unit,
     onDismissRequest: () -> Unit,
+    showUserTooYoung: () -> Unit,
 ) {
 
     val currentUserState = userViewModel.newUserState.value
@@ -120,6 +123,10 @@ suspend fun createAccountByEmail(
     if (email.isBlank()) { showEmailError() }
     if (password.isBlank()) { showPasswordError() }
     if (confirmPassword.isBlank()) { showConfirmPasswordError() }
+    if (!checkUserAge(dob)) {
+        showUserTooYoung()
+        return
+    }
 
     if (username.isNotBlank() && email.isNotBlank() && password.isNotBlank() && confirmPassword.isNotBlank()) {
         Timber.d("Checking password is valid.")
@@ -174,4 +181,26 @@ suspend fun createAccountByEmail(
         snackbarHostState.showSnackbar("Please enter valid information.")
         return
     }
+}
+
+fun checkUserAge(dob: String): Boolean {
+    val currentDate = LocalDate.now().toString().split("-").reversed()
+    val dobSplit = dob.split("/")
+    Timber.d("Current Date: $currentDate")
+    Timber.d("Birth Date: $dobSplit")
+    val currentAge = {
+        Timber.d("Month Now: ${currentDate[1]} Month Dob: ${dobSplit[0]}")
+        if (dobSplit[0].toInt() >= currentDate[1].toInt()) {
+            Timber.d("Day Now: ${currentDate[0]} Month Dob: ${dobSplit[1]}")
+            if (dobSplit[1].toInt() >= dobSplit[0].toInt()) {
+                (currentDate[2].toInt() - dobSplit[2].toInt())
+            } else {
+                (currentDate[2].toInt() - dobSplit[2].toInt()) - 1
+            }
+        } else {
+            (currentDate[2].toInt() - dobSplit[2].toInt()) - 1
+        }
+    }
+    Timber.d("Current Age: ${currentAge()}")
+    return currentAge() >= 16
 }
