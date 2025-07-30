@@ -2,16 +2,15 @@ package com.example.fightingflow.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.fightingflow.data.datastore.UserDsRepository
 import com.example.fightingflow.data.firebase.FirebaseRepository
 import com.example.fightingflow.data.firebase.UserFbResult
+import com.example.fightingflow.model.UserDataForCombos
 import com.example.fightingflow.model.UserEntry
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -20,6 +19,7 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import org.koin.compose.koinInject
 import timber.log.Timber
 
 class UserViewModel(
@@ -39,40 +39,52 @@ class UserViewModel(
             initialValue = ""
         )
 
+    val userDataMap = firebaseRepository.getUserMap()
+        .mapNotNull {
+            Timber.d("UserData: $it")
+            it
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(30_000L),
+            initialValue = UserDataForCombos(emptyMap())
+        )
+
     // Update Profile State
     var userIdState = MutableStateFlow<String?>(null)
     val newUserState = MutableStateFlow<UserEntry?>(null)
 
-    fun updateNewUserState(user: UserEntry?) {
-        newUserState.update { user }
-    }
+    fun updateNewUserState(user: UserEntry?) { newUserState.update { user } }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val userDetailsState = userIdState.flatMapLatest { userId ->
         if (userId.isNullOrBlank()) {
-            Timber.d("User ID is null. Emiting idle state")
+            Timber.d("User ID is null. Emitting idle state")
             flowOf(UserDetailsState.Idle)
         } else {
             Timber.d("Valid User ID detected, creating User Details flow.")
-            firebaseRepository.getUserDetailsById(userId)
-                .map { userEntry ->
-                    if (userEntry != null) {
-                        Timber.d("Mapping user entry to Loaded State")
-                        updateUsernameInDs(userEntry.username)
-                        UserDetailsState.Loaded(userEntry)
-                    } else {
-                        Timber.d("Mapping null entry to Not Found State")
-                        UserDetailsState.NotFound
+            try {
+                firebaseRepository.getUserDetailsById(userId)
+                    .map { userEntry ->
+                        if (userEntry != null) {
+                            Timber.d("Mapping user entry to Loaded State: $userEntry")
+                            updateUsernameInDs(userEntry.username)
+                            UserDetailsState.Loaded(userEntry)
+                        } else {
+                            Timber.d("Mapping null entry to Not Found State")
+                            UserDetailsState.NotFound
+                        }
                     }
-                }
-                .onStart { Timber.d("Flow initiated, mapping Loading State"); emit(UserDetailsState.Loading) }
-                .catch { e ->
-                    if (e is CancellationException) {
-                        Timber.w("User Details flow cancelled for $userId")
-                        throw e
+                    .onStart {
+                        Timber.d("Flow initiated, mapping Loading State"); emit(UserDetailsState.Loading)
                     }
-                    emit(UserDetailsState.Error(e as Exception))
+            } catch (e: Exception) {
+                if (e is CancellationException) {
+                    Timber.w("User Details flow cancelled for $userId")
+                    throw e
                 }
+                flowOf(UserDetailsState.Error(e))
+            }
         }
     }.stateIn(
         scope = viewModelScope,

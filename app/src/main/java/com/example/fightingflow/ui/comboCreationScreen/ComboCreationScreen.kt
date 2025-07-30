@@ -41,6 +41,7 @@ import com.example.fightingflow.ui.components.ProfileAndConsoleInputMenu
 import com.example.fightingflow.viewmodels.UserViewModel
 import com.example.fightingflow.util.emptyCharacter
 import com.example.fightingflow.util.emptyComboDisplay
+import com.example.fightingflow.viewmodels.AuthViewModel
 import com.example.fightingflow.viewmodels.ComboCreationViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.update
@@ -51,8 +52,10 @@ import timber.log.Timber
 @SuppressLint("SourceLockedOrientationActivity")
 @Composable
 fun ComboCreationScreen(
+    authViewModel: AuthViewModel,
     comboDisplayViewModel: ComboDisplayViewModel,
     comboCreationViewModel: ComboCreationViewModel,
+    userViewModel: UserViewModel,
     scope: CoroutineScope,
     snackbarHostState: SnackbarHostState,
     onNavigateToComboDisplay: () -> Unit,
@@ -65,8 +68,7 @@ fun ComboCreationScreen(
     val context = LocalContext.current
     (context as? Activity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
-    var comboReceived by remember { mutableStateOf(false) }
-    val profileViewModel = koinInject<UserViewModel>()
+    val userViewModel= koinInject<UserViewModel>()
 
     var settingsMenuExpanded by remember { mutableStateOf(false) }
 
@@ -86,7 +88,7 @@ fun ComboCreationScreen(
     val selectedItem by comboCreationViewModel.itemIndexState.collectAsStateWithLifecycle()
 
     // Datastore Flows
-    val username by profileViewModel.username.collectAsStateWithLifecycle()
+    val username by userViewModel.username.collectAsStateWithLifecycle()
     val characterNameState by comboDisplayViewModel.characterNameState.collectAsStateWithLifecycle()
     val comboIdState by comboCreationViewModel.comboIdState
     val editingState by comboCreationViewModel.editingState
@@ -94,6 +96,10 @@ fun ComboCreationScreen(
     val textComboDisplayState by comboDisplayViewModel.textComboState.collectAsStateWithLifecycle()
     val consoleTypeState by comboDisplayViewModel.consoleTypeState.collectAsStateWithLifecycle()
     val sf6ControlType by comboDisplayViewModel.modernOrClassicState.collectAsStateWithLifecycle()
+
+    // Firebase Flows
+    val userData by userViewModel.userDataMap.collectAsStateWithLifecycle()
+    val userDetails by userViewModel.userDetailsState.collectAsStateWithLifecycle()
 
     if (characterState.character != emptyCharacter) {
         comboCreationViewModel.getCharacterMoveEntryList(characterState.character.name)
@@ -211,12 +217,15 @@ fun ComboCreationScreen(
                     snackbarHostState = snackbarHostState,
                     editingState = editingState,
                     comboCreationViewModel = comboCreationViewModel,
-                    username = username,
+                    comboDisplayViewModel = comboDisplayViewModel,
+                    authViewModel = authViewModel,
                     game = game,
                     consoleTypeState = consoleTypeState,
                     sF6ControlType = sf6ControlType,
                     updateComboData = comboCreationViewModel::updateComboDetails,
                     setSelectedItem = comboCreationViewModel::updateItemIndex,
+                    userData = userData,
+                    userDetails = userDetails,
                     selectedItem = selectedItem,
                     character = characterState.character,
                     characterName = characterNameState.name,

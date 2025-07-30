@@ -24,7 +24,6 @@ import kotlin.test.assertEquals
 
 @RunWith(AndroidJUnit4::class)
 class FlowDaoTest {
-    private lateinit var profileDao: ProfileDao
     private lateinit var comboDao: ComboDao
     private lateinit var characterDao: CharacterDao
     private lateinit var moveDao: MoveDao
@@ -60,7 +59,6 @@ class FlowDaoTest {
             .allowMainThreadQueries()
             .build()
 
-        profileDao = flowDatabase.getUserDao()
         comboDao = flowDatabase.getComboDao()
         characterDao = flowDatabase.getCharacterDao()
         moveDao = flowDatabase.getMoveDao()
@@ -72,76 +70,8 @@ class FlowDaoTest {
         flowDatabase.close()
     }
 
-    /* Profile Dao Tests */
-    private var profile1 = UserEntry(
-        id = 1,
-        username = "Sam",
-        profilePic = "",
-        password = "D00ques",
-        loggedIn = false
-    )
-    private var profile2 = UserEntry(
-        id = 2,
-        username = "Dave",
-        profilePic = "",
-        password = "0blivionIV",
-        loggedIn = false
-    )
-
-    private suspend fun addProfileToDatabase() {
-        profileDao.insert(profile1)
-    }
-    private suspend fun addTwoProfilesToDatabase() {
-        profileDao.insert(profile1)
-        profileDao.insert(profile2)
-    }
-
-    @Test
-    @Throws(IOException::class)
-    fun daoInsert_daoGetProfile_InsertItemIntoDb () = runBlocking {
-        addProfileToDatabase()
-        val profileByName = profileDao.getProfile("Sam").first()
-        assertEquals(profileByName, profile1)
-    }
-
-    @Test
-    @Throws(IOException::class)
-    fun daoGetAllProfiles_AddMultipleProfiles() = runBlocking {
-        addTwoProfilesToDatabase()
-        val allProfiles = profileDao.getAllProfiles().first()
-        assertEquals(allProfiles[0], profile1)
-        assertEquals(allProfiles[1], profile2)
-    }
-
-    @Test
-    @Throws(IOException::class)
-    fun updateProfile_UpdateProfileInDb() = runBlocking {
-        addProfileToDatabase()
-        val profileUpdate = UserEntry(
-            id = 1,
-            username = "Dooques",
-            profilePic = "",
-            password = "Password420",
-            loggedIn = true
-        )
-        profileDao.update(profileUpdate)
-        val updatedProfile = profileDao.getAllProfiles().first()
-        assertEquals(updatedProfile[0], profileUpdate)
-    }
-
-    @Test
-    @Throws(IOException::class)
-    fun daoDeleteProfiles_DeletesAllItemsFromDb() = runBlocking {
-        addTwoProfilesToDatabase()
-        profileDao.delete(profile1)
-        profileDao.delete(profile2)
-        val result = profileDao.getAllProfiles().first()
-        assert(result.isEmpty())
-    }
-
     /* ComboDaoTests */
     private val combo1 = ComboEntry(
-        id = 1,
         title = "Combo",
         character = "reina",
         damage = 60,
@@ -150,7 +80,6 @@ class FlowDaoTest {
         moves = "1, 2, 1",
     )
     private val combo2 = ComboEntry(
-        id = 2,
         title = "Combo",
         character = "asuka",
         damage = 60,
@@ -159,7 +88,6 @@ class FlowDaoTest {
         moves = "1, 2, 1",
     )
     private val combo3 = ComboEntry(
-        id = 3,
         title = "Combo",
         character = "reina",
         damage = 60,

@@ -45,6 +45,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.example.fightingflow.data.firebase.GoogleAuthService
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.Console
@@ -55,8 +56,11 @@ import com.example.fightingflow.ui.comboDisplayScreen.comboItem.ComboItemViewMod
 import com.example.fightingflow.util.ComboDisplayUiState
 import com.example.fightingflow.util.MoveEntryListUiState
 import com.example.fightingflow.util.characterAndMoveData.convertibleInputs
+import com.example.fightingflow.viewmodels.AuthViewModel
 import com.example.fightingflow.viewmodels.ComboCreationViewModel
 import com.example.fightingflow.viewmodels.ComboResult
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -461,6 +465,7 @@ fun ConfirmButton(
     scope: CoroutineScope,
     snackbarHostState: SnackbarHostState,
     comboCreationViewModel: ComboCreationViewModel,
+    authViewModel: AuthViewModel,
     comboDisplay: ComboDisplay,
     editingState: Boolean,
     originalCombo: ComboDisplay,
@@ -491,14 +496,22 @@ fun ConfirmButton(
                             ).run { when (this) {
                                 SnackbarResult.Dismissed -> Timber.d("Snackbar Dismissed")
                                 SnackbarResult.ActionPerformed -> {
-                                    saveLogic(comboCreationViewModel, onNavigateToComboDisplay)
+                                    saveLogic(
+                                        comboCreationViewModel = comboCreationViewModel,
+                                        currentUser = authViewModel.signInState.value,
+                                        onNavigateToComboDisplay = onNavigateToComboDisplay
+                                    )
                                 }
                             } }
                         }
                     } else {
                         scope.launch {
                             Timber.d("Saving combo")
-                            saveLogic(comboCreationViewModel, onNavigateToComboDisplay)
+                            saveLogic(
+                                comboCreationViewModel = comboCreationViewModel,
+                                currentUser = authViewModel.signInState.value,
+                                onNavigateToComboDisplay = onNavigateToComboDisplay
+                            )
                         }
                     }
                 } else {
@@ -516,7 +529,11 @@ fun ConfirmButton(
                                 SnackbarResult.Dismissed -> Timber.d("Snackbar Dismissed")
                                 SnackbarResult.ActionPerformed -> {
                                     Timber.d("Saving Combo")
-                                    saveLogic(comboCreationViewModel, onNavigateToComboDisplay)
+                                    saveLogic(
+                                        comboCreationViewModel = comboCreationViewModel,
+                                        currentUser = authViewModel.signInState.value,
+                                        onNavigateToComboDisplay = onNavigateToComboDisplay
+                                    )
                                 }
                             }
                             }
@@ -524,7 +541,11 @@ fun ConfirmButton(
                     } else {
                         scope.launch {
                             Timber.d("Saving combo")
-                            saveLogic(comboCreationViewModel, onNavigateToComboDisplay)
+                            saveLogic(
+                                comboCreationViewModel = comboCreationViewModel,
+                                currentUser = authViewModel.signInState.value,
+                                onNavigateToComboDisplay = onNavigateToComboDisplay
+                            )
                         }
                     }
                 }
@@ -548,6 +569,7 @@ fun EditingButtons(
     scope: CoroutineScope,
     snackbarHostState: SnackbarHostState,
     comboCreationViewModel: ComboCreationViewModel,
+    authViewModel: AuthViewModel,
     game: Game,
     comboDisplay: ComboDisplay,
     editingState: Boolean,
@@ -599,6 +621,7 @@ fun EditingButtons(
             scope = scope,
             snackbarHostState = snackbarHostState,
             comboCreationViewModel = comboCreationViewModel,
+            authViewModel = authViewModel,
             comboDisplay = comboDisplay,
             editingState = editingState,
             originalCombo = originalCombo,
@@ -609,13 +632,15 @@ fun EditingButtons(
 
 suspend fun saveLogic(
     comboCreationViewModel: ComboCreationViewModel,
+    currentUser: GoogleAuthService.SignInState,
     onNavigateToComboDisplay: () -> Unit
 ) {
-    val result = comboCreationViewModel.saveCombo()
+    val result = comboCreationViewModel.saveCombo(currentUser)
     if (result is ComboResult.Success) {
         onNavigateToComboDisplay()
     } else {
-        if (result is ComboResult.Error)
+        if (result is ComboResult.Error) {
             Timber.e(result.e, "An error occured while trying to save the combo: ")
+        }
     }
 }

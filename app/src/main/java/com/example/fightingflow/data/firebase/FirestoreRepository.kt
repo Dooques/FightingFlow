@@ -1,7 +1,9 @@
 package com.example.fightingflow.data.firebase
 
 import com.example.fightingflow.model.ComboEntry
+import com.example.fightingflow.model.UserDataForCombos
 import com.example.fightingflow.model.UserEntry
+import com.example.fightingflow.model.toHashMap
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentSnapshot
@@ -16,6 +18,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import kotlin.collections.forEach
 
 class FirebaseRepository() {
     val firestore = Firebase.firestore
@@ -128,7 +131,8 @@ class FirebaseRepository() {
     }
 
     fun getCombo(character: String, comboId: String): Flow<ComboEntry?> = callbackFlow {
-        val documentReference = characterCollection.document(character).collection("combos").document(comboId)
+        val documentReference =
+            characterCollection.document(character).collection("combos").document(comboId)
 
         val listenerRegistration = documentReference
             .addSnapshotListener { documentSnapshot: DocumentSnapshot?, e: FirebaseFirestoreException? ->
@@ -141,7 +145,8 @@ class FirebaseRepository() {
 
                 if (documentSnapshot != null && documentSnapshot.exists()) {
                     val combo = try {
-                        documentSnapshot.toObject(ComboEntry::class.java)?.copy(id = documentSnapshot.id)
+                        documentSnapshot.toObject(ComboEntry::class.java)
+                            ?.copy(id = documentSnapshot.id)
                     } catch (e: Exception) {
                         Timber.e(e, "Error converting document to Combo: ${documentSnapshot.id}")
                         null
@@ -160,12 +165,24 @@ class FirebaseRepository() {
 
     fun deleteCombo(character: String, comboId: String) {
         Timber.d("Attempting to delete combo document %s from %s's collection", comboId, character)
-        val documentReference = characterCollection.document(character).collection("combos").document(comboId)
+        val documentReference =
+            characterCollection.document(character).collection("combos").document(comboId)
 
         try {
             documentReference.delete()
-                .addOnSuccessListener { Timber.d("Combo document %s successfully deleted", comboId) }
-                .addOnFailureListener { e -> Timber.e(e, "Error deleting combo document %s", comboId) }
+                .addOnSuccessListener {
+                    Timber.d(
+                        "Combo document %s successfully deleted",
+                        comboId
+                    )
+                }
+                .addOnFailureListener { e ->
+                    Timber.e(
+                        e,
+                        "Error deleting combo document %s",
+                        comboId
+                    )
+                }
         } catch (e: Exception) {
             Timber.e(e, "Error deleting combo document %s.", comboId)
         }
@@ -221,7 +238,7 @@ class FirebaseRepository() {
                         } catch (e: Exception) {
                             Timber.e(e, "Error converting user to User: $userId")
                             null
-                    }
+                        }
                     trySend(user)
                 } else {
                     Timber.d("User $userId does not exist or is null: $documentSnapshot")
@@ -231,6 +248,61 @@ class FirebaseRepository() {
         awaitClose {
             Timber.d("Closing firestore listener for User document: $userId")
             listenerRegistration.remove()
+        }
+    }
+
+    fun getUserMap(): Flow<UserDataForCombos> = callbackFlow {
+        Timber.d("--Starting callback flow for User Data collection--")
+        val userMap = mutableMapOf<String, Map<String, String>>()
+        val listenerRegistration = userCollection
+            .addSnapshotListener { querySnapshot: QuerySnapshot?, e: FirebaseFirestoreException? ->
+                Timber.d("User Snapshot: ${querySnapshot?.query}")
+                if (e != null) {
+                    Timber.e(e, "Error listening for user document.")
+                    close(e)
+                }
+                if (querySnapshot != null && !querySnapshot.isEmpty) {
+                    try {
+                        querySnapshot.forEach { user ->
+                            Timber.d("User: $user\nUserID: ${user.id}\nUsername: ${user.data["username"]}\nlikedCombos: ${user.data["liked_combos"]}")
+                            if (user.data["liked_combos"] != null) {
+                                userMap[user.id] = mapOf(
+                                    "Username" to user.data["username"] as String,
+                                )
+                            } else {
+                                userMap[user.id] = mapOf(
+                                    "Username" to user.data["username"] as String,
+                                )
+                            }
+                        }
+                    } catch (e: Exception) {
+                        Timber.e(e, "Error getting data from user collection")
+                        close(e)
+                    }
+                    Timber.d("UserMap: $userMap")
+                    trySend(UserDataForCombos(userMap))
+                }
+            }
+        awaitClose {
+            Timber.d("Closing firestore listener for User Collection")
+            listenerRegistration.remove()
+        }
+    }
+
+    fun updateUser(user: UserEntry) {
+        val userHash = user.toHashMap()
+        Timber.d("User Details: $userHash")
+
+        if (user.userId != null) {
+            try {
+                Timber.d("Attempting to update firestore database user")
+                userCollection.document(user.userId)
+                    .set(userHash)
+                    .addOnSuccessListener { Timber.d("${user.username} updated successfully") }
+                    .addOnFailureListener { e -> Timber.e(e, "Error updating user: $user") }
+            } catch (e: Exception) {
+                Timber.e(e, "Error updating ${user.username}'s details")
+            }
         }
     }
 
@@ -248,17 +320,6 @@ class FirebaseRepository() {
         }
     }
 }
-
-fun UserEntry.toHashMap(): HashMap<String, String?> =
-    hashMapOf(
-        "userId" to userId,
-        "name" to name,
-        "username" to username,
-        "email" to email,
-        "profile_pic" to profilePic,
-        "date_created" to dateCreated,
-        "dob" to dob
-    )
 
 fun ComboEntry.toHashMap(): HashMap<String, Any> =
     hashMapOf(

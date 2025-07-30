@@ -20,9 +20,13 @@ import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.Console
 import com.example.fightingflow.model.Game
 import com.example.fightingflow.model.SF6ControlType
+import com.example.fightingflow.model.UserDataForCombos
 import com.example.fightingflow.ui.comboCreationScreen.ComboAsText
 import com.example.fightingflow.ui.comboDisplayScreen.inputConverter.convertInputsToConsole
 import com.example.fightingflow.util.CharacterEntryListUiState
+import com.example.fightingflow.viewmodels.ComboDisplayViewModel
+import com.example.fightingflow.viewmodels.UserDetailsState
+import com.example.fightingflow.viewmodels.UserViewModel
 import dev.shreyaspatil.capturable.capturable
 import dev.shreyaspatil.capturable.controller.CaptureController
 import timber.log.Timber
@@ -34,7 +38,10 @@ fun ComboItemDisplay(
     captureController: CaptureController,
     toShare: Boolean,
     display: Boolean,
+    comboDisplayViewModel: ComboDisplayViewModel,
     characterEntryListUiState: CharacterEntryListUiState,
+    userData: UserDataForCombos,
+    userDetails: UserDetailsState,
     combo: ComboDisplay,
     comboAsText: String,
     console: Console?,
@@ -154,7 +161,13 @@ fun ComboItemDisplay(
             if (textComboState) {
                 ComboAsText(comboAsText)
             }
-            ComboInfoBottom(combo, fontColor)
+            ComboInfoBottom(
+                comboDisplayViewModel = comboDisplayViewModel,
+                combo = combo,
+                userData = userData,
+                userDetails = userDetails,
+                fontColor = fontColor
+            )
         }
     }
 }

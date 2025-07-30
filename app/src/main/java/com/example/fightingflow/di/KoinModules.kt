@@ -15,6 +15,8 @@ import com.example.fightingflow.data.datastore.CharacterDatastoreRepository
 import com.example.fightingflow.data.datastore.CharacterDsRepository
 import com.example.fightingflow.data.datastore.ComboDatastoreRepository
 import com.example.fightingflow.data.datastore.ComboDsRepository
+import com.example.fightingflow.data.datastore.ProfanityDatastoreRepository
+import com.example.fightingflow.data.datastore.ProfanityDsRepository
 import com.example.fightingflow.data.datastore.ProfileDatastoreRepository
 import com.example.fightingflow.data.datastore.UserDsRepository
 import com.example.fightingflow.data.datastore.SettingsDatastoreRepository
@@ -30,6 +32,7 @@ import com.example.fightingflow.viewmodels.ComboCreationViewModel
 import com.example.fightingflow.viewmodels.ComboDisplayViewModel
 import com.example.fightingflow.ui.comboDisplayScreen.comboItem.ComboItemViewModel
 import com.example.fightingflow.viewmodels.AuthViewModel
+import com.example.fightingflow.viewmodels.ProfanityViewModel
 import com.example.fightingflow.viewmodels.UserViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.singleOf
@@ -67,6 +70,7 @@ val repositoryModule = module {
     single<CharacterDsRepository> { CharacterDatastoreRepository(androidContext().dataStore) }
     single<ComboDsRepository> { ComboDatastoreRepository(androidContext().dataStore) }
     single<SettingsDsRepository> { SettingsDatastoreRepository(androidContext().dataStore) }
+    single<ProfanityDsRepository> { ProfanityDatastoreRepository(androidContext().dataStore) }
 
     // MediaStore
     singleOf(::MediaStoreUtil)
@@ -86,4 +90,5 @@ val viewModelModule = module {
     viewModelOf(::ComboItemViewModel)
     viewModelOf(::AddCharacterViewModel)
     viewModelOf(::AuthViewModel)
+    viewModelOf(::ProfanityViewModel)
 }

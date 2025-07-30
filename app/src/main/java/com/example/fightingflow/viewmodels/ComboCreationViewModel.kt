@@ -8,6 +8,8 @@ import com.example.fightingflow.data.datastore.ComboDsRepository
 import com.example.fightingflow.data.datastore.UserDsRepository
 import com.example.fightingflow.data.datastore.SettingsDsRepository
 import com.example.fightingflow.data.firebase.FirebaseRepository
+import com.example.fightingflow.data.firebase.GoogleAuthRepository
+import com.example.fightingflow.data.firebase.GoogleAuthService
 import com.example.fightingflow.model.Console
 import com.example.fightingflow.model.Game
 import com.example.fightingflow.model.MoveEntry
@@ -24,6 +26,7 @@ import com.example.fightingflow.util.ImmutableList
 import com.example.fightingflow.util.MoveEntryListUiState
 import com.example.fightingflow.util.emptyComboDisplay
 import com.example.fightingflow.util.emptyComboEntry
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
@@ -39,7 +42,7 @@ class ComboCreationViewModel(
     private val comboDsRepository: ComboDsRepository,
     private val profileDsRepository: UserDsRepository,
     private val settingsDsRepository: SettingsDsRepository,
-    private val firebaseRepository: FirebaseRepository
+    private val firebaseRepository: FirebaseRepository,
 ): ViewModel() {
 
     companion object {
@@ -110,8 +113,7 @@ class ComboCreationViewModel(
 
     fun updateComboDetails(comboDisplay: ComboDisplayUiState) {
         Timber.d("Updating combo details...")
-        val comboDisplayWithCharacterData = comboDisplay.comboDisplay.copy(
-                character = characterState.value.character.name)
+        val comboDisplayWithCharacterData = comboDisplay.comboDisplay.copy(character = characterState.value.character.name)
 
         Timber.d("Combo Display with Character: $comboDisplayWithCharacterData")
         comboDisplayState.update { ComboDisplayUiState(comboDisplayWithCharacterData) }
@@ -165,7 +167,7 @@ class ComboCreationViewModel(
         itemIndexState.update { 0 }
     }
 
-    suspend fun saveCombo(): ComboResult {
+    suspend fun saveCombo(currentUser: GoogleAuthService.SignInState): ComboResult {
         Timber.d("Checking if combo details valid")
         Timber.d("ComboDisplay Character: ${comboDisplayState.value.comboDisplay.character}")
         Timber.d("ComboDisplay Moves: ${comboDisplayState.value.comboDisplay.moves}")
@@ -177,10 +179,10 @@ class ComboCreationViewModel(
             try {
                 if (editingState.value) {
                     Timber.d("Edit mode true, updating existing combo...")
-                    return updateComboInDb()
+                    return updateCombo()
                 } else {
                     Timber.d("Edit mode false, adding new combo...")
-                    return insertComboIntoDb()
+                    return insertCombo(currentUser as GoogleAuthService.SignInState.Success)
                 }
             } catch (e: Exception) {
                 return ComboResult.Error(e = e)
@@ -217,9 +219,11 @@ class ComboCreationViewModel(
     }
 
     // Room Db Functions
-    private suspend fun insertComboIntoDb(): ComboResult {
-        val comboEntry = comboDisplayState.value.comboDisplay.toEntry(characterState.value.character)
-                .copy(createdBy = profileNameState.value)
+    private suspend fun insertCombo(currentUser: GoogleAuthService.SignInState.Success): ComboResult {
+        val userId = currentUser.user.userId
+        val comboEntry =
+            comboDisplayState.value.comboDisplay.toEntry(characterState.value.character)
+                .copy(createdBy = userId)
         try {
             var comboIdResult = ""
             val firestoreRequest = viewModelScope.launch {
@@ -241,7 +245,7 @@ class ComboCreationViewModel(
         }
     }
 
-    private suspend fun updateComboInDb(): ComboResult {
+    private suspend fun updateCombo(): ComboResult {
         Timber.d("Preparing to update combo in database...")
         val updatedCombo = comboDisplayState.value.comboDisplay.toEntry(characterState.value.character)
         Timber.d("Move List: ${updatedCombo.moves}")

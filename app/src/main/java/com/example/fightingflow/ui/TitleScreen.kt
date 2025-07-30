@@ -40,6 +40,7 @@ import com.example.fightingflow.ui.userScreen.UserCreationForm
 import com.example.fightingflow.ui.userScreen.dialogs.EmailAndPasswordDialog
 import com.example.fightingflow.ui.userScreen.dialogs.UserDetailsDialog
 import com.example.fightingflow.viewmodels.AuthViewModel
+import com.example.fightingflow.viewmodels.ProfanityViewModel
 import com.example.fightingflow.viewmodels.UserDetailsState
 import com.example.fightingflow.viewmodels.UserViewModel
 import timber.log.Timber
@@ -48,6 +49,7 @@ import timber.log.Timber
 fun TitleScreen(
     userViewModel: UserViewModel,
     authViewModel: AuthViewModel,
+    profanityViewModel: ProfanityViewModel,
     snackbarHostState: SnackbarHostState,
     deviceType: WindowSizeClass,
     onCharSelect: () -> Unit,
@@ -179,6 +181,7 @@ fun TitleScreen(
         UserDetailsDialog(
             scope = scope,
             userViewModel = userViewModel,
+            profanityViewModel = profanityViewModel,
             currentUser = currentUser,
             userDetailsState = userDetails,
             onDismissDialog = { showUserDetailsDialog = false }

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -54,9 +55,9 @@ import com.example.fightingflow.R
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.viewmodels.AddCharacterViewModel
 import com.example.fightingflow.viewmodels.ComboDisplayViewModel
-import com.example.fightingflow.ui.components.CharacterOptionsMenu
-import com.example.fightingflow.ui.components.GameSelectedMenu
-import com.example.fightingflow.ui.components.ProfileAndConsoleInputMenu
+import com.example.fightingflow.ui.settingsMenus.CharacterOptionsMenu
+import com.example.fightingflow.ui.settingsMenus.GameSelectedMenu
+import com.example.fightingflow.ui.settingsMenus.ProfileAndConsoleInputMenu
 import com.example.fightingflow.util.CharacterEntryUiState
 import com.example.fightingflow.util.emptyCharacter
 import com.example.fightingflow.viewmodels.CharacterViewModel
@@ -81,7 +82,6 @@ fun CharacterScreen(
     modifier: Modifier = Modifier
 ) {
     Timber.d("-- Loading Character Screen --")
-
 
     val characterListState by comboDisplayViewModel.characterEntryListState.collectAsStateWithLifecycle()
     val gameSelectedState by characterScreenViewModel.gameSelected.collectAsStateWithLifecycle()
@@ -308,51 +308,6 @@ fun CharacterCard(
                     onDismiss = { characterOptionsMenuExpanded = false }
                 )
             }
-        }
-    }
-}
-
-@Composable
-fun GameSelectedHeader(gameSelected: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        val gameColor = when (gameSelected) {
-            "Tekken 8" -> Color(color = 0xFFed1664)
-            "Street Fighter VI" -> Color(color = 0xFFff914d)
-            "Mortal Kombat 1" -> Color(color = 0xFFDC143C)
-            else -> Color.Green
-        }
-
-        Text(
-            text ="Game Selected: ",
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = modifier.padding(start = 16.dp)
-        )
-
-        Box {
-            Text(
-                text = gameSelected,
-                style = MaterialTheme.typography.bodyLarge
-                    .copy(
-                        shadow = Shadow(
-                            color = gameColor,
-                            offset = Offset(10f, 10f),
-                            blurRadius = 30f,
-                        )
-                    ),
-                color = Color.White,
-                fontWeight = FontWeight.ExtraBold,
-                modifier = modifier
-                    .padding(horizontal = 8.dp, vertical = 4.dp)
-            )
-            Box(
-                modifier
-                    .padding(4.dp)
-                    .clip(RoundedCornerShape(25.dp))
-                    .clickable(onClick = onClick)
-            )
         }
     }
 }

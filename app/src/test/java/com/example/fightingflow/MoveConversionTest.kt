@@ -6,10 +6,10 @@ import com.example.fightingflow.ui.comboDisplayScreen.inputConverter.convertInpu
 import com.example.fightingflow.ui.comboDisplayScreen.inputConverter.convertInputToStandard
 import com.example.fightingflow.util.characterAndMoveData.playstationInputs
 import com.example.fightingflow.util.characterAndMoveData.tekken8CharacterMoves
+import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import java.io.IOException
-import kotlin.test.Test
 import kotlin.test.assertEquals
 
 @RunWith(JUnit4::class)

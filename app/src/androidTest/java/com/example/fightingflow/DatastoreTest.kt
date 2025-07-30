@@ -22,10 +22,10 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
+import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import org.junit.runner.RunWith
 import java.io.IOException
-import kotlin.test.Test
 import kotlin.test.assertEquals
 
 @RunWith(AndroidJUnit4::class)
@@ -127,7 +127,7 @@ class DatastoreTest {
     @Throws(IOException::class)
     fun firstTimeDataValue_ReturnDefaultValues() = testScope.runTest {
         val comboID = testComboRepository.getComboId().first()
-        assertEquals(0, comboID)
+        assertEquals(0, comboID.toInt())
     }
 
     @Test

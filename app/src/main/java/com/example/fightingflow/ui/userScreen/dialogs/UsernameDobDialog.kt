@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment.Companion.TopStart
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
@@ -41,6 +42,7 @@ import com.example.fightingflow.data.firebase.GoogleAuthService
 import com.example.fightingflow.model.UserEntry
 import com.example.fightingflow.ui.components.convertMillisToDate
 import com.example.fightingflow.ui.userScreen.abstractedFunctions.checkUserAge
+import com.example.fightingflow.viewmodels.ProfanityViewModel
 import com.example.fightingflow.viewmodels.UserDetailsState
 import com.example.fightingflow.viewmodels.UserSaveResult
 import com.example.fightingflow.viewmodels.UserViewModel
@@ -54,16 +56,24 @@ import java.time.LocalDate
 fun UserDetailsDialog(
     scope: CoroutineScope,
     userViewModel: UserViewModel,
+    profanityViewModel: ProfanityViewModel,
     currentUser: GoogleAuthService.SignInState,
     userDetailsState: UserDetailsState,
     onDismissDialog: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+
     var username by remember { mutableStateOf("") }
     val dob = rememberDatePickerState()
     val selectedDob = dob.selectedDateMillis?.let { convertMillisToDate(it) } ?: ""
     var showUserTooYoung by remember { mutableStateOf(false) }
     var showDatePicker by remember { mutableStateOf(false) }
+    var usernameErrorMessage by remember { mutableStateOf("") }
+    var showUsernameError by remember { mutableStateOf(false) }
+    var showUsernameProfanityError by remember { mutableStateOf(false) }
+
+    profanityViewModel.readJsonFromAssets(context, "profanityFilter.JSON")
 
     BasicAlertDialog(onDismissRequest = { onDismissDialog() }) {
         Card(
@@ -83,8 +93,26 @@ fun UserDetailsDialog(
 
                 OutlinedTextField(
                     value = username,
-                    onValueChange = { username = it },
+                    onValueChange = {
+                        username = it
+                        if (profanityViewModel.checkForUsernameInProfanityFilter(it)) {
+                            showUsernameProfanityError = true
+                        } else {
+                            showUsernameProfanityError = false
+                            showUsernameError = false
+                        }
+                                    },
                     label = { Text("Username") },
+                    isError = showUsernameError || showUsernameProfanityError,
+                    supportingText = {
+                        if (showUsernameError) {
+                            usernameErrorMessage = "Username is not valid"
+                            if (showUsernameProfanityError) {
+                                usernameErrorMessage = "Username contains offensive language"
+                            }
+                        }
+                            Text(usernameErrorMessage)
+                                     },
                     modifier = modifier.padding(vertical = 16.dp)
                 )
 

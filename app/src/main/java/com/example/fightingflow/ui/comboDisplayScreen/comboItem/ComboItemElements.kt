@@ -1,6 +1,8 @@
 package com.example.fightingflow.ui.comboDisplayScreen.comboItem
 
 import android.content.Context
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -15,10 +17,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,8 +35,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.MoveEntry
+import com.example.fightingflow.model.UserDataForCombos
+import com.example.fightingflow.viewmodels.ComboDisplayViewModel
+import com.example.fightingflow.viewmodels.UserDetailsState
+import com.example.fightingflow.viewmodels.UserViewModel
+import timber.log.Timber
 
 @Composable
 fun ComboInfoTop(
@@ -78,20 +89,77 @@ fun ComboInfoTop(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 @Composable
 fun ComboInfoBottom(
+    comboDisplayViewModel: ComboDisplayViewModel,
     combo: ComboDisplay,
+    userData: UserDataForCombos,
+    userDetails: UserDetailsState,
     fontColor: Color,
     modifier: Modifier = Modifier
 ) {
-    Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = modifier.fillMaxWidth()) {
-        Row {
-            Text(text = "Damage: ", color = fontColor)
-            Text(text = combo.damage.toString(), color = Color.Red)
+    val userDataItem = userData.userMap?.get(combo.createdBy)
+
+    Timber.d("Current User Details: $userDetails")
+    Row(horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically, modifier = modifier.fillMaxWidth()) {
+        Column {
+            Row {
+                Text(text = "Damage: ", color = fontColor)
+                Text(text = combo.damage.toString(), color = Color.Red)
+            }
+            Row {
+                Text(text = "Created by: ", color = fontColor)
+                Text(text = userDataItem?.get("username") ?: "Invalid User", color = fontColor)
+            }
         }
-        Row {
-            Text(text = "Created by: ", color = fontColor)
-            Text(text = combo.createdBy, color = fontColor)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(
+                onClick = {
+                    Timber.d("Updating like value of combo and adding combo ID to User Likes")
+                    when (userDetails) {
+                        is UserDetailsState.Loaded -> {
+                            val comboList = userDetails.user.likedCombos.toMutableList()
+                            comboList.map { it.replace(" ", "") }
+                            if (comboList.size == 1 && comboList.contains("")) { comboList.remove("") }
+                            Timber.d("Checking if user has liked the combo...")
+                            Timber.d("Combo List: $comboList")
+                            Timber.d("UserData contains combo: ${comboList.contains(combo.id)}")
+                            Timber.d("Combo ID: ${combo.id}")
+                            if (!comboList.contains(combo.id)) {
+                                Timber.d("User has not liked the combo, adding a like.")
+                                comboList.add(combo.id)
+                                Timber.d("Combo List after adding ID: $comboList")
+                                comboDisplayViewModel.updateCombo(
+                                    combo = combo.copy(likes = combo.likes + 1),
+                                    user = userDetails.user.copy(likedCombos = comboList)
+                                )
+                            } else {
+                                Timber.d("User has liked the combo, removing like.")
+                                comboList.remove(combo.id)
+                                Timber.d("Combo List after removing ID: $comboList")
+                                comboDisplayViewModel.updateCombo(
+                                    combo = combo.copy(likes = combo.likes - 1),
+                                    user = userDetails.user.copy(likedCombos = comboList)
+                                )
+                            }
+                        }
+                        else -> {
+                            Timber.d("User details not loaded")
+                        }
+                    }
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ThumbUp,
+                    contentDescription = null,
+                    tint = if (
+                        userDetails is UserDetailsState.Loaded &&
+                        userDetails.user.likedCombos.contains(combo.id)
+                        ) Color.Blue else Color.White
+                )
+            }
+            Text(text = "${combo.likes} Likes", color = fontColor)
         }
     }
 }

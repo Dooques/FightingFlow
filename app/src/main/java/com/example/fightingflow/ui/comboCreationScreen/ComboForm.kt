@@ -21,6 +21,7 @@ import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.Console
 import com.example.fightingflow.model.Game
 import com.example.fightingflow.model.SF6ControlType
+import com.example.fightingflow.model.UserDataForCombos
 import com.example.fightingflow.ui.comboCreationScreen.layouts.CustomGameLayout
 import com.example.fightingflow.ui.comboCreationScreen.layouts.MortalKombatLayout
 import com.example.fightingflow.ui.comboCreationScreen.layouts.StreetFighterLayout
@@ -29,7 +30,11 @@ import com.example.fightingflow.ui.comboDisplayScreen.comboItem.ComboItemEditor
 import com.example.fightingflow.ui.comboDisplayScreen.comboItem.ComboInfoBottom
 import com.example.fightingflow.util.ComboDisplayUiState
 import com.example.fightingflow.util.MoveEntryListUiState
+import com.example.fightingflow.viewmodels.AuthViewModel
 import com.example.fightingflow.viewmodels.ComboCreationViewModel
+import com.example.fightingflow.viewmodels.ComboDisplayViewModel
+import com.example.fightingflow.viewmodels.UserDetailsState
+import com.example.fightingflow.viewmodels.UserViewModel
 import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
 import kotlin.reflect.KFunction0
@@ -41,11 +46,14 @@ fun ComboForm(
     scope: CoroutineScope,
     snackbarHostState: SnackbarHostState,
     editingState: Boolean,
+    comboDisplayViewModel: ComboDisplayViewModel,
     comboCreationViewModel: ComboCreationViewModel,
-    username: String,
+    authViewModel: AuthViewModel,
     game: Game,
     consoleTypeState: Console?,
     sF6ControlType: SF6ControlType?,
+    userData: UserDataForCombos,
+    userDetails: UserDetailsState,
     comboDisplay: ComboDisplay,
     originalCombo: ComboDisplay,
     selectedItem: Int,
@@ -84,12 +92,24 @@ fun ComboForm(
                 if (textComboDisplay) {
                     ComboAsText("", modifier.padding(horizontal = 4.dp))
                     Box(modifier.padding(horizontal = 4.dp)) {
-                        ComboInfoBottom(comboDisplay, Color.White)
+                        ComboInfoBottom(
+                            comboDisplayViewModel = comboDisplayViewModel,
+                            combo = comboDisplay,
+                            userData = userData,
+                            userDetails = userDetails,
+                            fontColor = Color.White
+                        )
                     }
                     Spacer(modifier.height(12.dp))
                 } else {
                     Box(modifier.padding(horizontal = 4.dp)) {
-                        ComboInfoBottom(comboDisplay, Color.White)
+                        ComboInfoBottom(
+                            comboDisplayViewModel = comboDisplayViewModel,
+                            combo = comboDisplay,
+                            userData = userData,
+                            userDetails = userDetails,
+                            fontColor = Color.White
+                        )
                     }
                     Spacer(modifier.height(12.dp))
                 }
@@ -99,6 +119,9 @@ fun ComboForm(
             /* Shows moves added to combo once a move has been added */
             ComboItemEditor(
                 context = context,
+                comboDisplayViewModel = comboDisplayViewModel,
+                userData = userData,
+                userDetails = userDetails,
                 combo = comboDisplay,
                 console = consoleTypeState,
                 sf6ControlType = sF6ControlType,
@@ -115,6 +138,7 @@ fun ComboForm(
         /* The buttons used to edit the moves in the combo */
         EditingButtons(
             comboCreationViewModel = comboCreationViewModel,
+            authViewModel = authViewModel,
             deleteMove = deleteMove,
             clearMoveList = clearMoveList,
             moveList = moveList,

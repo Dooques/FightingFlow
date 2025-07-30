@@ -60,8 +60,8 @@ import com.example.fightingflow.ui.comboDisplayScreen.comboItem.ComboItemDisplay
 import com.example.fightingflow.ui.components.ProfileAndConsoleInputMenu
 import com.example.fightingflow.viewmodels.UserViewModel
 import com.example.fightingflow.ui.components.ActionIcon
-import com.example.fightingflow.ui.components.ShowPublicCombosMenu
 import com.example.fightingflow.ui.components.SwipeableItem
+import com.example.fightingflow.ui.settingsMenus.ShowPublicCombosMenu
 import com.example.fightingflow.viewmodels.ComboDisplayViewModel
 import dev.shreyaspatil.capturable.controller.rememberCaptureController
 import kotlinx.coroutines.launch
@@ -77,6 +77,7 @@ fun ComboDisplayScreen(
     snackbarHostState: SnackbarHostState,
     comboDisplayViewModel: ComboDisplayViewModel,
     comboCreationViewModel: ComboCreationViewModel,
+    userViewModel: UserViewModel,
     onNavigateToComboEditor: () -> Unit,
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
@@ -87,7 +88,6 @@ fun ComboDisplayScreen(
     (context as? Activity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
 
     val mediaStoreUtil = koinInject<MediaStoreUtil>()
-    val profileViewModel = koinInject<UserViewModel>()
 
     val fontColor = MaterialTheme.colorScheme.onBackground
     val scope = rememberCoroutineScope()
@@ -111,7 +111,7 @@ fun ComboDisplayScreen(
     val characterImageState by comboDisplayViewModel.characterImageState.collectAsStateWithLifecycle()
     val iconDisplayState by comboDisplayViewModel.showIconState.collectAsStateWithLifecycle()
     val gameSelectedState by comboDisplayViewModel.gameSelectedState.collectAsStateWithLifecycle()
-    val userState by profileViewModel.username.collectAsStateWithLifecycle()
+    val userState by userViewModel.username.collectAsStateWithLifecycle()
 
     val textComboState by comboDisplayViewModel.textComboState.collectAsStateWithLifecycle()
     val consoleTypeState by comboDisplayViewModel.consoleTypeState.collectAsStateWithLifecycle()
@@ -120,6 +120,8 @@ fun ComboDisplayScreen(
     // Firebase Flows
     val comboDisplayListFirebase by comboDisplayViewModel.fireStoreComboDisplayFlow.collectAsStateWithLifecycle()
     val comboEntryListFirebase by comboDisplayViewModel.fireStoreComboEntryFlow.collectAsStateWithLifecycle()
+    val userData by userViewModel.userDataMap.collectAsStateWithLifecycle()
+    val userDetails by userViewModel.userDetailsState.collectAsStateWithLifecycle()
 
     Timber.d("Console: %s \nCombo List: %s",
         consoleTypeState, comboDisplayListFirebase.comboDisplayList)
@@ -373,7 +375,10 @@ fun ComboDisplayScreen(
                             toShare = shareDataOn,
                             display = true,
                             fontColor = fontColor,
+                            comboDisplayViewModel = comboDisplayViewModel,
                             characterEntryListUiState = characterListState,
+                            userData = userData,
+                            userDetails = userDetails,
                             combo = combo,
                             comboAsText = comboEntryList[index].moves,
                             console = consoleTypeState,

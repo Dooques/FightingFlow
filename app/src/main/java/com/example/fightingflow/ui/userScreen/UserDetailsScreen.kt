@@ -167,16 +167,6 @@ fun UserDetailsScreen(
                         modifier = modifier.fillMaxWidth().padding(vertical = 8.dp)
                     ) {
                         Text(
-                            "UserId: ${(userDetails as UserDetailsState.Loaded).user.userId}",
-                            modifier = modifier.padding(horizontal = 32.dp)
-                        )
-                    }
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Start,
-                        modifier = modifier.fillMaxWidth().padding(vertical = 8.dp)
-                    ) {
-                        Text(
                             "Date of Birth: ${(userDetails as UserDetailsState.Loaded).user.dob}",
                             modifier = modifier.padding(horizontal = 32.dp)
                         )
@@ -211,16 +201,6 @@ fun UserDetailsScreen(
                     ) {
                         Text(
                             "Email: ${currentUserState.user.email.toString()}",
-                            modifier = modifier.padding(horizontal = 32.dp)
-                        )
-                    }
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Start,
-                        modifier = modifier.fillMaxWidth().padding(vertical = 8.dp)
-                    ) {
-                        Text(
-                            "UserId: ${currentUserState.user.userId}",
                             modifier = modifier.padding(horizontal = 32.dp)
                         )
                     }
@@ -274,7 +254,6 @@ fun UserDetailsScreen(
                                 }
                             }
                         }
-
                     },
                     modifier
                         .fillMaxWidth()
@@ -283,7 +262,9 @@ fun UserDetailsScreen(
                     Text("Delete Account", color = Color.White)
                 }
             } else {
-
+                Row(Modifier.padding(horizontal = 16.dp)) {
+                    Text("Not currently logged in")
+                }
             }
         }
         if (showReauthDialog) {

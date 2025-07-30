@@ -13,6 +13,7 @@ import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.Console
 import com.example.fightingflow.model.SF6ControlType
+import com.example.fightingflow.model.UserEntry
 import com.example.fightingflow.model.toDisplay
 import com.example.fightingflow.model.toEntry
 import com.example.fightingflow.util.CharImageUiState
@@ -28,7 +29,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -67,7 +67,6 @@ class ComboDisplayViewModel(
         getAllMoveEntries()
         Timber.Forest.d("Getting Combo Display List")
     }
-
 
     val characterNameState = characterDsRepository.getName()
             .map { CharNameUiState(it) }
@@ -142,6 +141,14 @@ class ComboDisplayViewModel(
             started = SharingStarted.Companion.WhileSubscribed(ComboCreationViewModel.Companion.TIME_MILLIS * 6),
             initialValue = ComboEntryListUiState()
         )
+
+    fun updateCombo(combo: ComboDisplay, user: UserEntry) {
+        Timber.d("Updating combo ${combo.id} in firestore database")
+        firebaseRepository.updateCombo(combo.toEntry(characterEntryListState.value.characterList.first { it.name == combo.character }))
+        Timber.d("Updating user details to add/remove combo from likes")
+        Timber.d("User Details: $user")
+        firebaseRepository.updateUser(user)
+    }
 
     //Database Flows
     @OptIn(ExperimentalCoroutinesApi::class)

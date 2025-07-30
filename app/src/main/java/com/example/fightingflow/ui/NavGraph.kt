@@ -28,6 +28,7 @@ import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayScreen
 import com.example.fightingflow.viewmodels.ComboDisplayViewModel
 import com.example.fightingflow.viewmodels.AuthViewModel
 import com.example.fightingflow.ui.userScreen.UserDetailsScreen
+import com.example.fightingflow.viewmodels.ProfanityViewModel
 import com.example.fightingflow.viewmodels.UserViewModel
 import org.koin.compose.koinInject
 import timber.log.Timber
@@ -55,6 +56,7 @@ fun NavGraph(
     val characterViewModel = koinInject<CharacterViewModel>()
     val addCharacterViewModel = koinInject<AddCharacterViewModel>()
     val authViewModel = koinInject<AuthViewModel>()
+    val profanityViewModel = koinInject<ProfanityViewModel>()
 
     val scope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
@@ -77,6 +79,7 @@ fun NavGraph(
                 TitleScreen(
                     authViewModel = authViewModel,
                     userViewModel = userViewModel,
+                    profanityViewModel = profanityViewModel,
                     snackbarHostState = snackBarHostState,
                     deviceType = deviceType,
                     onCharSelect = { navController.navigate(FlowScreen.CharSelect.name) },
@@ -143,6 +146,7 @@ fun NavGraph(
                     deviceType = deviceType,
                     comboDisplayViewModel = comboDisplayViewModel,
                     comboCreationViewModel = comboCreationViewModel,
+                    userViewModel = userViewModel,
                     snackbarHostState = snackBarHostState,
                     onNavigateToComboEditor = { navController.navigate(FlowScreen.ComboCreation.name) },
                     navigateBack = { navController.navigate(FlowScreen.CharSelect.name) }
@@ -153,8 +157,10 @@ fun NavGraph(
             composable(route = FlowScreen.ComboCreation.name) {
                 Timber.d("Loading Combo Creation Screen...")
                 ComboCreationScreen(
+                    authViewModel = authViewModel,
                     comboDisplayViewModel = comboDisplayViewModel,
                     comboCreationViewModel = comboCreationViewModel,
+                    userViewModel = userViewModel,
                     scope = scope,
                     snackbarHostState = snackBarHostState,
                     onNavigateToComboDisplay = { navController.navigate(FlowScreen.Combos.name) },
