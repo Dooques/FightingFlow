@@ -73,7 +73,6 @@ fun UserDetailsDialog(
     var showUsernameError by remember { mutableStateOf(false) }
     var showUsernameProfanityError by remember { mutableStateOf(false) }
 
-    profanityViewModel.readJsonFromAssets(context, "profanityFilter.JSON")
 
     BasicAlertDialog(onDismissRequest = { onDismissDialog() }) {
         Card(
@@ -93,9 +92,9 @@ fun UserDetailsDialog(
 
                 OutlinedTextField(
                     value = username,
-                    onValueChange = {
-                        username = it
-                        if (profanityViewModel.checkForUsernameInProfanityFilter(it)) {
+                    onValueChange = { newValue ->
+                        username = newValue
+                        if (profanityViewModel.checkForUsernameInProfanityFilter(newValue)) {
                             showUsernameProfanityError = true
                         } else {
                             showUsernameProfanityError = false
@@ -148,8 +147,8 @@ fun UserDetailsDialog(
                                             UserEntry(
                                                 userId = currentUserState.user.userId,
                                                 username = username,
-                                                name = currentUserState.user.displayName,
-                                                email = currentUserState.user.email,
+                                                name = currentUserState.user.displayName ?: "Invalid Name",
+                                                email = currentUserState.user.email ?: "Invalid Email",
                                                 profilePic = currentUserState.user.photo.toString(),
                                                 dob = selectedDob,
                                                 dateCreated = LocalDate.now().toString(),

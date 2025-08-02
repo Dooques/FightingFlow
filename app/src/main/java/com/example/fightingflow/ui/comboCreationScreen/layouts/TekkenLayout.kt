@@ -25,12 +25,14 @@ import com.example.fightingflow.util.MoveEntryListUiState
 import com.example.fightingflow.util.characterAndMoveData.nintendoInputs
 import com.example.fightingflow.util.characterAndMoveData.playstationInputs
 import com.example.fightingflow.util.characterAndMoveData.xboxInputs
+import com.example.fightingflow.viewmodels.ProfanityViewModel
 import timber.log.Timber
 
 @Composable
 fun TekkenLayout(
     context: Context,
     comboCreationViewModel: ComboCreationViewModel,
+    profanityViewModel: ProfanityViewModel,
     comboDisplay: ComboDisplay,
     character: CharacterEntry,
     characterName: String,
@@ -58,6 +60,7 @@ fun TekkenLayout(
 
                 "Description" -> ComboDescription(
                     combo = combo,
+                    profanityViewModel = profanityViewModel,
                     updateComboData = updateComboData
                 )
 

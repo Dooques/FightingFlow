@@ -10,6 +10,8 @@ import com.example.fightingflow.data.datastore.SettingsDsRepository
 import com.example.fightingflow.data.firebase.FirebaseRepository
 import com.example.fightingflow.data.firebase.GoogleAuthRepository
 import com.example.fightingflow.data.firebase.GoogleAuthService
+import com.example.fightingflow.model.ComboEntry
+import com.example.fightingflow.model.ComboEntryFb
 import com.example.fightingflow.model.Console
 import com.example.fightingflow.model.Game
 import com.example.fightingflow.model.MoveEntry
@@ -17,6 +19,7 @@ import com.example.fightingflow.model.SF6ControlType
 import com.example.fightingflow.model.getMoveEntryDataForComboDisplay
 import com.example.fightingflow.model.toDisplay
 import com.example.fightingflow.model.toEntry
+import com.example.fightingflow.model.toFbEntry
 import com.example.fightingflow.ui.comboCreationScreen.processComboAsStringAbstract
 import com.example.fightingflow.ui.comboCreationScreen.updateMoveListAbstract
 import com.example.fightingflow.util.CharacterEntryUiState
@@ -26,6 +29,7 @@ import com.example.fightingflow.util.ImmutableList
 import com.example.fightingflow.util.MoveEntryListUiState
 import com.example.fightingflow.util.emptyComboDisplay
 import com.example.fightingflow.util.emptyComboEntry
+import com.example.fightingflow.util.emptyComboEntryFb
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -133,9 +137,8 @@ class ComboCreationViewModel(
 
     fun deleteMove() {
         Timber.d("Deleting last move...")
-        if (itemIndexState.value > 0) {
-            val currentMoves: MutableList<MoveEntry> =
-                comboDisplayState.value.comboDisplay.moves.toMutableList()
+        if (itemIndexState.value >= 0) {
+            val currentMoves: MutableList<MoveEntry> = comboDisplayState.value.comboDisplay.moves.toMutableList()
             Timber.d("Temporary move list created, move to delete: ${currentMoves.last()}")
 
             val index =
@@ -227,7 +230,11 @@ class ComboCreationViewModel(
         try {
             var comboIdResult = ""
             val firestoreRequest = viewModelScope.launch {
-                comboIdResult = firebaseRepository.addCombo(comboEntry)
+                comboIdResult = firebaseRepository.addCombo(
+                    comboEntry
+                        .toDisplay(moveEntryListUiState.value)
+                        .toFbEntry(characterState.value.character)
+                )
             }
             firestoreRequest.join()
             flowRepository.insertCombo(comboEntry.copy(id = comboIdResult))
@@ -250,7 +257,11 @@ class ComboCreationViewModel(
         val updatedCombo = comboDisplayState.value.comboDisplay.toEntry(characterState.value.character)
         Timber.d("Move List: ${updatedCombo.moves}")
         try {
-            firebaseRepository.updateCombo(updatedCombo)
+            firebaseRepository.updateCombo(
+                updatedCombo
+                    .toDisplay(moveEntryListUiState.value)
+                    .toFbEntry(characterState.value.character)
+            )
             flowRepository.updateCombo(updatedCombo)
 
             resetCombo()
@@ -368,14 +379,12 @@ class ComboCreationViewModel(
     fun getExistingComboFromFirestore() {
         viewModelScope.launch {
             if (characterState.value != CharacterEntryUiState() && comboIdState.value.isNotBlank()) {
-                firebaseRepository.getCombo(
-                    characterState.value.character.name,
-                    comboIdState.value
-                )
-                    .map { combo -> ComboEntryUiState(combo ?: emptyComboEntry) }
+                firebaseRepository.getCombo(characterState.value.character.name, comboIdState.value)
+                    .map { combo -> (combo ?: emptyComboEntryFb) }
                     .collect { combo ->
-                        val existingCombo =
-                            ComboDisplayUiState(combo.comboEntry.toDisplay(moveEntryListUiState.value))
+                        val existingCombo = ComboDisplayUiState(
+                            combo.toDisplay(moveEntryListUiState.value)
+                        )
                         comboDisplayState.update { existingCombo }
                         originalCombo.update { existingCombo }
                     }

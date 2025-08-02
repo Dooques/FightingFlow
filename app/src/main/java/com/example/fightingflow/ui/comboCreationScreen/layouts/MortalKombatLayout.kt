@@ -25,6 +25,7 @@ import com.example.fightingflow.util.MoveEntryListUiState
 import com.example.fightingflow.util.characterAndMoveData.nintendoInputs
 import com.example.fightingflow.util.characterAndMoveData.playstationInputs
 import com.example.fightingflow.util.characterAndMoveData.xboxInputs
+import com.example.fightingflow.viewmodels.ProfanityViewModel
 import timber.log.Timber
 
 
@@ -32,6 +33,7 @@ import timber.log.Timber
 fun MortalKombatLayout(
     context: Context,
     comboCreationViewModel: ComboCreationViewModel,
+    profanityViewModel: ProfanityViewModel,
     combo: ComboDisplay,
     character: CharacterEntry,
     console: Console?,
@@ -45,7 +47,11 @@ fun MortalKombatLayout(
     LazyColumn {
         items(items = mortalKombatLayout) { moveType ->
             when (moveType) {
-                "Description" -> ComboDescription(combo, updateComboData)
+                "Description" -> ComboDescription(
+                    combo = combo,
+                    profanityViewModel = profanityViewModel,
+                    updateComboData = updateComboData
+                )
 
                 "Move Modifiers" -> MoveModifiers()
 

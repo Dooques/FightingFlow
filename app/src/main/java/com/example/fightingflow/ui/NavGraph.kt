@@ -9,9 +9,13 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -59,7 +63,41 @@ fun NavGraph(
     val profanityViewModel = koinInject<ProfanityViewModel>()
 
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     val snackBarHostState = remember { SnackbarHostState() }
+
+    val profanityData = profanityViewModel.profanityData
+    val signInState by authViewModel.signInState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(profanityData) {
+        if (profanityData.isEmpty()) {
+            profanityViewModel.readJsonFromAssets(context, "profanityFilter.JSON")
+        }
+    }
+
+    LaunchedEffect(signInState) {
+        userViewModel.updateCurrentUser(signInState)
+    }
+
+    Timber.d("SignInState: $signInState")
+//    LaunchedEffect(signInState) {
+//        Timber.d("Sign In State detected, triggering launched effect")
+//        when (signInState) {
+//            is GoogleAuthService.SignInState.Success -> {
+//                userViewModel.updateUserId((signInState as GoogleAuthService.SignInState.Success).user.userId)
+//                userDetailsState = userViewModel.userDetailsState(signInState).value
+//
+//                Timber.d("Sign in successful, returning userDetails Value and updating user state")
+//                Timber.d("User Details State: %s",
+//                    when (userDetailsState) {
+//                        is UserDetailsState.Loaded -> { (userDetailsState as UserDetailsState.Loaded).user }
+//                        is UserDetailsState.Error -> { (userDetailsState as UserDetailsState.Error).e }
+//                        else -> { "No user details found" }
+//                    })
+//            }
+//            else -> null
+//        }
+//    }
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
@@ -95,6 +133,7 @@ fun NavGraph(
                     snackBarHostState = snackBarHostState,
                     userViewModel = userViewModel,
                     authViewModel = authViewModel,
+                    profanityViewModel = profanityViewModel,
                     navigateBack =  navController::navigateUp,
                 )
             }
@@ -147,6 +186,7 @@ fun NavGraph(
                     comboDisplayViewModel = comboDisplayViewModel,
                     comboCreationViewModel = comboCreationViewModel,
                     userViewModel = userViewModel,
+                    authViewModel = authViewModel,
                     snackbarHostState = snackBarHostState,
                     onNavigateToComboEditor = { navController.navigate(FlowScreen.ComboCreation.name) },
                     navigateBack = { navController.navigate(FlowScreen.CharSelect.name) }
@@ -161,6 +201,7 @@ fun NavGraph(
                     comboDisplayViewModel = comboDisplayViewModel,
                     comboCreationViewModel = comboCreationViewModel,
                     userViewModel = userViewModel,
+                    profanityViewModel = profanityViewModel,
                     scope = scope,
                     snackbarHostState = snackBarHostState,
                     onNavigateToComboDisplay = { navController.navigate(FlowScreen.Combos.name) },

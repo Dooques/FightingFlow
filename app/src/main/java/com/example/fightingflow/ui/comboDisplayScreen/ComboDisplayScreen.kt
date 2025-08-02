@@ -46,7 +46,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -54,7 +53,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.example.fightingflow.data.firebase.GoogleAuthService
 import com.example.fightingflow.data.mediastore.MediaStoreUtil
+import com.example.fightingflow.model.ComboDisplay
+import com.example.fightingflow.model.ComboEntryFb
 import com.example.fightingflow.viewmodels.ComboCreationViewModel
 import com.example.fightingflow.ui.comboDisplayScreen.comboItem.ComboItemDisplay
 import com.example.fightingflow.ui.components.ProfileAndConsoleInputMenu
@@ -62,7 +64,9 @@ import com.example.fightingflow.viewmodels.UserViewModel
 import com.example.fightingflow.ui.components.ActionIcon
 import com.example.fightingflow.ui.components.SwipeableItem
 import com.example.fightingflow.ui.settingsMenus.ShowPublicCombosMenu
+import com.example.fightingflow.viewmodels.AuthViewModel
 import com.example.fightingflow.viewmodels.ComboDisplayViewModel
+import com.example.fightingflow.viewmodels.UserDetailsState
 import dev.shreyaspatil.capturable.controller.rememberCaptureController
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -78,6 +82,7 @@ fun ComboDisplayScreen(
     comboDisplayViewModel: ComboDisplayViewModel,
     comboCreationViewModel: ComboCreationViewModel,
     userViewModel: UserViewModel,
+    authViewModel: AuthViewModel,
     onNavigateToComboEditor: () -> Unit,
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
@@ -97,13 +102,11 @@ fun ComboDisplayScreen(
     var capturedImage by remember { mutableStateOf<Uri?>(null) }
     var capturedImageFile by remember { mutableStateOf<File?>(null) }
     var shareDataOn by remember { mutableStateOf(false) }
-    var offlineMode by remember { mutableStateOf(false) }
+    var combosCollected by remember { mutableStateOf(true) }
 
     // Room Flows
     val characterState by comboDisplayViewModel.characterState.collectAsStateWithLifecycle()
     val characterListState by comboDisplayViewModel.characterEntryListState.collectAsStateWithLifecycle()
-    val comboDisplayListRoom by comboDisplayViewModel.databaseComboDisplayFlow.collectAsStateWithLifecycle()
-    val comboEntryListRoom by comboDisplayViewModel.databaseComboEntryFlow.collectAsStateWithLifecycle()
 
     // Datastore Flows
     val showPublicCombos by comboDisplayViewModel.publicCombosDisplayState.collectAsStateWithLifecycle()
@@ -121,13 +124,33 @@ fun ComboDisplayScreen(
     val comboDisplayListFirebase by comboDisplayViewModel.fireStoreComboDisplayFlow.collectAsStateWithLifecycle()
     val comboEntryListFirebase by comboDisplayViewModel.fireStoreComboEntryFlow.collectAsStateWithLifecycle()
     val userData by userViewModel.userDataMap.collectAsStateWithLifecycle()
-    val userDetails by userViewModel.userDetailsState.collectAsStateWithLifecycle()
 
-    Timber.d("Console: %s \nCombo List: %s",
-        consoleTypeState, comboDisplayListFirebase.comboDisplayList)
+    // Auth Flows
+    val currentUser by authViewModel.signInState.collectAsStateWithLifecycle()
+    val userDetails by userViewModel.userDetailsState.collectAsStateWithLifecycle()
+    val comboEntryList: MutableList<ComboEntryFb> = comboEntryListFirebase.comboEntryFbList.toMutableList()
+    val comboDisplayList: MutableList<ComboDisplay> = comboDisplayListFirebase.comboDisplayList.toMutableList()
+
+    Timber.d("--Flow Values--\nConsole: %s\nCombo List: %s\nCollected: %s",
+        consoleTypeState, comboDisplayListFirebase.comboDisplayList, combosCollected)
 
     Timber.d("Updating character data")
+    LaunchedEffect(currentUser) {
+        Timber.d("Launched Effect triggered by User State Change\nCurrent User: %s",
+        when (currentUser) {
+            is GoogleAuthService.SignInState.Success -> {"User is signed in: " +
+                (currentUser as GoogleAuthService.SignInState.Success).user
+            }
+            else -> { "User is not signed in yet: $currentUser"}
+        })
+        when (currentUser) {
+            is GoogleAuthService.SignInState.Success -> { comboDisplayViewModel.updateUserState(currentUser) }
+            else -> null
+        }
+    }
+
     LaunchedEffect(characterNameState.name) {
+        Timber.d("Launched Effect triggered by character change")
         if (characterNameState.name.isNotEmpty()) {
             try {
                 Timber.d("Getting ${characterNameState.name} from database...")
@@ -142,24 +165,22 @@ fun ComboDisplayScreen(
         }
     }
 
-    Timber.d("Getting combos by character...")
-
-    var comboEntryList = comboEntryListFirebase.comboEntryList.toMutableList()
-    var comboDisplayList = comboDisplayListFirebase.comboDisplayList.toMutableList()
-
-    LaunchedEffect(comboEntryList, comboDisplayList) {
-        if (comboEntryList.isEmpty() && comboDisplayList.isEmpty() &&
-            comboEntryListRoom.comboEntryList.isNotEmpty() && comboDisplayListRoom.comboDisplayList.isNotEmpty()) {
-            offlineMode = true
-            comboEntryList = comboEntryListRoom.comboEntryList.toMutableList()
-            comboDisplayList = comboDisplayListRoom.comboDisplayList.toMutableList()
-        } else {
-            offlineMode = false
-        }
-    }
+//    Timber.d("Getting combos by character...")
+//    LaunchedEffect(comboDisplayListFirebase, comboEntryListFirebase) {
+//        Timber.d("--Launched effect triggered by combo list change--")
+//        if (comboEntryListFirebase.comboEntryFbList.isNotEmpty() && comboDisplayListFirebase.comboDisplayList.isNotEmpty()) {
+//            Timber.d("Lists contain values, returning as mutable lists")
+//            comboEntryList = comboEntryListFirebase.comboEntryFbList.toMutableList()
+//            comboDisplayList = comboDisplayListFirebase.comboDisplayList.toMutableList()
+//            combosCollected = true
+//            Timber.d("ComboEntry: $comboEntryList\nComboDisplay: $comboDisplayList")
+//        } else {
+//            combosCollected = false
+//        }
+//    }
 
     Timber.d(
-        "Character Details \n Name: %s \n Image: %s \n CharacterState: %s \n Combo List: %s",
+        "Character Details\nName: %s\nImage: %s\nCharacterState: %s\nCombo List: %s",
         characterNameState.name,
         characterImageState.image,
         characterState.character,
@@ -240,16 +261,6 @@ fun ComboDisplayScreen(
                 }
             }
 
-            if (offlineMode) {
-                Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
-                    Text(
-                        "Offline Mode: \nUsing internal storage, changes will not be saved to network.",
-                        style = MaterialTheme.typography.bodySmall
-                            .copy(shadow = Shadow(color = Color.Green))
-                    )
-                }
-            }
-
             LazyColumn(modifier
                 .fillMaxSize()
                 .padding(
@@ -257,7 +268,9 @@ fun ComboDisplayScreen(
                     end = if (uiScale == 1.5f) 16.dp else 0.dp
                 )
             ) {
-                if (comboEntryList.isEmpty() && comboDisplayList.isEmpty()) {
+                Timber.d("--Loading Combo Display List--\n ComboList: $comboDisplayList")
+                if (!combosCollected) {
+                    Timber.d("Combo list is empty")
                     item {
                         Row(
                             modifier = modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 32.dp),
@@ -270,6 +283,7 @@ fun ComboDisplayScreen(
                 }
                 Timber.d("Getting display combos as lazy column with swipeable actions.")
                 itemsIndexed(items = comboDisplayList) { index, combo ->
+                    Timber.d("Combo: ${combo.id}\nIndex: $index")
                     val captureController = rememberCaptureController()
                     val isOptionRevealed by remember { mutableStateOf(false) }
 
@@ -313,41 +327,46 @@ fun ComboDisplayScreen(
                                 icon = Icons.Default.Share,
                                 modifier = modifier.fillMaxHeight()
                             )
-                            if (userState == combo.createdBy) {
-                            // Edit Combo
-                            ActionIcon(
-                                onclick = {
-                                    Timber.d("Preparing to edit combo")
-                                    scope.launch {
-                                        comboDisplayViewModel.updateComboStateInDs(combo)
-                                        comboDisplayViewModel.updateEditingState(true)
-                                        comboCreationViewModel.updateItemIndex(combo.moves.size)
-                                        onNavigateToComboEditor()
+                            when (userDetails) {
+                                is UserDetailsState.Loaded -> {
+                                    if ((userDetails as UserDetailsState.Loaded).user.userId == combo.createdBy) {
+                                        // Edit Combo
+                                        ActionIcon(
+                                            onclick = {
+                                                Timber.d("Preparing to edit combo")
+                                                scope.launch {
+                                                    comboDisplayViewModel.updateComboStateInDs(combo)
+                                                    comboDisplayViewModel.updateEditingState(true)
+                                                    comboCreationViewModel.updateItemIndex(combo.moves.size)
+                                                    onNavigateToComboEditor()
+                                                }
+                                            },
+                                            tint = Color.Green,
+                                            icon = Icons.Default.Edit,
+                                            modifier = modifier.fillMaxHeight()
+                                        )
+                                        // Delete Combo
+                                        ActionIcon(
+                                            onclick = {
+                                                scope.launch {
+                                                    comboDisplayViewModel.deleteCombo(
+                                                        combo,
+                                                    )
+                                                    Timber.d("UI deleted: $combo")
+                                                }
+                                                Toast.makeText(
+                                                    context,
+                                                    "Combo ${combo.id} was deleted.",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                            },
+                                            tint = Color.Red,
+                                            icon = Icons.Default.Delete,
+                                            modifier = modifier.fillMaxHeight()
+                                        )
                                     }
-                                },
-                                tint = Color.Green,
-                                icon = Icons.Default.Edit,
-                                modifier = modifier.fillMaxHeight()
-                            )
-                            // Delete Combo
-                                ActionIcon(
-                                    onclick = {
-                                        scope.launch {
-                                            comboDisplayViewModel.deleteCombo(
-                                                combo,
-                                            )
-                                            Timber.d("UI deleted: $combo")
-                                        }
-                                        Toast.makeText(
-                                            context,
-                                            "Combo ${combo.id} was deleted.",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    },
-                                    tint = Color.Red,
-                                    icon = Icons.Default.Delete,
-                                    modifier = modifier.fillMaxHeight()
-                                )
+                                }
+                                else -> null
                             }
                             var settingsMenuExpanded by remember { mutableStateOf(false) }
                             ActionIcon(
@@ -371,16 +390,19 @@ fun ComboDisplayScreen(
                     ) {
                         ComboItemDisplay(
                             context = context,
+                            scope = scope,
                             captureController = captureController,
                             toShare = shareDataOn,
                             display = true,
                             fontColor = fontColor,
                             comboDisplayViewModel = comboDisplayViewModel,
                             characterEntryListUiState = characterListState,
+                            currentUser = currentUser,
                             userData = userData,
                             userDetails = userDetails,
+                            comboCreationState = false,
                             combo = combo,
-                            comboAsText = comboEntryList[index].moves,
+                            comboAsText = comboEntryList[index].moves.toString(),
                             console = consoleTypeState,
                             sf6ControlType = sF6ControlType,
                             iconDisplayState = iconDisplayState,

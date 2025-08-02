@@ -11,7 +11,7 @@ import com.example.fightingflow.util.ImmutableList
 import com.example.fightingflow.util.characterAndMoveData.consoleInputs
 import timber.log.Timber
 
-fun processComboAsStringAbstract(moveList: ImmutableList<MoveEntry>): String {
+fun processComboAsStringAbstract(moveList: List<MoveEntry>): String {
     val comboIterator = moveList.iterator()
     var moveAsString = ""
     while (comboIterator.hasNext()) {

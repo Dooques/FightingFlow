@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.fightingflow.data.firebase.GoogleAuthService
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.Console
 import com.example.fightingflow.model.Game
@@ -24,15 +25,19 @@ import com.example.fightingflow.ui.comboDisplayScreen.inputConverter.convertInpu
 import com.example.fightingflow.viewmodels.ComboDisplayViewModel
 import com.example.fightingflow.viewmodels.UserDetailsState
 import com.example.fightingflow.viewmodels.UserViewModel
+import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
 
 
 @Composable
 fun ComboItemEditor(
     context: Context,
+    scope: CoroutineScope,
     comboDisplayViewModel: ComboDisplayViewModel,
+    currentUser: GoogleAuthService.SignInState,
     userData: UserDataForCombos,
     userDetails: UserDetailsState,
+    comboCreationState: Boolean,
     combo: ComboDisplay,
     comboAsText: String,
     console: Console?,
@@ -325,7 +330,10 @@ fun ComboItemEditor(
                 ComboAsText(comboAsText)
             }
             ComboInfoBottom(
+                scope = scope,
                 comboDisplayViewModel = comboDisplayViewModel,
+                currentUser = currentUser,
+                comboCreationState = comboCreationState,
                 combo = combo,
                 userData = userData,
                 userDetails = userDetails,

@@ -43,6 +43,7 @@ import com.example.fightingflow.util.emptyCharacter
 import com.example.fightingflow.util.emptyComboDisplay
 import com.example.fightingflow.viewmodels.AuthViewModel
 import com.example.fightingflow.viewmodels.ComboCreationViewModel
+import com.example.fightingflow.viewmodels.ProfanityViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.update
 import org.koin.compose.koinInject
@@ -56,6 +57,7 @@ fun ComboCreationScreen(
     comboDisplayViewModel: ComboDisplayViewModel,
     comboCreationViewModel: ComboCreationViewModel,
     userViewModel: UserViewModel,
+    profanityViewModel: ProfanityViewModel,
     scope: CoroutineScope,
     snackbarHostState: SnackbarHostState,
     onNavigateToComboDisplay: () -> Unit,
@@ -67,8 +69,6 @@ fun ComboCreationScreen(
 
     val context = LocalContext.current
     (context as? Activity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-
-    val userViewModel= koinInject<UserViewModel>()
 
     var settingsMenuExpanded by remember { mutableStateOf(false) }
 
@@ -99,6 +99,9 @@ fun ComboCreationScreen(
 
     // Firebase Flows
     val userData by userViewModel.userDataMap.collectAsStateWithLifecycle()
+
+    // Auth Flows
+    val currentUser by authViewModel.signInState.collectAsStateWithLifecycle()
     val userDetails by userViewModel.userDetailsState.collectAsStateWithLifecycle()
 
     if (characterState.character != emptyCharacter) {
@@ -219,11 +222,14 @@ fun ComboCreationScreen(
                     comboCreationViewModel = comboCreationViewModel,
                     comboDisplayViewModel = comboDisplayViewModel,
                     authViewModel = authViewModel,
+                    profanityViewModel = profanityViewModel,
+                    comboCreationState = true,
                     game = game,
                     consoleTypeState = consoleTypeState,
                     sF6ControlType = sf6ControlType,
                     updateComboData = comboCreationViewModel::updateComboDetails,
                     setSelectedItem = comboCreationViewModel::updateItemIndex,
+                    currentUser = currentUser,
                     userData = userData,
                     userDetails = userDetails,
                     selectedItem = selectedItem,

@@ -18,6 +18,7 @@ val tekken8Characters: ImmutableList<CharacterEntry> = ImmutableList(
         CharacterEntry(name = "Devil Jin", imageId = R.drawable.devil_jin, fightingStyle = "Unknown", controlType = "Tekken", game = "Tekken 8"),
         CharacterEntry(name = "Dragunov", imageId = R.drawable.dragunov, fightingStyle = "White Reaper", controlType = "Tekken", game = "Tekken 8"),
         CharacterEntry(name = "Eddy", imageId = R.drawable.eddy, fightingStyle = "Capoeira", controlType = "Tekken", game = "Tekken 8"),
+        CharacterEntry(name = "Fahkumram", imageId = R.drawable.fahkumram, fightingStyle = "Muay Thai", controlType = "Tekken", game = "Tekken 8"),
         CharacterEntry(name = "Feng", imageId = R.drawable.feng, fightingStyle = "Taijiquan", controlType = "Tekken", game = "Tekken 8"),
         CharacterEntry(name = "Heihachi", imageId = R.drawable.heihachi, fightingStyle = "Mishima Style Fighting Karate", controlType = "Tekken", game = "Tekken 8"),
         CharacterEntry(name = "Hwoarang", imageId = R.drawable.hwoarang, fightingStyle = "Taekwondo", controlType = "Tekken", game = "Tekken 8"),
@@ -160,6 +161,10 @@ val tekken8CharacterMoves = ImmutableList(
         MoveEntry(moveName = "Bananeira", notation = "Bananeira", moveType = "Character", character = "Eddy", game = "Tekken 8"),
         MoveEntry(moveName = "Negativa", notation = "Negativa", moveType = "Character", character = "Eddy", game = "Tekken 8"),
         MoveEntry(moveName = "Mandinga", notation = "Mandinga", moveType = "Character", character = "Eddy", game = "Tekken 8"),
+
+        // Fahkumram
+        MoveEntry(moveName = "Garuda Force", notation = "Garuda Force", moveType = "Character", character = "Fahkumram", game = "Tekken 8"),
+        MoveEntry(moveName = "Rama Stance", notation = "Rama Stance", moveType = "Character", character = "Fahkumram", game = "Tekken 8"),
 
         // Feng
         MoveEntry(moveName = "Deceptive Step", notation = "Deceptive Step", moveType = "Character", character = "Feng", game = "Tekken 8"),

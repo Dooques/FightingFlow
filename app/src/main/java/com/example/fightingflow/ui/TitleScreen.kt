@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -89,15 +90,21 @@ fun TitleScreen(
         Timber.d("Checking if user is logged in...")
         if (userDetails is UserDetailsState.Loaded && currentUser is GoogleAuthService.SignInState.Success) {
             Timber.d("User is logged in, loading greeting...")
-            val username = (userDetails as UserDetailsState.Loaded)
-                .user.username?.replaceFirstChar { it.uppercase() } ?: "Invalid Username"
-            Text(
-                text = "Welcome $username",
-                style = MaterialTheme.typography.bodyLarge,
-                fontSize = if (uiScale == 2) 25.sp else 30.sp,
-                color = Color.White,
-                modifier = modifier.padding(bottom = if (uiScale != 2) 20.dp else 0.dp)
-            )
+            val username = (userDetails as UserDetailsState.Loaded).user.username.replaceFirstChar { it.uppercase() }
+            Row (
+                horizontalArrangement = Arrangement.Center,
+                modifier = modifier.fillMaxWidth().padding(16.dp)
+            ) {
+                Text(
+                    text = "Welcome $username",
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontSize = if (uiScale == 2) 25.sp else 30.sp,
+                    lineHeight = if (uiScale == 2) 27.sp else 32.sp,
+                    color = Color.White,
+                    textAlign = TextAlign.Center,
+                    modifier = modifier.padding(bottom = if (uiScale != 2) 20.dp else 0.dp)
+                )
+            }
         }
         else {
             Row(Modifier.fillMaxWidth()) {
@@ -127,15 +134,18 @@ fun TitleScreen(
                         LaunchedEffect(currentUser) {
                             if (currentUser is GoogleAuthService.SignInState.Success) {
                                 Timber.d("Launched Effect triggered on successful sign in.")
-                                userViewModel.getUserDetailsFromFb((currentUser as GoogleAuthService.SignInState.Success).user.userId)
+                                userViewModel.updateUserId((currentUser as GoogleAuthService.SignInState.Success).user.userId)
                             }
                         }
 
                         LaunchedEffect(userDetails) {
-                            Timber.d(
-                                "User Details: %s\nCurrent User: %s",
-                                userDetails, currentUser
-                            )
+                            Timber.d("UserDetails: %s",
+                                when (userDetails) {
+                                    is UserDetailsState.Loaded -> { (userDetails as UserDetailsState.Loaded).user }
+                                    is UserDetailsState.Error -> { (userDetails as UserDetailsState.Error).e }
+                                    else -> { "No User Found" }
+                                })
+                            Timber.d("Current User: %s", currentUser)
                             when (userDetails) {
                                 is UserDetailsState.NotFound -> {
                                     Timber.d("User data is null, opening user details dialog.")
@@ -191,6 +201,7 @@ fun TitleScreen(
         EmailAndPasswordDialog(
             userViewModel = userViewModel,
             authViewModel = authViewModel,
+            profanityViewModel = profanityViewModel,
             createAccount = createAccountState,
             snackbarHostState = snackbarHostState,
             onDismissRequest = {

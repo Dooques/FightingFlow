@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.example.fightingflow.data.firebase.GoogleAuthService
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.Console
@@ -33,6 +34,7 @@ import com.example.fightingflow.util.MoveEntryListUiState
 import com.example.fightingflow.viewmodels.AuthViewModel
 import com.example.fightingflow.viewmodels.ComboCreationViewModel
 import com.example.fightingflow.viewmodels.ComboDisplayViewModel
+import com.example.fightingflow.viewmodels.ProfanityViewModel
 import com.example.fightingflow.viewmodels.UserDetailsState
 import com.example.fightingflow.viewmodels.UserViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -49,9 +51,12 @@ fun ComboForm(
     comboDisplayViewModel: ComboDisplayViewModel,
     comboCreationViewModel: ComboCreationViewModel,
     authViewModel: AuthViewModel,
+    profanityViewModel: ProfanityViewModel,
+    comboCreationState: Boolean,
     game: Game,
     consoleTypeState: Console?,
     sF6ControlType: SF6ControlType?,
+    currentUser: GoogleAuthService.SignInState,
     userData: UserDataForCombos,
     userDetails: UserDetailsState,
     comboDisplay: ComboDisplay,
@@ -93,8 +98,11 @@ fun ComboForm(
                     ComboAsText("", modifier.padding(horizontal = 4.dp))
                     Box(modifier.padding(horizontal = 4.dp)) {
                         ComboInfoBottom(
+                            scope = scope,
                             comboDisplayViewModel = comboDisplayViewModel,
+                            comboCreationState = comboCreationState,
                             combo = comboDisplay,
+                            currentUser = currentUser,
                             userData = userData,
                             userDetails = userDetails,
                             fontColor = Color.White
@@ -104,8 +112,11 @@ fun ComboForm(
                 } else {
                     Box(modifier.padding(horizontal = 4.dp)) {
                         ComboInfoBottom(
+                            scope = scope,
                             comboDisplayViewModel = comboDisplayViewModel,
+                            comboCreationState = comboCreationState,
                             combo = comboDisplay,
+                            currentUser = currentUser,
                             userData = userData,
                             userDetails = userDetails,
                             fontColor = Color.White
@@ -119,9 +130,12 @@ fun ComboForm(
             /* Shows moves added to combo once a move has been added */
             ComboItemEditor(
                 context = context,
+                scope = scope,
                 comboDisplayViewModel = comboDisplayViewModel,
+                currentUser = currentUser,
                 userData = userData,
                 userDetails = userDetails,
+                comboCreationState = comboCreationState,
                 combo = comboDisplay,
                 console = consoleTypeState,
                 sf6ControlType = sF6ControlType,
@@ -159,6 +173,7 @@ fun ComboForm(
                 Game.T8 -> TekkenLayout(
                     context = context,
                     comboCreationViewModel = comboCreationViewModel,
+                    profanityViewModel = profanityViewModel,
                     comboDisplay = comboDisplay,
                     character = character,
                     characterName = characterName,
@@ -173,6 +188,7 @@ fun ComboForm(
                 Game.SF6 -> StreetFighterLayout(
                     context = context,
                     comboCreationViewModel = comboCreationViewModel,
+                    profanityViewModel = profanityViewModel,
                     comboDisplay = comboDisplay,
                     character = character,
                     combo = comboDisplay,
@@ -187,6 +203,7 @@ fun ComboForm(
                 Game.MK1 -> MortalKombatLayout(
                     context = context,
                     comboCreationViewModel = comboCreationViewModel,
+                    profanityViewModel = profanityViewModel,
                     combo = comboDisplay,
                     console = consoleTypeState,
                     character = character,
@@ -199,6 +216,7 @@ fun ComboForm(
                 Game.CUSTOM -> CustomGameLayout(
                     context = context,
                     comboCreationViewModel = comboCreationViewModel,
+                    profanityViewModel = profanityViewModel,
                     combo = comboDisplay,
                     updateComboData = updateComboData,
                     character = character,

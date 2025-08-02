@@ -8,7 +8,7 @@ import com.example.fightingflow.data.datastore.ComboDsRepository
 import com.example.fightingflow.data.datastore.SettingsDsRepository
 import com.example.fightingflow.data.datastore.UserDsRepository
 import com.example.fightingflow.data.firebase.FirebaseRepository
-import com.example.fightingflow.data.firebase.GoogleAuthRepository
+import com.example.fightingflow.data.firebase.GoogleAuthService
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.Console
@@ -16,14 +16,17 @@ import com.example.fightingflow.model.SF6ControlType
 import com.example.fightingflow.model.UserEntry
 import com.example.fightingflow.model.toDisplay
 import com.example.fightingflow.model.toEntry
+import com.example.fightingflow.model.toFbEntry
 import com.example.fightingflow.util.CharImageUiState
 import com.example.fightingflow.util.CharNameUiState
 import com.example.fightingflow.util.CharacterEntryListUiState
 import com.example.fightingflow.util.CharacterEntryUiState
 import com.example.fightingflow.util.ComboDisplayListUiState
+import com.example.fightingflow.util.ComboEntryFbListUiState
 import com.example.fightingflow.util.ComboEntryListUiState
 import com.example.fightingflow.util.MoveEntryListUiState
 import com.example.fightingflow.util.emptyCharacter
+import com.example.fightingflow.util.emptyComboDisplay
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -44,7 +47,7 @@ class ComboDisplayViewModel(
     private val comboDsRepository: ComboDsRepository,
     private val settingsDsRepository: SettingsDsRepository,
     private val firebaseRepository: FirebaseRepository,
-    private val profileDsRepository: UserDsRepository,
+    profileDsRepository: UserDsRepository,
 ): ViewModel() {
 
     companion object {
@@ -77,29 +80,70 @@ class ComboDisplayViewModel(
             )
 
     // Firebase Flows
+    private val _currentUserState = MutableStateFlow<GoogleAuthService.SignInState>(GoogleAuthService.SignInState.Idle)
+    val currentUserState:StateFlow<GoogleAuthService.SignInState> = _currentUserState
+
+    val fireStoreComboDisplayFlow = MutableStateFlow(ComboDisplayListUiState())
+
+    fun updateUserState(userState: GoogleAuthService.SignInState) {
+        Timber.d("Updating User ID to $userState")
+        _currentUserState.update { userState }
+        Timber.d("Updated ID: ${currentUserState.value}")
+    }
+
     @OptIn(ExperimentalCoroutinesApi::class)
-    val fireStoreComboDisplayFlow: StateFlow<ComboDisplayListUiState> = characterNameState
-        .flatMapLatest { characterName ->
-            user.flatMapLatest { currentUser ->
-                publicCombosDisplayState.flatMapLatest { publicCombosDisplayState ->
-                    if (characterName.name.isNotBlank() && currentUser.isNotBlank()) {
-                        firebaseRepository.getComboList(
-                            characterName.name,
-                            publicCombosDisplayState,
-                            currentUser
-                        )
-                            .map { entryList ->
-                                ComboDisplayListUiState(entryList.map { entry ->
-                                    entry.toDisplay(moveEntryListUiState.value)
-                                })
+    val fireStoreComboEntryFlow: StateFlow<ComboEntryFbListUiState> =
+        characterNameState.flatMapLatest { characterName ->
+            Timber.d("--Getting Combo Display List from Firestore--\nCharacter: %s", characterName)
+            currentUserState.flatMapLatest { currentUser ->
+                Timber.d("User: %s", currentUser)
+                when (currentUser) {
+                    is GoogleAuthService.SignInState.Success -> {
+                        moveEntryListUiState.flatMapLatest { moveList ->
+                            publicCombosDisplayState.flatMapLatest { publicCombosDisplayState ->
+                                Timber.d("Show Public Combos: $publicCombosDisplayState")
+                                if (characterName.name.isNotBlank()) {
+                                    firebaseRepository.getComboList(
+                                        character = characterName.name,
+                                        publicComboDisplayState = publicCombosDisplayState,
+                                        user = currentUser.user.userId
+                                    )
+                                        .map { entryList ->
+                                            Timber.d("ComboList Found: ${entryList}\nCreating Display List")
+                                            val comboDisplayList = entryList.map { entry ->
+                                                if (moveList.moveList.isNotEmpty()) {
+                                                    entry.toDisplay(moveList)
+                                                } else {
+                                                    emptyComboDisplay
+                                                }
+                                            }
+                                            Timber.d("Display List: $comboDisplayList")
+                                            fireStoreComboDisplayFlow.update {
+                                                ComboDisplayListUiState(
+                                                    comboDisplayList
+                                                )
+                                            }
+                                            Timber.d("Returning Fb Entry List: $entryList")
+                                            ComboEntryFbListUiState(entryList)
+                                        }
+                                        .catch { exception ->
+                                            Timber.Forest.e(
+                                                exception,
+                                                "Error collecting firestore combo flow: "
+                                            )
+                                            emit(ComboEntryFbListUiState())
+                                        }
+                                } else {
+                                    Timber.Forest.d("Character name is blank, emitting empty list.")
+                                    flowOf(ComboEntryFbListUiState())
+                                }
                             }
-                            .catch { exception ->
-                                Timber.Forest.e(exception, "Error collecting firestore combo flow: ")
-                                emit(ComboDisplayListUiState())
-                            }
-                    } else {
-                        Timber.Forest.d("Character name is blank, emitting empty list.")
-                        flowOf(ComboDisplayListUiState())
+                        }
+                    }
+
+                    else -> {
+                        Timber.d("")
+                        flowOf(ComboEntryFbListUiState())
                     }
                 }
             }
@@ -107,44 +151,16 @@ class ComboDisplayViewModel(
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.Companion.WhileSubscribed(ComboCreationViewModel.Companion.TIME_MILLIS * 6),
-                initialValue = ComboDisplayListUiState()
+                initialValue = ComboEntryFbListUiState()
             )
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val fireStoreComboEntryFlow: StateFlow<ComboEntryListUiState> = characterNameState
-        .flatMapLatest { characterName ->
-            user.flatMapLatest { currentUserDetails ->
-                publicCombosDisplayState.flatMapLatest { publicCombosDisplayState ->
-                    if (characterName.name.isNotBlank() && currentUserDetails.isNotBlank()) {
-                        firebaseRepository.getComboList(
-                            characterName.name,
-                            publicCombosDisplayState,
-                            currentUserDetails
-                        )
-                            .map { entryList -> ComboEntryListUiState(entryList) }
-                            .catch { exception ->
-                                Timber.Forest.e(
-                                    exception,
-                                    "Error collecting firestore combo flow: "
-                                )
-                                emit(ComboEntryListUiState())
-                            }
-                    } else {
-                        Timber.Forest.d("Character name is blank, emitting empty list.")
-                        flowOf(ComboEntryListUiState())
-                    }
-                }
-            }
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.Companion.WhileSubscribed(ComboCreationViewModel.Companion.TIME_MILLIS * 6),
-            initialValue = ComboEntryListUiState()
-        )
 
     fun updateCombo(combo: ComboDisplay, user: UserEntry) {
         Timber.d("Updating combo ${combo.id} in firestore database")
-        firebaseRepository.updateCombo(combo.toEntry(characterEntryListState.value.characterList.first { it.name == combo.character }))
+        firebaseRepository.updateCombo(
+            combo.toFbEntry(
+                characterEntryListState.value.characterList.first { it.name == combo.character }
+            )
+        )
         Timber.d("Updating user details to add/remove combo from likes")
         Timber.d("User Details: $user")
         firebaseRepository.updateUser(user)

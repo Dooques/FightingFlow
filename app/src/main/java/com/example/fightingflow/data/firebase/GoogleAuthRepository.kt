@@ -33,6 +33,7 @@ interface GoogleAuthService {
         val email: String?,
         val photo: String?
     )
+
     sealed class SignInState {
         data object Idle: SignInState()
         data object Loading: SignInState()
@@ -199,7 +200,7 @@ class GoogleAuthRepository(
     override fun getCurrentUser(): GoogleAuthService.GoogleSignInResult? {
         Timber.d("--Getting current User--")
         val firebaseUser = auth.currentUser
-        Timber.d("User: $firebaseUser")
+        Timber.d("User: ${firebaseUser?.email}")
         return firebaseUser?.let {
             GoogleAuthService.GoogleSignInResult(
                 userId = it.uid,

@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.example.fightingflow.data.firebase.GoogleAuthService
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.Console
 import com.example.fightingflow.model.Game
@@ -29,19 +30,23 @@ import com.example.fightingflow.viewmodels.UserDetailsState
 import com.example.fightingflow.viewmodels.UserViewModel
 import dev.shreyaspatil.capturable.capturable
 import dev.shreyaspatil.capturable.controller.CaptureController
+import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ComboItemDisplay(
     context: Context,
+    scope: CoroutineScope,
     captureController: CaptureController,
     toShare: Boolean,
     display: Boolean,
     comboDisplayViewModel: ComboDisplayViewModel,
     characterEntryListUiState: CharacterEntryListUiState,
+    currentUser: GoogleAuthService.SignInState,
     userData: UserDataForCombos,
     userDetails: UserDetailsState,
+    comboCreationState: Boolean,
     combo: ComboDisplay,
     comboAsText: String,
     console: Console?,
@@ -66,7 +71,7 @@ fun ComboItemDisplay(
         Column(
             modifier.padding(horizontal = (4 * uiScale).dp, vertical = (4 * uiScale).dp)
         ) {
-            Timber.d("Loading flow row... \n Move List: %s", combo.moves)
+//            Timber.d("Loading flow row... \n Move List: %s", combo.moves)
             if (display) {
                 ComboInfoTop(combo, uiScale)
             }
@@ -81,9 +86,9 @@ fun ComboItemDisplay(
                 ) {
                     Timber.d("Loading moves from combo...")
                     combo.moves.forEach {
-                        Timber.d("$it from ${it.game}")
-                        Timber.d("Console Type: $console")
-                        Timber.d("If not Standard, converting to console input.")
+//                        Timber.d("$it from ${it.game}")
+//                        Timber.d("Console Type: $console")
+//                        Timber.d("If not Standard, converting to console input.")
                         val move = if (console != Console.STANDARD) convertInputsToConsole(
                             move = it,
                             game = when (it.game) {
@@ -96,7 +101,7 @@ fun ComboItemDisplay(
                             classic = sf6ControlType == SF6ControlType.Classic
                         ) else it
 
-                        Timber.d(move.moveName)
+//                        Timber.d(move.moveName)
                         when (move.moveType) {
                             "Break" -> MoveBreak(
                                 uiScale,
@@ -162,8 +167,11 @@ fun ComboItemDisplay(
                 ComboAsText(comboAsText)
             }
             ComboInfoBottom(
+                scope = scope,
                 comboDisplayViewModel = comboDisplayViewModel,
+                comboCreationState = comboCreationState,
                 combo = combo,
+                currentUser = currentUser,
                 userData = userData,
                 userDetails = userDetails,
                 fontColor = fontColor

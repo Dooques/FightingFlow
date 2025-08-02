@@ -59,6 +59,7 @@ import com.example.fightingflow.util.characterAndMoveData.convertibleInputs
 import com.example.fightingflow.viewmodels.AuthViewModel
 import com.example.fightingflow.viewmodels.ComboCreationViewModel
 import com.example.fightingflow.viewmodels.ComboResult
+import com.example.fightingflow.viewmodels.ProfanityViewModel
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
@@ -103,16 +104,24 @@ fun ComboAsText(
 @Composable
 fun ComboDescription(
     combo: ComboDisplay,
+    profanityViewModel: ProfanityViewModel,
     updateComboData: (ComboDisplayUiState) -> Unit,
     modifier: Modifier = Modifier
 ) {
+
     var description by remember { mutableStateOf(combo.title.ifEmpty { "" }) }
+    var showDescriptionError by remember { mutableStateOf(false) }
     OutlinedTextField(
         value = description,
         onValueChange = {
-            if (description.length <= 34 ) {
-                description = it
-                updateComboData(ComboDisplayUiState(combo.copy(title = description)))
+            if (it.length <= 34 ) {
+                if (profanityViewModel.checkForUsernameInProfanityFilter(it)) {
+                    showDescriptionError = true
+                } else {
+                    showDescriptionError = false
+                    description = it
+                    updateComboData(ComboDisplayUiState(combo.copy(title = description)))
+                }
             } },
         label = { Text("Write a description of your combo...") },
         maxLines = 1,
@@ -120,6 +129,8 @@ fun ComboDescription(
             IconButton(onClick = { description = "" }) {
                 Icon(imageVector = Icons.Default.Clear, contentDescription = "Clear description")
             } },
+        isError = showDescriptionError,
+        supportingText = {if (showDescriptionError) { Text("Description contains illegal words")} },
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 8.dp)

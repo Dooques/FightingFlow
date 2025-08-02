@@ -23,7 +23,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,13 +34,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.fightingflow.data.firebase.GoogleAuthService
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.MoveEntry
 import com.example.fightingflow.model.UserDataForCombos
 import com.example.fightingflow.viewmodels.ComboDisplayViewModel
 import com.example.fightingflow.viewmodels.UserDetailsState
-import com.example.fightingflow.viewmodels.UserViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import org.koin.core.scope.Scope
 import timber.log.Timber
 
 @Composable
@@ -50,28 +51,26 @@ fun ComboInfoTop(
     uiScale: Float,
     modifier: Modifier = Modifier
 ) {
-    val fontSize = if (uiScale == 2f) 20.sp else 16.sp
     val font = MaterialTheme.typography.bodySmall
     Column {
         Box(Modifier.fillMaxWidth()) {
             Row(
                 modifier = modifier.align(Alignment.CenterEnd)
             ) {
-                Text(text = combo.character, fontSize = fontSize)
+                Text(text = combo.character, style = font)
                 Spacer(modifier.width((4 * uiScale).dp))
                 if (combo.dateCreated.isNotBlank()) {
-                    Text(text = "|")
+                    Text(text = "|", style = font)
                     Spacer(modifier.width((4 * uiScale).dp))
-                    Text(text = combo.dateCreated, fontSize = fontSize)
+                    Text(text = combo.dateCreated, style = font)
                     Spacer(modifier.width((4 * uiScale).dp))
                 }
                 if (combo.difficulty != 0f) {
-                    Text(text = "|")
+                    Text(text = "|", style = font)
                     Spacer(modifier.width((4 * uiScale).dp))
                     Text(
                         text = "★".repeat(combo.difficulty.toInt()),
                         color = Color.Yellow,
-                        fontSize = fontSize,
                         style = font
                     )
                 }
@@ -82,7 +81,10 @@ fun ComboInfoTop(
                 Row(
                     modifier = modifier.align(alignment = Alignment.CenterStart)
                 ) {
-                    Text(text = combo.title, fontSize = fontSize)
+                    Text(
+                        text = combo.title,
+                        style = font
+                    )
                 }
             }
         }
@@ -92,36 +94,70 @@ fun ComboInfoTop(
 @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 @Composable
 fun ComboInfoBottom(
+    scope: CoroutineScope,
     comboDisplayViewModel: ComboDisplayViewModel,
     combo: ComboDisplay,
+    comboCreationState: Boolean,
+    currentUser: GoogleAuthService.SignInState,
     userData: UserDataForCombos,
     userDetails: UserDetailsState,
     fontColor: Color,
     modifier: Modifier = Modifier
 ) {
-    val userDataItem = userData.userMap?.get(combo.createdBy)
+    Timber.d("Current User Details: $userDetails\nUserMap: $userData")
+    val font = MaterialTheme.typography.bodySmall
 
-    Timber.d("Current User Details: $userDetails")
-    Row(horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically, modifier = modifier.fillMaxWidth()) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier.fillMaxWidth()
+    ) {
         Column {
             Row {
-                Text(text = "Damage: ", color = fontColor)
-                Text(text = combo.damage.toString(), color = Color.Red)
+                Text(
+                    text = "Damage: ",
+                    color = fontColor,
+                    style = font
+                )
+                Text(
+                    text = combo.damage.toString(),
+                    color = Color.Red,
+                    style = font
+                )
             }
             Row {
-                Text(text = "Created by: ", color = fontColor)
-                Text(text = userDataItem?.get("username") ?: "Invalid User", color = fontColor)
+                Text(
+                    text = "Created by: ",
+                    color = fontColor,
+                    style = font
+                )
+                Text(
+                    text =
+                        if (comboCreationState) {
+                            userData.userMap?.get(
+                                (currentUser as GoogleAuthService.SignInState.Success).user.userId
+                            ) ?: "Invalid User"
+                        } else {
+                            userData.userMap?.get(combo.createdBy) ?: "Invalid User"
+                        },
+                    color = fontColor,
+                    style = font
+                )
             }
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(
                 onClick = {
+                    scope.launch {
                     Timber.d("Updating like value of combo and adding combo ID to User Likes")
                     when (userDetails) {
                         is UserDetailsState.Loaded -> {
+                            Timber.d("User Details available: $userDetails")
                             val comboList = userDetails.user.likedCombos.toMutableList()
                             comboList.map { it.replace(" ", "") }
-                            if (comboList.size == 1 && comboList.contains("")) { comboList.remove("") }
+                            if (comboList.size == 1 && comboList.contains("")) {
+                                comboList.remove("")
+                            }
                             Timber.d("Checking if user has liked the combo...")
                             Timber.d("Combo List: $comboList")
                             Timber.d("UserData contains combo: ${comboList.contains(combo.id)}")
@@ -144,9 +180,11 @@ fun ComboInfoBottom(
                                 )
                             }
                         }
+
                         else -> {
                             Timber.d("User details not loaded")
                         }
+                    }
                     }
                 }
             ) {
@@ -156,10 +194,14 @@ fun ComboInfoBottom(
                     tint = if (
                         userDetails is UserDetailsState.Loaded &&
                         userDetails.user.likedCombos.contains(combo.id)
-                        ) Color.Blue else Color.White
+                    ) Color.Blue else Color.White
                 )
             }
-            Text(text = "${combo.likes} Likes", color = fontColor)
+            Text(
+                text = "${combo.likes} Likes",
+                color = fontColor,
+                style = font
+            )
         }
     }
 }

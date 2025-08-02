@@ -26,7 +26,6 @@ class ProfanityViewModel(): ViewModel() {
             inputStream.read(buffer)
             inputStream.close()
             jsonString = String(buffer, Charset.defaultCharset())
-            Timber.d("Json Data: $jsonString")
         } catch (e: IOException) {
             Timber.e(e, "Error reading assets file.")
             return
@@ -48,22 +47,16 @@ class ProfanityViewModel(): ViewModel() {
     }
 
     fun checkForUsernameInProfanityFilter(username: String): Boolean {
-        Timber.d("Checking username for profanity")
         val profanityData = profanityData
         if (profanityData.isNotEmpty()) {
-            Timber.d("Data: $profanityData")
             profanityData.forEach { profanityObject ->
-                Timber.d("Profanity Object: $profanityObject")
                 profanityObject.dictionary.forEach { wordObject ->
-                    Timber.d("Word to check: ${wordObject.match}")
                     val profaneWord = wordObject.match.replace("*", "")
                     if (profaneWord in username) {
                         val exceptionsList = wordObject.exceptions
                         exceptionsList?.forEach { exception ->
-                            Timber.d("Exception: $exception")
                             if (exception.first() == '*') {
                                 val exceptionWord = "$profaneWord${exception.replace("*", "")}"
-                                Timber.d("")
                                 if (exceptionWord in username) {
                                     Timber.d("Profanity word is an exception, returning false")
                                     return false
@@ -81,18 +74,13 @@ class ProfanityViewModel(): ViewModel() {
                                 "${wordSplit[0]}$profaneWord${wordSplit[1]}"
                             }
                         }
-                        Timber.d("No exceptions, profane word found, returning true")
                         return true
-                    } else {
-                        Timber.d("No profane words found, returning false")
                     }
                 }
             }
         } else {
-            Timber.d("Profanity filter not found, returning true")
             return true
         }
-        Timber.d("No problems found, username is ok.")
         return false
     }
 }

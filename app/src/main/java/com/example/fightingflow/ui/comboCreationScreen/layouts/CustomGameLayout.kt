@@ -30,12 +30,14 @@ import com.example.fightingflow.util.characterAndMoveData.customInputLayouts.vir
 import com.example.fightingflow.util.characterAndMoveData.mk1Moves
 import com.example.fightingflow.util.characterAndMoveData.streetFighter6Moves
 import com.example.fightingflow.util.characterAndMoveData.tekken8Moves
+import com.example.fightingflow.viewmodels.ProfanityViewModel
 import timber.log.Timber
 
 @Composable
 fun CustomGameLayout(
     context: Context,
     comboCreationViewModel: ComboCreationViewModel,
+    profanityViewModel: ProfanityViewModel,
     combo: ComboDisplay,
     character: CharacterEntry,
     moveList: MoveEntryListUiState,
@@ -74,7 +76,11 @@ fun CustomGameLayout(
     LazyColumn {
         items(items = layoutFilter) { moveType ->
             when (moveType) {
-                "Description" -> ComboDescription(combo, updateComboData)
+                "Description" -> ComboDescription(
+                    combo = combo,
+                    profanityViewModel = profanityViewModel,
+                    updateComboData = updateComboData
+                )
 
                 "Move Modifiers" -> MoveModifiers()
 

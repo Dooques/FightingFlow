@@ -4,6 +4,7 @@ import com.example.fightingflow.R
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.ComboEntry
+import com.example.fightingflow.model.ComboEntryFb
 import com.example.fightingflow.model.MoveEntry
 import com.example.fightingflow.model.UserEntry
 
@@ -37,6 +38,20 @@ val emptyComboEntry = ComboEntry(
     moves = ""
 )
 
+val emptyComboEntryFb = ComboEntryFb(
+    comboId = "",
+    title = "",
+    character = "",
+    damage = 0,
+    createdBy = "",
+    dateCreated = "",
+    difficulty = 0f,
+    likes = 0,
+    tags = "",
+    private = false,
+    moves = ImmutableList(listOf()),
+)
+
 val emptyMove = MoveEntry(
     moveName = "",
     notation = "",
@@ -44,7 +59,7 @@ val emptyMove = MoveEntry(
     character = ""
 )
 
-val emptyProfile = UserEntry(
+val emptyUser = UserEntry(
     userId = "",
     username = "",
     profilePic = "",

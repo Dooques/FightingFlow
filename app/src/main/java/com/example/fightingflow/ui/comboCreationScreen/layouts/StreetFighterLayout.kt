@@ -26,6 +26,7 @@ import com.example.fightingflow.util.MoveEntryListUiState
 import com.example.fightingflow.util.characterAndMoveData.nintendoInputs
 import com.example.fightingflow.util.characterAndMoveData.playstationInputs
 import com.example.fightingflow.util.characterAndMoveData.xboxInputs
+import com.example.fightingflow.viewmodels.ProfanityViewModel
 import timber.log.Timber
 
 
@@ -33,6 +34,7 @@ import timber.log.Timber
 fun StreetFighterLayout(
     context: Context,
     comboCreationViewModel: ComboCreationViewModel,
+    profanityViewModel: ProfanityViewModel,
     comboDisplay: ComboDisplay,
     character: CharacterEntry,
     combo: ComboDisplay,
@@ -51,7 +53,11 @@ fun StreetFighterLayout(
             else streetFighterLayoutModern
         ) { moveType ->
             when (moveType) {
-                "Description" -> ComboDescription(combo, updateComboData)
+                "Description" -> ComboDescription(
+                    combo = combo,
+                    profanityViewModel = profanityViewModel,
+                    updateComboData = updateComboData
+                )
 
                 "Move Modifiers" -> MoveModifiers()
 

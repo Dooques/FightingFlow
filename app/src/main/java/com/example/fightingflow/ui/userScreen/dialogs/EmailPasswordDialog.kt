@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -38,6 +39,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -45,6 +48,7 @@ import com.example.fightingflow.model.UserEntry
 import com.example.fightingflow.ui.components.convertMillisToDate
 import com.example.fightingflow.ui.userScreen.abstractedFunctions.signInOrCreateUserByEmail
 import com.example.fightingflow.viewmodels.AuthViewModel
+import com.example.fightingflow.viewmodels.ProfanityViewModel
 import com.example.fightingflow.viewmodels.UserViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -52,6 +56,7 @@ import com.example.fightingflow.viewmodels.UserViewModel
 fun EmailAndPasswordDialog(
     userViewModel: UserViewModel,
     authViewModel: AuthViewModel,
+    profanityViewModel: ProfanityViewModel,
     createAccount: Boolean,
     snackbarHostState: SnackbarHostState,
     onDismissRequest: () -> Unit,
@@ -70,6 +75,7 @@ fun EmailAndPasswordDialog(
     val selectedDob = dob.selectedDateMillis?.let { convertMillisToDate(it) } ?: ""
 
     var showUsernameError by remember { mutableStateOf(false) }
+    var showUsernameIllegalWordError by remember { mutableStateOf(false) }
     var showNameError by remember { mutableStateOf(false) }
     var showEmailError by remember { mutableStateOf(false) }
     var showPasswordError by remember { mutableStateOf(false) }
@@ -77,6 +83,9 @@ fun EmailAndPasswordDialog(
     var showConfirmPasswordError by remember { mutableStateOf(false) }
     var showDobError by remember { mutableStateOf(false) }
     var showUserTooYoung by remember { mutableStateOf(false) }
+
+    var hidePassword by remember { mutableStateOf(true) }
+    var hideConfirmPassword by remember { mutableStateOf(true) }
 
     val newUserDetails by userViewModel.newUserState.collectAsStateWithLifecycle()
 
@@ -87,8 +96,7 @@ fun EmailAndPasswordDialog(
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = modifier
-                    .padding(24.dp)
+                modifier = modifier.padding(24.dp)
             ) {
                 Text("Create an account", style = MaterialTheme.typography.displaySmall)
 
@@ -97,25 +105,34 @@ fun EmailAndPasswordDialog(
                         value = username,
                         onValueChange = { newValue ->
                             if (newValue.length <= 20) {
-                                username = newValue
-                                showUsernameError = false
-                                if (createAccount) {
-                                    userViewModel.updateNewUserState(
-                                        newUserDetails?.copy(username = username) ?: UserEntry(username = username)
-                                    )
+                                if (profanityViewModel.checkForUsernameInProfanityFilter(newValue)) {
+                                    showUsernameIllegalWordError = true
+                                } else {
+                                    username = newValue
+                                    showUsernameError = false
+                                    showUsernameIllegalWordError = false
+                                    if (createAccount) {
+                                        userViewModel.updateNewUserState(
+                                            newUserDetails?.copy(username = username) ?: UserEntry(
+                                                username = username
+                                            )
+                                        )
+                                    }
                                 }
                             }
                         },
-                        label = {
-                            Text(
-                                if (showUsernameError) "Please enter a username"
-                                else "Username"
-                            )
-                        },
-                        supportingText = { Text("Maximum 20 characters") },
+                        label = { Text("Username") },
+                        supportingText = { Text(
+                            if (showUsernameError) {
+                                "Please enter a username"
+                            } else if (showUsernameIllegalWordError) {
+                                "Username contains an inappropriate word"
+                            } else
+                                "Maximum 20 characters"
+                        ) },
                         maxLines = 1,
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                        isError = showUsernameError,
+                        isError = showUsernameError || showUsernameIllegalWordError,
                         modifier = modifier.padding(4.dp)
                     )
 
@@ -178,6 +195,12 @@ fun EmailAndPasswordDialog(
                         else if (showShortPasswordError) "Password is less than 6 characters"
                         else "Password") },
                     supportingText = { Text("Minimum 6 characters") },
+                    trailingIcon = { IconButton(onClick = { hidePassword = !hidePassword }) {
+                        Icon(imageVector = Icons.Default.Lock, contentDescription = "Hide Password")
+                    } },
+                    visualTransformation =
+                        if (hidePassword) {PasswordVisualTransformation() }
+                        else VisualTransformation.None,
                     maxLines = 1,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     isError = showPasswordError,
@@ -201,6 +224,12 @@ fun EmailAndPasswordDialog(
                         },
                         maxLines = 1,
                         supportingText = { Text("You must be at least 16 years old")},
+                        trailingIcon = { IconButton(onClick = { hideConfirmPassword = !hideConfirmPassword }) {
+                            Icon(imageVector = Icons.Default.Lock, contentDescription = "Hide Password")
+                        } },
+                        visualTransformation =
+                            if (hidePassword) {PasswordVisualTransformation() }
+                            else VisualTransformation.None,
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                         isError = showConfirmPasswordError,
                         modifier = modifier.padding(4.dp)

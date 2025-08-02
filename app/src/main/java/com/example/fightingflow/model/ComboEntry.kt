@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
 import com.example.fightingflow.util.ImmutableList
 import com.example.fightingflow.util.MoveEntryListUiState
+import com.google.firebase.firestore.PropertyName
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import timber.log.Timber
@@ -31,21 +32,39 @@ data class ComboEntry (
     val moves: String = "",
 )
 
+data class ComboEntryFb(
+    val comboId: String = "",
+    val title: String = "",
+    val character: String = "",
+    val damage: Int = 0,
+    @get:PropertyName("created_by")
+    @set:PropertyName("created_by")
+    var createdBy: String = "",
+    @get:PropertyName("date_created")
+    @set:PropertyName("date_created")
+    var dateCreated: String = "",
+    val difficulty: Float = 0f,
+    val likes: Int = 0,
+    val tags: String? = null,
+    val private: Boolean = false,
+    val moves: List<String> = listOf(),
+)
+
 @Immutable
 data class ComboDisplay(
     val id: String = "",
     val title: String = "",
-    val character: String,
+    val character: String = "",
     val damage: Int = 0,
     val createdBy: String = "",
-    val dateCreated: String,
+    val dateCreated: String = "",
     val areOptionsRevealed: Boolean = false,
     val pinned: Boolean = false,
     val difficulty: Float = 0f,
     val likes: Int = 0,
     val tags: String? = null,
     val private: Boolean = false,
-    val moves: ImmutableList<MoveEntry>
+    val moves: List<MoveEntry> = listOf()
 )
 
 fun ComboEntry.toDisplay(moveEntryList: MoveEntryListUiState): ComboDisplay =
@@ -74,6 +93,56 @@ fun ComboDisplay.toEntry(character: CharacterEntry): ComboEntry =
         likes = likes,
         tags = tags,
         moves = moveEntryListToMoveListString(moves)
+    )
+
+fun ComboDisplay.toFbEntry(character: CharacterEntry): ComboEntryFb {
+    val movesList = mutableListOf<String>()
+    moves.forEach { movesList.add(it.notation) }
+    return ComboEntryFb(
+        comboId = id,
+        title = title,
+        character = character.name,
+        damage = damage,
+        createdBy = createdBy,
+        dateCreated = dateCreated,
+        difficulty = difficulty,
+        likes = likes,
+        tags = tags,
+        private = private,
+        moves = ImmutableList(movesList.toList())
+    )
+}
+
+fun ComboEntryFb.toDisplay(moveEntryListUiState: MoveEntryListUiState): ComboDisplay =
+    ComboDisplay(
+        id = comboId,
+        title = title,
+        character = character,
+        damage = damage,
+        createdBy = createdBy,
+        dateCreated = dateCreated,
+        areOptionsRevealed = false,
+        pinned = false,
+        difficulty = difficulty,
+        likes = likes,
+        tags = tags,
+        private = private,
+        moves = ImmutableList(moves.map { move ->
+            moveEntryListUiState.moveList.first { it.notation == move }
+        })
+    )
+
+fun ComboEntryFb.toHashMap(): HashMap<String, Any> =
+    hashMapOf(
+        "title" to title,
+        "character" to character,
+        "damage" to damage,
+        "created_by" to createdBy,
+        "date_created" to dateCreated,
+        "difficulty" to difficulty,
+        "likes" to likes,
+        "tags" to tags.let { "" },
+        "moves" to moves
     )
 
 fun moveListStringToMoveEntryList(moveList: String, moveListEntries: MoveEntryListUiState): List<MoveEntry> {
@@ -134,6 +203,6 @@ class CharacterConverter {
         character?.let { jsonAdapter.toJson(it) } ?: ""
 
     @TypeConverter
-    fun stringToCharacter(json: kotlin.String?) =
+    fun stringToCharacter(json: String?) =
         json?.let { jsonAdapter.fromJson(json) }
 }
