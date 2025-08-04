@@ -17,7 +17,7 @@ data class MoveEntry(
     @ColumnInfo(name = "character")
     val character: String,
     val game: String? = null,
-    val controlType: SF6ControlType? = SF6ControlType.Invalid
+    val controlTypeSF: SF6ControlType? = SF6ControlType.Invalid
 )
 
 data class MoveString(

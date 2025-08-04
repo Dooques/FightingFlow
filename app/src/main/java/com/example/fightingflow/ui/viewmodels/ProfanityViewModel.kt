@@ -1,4 +1,4 @@
-package com.example.fightingflow.viewmodels
+package com.example.fightingflow.ui.viewmodels
 
 import android.content.Context
 import androidx.lifecycle.ViewModel

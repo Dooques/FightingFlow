@@ -22,18 +22,19 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.fightingflow.R
 import com.example.fightingflow.ui.addCharacterScreen.AddCharacterScreen
-import com.example.fightingflow.viewmodels.AddCharacterViewModel
+import com.example.fightingflow.ui.viewmodels.AddCharacterViewModel
 import com.example.fightingflow.ui.addCharacterScreen.ControlSchemeDemoScreen
 import com.example.fightingflow.ui.characterScreen.CharacterScreen
-import com.example.fightingflow.viewmodels.CharacterViewModel
+import com.example.fightingflow.ui.viewmodels.CharacterViewModel
 import com.example.fightingflow.ui.comboCreationScreen.ComboCreationScreen
-import com.example.fightingflow.viewmodels.ComboCreationViewModel
+import com.example.fightingflow.ui.viewmodels.ComboCreationViewModel
 import com.example.fightingflow.ui.comboDisplayScreen.ComboDisplayScreen
-import com.example.fightingflow.viewmodels.ComboDisplayViewModel
-import com.example.fightingflow.viewmodels.AuthViewModel
+import com.example.fightingflow.ui.userScreen.TitleScreen
+import com.example.fightingflow.ui.viewmodels.ComboDisplayViewModel
+import com.example.fightingflow.ui.viewmodels.AuthViewModel
 import com.example.fightingflow.ui.userScreen.UserDetailsScreen
-import com.example.fightingflow.viewmodels.ProfanityViewModel
-import com.example.fightingflow.viewmodels.UserViewModel
+import com.example.fightingflow.ui.viewmodels.ProfanityViewModel
+import com.example.fightingflow.ui.viewmodels.UserViewModel
 import org.koin.compose.koinInject
 import timber.log.Timber
 

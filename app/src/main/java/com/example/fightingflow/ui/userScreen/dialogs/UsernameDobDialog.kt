@@ -42,10 +42,10 @@ import com.example.fightingflow.data.firebase.GoogleAuthService
 import com.example.fightingflow.model.UserEntry
 import com.example.fightingflow.ui.components.convertMillisToDate
 import com.example.fightingflow.ui.userScreen.abstractedFunctions.checkUserAge
-import com.example.fightingflow.viewmodels.ProfanityViewModel
-import com.example.fightingflow.viewmodels.UserDetailsState
-import com.example.fightingflow.viewmodels.UserSaveResult
-import com.example.fightingflow.viewmodels.UserViewModel
+import com.example.fightingflow.ui.viewmodels.ProfanityViewModel
+import com.example.fightingflow.ui.viewmodels.UserDetailsState
+import com.example.fightingflow.ui.viewmodels.UserSaveResult
+import com.example.fightingflow.ui.viewmodels.UserViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber

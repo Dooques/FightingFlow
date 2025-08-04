@@ -35,18 +35,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import com.example.fightingflow.viewmodels.ComboDisplayViewModel
+import com.example.fightingflow.ui.viewmodels.ComboDisplayViewModel
 import com.example.fightingflow.ui.components.ActionIcon
 import com.example.fightingflow.ui.components.ProfileAndConsoleInputMenu
-import com.example.fightingflow.viewmodels.UserViewModel
+import com.example.fightingflow.ui.viewmodels.UserViewModel
 import com.example.fightingflow.util.emptyCharacter
 import com.example.fightingflow.util.emptyComboDisplay
-import com.example.fightingflow.viewmodels.AuthViewModel
-import com.example.fightingflow.viewmodels.ComboCreationViewModel
-import com.example.fightingflow.viewmodels.ProfanityViewModel
+import com.example.fightingflow.ui.viewmodels.AuthViewModel
+import com.example.fightingflow.ui.viewmodels.ComboCreationViewModel
+import com.example.fightingflow.ui.viewmodels.ProfanityViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.update
-import org.koin.compose.koinInject
 import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)

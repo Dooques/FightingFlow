@@ -15,6 +15,7 @@ data class CharacterEntry(
     val combosById: String = "",
     val game: String,
     val controlType: String,
+    val numpadNotation: Boolean,
     val uniqueMoves: String? = null,
     val mutable: Boolean = false
 )

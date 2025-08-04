@@ -41,17 +41,17 @@ class MainActivity : ComponentActivity() {
 @RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun FightingFlowApp(
-    initViewModel: InitViewModel = koinViewModel<InitViewModel>(),
+//    initViewModel: InitViewModel = koinViewModel<InitViewModel>(),
     deviceType: WindowSizeClass
 ) {
-    val scope = rememberCoroutineScope()
-    val databaseExists = remember { mutableStateOf(false) }
+//    val scope = rememberCoroutineScope()
+//    val databaseExists = remember { mutableStateOf(false) }
 
     Timber.d("Checking data in database...")
-    LaunchedEffect(scope) {
-        if (initViewModel.addDataToDb()) { databaseExists.value = true}
-    }
-    if (databaseExists.value) {
+//    LaunchedEffect(scope) {
+//        if (initViewModel.addDataToDb()) { databaseExists.value = true}
+//    }
+//    if (databaseExists.value) {
         NavGraph(deviceType = deviceType)
-    }
+//    }
 }

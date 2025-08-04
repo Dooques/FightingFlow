@@ -33,10 +33,10 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.fightingflow.model.Console
 import com.example.fightingflow.model.MoveEntry
-import com.example.fightingflow.viewmodels.ComboCreationViewModel
+import com.example.fightingflow.ui.viewmodels.ComboCreationViewModel
 import com.example.fightingflow.ui.comboCreationScreen.IconMoves
 import com.example.fightingflow.ui.comboCreationScreen.TextMoves
-import com.example.fightingflow.viewmodels.ComboDisplayViewModel
+import com.example.fightingflow.ui.viewmodels.ComboDisplayViewModel
 import com.example.fightingflow.util.MoveEntryListUiState
 import com.example.fightingflow.util.characterAndMoveData.customInputLayouts.arcSysMoves
 import com.example.fightingflow.util.characterAndMoveData.customInputLayouts.movement

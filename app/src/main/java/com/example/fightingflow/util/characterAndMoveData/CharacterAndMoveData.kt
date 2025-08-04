@@ -38,4 +38,38 @@ class CharacterAndMoveData {
     )
 }
 
+val moveMap = mapOf(
+    "movement" to mapOf(
+        "standard" to movement,
+        "numpad" to numpadNotationMoves
+    ),
+    "inputs" to mapOf(
+        "standard" to mapOf(
+            "Tekken" to tekken8Moves,
+            "Mortal Kombat" to mk1Moves,
+            "Street Fighter" to streetFighter6Moves,
+            "Common" to commonMoves),
+        "console" to mapOf(
+            "PlayStation" to playstationInputs,
+            "Xbox" to xboxInputs,
+            "Nintendo" to nintendoInputs
+        ),
+        "custom" to mapOf(
+            "ArcSys" to arcSysMoves,
+            "Tag Fighter" to tagFighterMoves,
+            "Virtua Fighter" to virtuaFighterMoves
+        )
+    ),
+    "character" to mapOf(
+        "Mortal Kombat" to mk1CharacterMoves,
+        "Tekken" to tekken8CharacterMoves,
+        "Street Fighter" to streetFighter6CharacterMoves
+    )
+)
+
+val characterMap = mapOf(
+    "Tekken 8" to tekken8Characters,
+    "Mortal Kombat 1" to mortalKombat1Characters,
+    "Street Fighter VI" to streetFighter6Characters
+)
 

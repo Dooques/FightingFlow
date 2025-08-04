@@ -47,9 +47,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.fightingflow.model.UserEntry
 import com.example.fightingflow.ui.components.convertMillisToDate
 import com.example.fightingflow.ui.userScreen.abstractedFunctions.signInOrCreateUserByEmail
-import com.example.fightingflow.viewmodels.AuthViewModel
-import com.example.fightingflow.viewmodels.ProfanityViewModel
-import com.example.fightingflow.viewmodels.UserViewModel
+import com.example.fightingflow.ui.viewmodels.AuthViewModel
+import com.example.fightingflow.ui.viewmodels.ProfanityViewModel
+import com.example.fightingflow.ui.viewmodels.UserViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

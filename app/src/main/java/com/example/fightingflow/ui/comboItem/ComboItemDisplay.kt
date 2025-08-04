@@ -1,4 +1,4 @@
-package com.example.fightingflow.ui.comboDisplayScreen.comboItem
+package com.example.fightingflow.ui.comboItem
 
 import android.content.Context
 import androidx.compose.foundation.Image
@@ -25,9 +25,8 @@ import com.example.fightingflow.model.UserDataForCombos
 import com.example.fightingflow.ui.comboCreationScreen.ComboAsText
 import com.example.fightingflow.ui.comboDisplayScreen.inputConverter.convertInputsToConsole
 import com.example.fightingflow.util.CharacterEntryListUiState
-import com.example.fightingflow.viewmodels.ComboDisplayViewModel
-import com.example.fightingflow.viewmodels.UserDetailsState
-import com.example.fightingflow.viewmodels.UserViewModel
+import com.example.fightingflow.ui.viewmodels.ComboDisplayViewModel
+import com.example.fightingflow.ui.viewmodels.UserDetailsState
 import dev.shreyaspatil.capturable.capturable
 import dev.shreyaspatil.capturable.controller.CaptureController
 import kotlinx.coroutines.CoroutineScope
@@ -101,7 +100,7 @@ fun ComboItemDisplay(
                             classic = sf6ControlType == SF6ControlType.Classic
                         ) else it
 
-//                        Timber.d(move.moveName)
+                        Timber.d("Move: $move")
                         when (move.moveType) {
                             "Break" -> MoveBreak(
                                 uiScale,

@@ -1,4 +1,4 @@
-package com.example.fightingflow.ui.comboDisplayScreen.comboItem
+package com.example.fightingflow.ui.comboItem
 
 import android.content.Context
 import androidx.compose.foundation.background
@@ -22,9 +22,8 @@ import com.example.fightingflow.model.SF6ControlType
 import com.example.fightingflow.model.UserDataForCombos
 import com.example.fightingflow.ui.comboCreationScreen.ComboAsText
 import com.example.fightingflow.ui.comboDisplayScreen.inputConverter.convertInputsToConsole
-import com.example.fightingflow.viewmodels.ComboDisplayViewModel
-import com.example.fightingflow.viewmodels.UserDetailsState
-import com.example.fightingflow.viewmodels.UserViewModel
+import com.example.fightingflow.ui.viewmodels.ComboDisplayViewModel
+import com.example.fightingflow.ui.viewmodels.UserDetailsState
 import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
 

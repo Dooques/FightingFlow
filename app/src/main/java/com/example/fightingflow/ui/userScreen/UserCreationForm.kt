@@ -19,7 +19,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.fightingflow.data.firebase.GoogleAuthService
-import com.example.fightingflow.viewmodels.AuthViewModel
+import com.example.fightingflow.ui.viewmodels.AuthViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber

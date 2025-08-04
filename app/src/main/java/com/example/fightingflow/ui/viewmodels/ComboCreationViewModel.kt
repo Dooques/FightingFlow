@@ -1,4 +1,4 @@
-package com.example.fightingflow.viewmodels
+package com.example.fightingflow.ui.viewmodels
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -8,10 +8,7 @@ import com.example.fightingflow.data.datastore.ComboDsRepository
 import com.example.fightingflow.data.datastore.UserDsRepository
 import com.example.fightingflow.data.datastore.SettingsDsRepository
 import com.example.fightingflow.data.firebase.FirebaseRepository
-import com.example.fightingflow.data.firebase.GoogleAuthRepository
 import com.example.fightingflow.data.firebase.GoogleAuthService
-import com.example.fightingflow.model.ComboEntry
-import com.example.fightingflow.model.ComboEntryFb
 import com.example.fightingflow.model.Console
 import com.example.fightingflow.model.Game
 import com.example.fightingflow.model.MoveEntry
@@ -30,7 +27,6 @@ import com.example.fightingflow.util.MoveEntryListUiState
 import com.example.fightingflow.util.emptyComboDisplay
 import com.example.fightingflow.util.emptyComboEntry
 import com.example.fightingflow.util.emptyComboEntryFb
-import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
@@ -170,7 +166,9 @@ class ComboCreationViewModel(
         itemIndexState.update { 0 }
     }
 
-    suspend fun saveCombo(currentUser: GoogleAuthService.SignInState): ComboResult {
+    suspend fun saveCombo(
+        currentUser: GoogleAuthService.SignInState
+    ): ComboResult {
         Timber.d("Checking if combo details valid")
         Timber.d("ComboDisplay Character: ${comboDisplayState.value.comboDisplay.character}")
         Timber.d("ComboDisplay Moves: ${comboDisplayState.value.comboDisplay.moves}")
@@ -197,7 +195,9 @@ class ComboCreationViewModel(
     }
 
     // Datastore Functions
-    private fun updateComboIdInDs(comboDisplay: ComboDisplayUiState = ComboDisplayUiState()) {
+    private fun updateComboIdInDs(
+        comboDisplay: ComboDisplayUiState = ComboDisplayUiState()
+    ) {
         Timber.d("Saving combo details to datastore...")
         Timber.d("Combo to save: ${comboDisplay.comboDisplay}")
         viewModelScope.launch {
@@ -222,33 +222,54 @@ class ComboCreationViewModel(
     }
 
     // Room Db Functions
-    private suspend fun insertCombo(currentUser: GoogleAuthService.SignInState.Success): ComboResult {
+    private suspend fun insertCombo(
+        currentUser: GoogleAuthService.SignInState.Success
+    ): ComboResult {
         val userId = currentUser.user.userId
         val comboEntry =
             comboDisplayState.value.comboDisplay.toEntry(characterState.value.character)
                 .copy(createdBy = userId)
-        try {
-            var comboIdResult = ""
-            val firestoreRequest = viewModelScope.launch {
-                comboIdResult = firebaseRepository.addCombo(
-                    comboEntry
-                        .toDisplay(moveEntryListUiState.value)
-                        .toFbEntry(characterState.value.character)
-                )
-            }
-            firestoreRequest.join()
-            flowRepository.insertCombo(comboEntry.copy(id = comboIdResult))
 
-            Timber.d("Combo added to Db.")
-            Timber.d("Clearing move list...")
-            resetCombo()
-            resetComboId()
-            resetItemIndex()
-            updateComboIdInDs(ComboDisplayUiState())
-            Timber.d("Move list cleared.")
-            return ComboResult.Success
-        } catch (e: Exception) {
-            return ComboResult.Error(e)
+        if (!characterState.value.character.mutable) {
+            try {
+                var comboIdResult = ""
+                val firestoreRequest = viewModelScope.launch {
+                    comboIdResult = firebaseRepository.addCombo(
+                        comboEntry
+                            .toDisplay(moveEntryListUiState.value)
+                            .toFbEntry(characterState.value.character)
+                    )
+                }
+                firestoreRequest.join()
+
+                flowRepository.insertCombo(comboEntry.copy(id = comboIdResult))
+
+                Timber.d("Combo added to Db.")
+                Timber.d("Clearing move list...")
+                resetCombo()
+                resetComboId()
+                resetItemIndex()
+                updateComboIdInDs(ComboDisplayUiState())
+                Timber.d("Move list cleared.")
+                return ComboResult.Success
+            } catch (e: Exception) {
+                return ComboResult.Error(e)
+            }
+        } else {
+            try {
+                flowRepository.insertCombo(comboEntry)
+
+                Timber.d("Combo added to Db.")
+                Timber.d("Clearing move list...")
+                resetCombo()
+                resetComboId()
+                resetItemIndex()
+                updateComboIdInDs(ComboDisplayUiState())
+                Timber.d("Move list cleared.")
+                return ComboResult.Success
+            } catch (e: Exception) {
+                return ComboResult.Error(e)
+            }
         }
     }
 
@@ -256,23 +277,39 @@ class ComboCreationViewModel(
         Timber.d("Preparing to update combo in database...")
         val updatedCombo = comboDisplayState.value.comboDisplay.toEntry(characterState.value.character)
         Timber.d("Move List: ${updatedCombo.moves}")
-        try {
-            firebaseRepository.updateCombo(
-                updatedCombo
-                    .toDisplay(moveEntryListUiState.value)
-                    .toFbEntry(characterState.value.character)
-            )
-            flowRepository.updateCombo(updatedCombo)
+        if (!characterState.value.character.mutable) {
+            try {
+                firebaseRepository.updateCombo(
+                    updatedCombo
+                        .toDisplay(moveEntryListUiState.value)
+                        .toFbEntry(characterState.value.character)
+                )
+                flowRepository.updateCombo(updatedCombo)
 
-            resetCombo()
-            resetComboId()
-            resetItemIndex()
-            updateComboIdInDs(ComboDisplayUiState())
-            Timber.d("Existing combo updated in Db.")
+                resetCombo()
+                resetComboId()
+                resetItemIndex()
+                updateComboIdInDs(ComboDisplayUiState())
+                Timber.d("Existing combo updated in Db.")
 
-            return ComboResult.Success
-        } catch (e: Exception) {
-            return ComboResult.Error(e)
+                return ComboResult.Success
+            } catch (e: Exception) {
+                return ComboResult.Error(e)
+            }
+        } else {
+           try {
+               flowRepository.updateCombo(updatedCombo)
+
+               resetCombo()
+               resetComboId()
+               resetItemIndex()
+               updateComboIdInDs(ComboDisplayUiState())
+               Timber.d("Existing combo updated in Db.")
+
+               return ComboResult.Success
+           } catch (e: Exception) {
+               return ComboResult.Error(e)
+           }
         }
     }
 

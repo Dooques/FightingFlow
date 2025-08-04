@@ -15,6 +15,7 @@ val emptyCharacter = CharacterEntry(
     fightingStyle = "",
     combosById = "",
     game = "Custom",
+    numpadNotation = false,
     controlType = "Tekken"
 )
 

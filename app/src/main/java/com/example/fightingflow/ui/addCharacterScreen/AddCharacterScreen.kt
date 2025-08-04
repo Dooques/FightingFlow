@@ -8,6 +8,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -60,12 +61,12 @@ import com.example.fightingflow.R
 import com.example.fightingflow.data.mediastore.MediaStoreUtil
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ControlType
-import com.example.fightingflow.viewmodels.CharacterViewModel
-import com.example.fightingflow.viewmodels.ComboDisplayViewModel
+import com.example.fightingflow.ui.viewmodels.CharacterViewModel
+import com.example.fightingflow.ui.viewmodels.ComboDisplayViewModel
 import com.example.fightingflow.util.emptyCharacter
 import com.example.fightingflow.util.featureColor
-import com.example.fightingflow.viewmodels.AddCharacterViewModel
-import com.example.fightingflow.viewmodels.CharacterDbResult
+import com.example.fightingflow.ui.viewmodels.AddCharacterViewModel
+import com.example.fightingflow.ui.viewmodels.CharacterDbResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -93,6 +94,7 @@ fun AddCharacterScreen(
         imageId = R.drawable.mokujin,
         game = "Custom",
         controlType = "Tekken",
+        numpadNotation = false,
         uniqueMoves = "",
         mutable = true
     )) }
@@ -177,11 +179,19 @@ fun AddCharacterScreen(
             )
         },
     ) { innerPadding ->
-        LazyColumn {
+        LazyColumn(modifier.padding(innerPadding)) {
+            item {
+                Row(modifier = modifier.fillMaxWidth()) {
+                    Text(
+                        "Custom characters are not saved to the online database, any Combos you create will only be visible to you.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = modifier.padding(horizontal = 16.dp)
+                    )
+                }
+            }
             item {
                 Column(
                     modifier = Modifier
-                        .padding(innerPadding)
                         .padding(16.dp)
                         .fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally,

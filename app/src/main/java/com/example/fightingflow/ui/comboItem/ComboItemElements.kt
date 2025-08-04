@@ -1,4 +1,4 @@
-package com.example.fightingflow.ui.comboDisplayScreen.comboItem
+package com.example.fightingflow.ui.comboItem
 
 import android.content.Context
 import android.os.Build
@@ -38,11 +38,10 @@ import com.example.fightingflow.data.firebase.GoogleAuthService
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.MoveEntry
 import com.example.fightingflow.model.UserDataForCombos
-import com.example.fightingflow.viewmodels.ComboDisplayViewModel
-import com.example.fightingflow.viewmodels.UserDetailsState
+import com.example.fightingflow.ui.viewmodels.ComboDisplayViewModel
+import com.example.fightingflow.ui.viewmodels.UserDetailsState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import org.koin.core.scope.Scope
 import timber.log.Timber
 
 @Composable
@@ -65,15 +64,18 @@ fun ComboInfoTop(
                     Text(text = combo.dateCreated, style = font)
                     Spacer(modifier.width((4 * uiScale).dp))
                 }
-                if (combo.difficulty != 0f) {
-                    Text(text = "|", style = font)
-                    Spacer(modifier.width((4 * uiScale).dp))
-                    Text(
-                        text = "★".repeat(combo.difficulty.toInt()),
-                        color = Color.Yellow,
-                        style = font
-                    )
-                }
+                Text(text = "|", style = font)
+                Spacer(modifier.width((4 * uiScale).dp))
+                Text(
+                    text = "★".repeat(combo.difficulty.toInt()),
+                    color = Color.Yellow,
+                    style = font
+                )
+                Text(
+                    "★".repeat(5 - combo.difficulty.toInt()),
+                    color = Color.Black,
+                    style = font
+                )
             }
         }
         if (combo.title.isNotBlank()) {

@@ -13,6 +13,7 @@ val streetFighter6Characters = ImmutableList(
             imageId = R.drawable.aki,
             fightingStyle = "Snake Kung Fu",
             controlType = "Street Fighter",
+            numpadNotation = false,
             game = "Street Fighter VI",
         ),
         CharacterEntry(
@@ -20,6 +21,7 @@ val streetFighter6Characters = ImmutableList(
             imageId = R.drawable.akuma,
             fightingStyle = " Satsui no Hado, Ansatsuken",
             controlType = "Street Fighter",
+            numpadNotation = false,
             game = "Street Fighter VI",
         ),
         CharacterEntry(
@@ -27,6 +29,7 @@ val streetFighter6Characters = ImmutableList(
             imageId = R.drawable.blanka,
             fightingStyle = "Feral movement, electric attacks",
             controlType = "Street Fighter",
+            numpadNotation = false,
             game = "Street Fighter VI",
         ),
         CharacterEntry(
@@ -35,6 +38,7 @@ val streetFighter6Characters = ImmutableList(
             fightingStyle = "Shadaloo fighting techniques (Shadaloo)" +
                     "Special Forces training (Delta Red)",
             controlType = "Street Fighter",
+            numpadNotation = false,
             game = "Street Fighter VI",
         ),
         CharacterEntry(
@@ -42,6 +46,7 @@ val streetFighter6Characters = ImmutableList(
             imageId = R.drawable.chunli,
             fightingStyle = "Chinese martial arts/Kung Fu and Tai Chi",
             controlType = "Street Fighter",
+            numpadNotation = false,
             game = "Street Fighter VI",
         ),
         CharacterEntry(
@@ -49,6 +54,7 @@ val streetFighter6Characters = ImmutableList(
             imageId = R.drawable.deejay,
             fightingStyle = "Kickboxing and break dancing",
             controlType = "Street Fighter",
+            numpadNotation = false,
             game = "Street Fighter VI",
         ),
         CharacterEntry(
@@ -56,6 +62,7 @@ val streetFighter6Characters = ImmutableList(
             imageId = R.drawable.dhalsim,
             fightingStyle = "Esoteric Yoga",
             controlType = "Street Fighter",
+            numpadNotation = false,
             game = "Street Fighter VI",
         ),
         CharacterEntry(
@@ -63,6 +70,7 @@ val streetFighter6Characters = ImmutableList(
             imageId = R.drawable.ehonda,
             fightingStyle = "Sumo Wrestler Chef",
             controlType = "Street Fighter",
+            numpadNotation = false,
             game = "Street Fighter VI",
         ),
         CharacterEntry(
@@ -70,12 +78,15 @@ val streetFighter6Characters = ImmutableList(
             imageId = R.drawable.ed,
             fightingStyle = "Psycho Boxing",
             controlType = "Street Fighter",
+            numpadNotation = false,
             game = "Street Fighter VI",
-        ),CharacterEntry(
+        ),
+        CharacterEntry(
             name = "Elena",
             imageId = R.drawable.elena,
             fightingStyle = "Capoeira Master",
             controlType = "Street Fighter",
+            numpadNotation = false,
             game = "Street Fighter VI",
         ),
         CharacterEntry(
@@ -83,6 +94,7 @@ val streetFighter6Characters = ImmutableList(
             imageId = R.drawable.guile,
             fightingStyle = "Martial arts and professional wrestling",
             controlType = "Street Fighter",
+            numpadNotation = false,
             game = "Street Fighter VI",
         ),
         CharacterEntry(
@@ -90,6 +102,7 @@ val streetFighter6Characters = ImmutableList(
             imageId = R.drawable.jamie,
             fightingStyle = "Zui Quan (Drunken Fist) & Breakdancing",
             controlType = "Street Fighter",
+            numpadNotation = false,
             game = "Street Fighter VI",
         ),
         CharacterEntry(
@@ -97,6 +110,7 @@ val streetFighter6Characters = ImmutableList(
             imageId = R.drawable.jp,
             fightingStyle = "Bartitsu & Psycho Power",
             controlType = "Street Fighter",
+            numpadNotation = false,
             game = "Street Fighter VI 6",
         ),
         CharacterEntry(
@@ -104,6 +118,7 @@ val streetFighter6Characters = ImmutableList(
             imageId = R.drawable.juri,
             fightingStyle = "Taekwondo, ki attacks",
             controlType = "Street Fighter",
+            numpadNotation = false,
             game = "Street Fighter VI",
         ),
         CharacterEntry(
@@ -111,6 +126,7 @@ val streetFighter6Characters = ImmutableList(
             imageId = R.drawable.ken,
             fightingStyle = "Karate based martial arts, Ansatsuken",
             controlType = "Street Fighter",
+            numpadNotation = false,
             game = "Street Fighter VI",
         ),
         CharacterEntry(
@@ -118,6 +134,7 @@ val streetFighter6Characters = ImmutableList(
             imageId = R.drawable.kimberly,
             fightingStyle = "Bushin-ryu Ninjutsu",
             controlType = "Street Fighter",
+            numpadNotation = false,
             game = "Street Fighter VI",
         ),
         CharacterEntry(
@@ -125,6 +142,7 @@ val streetFighter6Characters = ImmutableList(
             imageId = R.drawable.lily,
             fightingStyle = "Thunderfoot Martial Arts",
             controlType = "Street Fighter",
+            numpadNotation = false,
             game = "Street Fighter VI",
         ),
         CharacterEntry(
@@ -132,6 +150,7 @@ val streetFighter6Characters = ImmutableList(
             imageId = R.drawable.luke,
             fightingStyle = "Military MMA",
             controlType = "Street Fighter",
+            numpadNotation = false,
             game = "Street Fighter VI",
         ),
         CharacterEntry(
@@ -139,6 +158,7 @@ val streetFighter6Characters = ImmutableList(
             imageId = R.drawable.m_bison,
             fightingStyle = "Psycho Power & Lerdrit",
             controlType = "Street Fighter",
+            numpadNotation = false,
             game = "Street Fighter VI",
         ),
         CharacterEntry(
@@ -146,6 +166,7 @@ val streetFighter6Characters = ImmutableList(
             imageId = R.drawable.mai,
             fightingStyle = "Shiranui-ryuu Ninjitsu",
             controlType = "Street Fighter",
+            numpadNotation = false,
             game = "Street Fighter VI",
         ),
         CharacterEntry(
@@ -153,6 +174,7 @@ val streetFighter6Characters = ImmutableList(
             imageId = R.drawable.manon,
             fightingStyle = "Judo and ballet dancing",
             controlType = "Street Fighter",
+            numpadNotation = false,
             game = "Street Fighter VI",
         ),
         CharacterEntry(
@@ -160,6 +182,7 @@ val streetFighter6Characters = ImmutableList(
             imageId = R.drawable.marisa,
             fightingStyle = "Pankration",
             controlType = "Street Fighter",
+            numpadNotation = false,
             game = "Street Fighter VI",
         ),
         CharacterEntry(
@@ -167,6 +190,7 @@ val streetFighter6Characters = ImmutableList(
             imageId = R.drawable.rashid,
             fightingStyle = "Wind and parkour",
             controlType = "Street Fighter",
+            numpadNotation = false,
             game = "Street Fighter VI",
         ),
         CharacterEntry(
@@ -174,6 +198,15 @@ val streetFighter6Characters = ImmutableList(
             imageId = R.drawable.ryu,
             fightingStyle = "Ansatsuken",
             controlType = "Street Fighter",
+            numpadNotation = false,
+            game = "Street Fighter VI",
+        ),
+        CharacterEntry(
+            name = "Sagat",
+            imageId = R.drawable.sagat,
+            fightingStyle = "Muay Thai",
+            controlType = "Street Fighter",
+            numpadNotation = false,
             game = "Street Fighter VI",
         ),
         CharacterEntry(
@@ -181,6 +214,7 @@ val streetFighter6Characters = ImmutableList(
             imageId = R.drawable.terry_bogard,
             fightingStyle = "Martial arts and Hakkyokuseiken chi techniques",
             controlType = "Street Fighter",
+            numpadNotation = false,
             game = "Street Fighter VI",
         ),
         CharacterEntry(
@@ -188,6 +222,7 @@ val streetFighter6Characters = ImmutableList(
             imageId = R.drawable.zangief,
             fightingStyle = "Mix of Russian and American pro wrestling",
             controlType = "Street Fighter",
+            numpadNotation = false,
             game = "Street Fighter VI",
         ),
     )
@@ -196,22 +231,22 @@ val streetFighter6Characters = ImmutableList(
 val streetFighter6Moves = ImmutableList(
     listOf(
         // Classic Inputs
-        MoveEntry(moveName = "lp", notation = "lp", moveType = "SF Classic", character = "Generic", game = "Street Fighter VI", controlType = SF6ControlType.Classic),
-        MoveEntry(moveName = "mp", notation = "mp", moveType = "SF Classic", character = "Generic", game = "Street Fighter VI", controlType = SF6ControlType.Classic),
-        MoveEntry(moveName = "hp", notation = "hp", moveType = "SF Classic", character = "Generic", game = "Street Fighter VI", controlType = SF6ControlType.Classic),
-        MoveEntry(moveName = "lk", notation = "lk", moveType = "SF Classic", character = "Generic", game = "Street Fighter VI", controlType = SF6ControlType.Classic),
-        MoveEntry(moveName = "mk", notation = "mk", moveType = "SF Classic", character = "Generic", game = "Street Fighter VI", controlType = SF6ControlType.Classic),
-        MoveEntry(moveName = "hk", notation = "hk", moveType = "SF Classic", character = "Generic", game = "Street Fighter VI", controlType = SF6ControlType.Classic),
+        MoveEntry(moveName = "lp", notation = "lp", moveType = "SF Classic", character = "Generic", game = "Street Fighter VI", controlTypeSF = SF6ControlType.Classic),
+        MoveEntry(moveName = "mp", notation = "mp", moveType = "SF Classic", character = "Generic", game = "Street Fighter VI", controlTypeSF = SF6ControlType.Classic),
+        MoveEntry(moveName = "hp", notation = "hp", moveType = "SF Classic", character = "Generic", game = "Street Fighter VI", controlTypeSF = SF6ControlType.Classic),
+        MoveEntry(moveName = "lk", notation = "lk", moveType = "SF Classic", character = "Generic", game = "Street Fighter VI", controlTypeSF = SF6ControlType.Classic),
+        MoveEntry(moveName = "mk", notation = "mk", moveType = "SF Classic", character = "Generic", game = "Street Fighter VI", controlTypeSF = SF6ControlType.Classic),
+        MoveEntry(moveName = "hk", notation = "hk", moveType = "SF Classic", character = "Generic", game = "Street Fighter VI", controlTypeSF = SF6ControlType.Classic),
 
         // Modern Inputs
-        MoveEntry(moveName = "l", notation = "light", moveType = "SF Modern", character = "Generic", game = "Street Fighter VI", controlType = SF6ControlType.Modern),
-        MoveEntry(moveName = "m", notation = "medium", moveType = "SF Modern", character = "Generic", game = "Street Fighter VI", controlType = SF6ControlType.Modern),
-        MoveEntry(moveName = "h", notation = "heavy", moveType = "SF Modern", character = "Generic", game = "Street Fighter VI", controlType = SF6ControlType.Modern),
-        MoveEntry(moveName = "s", notation = "special", moveType = "SF Modern", character = "Generic", game = "Street Fighter VI", controlType = SF6ControlType.Modern),
+        MoveEntry(moveName = "l", notation = "light", moveType = "SF Modern", character = "Generic", game = "Street Fighter VI", controlTypeSF = SF6ControlType.Modern),
+        MoveEntry(moveName = "m", notation = "medium", moveType = "SF Modern", character = "Generic", game = "Street Fighter VI", controlTypeSF = SF6ControlType.Modern),
+        MoveEntry(moveName = "h", notation = "heavy", moveType = "SF Modern", character = "Generic", game = "Street Fighter VI", controlTypeSF = SF6ControlType.Modern),
+        MoveEntry(moveName = "s", notation = "special", moveType = "SF Modern", character = "Generic", game = "Street Fighter VI", controlTypeSF = SF6ControlType.Modern),
 
 
         // Mechanics
-        MoveEntry(moveName = "Assist", notation = "assist", moveType = "Mechanic", character = "Generic", game = "Street Fighter VI", controlType = SF6ControlType.Modern),
+        MoveEntry(moveName = "Assist", notation = "assist", moveType = "Mechanic", character = "Generic", game = "Street Fighter VI", controlTypeSF = SF6ControlType.Modern),
         MoveEntry(moveName = "Taunt", notation = "taunt", moveType = "Mechanic", character = "Generic", game = "Street Fighter VI"),
         MoveEntry(moveName = "Throw", notation = "throw", moveType = "Mechanic", character = "Generic", game = "Street Fighter VI"),
         MoveEntry(moveName = "DI", notation = "DI", moveType = "Mechanic",character = "Generic", game = "Street Fighter VI"),
@@ -223,16 +258,6 @@ val streetFighter6Moves = ImmutableList(
         MoveEntry(moveName = "Wall Bounce", notation = "WB", moveType = "Mechanic", character = "Generic", game = "Street Fighter VI"),
 
         // Movements
-        MoveEntry(moveName = "forward", notation = "f", moveType = "Movement", character = "Generic", game = "Street Fighter VI"),
-        MoveEntry(moveName = "up", notation = "u", moveType = "Movement", character = "Generic", game = "Street Fighter VI"),
-        MoveEntry(moveName = "up_forward", notation = "u/f", moveType = "Movement", character = "Generic", game = "Street Fighter VI"),
-        MoveEntry(moveName = "down_forward", notation = "d/f", moveType = "Movement", character = "Generic", game = "Street Fighter VI"),
-        MoveEntry(moveName = "forward_dash", notation = "F", moveType = "Movement", character = "Generic", game = "Street Fighter VI"),
-        MoveEntry(moveName = "back", notation = "b", moveType = "Movement", character = "Generic", game = "Street Fighter VI"),
-        MoveEntry(moveName = "down", notation = "d", moveType = "Movement", character = "Generic", game = "Street Fighter VI"),
-        MoveEntry(moveName = "up_back", notation = "u/b", moveType = "Movement", character = "Generic", game = "Street Fighter VI"),
-        MoveEntry(moveName = "down_back", notation = "d/b", moveType = "Movement", character = "Generic", game = "Street Fighter VI"),
-        MoveEntry(moveName = "neutral", notation = "n", moveType = "Movement", character = "Generic", game = "Street Fighter VI"),
         MoveEntry(moveName = "qcf", notation = "qcf", moveType = "Movement", character = "Generic", game = "Street Fighter VI"),
         MoveEntry(moveName = "qcb", notation = "qcb", moveType = "Movement", character = "Generic", game = "Street Fighter VI"),
         MoveEntry(moveName = "hcf", notation = "hcf", moveType = "Movement", character = "Generic", game = "Street Fighter VI"),

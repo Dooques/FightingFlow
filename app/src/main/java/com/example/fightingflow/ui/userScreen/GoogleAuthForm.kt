@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.fightingflow.model.UserEntry
-import com.example.fightingflow.viewmodels.AuthViewModel
+import com.example.fightingflow.ui.viewmodels.AuthViewModel
 
 @Composable
 fun GoogleSignIn(

@@ -1,4 +1,4 @@
-package com.example.fightingflow.viewmodels
+package com.example.fightingflow.ui.viewmodels
 
 import com.example.fightingflow.data.database.FlowRepository
 import com.example.fightingflow.util.CharacterEntryUiState

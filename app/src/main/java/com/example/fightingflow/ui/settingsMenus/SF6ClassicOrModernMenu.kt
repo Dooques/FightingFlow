@@ -8,7 +8,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.example.fightingflow.model.Game
 import com.example.fightingflow.model.SF6ControlType
-import com.example.fightingflow.viewmodels.CharacterViewModel
+import com.example.fightingflow.ui.viewmodels.CharacterViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber

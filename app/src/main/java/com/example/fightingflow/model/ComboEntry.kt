@@ -150,7 +150,7 @@ fun moveListStringToMoveEntryList(moveList: String, moveListEntries: MoveEntryLi
     moveList
         .split(",")
         .map { move -> move.trimIndent() }
-        .forEach { move -> moveEntryList.add(moveListEntries.moveList.first { it.notation == move }) }
+        .forEach { move -> moveEntryList.add(moveListEntries.moveList.first { it.moveName == move }) }
     return moveEntryList
 }
 

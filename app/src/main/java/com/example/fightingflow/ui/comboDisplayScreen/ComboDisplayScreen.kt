@@ -56,17 +56,18 @@ import coil.compose.AsyncImage
 import com.example.fightingflow.data.firebase.GoogleAuthService
 import com.example.fightingflow.data.mediastore.MediaStoreUtil
 import com.example.fightingflow.model.ComboDisplay
+import com.example.fightingflow.model.ComboEntry
 import com.example.fightingflow.model.ComboEntryFb
-import com.example.fightingflow.viewmodels.ComboCreationViewModel
-import com.example.fightingflow.ui.comboDisplayScreen.comboItem.ComboItemDisplay
+import com.example.fightingflow.ui.viewmodels.ComboCreationViewModel
+import com.example.fightingflow.ui.comboItem.ComboItemDisplay
 import com.example.fightingflow.ui.components.ProfileAndConsoleInputMenu
-import com.example.fightingflow.viewmodels.UserViewModel
+import com.example.fightingflow.ui.viewmodels.UserViewModel
 import com.example.fightingflow.ui.components.ActionIcon
 import com.example.fightingflow.ui.components.SwipeableItem
 import com.example.fightingflow.ui.settingsMenus.ShowPublicCombosMenu
-import com.example.fightingflow.viewmodels.AuthViewModel
-import com.example.fightingflow.viewmodels.ComboDisplayViewModel
-import com.example.fightingflow.viewmodels.UserDetailsState
+import com.example.fightingflow.ui.viewmodels.AuthViewModel
+import com.example.fightingflow.ui.viewmodels.ComboDisplayViewModel
+import com.example.fightingflow.ui.viewmodels.UserDetailsState
 import dev.shreyaspatil.capturable.controller.rememberCaptureController
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -107,6 +108,8 @@ fun ComboDisplayScreen(
     // Room Flows
     val characterState by comboDisplayViewModel.characterState.collectAsStateWithLifecycle()
     val characterListState by comboDisplayViewModel.characterEntryListState.collectAsStateWithLifecycle()
+    val comboDisplayListRoom by comboDisplayViewModel.comboDisplayListRoom.collectAsStateWithLifecycle()
+    val comboEntryListRoom by comboDisplayViewModel.comboEntryListRoom.collectAsStateWithLifecycle()
 
     // Datastore Flows
     val showPublicCombos by comboDisplayViewModel.publicCombosDisplayState.collectAsStateWithLifecycle()
@@ -128,8 +131,19 @@ fun ComboDisplayScreen(
     // Auth Flows
     val currentUser by authViewModel.signInState.collectAsStateWithLifecycle()
     val userDetails by userViewModel.userDetailsState.collectAsStateWithLifecycle()
-    val comboEntryList: MutableList<ComboEntryFb> = comboEntryListFirebase.comboEntryFbList.toMutableList()
-    val comboDisplayList: MutableList<ComboDisplay> = comboDisplayListFirebase.comboDisplayList.toMutableList()
+
+    val comboEntryList: MutableList<Any> =
+        if (!characterState.character.mutable) {
+            comboEntryListFirebase.comboEntryFbList.toMutableList()
+        } else {
+            comboEntryListRoom.comboEntryList.toMutableList()
+        }
+    val comboDisplayList: MutableList<ComboDisplay> =
+        if (!characterState.character.mutable) {
+            comboDisplayListFirebase.comboDisplayList.toMutableList()
+        } else {
+            comboDisplayListRoom.comboDisplayList.toMutableList()
+        }
 
     Timber.d("--Flow Values--\nConsole: %s\nCombo List: %s\nCollected: %s",
         consoleTypeState, comboDisplayListFirebase.comboDisplayList, combosCollected)
@@ -164,20 +178,6 @@ fun ComboDisplayScreen(
             }
         }
     }
-
-//    Timber.d("Getting combos by character...")
-//    LaunchedEffect(comboDisplayListFirebase, comboEntryListFirebase) {
-//        Timber.d("--Launched effect triggered by combo list change--")
-//        if (comboEntryListFirebase.comboEntryFbList.isNotEmpty() && comboDisplayListFirebase.comboDisplayList.isNotEmpty()) {
-//            Timber.d("Lists contain values, returning as mutable lists")
-//            comboEntryList = comboEntryListFirebase.comboEntryFbList.toMutableList()
-//            comboDisplayList = comboDisplayListFirebase.comboDisplayList.toMutableList()
-//            combosCollected = true
-//            Timber.d("ComboEntry: $comboEntryList\nComboDisplay: $comboDisplayList")
-//        } else {
-//            combosCollected = false
-//        }
-//    }
 
     Timber.d(
         "Character Details\nName: %s\nImage: %s\nCharacterState: %s\nCombo List: %s",
@@ -269,7 +269,7 @@ fun ComboDisplayScreen(
                 )
             ) {
                 Timber.d("--Loading Combo Display List--\n ComboList: $comboDisplayList")
-                if (!combosCollected) {
+                if (comboDisplayList.isEmpty()) {
                     Timber.d("Combo list is empty")
                     item {
                         Row(
@@ -402,7 +402,18 @@ fun ComboDisplayScreen(
                             userDetails = userDetails,
                             comboCreationState = false,
                             combo = combo,
-                            comboAsText = comboEntryList[index].moves.toString(),
+                            comboAsText =
+                                when (comboEntryList.first()) {
+                                    is ComboEntryFb -> {
+                                        (comboEntryList as MutableList<ComboEntryFb>)[index].moves.joinToString(",")
+                                    }
+                                    is ComboEntry -> {
+                                        (comboEntryList as MutableList<ComboEntry>)[index].moves
+                                    }
+                                    else -> {
+                                        ""
+                                    }
+                                },
                             console = consoleTypeState,
                             sf6ControlType = sF6ControlType,
                             iconDisplayState = iconDisplayState,

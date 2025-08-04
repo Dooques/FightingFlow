@@ -3,9 +3,9 @@ package com.example.fightingflow.ui.userScreen.abstractedFunctions
 import androidx.compose.material3.SnackbarHostState
 import com.example.fightingflow.data.firebase.GoogleAuthService
 import com.example.fightingflow.model.UserEntry
-import com.example.fightingflow.viewmodels.AuthViewModel
-import com.example.fightingflow.viewmodels.UserSaveResult
-import com.example.fightingflow.viewmodels.UserViewModel
+import com.example.fightingflow.ui.viewmodels.AuthViewModel
+import com.example.fightingflow.ui.viewmodels.UserSaveResult
+import com.example.fightingflow.ui.viewmodels.UserViewModel
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch

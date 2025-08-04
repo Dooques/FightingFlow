@@ -26,7 +26,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,10 +42,10 @@ import coil.compose.AsyncImage
 import com.example.fightingflow.data.firebase.GoogleAuthService
 import com.example.fightingflow.ui.userScreen.dialogs.EmailAndPasswordDialog
 import com.example.fightingflow.ui.userScreen.dialogs.ReauthDialog
-import com.example.fightingflow.viewmodels.AuthViewModel
-import com.example.fightingflow.viewmodels.ProfanityViewModel
-import com.example.fightingflow.viewmodels.UserDetailsState
-import com.example.fightingflow.viewmodels.UserViewModel
+import com.example.fightingflow.ui.viewmodels.AuthViewModel
+import com.example.fightingflow.ui.viewmodels.ProfanityViewModel
+import com.example.fightingflow.ui.viewmodels.UserDetailsState
+import com.example.fightingflow.ui.viewmodels.UserViewModel
 import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch

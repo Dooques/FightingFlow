@@ -12,6 +12,7 @@ val mortalKombat1Characters = ImmutableList(
             imageId = R.drawable.ashrah, // Replace with actual image resource ID
             fightingStyle = "Krabi-Krabong",
             controlType = "Mortal Kombat",
+            numpadNotation = false,
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
@@ -19,6 +20,7 @@ val mortalKombat1Characters = ImmutableList(
             imageId = R.drawable.baraka, // Replace with actual image resource ID
             fightingStyle = "Silat, Hung Gar",
             controlType = "Mortal Kombat",
+            numpadNotation = false,
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
@@ -26,6 +28,7 @@ val mortalKombat1Characters = ImmutableList(
             imageId = R.drawable.conan, // Replace with actual image ID
             fightingStyle = "Barbarian",
             controlType = "Mortal Kombat",
+            numpadNotation = false,
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
@@ -33,6 +36,7 @@ val mortalKombat1Characters = ImmutableList(
             imageId = R.drawable.cyrax,  // Replace with actual image ID
             fightingStyle = "Tekunin",
             controlType = "Mortal Kombat",
+            numpadNotation = false,
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
@@ -40,6 +44,7 @@ val mortalKombat1Characters = ImmutableList(
             imageId = R.drawable.ermac, // Replace with actual image resource ID
             fightingStyle = "Telekinesis",
             controlType = "Mortal Kombat",
+            numpadNotation = false,
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
@@ -47,6 +52,7 @@ val mortalKombat1Characters = ImmutableList(
             imageId = R.drawable.generalshao, // Replace with actual image resource ID
             fightingStyle = "Axe Fighting",
             controlType = "Mortal Kombat",
+            numpadNotation = false,
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
@@ -54,6 +60,7 @@ val mortalKombat1Characters = ImmutableList(
             imageId = R.drawable.geras, // Replace with actual image ID
             fightingStyle = "Temporal",
             controlType = "Mortal Kombat",
+            numpadNotation = false,
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
@@ -61,6 +68,7 @@ val mortalKombat1Characters = ImmutableList(
             imageId = R.drawable.ghostface,
             fightingStyle = "Stealth",
             controlType = "Mortal Kombat",
+            numpadNotation = false,
             game = "Mortal Kombat 1"
         ),
         CharacterEntry(
@@ -68,6 +76,7 @@ val mortalKombat1Characters = ImmutableList(
             imageId = R.drawable.havik, // Replace with actual image resource ID
             fightingStyle = "Agonizing Style",
             controlType = "Mortal Kombat",
+            numpadNotation = false,
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
@@ -75,6 +84,7 @@ val mortalKombat1Characters = ImmutableList(
             imageId = R.drawable.homelander, // Replace with actual image resource ID
             fightingStyle = "Viltrumite-like Abilities",
             controlType = "Mortal Kombat",
+            numpadNotation = false,
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
@@ -82,6 +92,7 @@ val mortalKombat1Characters = ImmutableList(
             imageId = R.drawable.johnnycage, // Replace with actual image resource ID
             fightingStyle = "Jeet Kune Do, Shorin-Ryu Karate",
             controlType = "Mortal Kombat",
+            numpadNotation = false,
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
@@ -89,6 +100,7 @@ val mortalKombat1Characters = ImmutableList(
             imageId = R.drawable.kenshi, // Replace with actual image resource ID
             fightingStyle = "Tai Chi Chuan",
             controlType = "Mortal Kombat",
+            numpadNotation = false,
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
@@ -96,6 +108,7 @@ val mortalKombat1Characters = ImmutableList(
             imageId = R.drawable.kitana, // Replace with actual image resource ID
             fightingStyle = "Eagle Claw, Ba Gua Zhang",
             controlType = "Mortal Kombat",
+            numpadNotation = false,
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
@@ -103,6 +116,7 @@ val mortalKombat1Characters = ImmutableList(
             imageId = R.drawable.kunglao, // Replace with actual image resource ID
             fightingStyle = "Shaolin Kung Fu, Wing Chun",
             controlType = "Mortal Kombat",
+            numpadNotation = false,
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
@@ -110,6 +124,7 @@ val mortalKombat1Characters = ImmutableList(
             imageId = R.drawable.limei, // Replace with actual image resource ID
             fightingStyle = "Shuai Jiao, Lui He Ba Fa",
             controlType = "Mortal Kombat",
+            numpadNotation = false,
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
@@ -117,6 +132,7 @@ val mortalKombat1Characters = ImmutableList(
             imageId = R.drawable.liukang, // Replace with actual image resource ID
             fightingStyle = "Jun Fan Gung Fu, Pao Chui",
             controlType = "Mortal Kombat",
+            numpadNotation = false,
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
@@ -124,6 +140,7 @@ val mortalKombat1Characters = ImmutableList(
             imageId = R.drawable.mileena, // Replace with actual image resource ID
             fightingStyle = "Tarkatan Fighting Style",
             controlType = "Mortal Kombat",
+            numpadNotation = false,
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
@@ -131,6 +148,7 @@ val mortalKombat1Characters = ImmutableList(
             imageId = R.drawable.nitara, // Replace with actual image resource ID
             fightingStyle = "Vampire Fighting Style",
             controlType = "Mortal Kombat",
+            numpadNotation = false,
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
@@ -138,6 +156,7 @@ val mortalKombat1Characters = ImmutableList(
             imageId = R.drawable.noobsaibot, // Replace with actual image ID
             fightingStyle = "Shadow",
             controlType = "Mortal Kombat",
+            numpadNotation = false,
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
@@ -145,6 +164,7 @@ val mortalKombat1Characters = ImmutableList(
             imageId = R.drawable.omniman, // Replace with actual image resource ID
             fightingStyle = "Viltrumite Martial Arts",
             controlType = "Mortal Kombat",
+            numpadNotation = false,
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
@@ -152,6 +172,7 @@ val mortalKombat1Characters = ImmutableList(
             imageId = R.drawable.peacemaker, // Replace with actual image resource ID
             fightingStyle = "Hand-to-Hand Combat, Firearms",
             controlType = "Mortal Kombat",
+            numpadNotation = false,
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
@@ -159,6 +180,7 @@ val mortalKombat1Characters = ImmutableList(
             imageId = R.drawable.quanchi, // Replace with actual image resource ID
             fightingStyle = "Netherealm Sorcery",
             controlType = "Mortal Kombat",
+            numpadNotation = false,
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
@@ -166,6 +188,7 @@ val mortalKombat1Characters = ImmutableList(
             imageId = R.drawable.raiden, // Replace with actual image resource ID
             fightingStyle = "Nan Chuan, Staff Fighting",
             controlType = "Mortal Kombat",
+            numpadNotation = false,
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
@@ -173,6 +196,7 @@ val mortalKombat1Characters = ImmutableList(
             imageId = R.drawable.rain, // Replace with actual image resource ID
             fightingStyle = "Jeet Kune Do, Tae Kwon Do",
             controlType = "Mortal Kombat",
+            numpadNotation = false,
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
@@ -180,6 +204,7 @@ val mortalKombat1Characters = ImmutableList(
             imageId = R.drawable.reiko, // Replace with actual image resource ID
             fightingStyle = "Commando",
             controlType = "Mortal Kombat",
+            numpadNotation = false,
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
@@ -187,6 +212,7 @@ val mortalKombat1Characters = ImmutableList(
             imageId = R.drawable.reptile, // Replace with actual image resource ID
             fightingStyle = "Hung Gar, Lizard Style",
             controlType = "Mortal Kombat",
+            numpadNotation = false,
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
@@ -194,6 +220,7 @@ val mortalKombat1Characters = ImmutableList(
             imageId = R.drawable.scorpion, // Replace with actual image resource ID
             fightingStyle = "Hapkido, Pi Gua Quan",
             controlType = "Mortal Kombat",
+            numpadNotation = false,
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
@@ -201,6 +228,7 @@ val mortalKombat1Characters = ImmutableList(
             imageId = R.drawable.sektor, // Replace with actual image resource ID
             fightingStyle = "Tekunin",
             controlType = "Mortal Kombat",
+            numpadNotation = false,
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
@@ -208,6 +236,7 @@ val mortalKombat1Characters = ImmutableList(
             imageId = R.drawable.shangtsung, // Replace with actual image resource ID
             fightingStyle = "Snake Fist, Crane Style",
             controlType = "Mortal Kombat",
+            numpadNotation = false,
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
@@ -215,6 +244,7 @@ val mortalKombat1Characters = ImmutableList(
             imageId = R.drawable.sindel, // Replace with actual image resource ID
             fightingStyle = "Zha Quan",
             controlType = "Mortal Kombat",
+            numpadNotation = false,
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
@@ -222,6 +252,7 @@ val mortalKombat1Characters = ImmutableList(
             imageId = R.drawable.smoke, // Replace with actual image resource ID
             fightingStyle = "Mime", // Subject to change/variation
             controlType = "Mortal Kombat",
+            numpadNotation = false,
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
@@ -229,6 +260,7 @@ val mortalKombat1Characters = ImmutableList(
             imageId = R.drawable.subzero, // Replace with actual image resource ID
             fightingStyle = "Shotokan Karate, Cryomancy",
             controlType = "Mortal Kombat",
+            numpadNotation = false,
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
@@ -236,6 +268,7 @@ val mortalKombat1Characters = ImmutableList(
             imageId = R.drawable.takeda, // Replace with actual image resource ID
             fightingStyle = "Lasher, Ronin",
             controlType = "Mortal Kombat",
+            numpadNotation = false,
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
@@ -243,6 +276,7 @@ val mortalKombat1Characters = ImmutableList(
             imageId = R.drawable.t1000, // Replace with actual image ID
             fightingStyle = "Mimicry",
             controlType = "Mortal Kombat",
+            numpadNotation = false,
             game = "Mortal Kombat 1",
         ),
         CharacterEntry(
@@ -250,6 +284,7 @@ val mortalKombat1Characters = ImmutableList(
             imageId = R.drawable.tanya, // Replace with actual image resource ID
             fightingStyle = "Zi Ran Men",
             controlType = "Mortal Kombat",
+            numpadNotation = false,
             game = "Mortal Kombat 1",
         ),
     )
@@ -262,17 +297,6 @@ val mk1Moves = ImmutableList(
         MoveEntry(moveName = "two", notation = "2", moveType = "Input", character = "Generic", game = "Mortal Kombat 1"),
         MoveEntry(moveName = "three", notation = "3", moveType = "Input", character = "Generic", game = "Mortal Kombat 1"),
         MoveEntry(moveName = "four", notation = "4", moveType = "Input", character = "Generic", game = "Mortal Kombat 1"),
-
-        // Movement
-        MoveEntry(moveName = "forward", notation = "f", moveType = "Movement", character = "Generic", game = "Mortal Kombat 1"),
-        MoveEntry(moveName = "up", notation = "u", moveType = "Movement", character = "Generic", game = "Mortal Kombat 1"),
-        MoveEntry(moveName = "up_forward", notation = "u/f", moveType = "Movement", character = "Generic", game = "Mortal Kombat 1"),
-        MoveEntry(moveName = "down_forward", notation = "d/f", moveType = "Movement", character = "Generic", game = "Mortal Kombat 1"),
-        MoveEntry(moveName = "forward_dash", notation = "F", moveType = "Movement", character = "Generic", game = "Mortal Kombat 1"),
-        MoveEntry(moveName = "back", notation = "b", moveType = "Movement", character = "Generic", game = "Mortal Kombat 1"),
-        MoveEntry(moveName = "down", notation = "d", moveType = "Movement", character = "Generic", game = "Mortal Kombat 1"),
-        MoveEntry(moveName = "up_back", notation = "u/b", moveType = "Movement", character = "Generic", game = "Mortal Kombat 1"),
-        MoveEntry(moveName = "down_back", notation = "d/b", moveType = "Movement", character = "Generic", game = "Mortal Kombat 1"),
 
         // Mechanics
         MoveEntry(moveName = "Block", notation = "block", moveType = "Text Input", character = "Generic", game = "Mortal Kombat 1"),

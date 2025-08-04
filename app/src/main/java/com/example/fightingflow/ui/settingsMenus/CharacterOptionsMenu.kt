@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.example.fightingflow.R
 import com.example.fightingflow.model.CharacterEntry
-import com.example.fightingflow.viewmodels.CharacterViewModel
+import com.example.fightingflow.ui.viewmodels.CharacterViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber

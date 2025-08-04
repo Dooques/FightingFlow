@@ -12,7 +12,7 @@ import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.Console
 import com.example.fightingflow.model.ControlType
-import com.example.fightingflow.viewmodels.ComboCreationViewModel
+import com.example.fightingflow.ui.viewmodels.ComboCreationViewModel
 import com.example.fightingflow.ui.comboCreationScreen.ComboDescription
 import com.example.fightingflow.ui.comboCreationScreen.DamageAndDifficulty
 import com.example.fightingflow.ui.comboCreationScreen.IconMoves
@@ -30,7 +30,7 @@ import com.example.fightingflow.util.characterAndMoveData.customInputLayouts.vir
 import com.example.fightingflow.util.characterAndMoveData.mk1Moves
 import com.example.fightingflow.util.characterAndMoveData.streetFighter6Moves
 import com.example.fightingflow.util.characterAndMoveData.tekken8Moves
-import com.example.fightingflow.viewmodels.ProfanityViewModel
+import com.example.fightingflow.ui.viewmodels.ProfanityViewModel
 import timber.log.Timber
 
 @Composable
