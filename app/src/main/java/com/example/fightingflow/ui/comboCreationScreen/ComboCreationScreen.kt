@@ -104,20 +104,19 @@ fun ComboCreationScreen(
     val userDetails by userViewModel.userDetailsState.collectAsStateWithLifecycle()
 
     if (characterState.character != emptyCharacter) {
-        comboCreationViewModel.getCharacterMoveEntryList(characterState.character.name)
+        Timber.d("Getting move list for ${characterState.character.name}")
+        comboCreationViewModel.getCharacterMoveEntryList(characterState.character)
     }
 
-    comboCreationViewModel.getGameMoveEntryList(game.title)
-
     Timber.d("Flows Collected: \n Character Name: %s \n Game: %s \n ComboDisplayState: %s ",
-        characterNameState.name, game, comboDisplay.comboDisplay)
+        characterNameState?.name, game, comboDisplay.comboDisplay)
 
     Timber.d("\n ComboString: %s \n ComboId from DS:%s \n Editing State: %s \n Character Move List: %s",
         comboAsString, comboIdState, editingState, characterMoveListState)
 
     Timber.d("Updating Character State")
     LaunchedEffect(characterListState, characterNameState) {
-        if (characterListState.characterList.isNotEmpty() && characterNameState.name.isNotEmpty()) {
+        if (characterListState.characterList.isNotEmpty() && characterNameState?.name?.isNotEmpty() == true) {
             comboCreationViewModel.characterState.update { characterState }
         }
         Timber.d("%s is loaded.", characterState.character.name)
@@ -214,6 +213,7 @@ fun ComboCreationScreen(
         ) {
             Timber.d("Loading Header...")
             if (comboDisplay.comboDisplay != emptyComboDisplay || !editingState) {
+                Timber.d("CharacterMove List: ${characterMoveListState.moveList}\nGameMoveList: $gameMoveListState")
                 ComboForm(
                     scope = scope,
                     snackbarHostState = snackbarHostState,
@@ -233,13 +233,11 @@ fun ComboCreationScreen(
                     userDetails = userDetails,
                     selectedItem = selectedItem,
                     character = characterState.character,
-                    characterName = characterNameState.name,
+                    characterName = characterNameState?.name,
                     comboDisplay = comboDisplay.comboDisplay,
                     originalCombo = originalCombo.comboDisplay,
                     comboAsString = comboAsString,
-                    moveList = moveListState,
-                    characterMoveList = characterMoveListState,
-                    gameMoveList = gameMoveListState,
+                    moveList = characterMoveListState,
                     iconDisplayState = iconDisplayState,
                     textComboDisplay = textComboDisplayState,
                     deleteMove = comboCreationViewModel::deleteMove,

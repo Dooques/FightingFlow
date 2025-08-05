@@ -1,6 +1,7 @@
 package com.example.fightingflow.util.characterAndMoveData
 
 import androidx.compose.runtime.Immutable
+import com.example.fightingflow.model.MoveEntry
 import com.example.fightingflow.util.ImmutableList
 import com.example.fightingflow.util.characterAndMoveData.customInputLayouts.arcSysMoves
 import com.example.fightingflow.util.characterAndMoveData.customInputLayouts.movement
@@ -40,8 +41,10 @@ class CharacterAndMoveData {
 
 val moveMap = mapOf(
     "movement" to mapOf(
-        "standard" to movement,
-        "numpad" to numpadNotationMoves
+        "standard" to mapOf(
+            "standard" to movement,
+            "numpad" to numpadNotationMoves
+        )
     ),
     "inputs" to mapOf(
         "standard" to mapOf(
@@ -61,9 +64,11 @@ val moveMap = mapOf(
         )
     ),
     "character" to mapOf(
-        "Mortal Kombat" to mk1CharacterMoves,
-        "Tekken" to tekken8CharacterMoves,
-        "Street Fighter" to streetFighter6CharacterMoves
+        "standard" to mapOf(
+            "Mortal Kombat" to mk1CharacterMoves,
+            "Tekken" to tekken8CharacterMoves,
+            "Street Fighter" to streetFighter6CharacterMoves
+        )
     )
 )
 

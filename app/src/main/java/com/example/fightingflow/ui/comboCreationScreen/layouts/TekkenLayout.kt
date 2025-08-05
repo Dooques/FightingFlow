@@ -35,13 +35,11 @@ fun TekkenLayout(
     profanityViewModel: ProfanityViewModel,
     comboDisplay: ComboDisplay,
     character: CharacterEntry,
-    characterName: String,
+    characterName: String?,
     combo: ComboDisplay,
     console: Console?,
     updateComboData: (ComboDisplayUiState) -> Unit,
     moveList: MoveEntryListUiState,
-    characterMoveList: MoveEntryListUiState,
-    gameMoveList: MoveEntryListUiState,
     modifier: Modifier = Modifier
 ) {
     Timber.d("Loading Input Selector")
@@ -72,7 +70,7 @@ fun TekkenLayout(
                 "Movement" -> IconMoves(
                     comboCreationViewModel = comboCreationViewModel,
                     moveType = moveType,
-                    moveList = gameMoveList,
+                    moveList = moveList,
                     context = context,
                     console = console,
                 )
@@ -80,7 +78,7 @@ fun TekkenLayout(
                 "Console" -> IconMoves(
                     comboCreationViewModel = comboCreationViewModel,
                     moveType = moveType,
-                    moveList = gameMoveList,
+                    moveList = moveList,
                     context = context,
                     console = console,
                 )
@@ -88,7 +86,7 @@ fun TekkenLayout(
                 "Input" -> if (console == Console.STANDARD) IconMoves(
                     comboCreationViewModel = comboCreationViewModel,
                     moveType = moveType,
-                    moveList = gameMoveList,
+                    moveList = moveList,
                     context = context,
                     console = console,
                 )
@@ -105,7 +103,7 @@ fun TekkenLayout(
                 "Common", "Mechanic", "Stage" -> TextMoves(
                     comboCreationViewModel = comboCreationViewModel,
                     moveType = moveType,
-                    moveList = gameMoveList,
+                    moveList = moveList,
                     console = console,
                 )
 
@@ -125,14 +123,14 @@ fun TekkenLayout(
                 "Mishima" -> if (character.name in mishima) TextMoves(
                     comboCreationViewModel = comboCreationViewModel,
                     moveType = moveType,
-                    moveList = characterMoveList,
-                    maxItems = if (characterMoveList.moveList.size <= 4) 4 else 5,
+                    moveList = moveList,
+                    maxItems = if (moveList.moveList.size <= 4) 4 else 5,
                     console = console
                 )
 
                 "Character" -> CharacterMoves(
                     comboCreationViewModel = comboCreationViewModel,
-                    characterMoveList = characterMoveList,
+                    characterMoveList = moveList,
                     moveType = moveType,
                     character = character,
                 )

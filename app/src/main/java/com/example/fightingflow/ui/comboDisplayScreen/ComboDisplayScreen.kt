@@ -38,6 +38,7 @@ import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -68,6 +69,8 @@ import com.example.fightingflow.ui.settingsMenus.ShowPublicCombosMenu
 import com.example.fightingflow.ui.viewmodels.AuthViewModel
 import com.example.fightingflow.ui.viewmodels.ComboDisplayViewModel
 import com.example.fightingflow.ui.viewmodels.UserDetailsState
+import com.example.fightingflow.util.CharacterEntryUiState
+import com.example.fightingflow.util.characterAndMoveData.characterMap
 import dev.shreyaspatil.capturable.controller.rememberCaptureController
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -106,47 +109,51 @@ fun ComboDisplayScreen(
     var combosCollected by remember { mutableStateOf(true) }
 
     // Room Flows
-    val characterState by comboDisplayViewModel.characterState.collectAsStateWithLifecycle()
-    val characterListState by comboDisplayViewModel.characterEntryListState.collectAsStateWithLifecycle()
     val comboDisplayListRoom by comboDisplayViewModel.comboDisplayListRoom.collectAsStateWithLifecycle()
     val comboEntryListRoom by comboDisplayViewModel.comboEntryListRoom.collectAsStateWithLifecycle()
 
     // Datastore Flows
     val showPublicCombos by comboDisplayViewModel.publicCombosDisplayState.collectAsStateWithLifecycle()
     val characterNameState by comboDisplayViewModel.characterNameState.collectAsStateWithLifecycle()
+    val characterState by comboDisplayViewModel.characterState.collectAsStateWithLifecycle()
     val characterImageState by comboDisplayViewModel.characterImageState.collectAsStateWithLifecycle()
     val iconDisplayState by comboDisplayViewModel.showIconState.collectAsStateWithLifecycle()
     val gameSelectedState by comboDisplayViewModel.gameSelectedState.collectAsStateWithLifecycle()
-    val userState by userViewModel.username.collectAsStateWithLifecycle()
 
     val textComboState by comboDisplayViewModel.textComboState.collectAsStateWithLifecycle()
     val consoleTypeState by comboDisplayViewModel.consoleTypeState.collectAsStateWithLifecycle()
     val sF6ControlType by comboDisplayViewModel.modernOrClassicState.collectAsStateWithLifecycle()
 
     // Firebase Flows
-    val comboDisplayListFirebase by comboDisplayViewModel.fireStoreComboDisplayFlow.collectAsStateWithLifecycle()
-    val comboEntryListFirebase by comboDisplayViewModel.fireStoreComboEntryFlow.collectAsStateWithLifecycle()
+    val comboDisplayListFirebase by comboDisplayViewModel.comboDisplayListFb.collectAsStateWithLifecycle()
+    val comboEntryListFirestore by comboDisplayViewModel.comboEntryListFb.collectAsStateWithLifecycle()
     val userData by userViewModel.userDataMap.collectAsStateWithLifecycle()
 
     // Auth Flows
     val currentUser by authViewModel.signInState.collectAsStateWithLifecycle()
     val userDetails by userViewModel.userDetailsState.collectAsStateWithLifecycle()
 
-    val comboEntryList: MutableList<Any> =
-        if (!characterState.character.mutable) {
-            comboEntryListFirebase.comboEntryFbList.toMutableList()
-        } else {
-            comboEntryListRoom.comboEntryList.toMutableList()
+    val comboEntryList by remember(characterState) {
+        derivedStateOf {
+            if (!characterState.character.mutable) {
+                comboEntryListFirestore.comboEntryFbList.toMutableList()
+            } else {
+                comboEntryListRoom.comboEntryList.toMutableList()
+            }
         }
-    val comboDisplayList: MutableList<ComboDisplay> =
-        if (!characterState.character.mutable) {
-            comboDisplayListFirebase.comboDisplayList.toMutableList()
-        } else {
-            comboDisplayListRoom.comboDisplayList.toMutableList()
+    }
+    val comboDisplayList by remember(characterState) {
+        derivedStateOf {
+            if (!characterState.character.mutable) {
+                comboDisplayListFirebase.comboDisplayList.toMutableList()
+            } else {
+                comboDisplayListRoom.comboDisplayList.toMutableList()
+            }
         }
+    }
 
-    Timber.d("--Flow Values--\nConsole: %s\nCombo List: %s\nCollected: %s",
-        consoleTypeState, comboDisplayListFirebase.comboDisplayList, combosCollected)
+//    Timber.d("--Flow Values--\n Console: %s\n Combo List: %s\n Collected: %s\n GameSelectedState: %s",
+//        consoleTypeState, comboDisplayListFirebase.comboDisplayList, combosCollected, gameSelectedState)
 
     Timber.d("Updating character data")
     LaunchedEffect(currentUser) {
@@ -163,13 +170,13 @@ fun ComboDisplayScreen(
         }
     }
 
-    LaunchedEffect(characterNameState.name) {
+    LaunchedEffect(characterNameState, gameSelectedState) {
         Timber.d("Launched Effect triggered by character change")
-        if (characterNameState.name.isNotEmpty()) {
+        if (characterNameState?.name != null && characterNameState?.name?.isNotBlank() == true) {
             try {
-                Timber.d("Getting ${characterNameState.name} from database...")
+                Timber.d("Getting ${characterNameState!!.name} from database...")
                 comboDisplayViewModel.updateCharacterState(
-                    characterNameState.name,
+                    characterNameState!!.name,
                     gameSelectedState
                 )
                 Timber.d("Character returned: $characterState")
@@ -181,10 +188,7 @@ fun ComboDisplayScreen(
 
     Timber.d(
         "Character Details\nName: %s\nImage: %s\nCharacterState: %s\nCombo List: %s",
-        characterNameState.name,
-        characterImageState.image,
-        characterState.character,
-        comboDisplayList
+        characterNameState?.name, characterImageState.image, characterState.character, comboDisplayList
     )
     Timber.d("Checking details valid...")
 
@@ -282,7 +286,10 @@ fun ComboDisplayScreen(
                     }
                 }
                 Timber.d("Getting display combos as lazy column with swipeable actions.")
-                itemsIndexed(items = comboDisplayList) { index, combo ->
+                itemsIndexed(
+                    items = comboDisplayList,
+                    key = {index, item -> item.id}
+                ) { index, combo ->
                     Timber.d("Combo: ${combo.id}\nIndex: $index")
                     val captureController = rememberCaptureController()
                     val isOptionRevealed by remember { mutableStateOf(false) }
@@ -396,23 +403,23 @@ fun ComboDisplayScreen(
                             display = true,
                             fontColor = fontColor,
                             comboDisplayViewModel = comboDisplayViewModel,
-                            characterEntryListUiState = characterListState,
+                            characterEntryUiState = characterState,
                             currentUser = currentUser,
                             userData = userData,
                             userDetails = userDetails,
                             comboCreationState = false,
                             combo = combo,
                             comboAsText =
-                                when (comboEntryList.first()) {
-                                    is ComboEntryFb -> {
-                                        (comboEntryList as MutableList<ComboEntryFb>)[index].moves.joinToString(",")
-                                    }
-                                    is ComboEntry -> {
-                                        (comboEntryList as MutableList<ComboEntry>)[index].moves
-                                    }
-                                    else -> {
+                                if (comboEntryList.isNotEmpty()) {
+                                    if (comboEntryList.first() is ComboEntryFb) {
+                                        (comboEntryList[index] as ComboEntryFb).moves.joinToString(",")
+                                    } else if (comboEntryList.first() is ComboEntry) {
+                                        (comboEntryList[index] as ComboEntry).moves
+                                    } else {
                                         ""
                                     }
+                                } else {
+                                    ""
                                 },
                             console = consoleTypeState,
                             sf6ControlType = sF6ControlType,

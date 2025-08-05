@@ -1,6 +1,5 @@
 package com.example.fightingflow.data.database
 
-import androidx.compose.runtime.MutableState
 import com.example.fightingflow.data.database.dao.CharacterDao
 import com.example.fightingflow.data.database.dao.ComboDao
 import com.example.fightingflow.data.database.dao.MoveDao
@@ -13,7 +12,7 @@ interface FlowRepository {
     // Character
     fun getCharacter(name: String): Flow<CharacterEntry?>
     fun getCharactersByGame(game: String): Flow<List<CharacterEntry>>
-    fun getCharacterByNameAndGame(name: String, game: String): Flow<CharacterEntry?>
+    fun getCharacterByNameAndGame(name: String, game: String?): Flow<CharacterEntry?>
     fun getCustomCharacters(): Flow<List<CharacterEntry>?>
     suspend fun updateCharacter(characterEntry: CharacterEntry)
     suspend fun insertCharacter(characterEntry: CharacterEntry)
@@ -55,7 +54,7 @@ class FlowDataRepository(
     override fun getCharactersByGame(game: String): Flow<List<CharacterEntry>> =
         characterDao.getCharactersFromGame(game)
 
-    override fun getCharacterByNameAndGame(name: String, game: String) =
+    override fun getCharacterByNameAndGame(name: String, game: String?) =
         characterDao.getCharacterByGameAndName(name, game)
 
     override fun getCustomCharacters(): Flow<List<CharacterEntry>?> =

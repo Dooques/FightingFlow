@@ -1,6 +1,5 @@
 package com.example.fightingflow.data.firebase
 
-import com.example.fightingflow.model.ComboEntry
 import com.example.fightingflow.model.ComboEntryFb
 import com.example.fightingflow.model.UserDataForCombos
 import com.example.fightingflow.model.UserEntry
@@ -63,72 +62,74 @@ class FirebaseRepository() {
     }
 
     fun getComboList(
-        character: String,
+        character: String?,
         publicComboDisplayState: Boolean,
         user: String
     ): Flow<List<ComboEntryFb>> = callbackFlow {
         Timber.d("--Initiating combo list flow from Firebase--")
-        if (character.isBlank() || character.contains("/")) {
+        if (character?.isBlank() == true || character?.contains("/") == true) {
             Timber.e("Invalid character name provided for Firestore query: $character")
             close(IllegalArgumentException("Invalid character name: $character"))
             return@callbackFlow
         }
 
-        val listenerRegistration: ListenerRegistration =
-            characterCollection.document(character)
-                .collection("combos")
-                .addSnapshotListener { querySnapshot: QuerySnapshot?, e: FirebaseFirestoreException? ->
-                    /* Error Result */
-                    if (e != null) {
-                        Timber.e(e, "Error listening to combo collection")
-                        close(e)
-                        return@addSnapshotListener
-                    }
+        if (character != null) {
+            val listenerRegistration: ListenerRegistration =
+                characterCollection.document(character)
+                    .collection("combos")
+                    .addSnapshotListener { querySnapshot: QuerySnapshot?, e: FirebaseFirestoreException? ->
+                        /* Error Result */
+                        if (e != null) {
+                            Timber.e(e, "Error listening to combo collection")
+                            close(e)
+                            return@addSnapshotListener
+                        }
 
-                    /* Query Snapshot null */
-                    if (querySnapshot == null) {
-                        Timber.w("Query Snapshot was null")
-                        return@addSnapshotListener
-                    }
+                        /* Query Snapshot null */
+                        if (querySnapshot == null) {
+                            Timber.w("Query Snapshot was null")
+                            return@addSnapshotListener
+                        }
 
-                    /* Snapshot success */
-                    Timber.d("Sorting combos from the firestore database by public/user")
-                    val combos = querySnapshot.documents.mapNotNull { document ->
-                        try {
-                            Timber.d("Combo: ${document.data}")
-                            if (publicComboDisplayState) {
-                                Timber.d("Showing public combos.")
-                                document.toObject(ComboEntryFb::class.java)?.copy(
-                                    comboId = document.id,
-                                    createdBy = document.data?.get("created_by").toString(),
-                                    dateCreated = document.data?.get("date_created").toString(),
-                                )
-                            } else {
-                                Timber.d("Showing user combos.")
-                                Timber.d("User: %s", user)
-                                if (document.data?.get("created_by").toString() == user) {
-                                    Timber.d("Combo creator matches current user.")
+                        /* Snapshot success */
+                        Timber.d("Sorting combos from the firestore database by public/user")
+                        val combos = querySnapshot.documents.mapNotNull { document ->
+                            try {
+                                Timber.d("Combo: ${document.data}")
+                                if (publicComboDisplayState) {
+                                    Timber.d("Showing public combos.")
                                     document.toObject(ComboEntryFb::class.java)?.copy(
                                         comboId = document.id,
                                         createdBy = document.data?.get("created_by").toString(),
                                         dateCreated = document.data?.get("date_created").toString(),
                                     )
                                 } else {
-                                    Timber.d("Combo does not match user, returning null.")
-                                    null
+                                    Timber.d("Showing user combos.")
+                                    Timber.d("User: %s", user)
+                                    if (document.data?.get("created_by").toString() == user) {
+                                        Timber.d("Combo creator matches current user.")
+                                        document.toObject(ComboEntryFb::class.java)?.copy(
+                                            comboId = document.id,
+                                            createdBy = document.data?.get("created_by").toString(),
+                                            dateCreated = document.data?.get("date_created").toString(),
+                                        )
+                                    } else {
+                                        Timber.d("Combo does not match user, returning null.")
+                                        null
+                                    }
                                 }
+                            } catch (e: Exception) {
+                                Timber.e(e, "Error converting document to Combo: ${document.id}")
+                                null
                             }
-                        } catch (e: Exception) {
-                            Timber.e(e, "Error converting document to Combo: ${document.id}")
-                            null
                         }
+                        Timber.d("Firestore combos updated: ${combos.size} items")
+                        trySend(combos).isSuccess
                     }
-                    Timber.d("Firestore combos updated: ${combos.size} items")
-                    trySend(combos).isSuccess
-                }
-        awaitClose {
-            Timber.d("Closing Firestore listener for combos")
-            listenerRegistration.remove()
+            awaitClose {
+                Timber.d("Closing Firestore listener for combos")
+                listenerRegistration.remove()
+            }
         }
     }
 

@@ -24,7 +24,7 @@ class CharacterViewModel(
         const val TIME_MILLIS = 5_000L
     }
 
-    val gameSelected = settingsDsRepository.getGame()
+    val gameSelectedState = settingsDsRepository.getGame()
         .map { it }
         .stateIn(
             scope = viewModelScope,

@@ -42,8 +42,6 @@ fun StreetFighterLayout(
     console: Console?,
     sF6ControlType: SF6ControlType?,
     moveList: MoveEntryListUiState,
-    characterMoveList: MoveEntryListUiState,
-    gameMoveList: MoveEntryListUiState,
     modifier: Modifier = Modifier
 ) {
     Timber.d("Loading Input Selector")
@@ -79,7 +77,7 @@ fun StreetFighterLayout(
                 "Movement" -> IconMoves(
                     comboCreationViewModel = comboCreationViewModel,
                     moveType = moveType,
-                    moveList = gameMoveList,
+                    moveList = moveList,
                     maxItems = 5,
                     context = context,
                     console = console,
@@ -89,7 +87,7 @@ fun StreetFighterLayout(
                 "Console" -> IconMoves(
                     comboCreationViewModel = comboCreationViewModel,
                     moveType = moveType,
-                    moveList = gameMoveList,
+                    moveList = moveList,
                     context = context,
                     console = console,
                 )
@@ -97,7 +95,7 @@ fun StreetFighterLayout(
                 "Complex Movement" -> IconMoves(
                     comboCreationViewModel = comboCreationViewModel,
                     moveType = moveType,
-                    moveList = gameMoveList,
+                    moveList = moveList,
                     maxItems = 3,
                     context = context,
                     console = console,
@@ -109,7 +107,7 @@ fun StreetFighterLayout(
                         comboCreationViewModel = comboCreationViewModel,
                         context = context,
                         moveType = moveType,
-                        moveList = gameMoveList,
+                        moveList = moveList,
                         console = console,
                         maxItems = if (moveType == "SF Modern") 4 else 3
                     )
@@ -117,7 +115,7 @@ fun StreetFighterLayout(
                 "Mechanic" -> TextMoves(
                     comboCreationViewModel = comboCreationViewModel,
                     moveType = moveType,
-                    moveList = gameMoveList,
+                    moveList = moveList,
                     console = console
                 )
 
@@ -136,7 +134,7 @@ fun StreetFighterLayout(
 
                 "Special", "Super Art" -> CharacterMoves(
                     comboCreationViewModel = comboCreationViewModel,
-                    characterMoveList = characterMoveList,
+                    characterMoveList = moveList,
                     character = character,
                     moveType = moveType,
                 )

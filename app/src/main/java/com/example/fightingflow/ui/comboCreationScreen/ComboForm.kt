@@ -62,11 +62,9 @@ fun ComboForm(
     originalCombo: ComboDisplay,
     selectedItem: Int,
     character: CharacterEntry,
-    characterName: String,
+    characterName: String?,
     comboAsString: String,
     moveList: MoveEntryListUiState,
-    characterMoveList: MoveEntryListUiState,
-    gameMoveList: MoveEntryListUiState,
     iconDisplayState: Boolean,
     textComboDisplay: Boolean,
     setSelectedItem: (Int) -> Unit,
@@ -125,7 +123,7 @@ fun ComboForm(
                 }
             }
         } else {
-            Timber.d("Combo Move List exists, populating form with moves...")
+            Timber.d("Combo Move List exists, populating form with moves...\n")
             /* Shows moves added to combo once a move has been added */
             ComboItemEditor(
                 context = context,
@@ -165,6 +163,7 @@ fun ComboForm(
         )
     }
 
+    Timber.d("MoveList Combo Form: ${moveList.moveList}")
     if (moveList.moveList.isNotEmpty()) {
         Timber.d("Move Entry List exists, populating Input Selector Column...")
         game.let { innerGame ->
@@ -180,8 +179,6 @@ fun ComboForm(
                     console = consoleTypeState,
                     updateComboData = updateComboData,
                     moveList = moveList,
-                    characterMoveList = characterMoveList,
-                    gameMoveList = gameMoveList
                 )
 
                 Game.SF6 -> StreetFighterLayout(
@@ -195,8 +192,6 @@ fun ComboForm(
                     console = consoleTypeState,
                     sF6ControlType = sF6ControlType,
                     moveList = moveList,
-                    characterMoveList = characterMoveList,
-                    gameMoveList = gameMoveList
                 )
 
                 Game.MK1 -> MortalKombatLayout(
@@ -208,8 +203,6 @@ fun ComboForm(
                     character = character,
                     updateComboData = updateComboData,
                     moveList = moveList,
-                    characterMoveList = characterMoveList,
-                    gameMoveList = gameMoveList
                 )
 
                 Game.CUSTOM -> CustomGameLayout(

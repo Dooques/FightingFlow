@@ -29,7 +29,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -55,6 +54,8 @@ import com.example.fightingflow.ui.settingsMenus.ProfileAndConsoleInputMenu
 import com.example.fightingflow.util.CharacterEntryUiState
 import com.example.fightingflow.util.emptyCharacter
 import com.example.fightingflow.ui.viewmodels.CharacterViewModel
+import com.example.fightingflow.util.CharacterEntryListUiState
+import com.example.fightingflow.util.characterAndMoveData.characterMap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -78,35 +79,29 @@ fun CharacterScreen(
     Timber.d("-- Loading Character Screen --")
 
     val characterListState by comboDisplayViewModel.characterEntryListState.collectAsStateWithLifecycle()
-    val gameSelectedState by characterScreenViewModel.gameSelected.collectAsStateWithLifecycle()
+    val gameSelectedState by characterScreenViewModel.gameSelectedState.collectAsStateWithLifecycle()
     val modernOrClassicState by characterScreenViewModel.modernOrClassicState.collectAsStateWithLifecycle()
     val customGameList by characterScreenViewModel.customGameList.collectAsStateWithLifecycle()
 
-    val characterList: List<CharacterEntry>
-
-    Timber.d("-- Flows Collected -- \n Character List: %s " +
-            "\n Game Selected From DS: %s \n Custom Game List: %s",
+    Timber.d("-- Flows Collected --\nCharacter List: %s\nGame Selected From DS: %s\nCustom Game List: %s",
         characterListState.characterList, gameSelectedState, customGameList)
 
     var gameSelected by remember { mutableStateOf<String?>(null) }
+    var characterList = characterListState
 
     gameSelectedState?.let {
         Timber.d("Getting characters by game...")
         gameSelected = gameSelectedState
         Timber.d("Game selected: $gameSelected")
         gameSelected?.let { game ->
-            if (game == "All") {
+            if (!characterMap.keys.contains(game)) {
                 Timber.d("Getting all custom characters")
                 comboDisplayViewModel.getCustomCharacters()
             } else {
                 Timber.d("Getting characters for $game")
-                comboDisplayViewModel.getCharacterEntryListByGame(game)
+                characterList = CharacterEntryListUiState(characterMap[gameSelected] ?: emptyList())
             }
         }
-    }
-
-    LaunchedEffect(gameSelected) {
-
     }
 
     Scaffold(
@@ -181,7 +176,7 @@ fun CharacterScreen(
                     .fillMaxWidth()
             ) {
                 Timber.d("Loading Character Grid...")
-                items(items = characterListState.characterList.sortedBy { it.name }) { character ->
+                items(items = characterList.characterList.sortedBy { character -> character.name }) { character ->
                     CharacterCard(
                         scope = scope,
                         snackbarHostState = snackbarHostState,

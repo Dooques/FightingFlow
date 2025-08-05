@@ -29,6 +29,8 @@ data class ComboEntry (
     val likes: Int = 0,
     val tags: String? = null,
     val private: Boolean = false,
+    val game: String = "",
+    val controlType: String = "",
     val moves: String = "",
 )
 
@@ -47,6 +49,10 @@ data class ComboEntryFb(
     val likes: Int = 0,
     val tags: String? = null,
     val private: Boolean = false,
+    val game: String = "",
+    @get:PropertyName("control_type")
+    @set:PropertyName("control_type")
+    var controlType: String = "",
     val moves: List<String> = listOf(),
 )
 
@@ -64,6 +70,8 @@ data class ComboDisplay(
     val likes: Int = 0,
     val tags: String? = null,
     val private: Boolean = false,
+    val game: String = "",
+    val controlType: String = "",
     val moves: List<MoveEntry> = listOf()
 )
 
@@ -78,6 +86,8 @@ fun ComboEntry.toDisplay(moveEntryList: MoveEntryListUiState): ComboDisplay =
         difficulty = difficulty,
         likes = likes,
         tags = tags,
+        game = game,
+        controlType = controlType,
         moves = ImmutableList(moveListStringToMoveEntryList(moves, moveEntryList))
     )
 
@@ -92,6 +102,8 @@ fun ComboDisplay.toEntry(character: CharacterEntry): ComboEntry =
         difficulty = difficulty,
         likes = likes,
         tags = tags,
+        game = game,
+        controlType = controlType,
         moves = moveEntryListToMoveListString(moves)
     )
 
@@ -109,6 +121,8 @@ fun ComboDisplay.toFbEntry(character: CharacterEntry): ComboEntryFb {
         likes = likes,
         tags = tags,
         private = private,
+        game = game,
+        controlType = controlType,
         moves = ImmutableList(movesList.toList())
     )
 }
@@ -127,7 +141,10 @@ fun ComboEntryFb.toDisplay(moveEntryListUiState: MoveEntryListUiState): ComboDis
         likes = likes,
         tags = tags,
         private = private,
+        game = game,
+        controlType = controlType,
         moves = ImmutableList(moves.map { move ->
+            Timber.d("Move: $move")
             moveEntryListUiState.moveList.first { it.notation == move }
         })
     )
@@ -142,15 +159,25 @@ fun ComboEntryFb.toHashMap(): HashMap<String, Any> =
         "difficulty" to difficulty,
         "likes" to likes,
         "tags" to tags.let { "" },
+        "game" to game,
+        "control_type" to controlType,
         "moves" to moves
     )
 
 fun moveListStringToMoveEntryList(moveList: String, moveListEntries: MoveEntryListUiState): List<MoveEntry> {
+    Timber.d("--Processing Move List--\n MoveListString: $moveList\n MoveEntryList: $moveListEntries")
     val moveEntryList = mutableListOf<MoveEntry>()
     moveList
         .split(",")
         .map { move -> move.trimIndent() }
-        .forEach { move -> moveEntryList.add(moveListEntries.moveList.first { it.moveName == move }) }
+        .forEach { move ->
+            Timber.d("Move: $move")
+            moveEntryList.add(
+                moveListEntries.moveList.first {
+                    it.notation == move
+                }
+            )
+        }
     return moveEntryList
 }
 
@@ -199,10 +226,8 @@ class CharacterConverter {
         .adapter(CharacterEntry::class.java)
 
     @TypeConverter
-    fun characterToString(character: CharacterEntry?) =
-        character?.let { jsonAdapter.toJson(it) } ?: ""
+    fun characterToString(character: CharacterEntry?) = character?.let { jsonAdapter.toJson(it) } ?: ""
 
     @TypeConverter
-    fun stringToCharacter(json: String?) =
-        json?.let { jsonAdapter.fromJson(json) }
+    fun stringToCharacter(json: String?) = json?.let { jsonAdapter.fromJson(json) }
 }

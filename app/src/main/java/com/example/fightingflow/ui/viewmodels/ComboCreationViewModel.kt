@@ -9,6 +9,7 @@ import com.example.fightingflow.data.datastore.UserDsRepository
 import com.example.fightingflow.data.datastore.SettingsDsRepository
 import com.example.fightingflow.data.firebase.FirebaseRepository
 import com.example.fightingflow.data.firebase.GoogleAuthService
+import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.Console
 import com.example.fightingflow.model.Game
 import com.example.fightingflow.model.MoveEntry
@@ -22,6 +23,7 @@ import com.example.fightingflow.ui.comboCreationScreen.updateMoveListAbstract
 import com.example.fightingflow.util.CharacterEntryUiState
 import com.example.fightingflow.util.ComboDisplayUiState
 import com.example.fightingflow.util.ComboEntryUiState
+import com.example.fightingflow.util.DataProcessor
 import com.example.fightingflow.util.ImmutableList
 import com.example.fightingflow.util.MoveEntryListUiState
 import com.example.fightingflow.util.emptyComboDisplay
@@ -29,6 +31,8 @@ import com.example.fightingflow.util.emptyComboEntry
 import com.example.fightingflow.util.emptyComboEntryFb
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -48,6 +52,8 @@ class ComboCreationViewModel(
     companion object {
         const val TIME_MILLIS = 5_000L
     }
+
+    val dataProcessor = DataProcessor()
 
     // Mutable State
     val editingState = mutableStateOf(false)
@@ -439,25 +445,38 @@ class ComboCreationViewModel(
         }
     }
 
-    fun getCharacterMoveEntryList(character: String) {
+    fun getCharacterMoveEntryList(character: CharacterEntry) {
         viewModelScope.launch {
-            flowRepository.getAllMovesByCharacter(character)
-                .map {moveList -> moveList}
-                .collect { characterMoveList ->
-                    characterMoveEntryList.update { MoveEntryListUiState(characterMoveList) }
-                }
+            val moveList = if (!character.mutable) {
+                dataProcessor.getMoveListForCharacter(character)
+            } else {
+                val moveList: MutableList<MoveEntry> = mutableListOf()
+                moveList.addAll(dataProcessor.getMoveListForCharacter(character).moveList)
+                moveList.addAll(
+                    flowRepository.getAllMovesByCharacter(character.name)
+                        .map { moveList -> MoveEntryListUiState(moveList) }
+                        .first()
+                        .moveList
+                )
+                MoveEntryListUiState(moveList)
+            }
+            characterMoveEntryList.update { moveList }
         }
     }
 
-    fun getGameMoveEntryList(game: String) {
-        viewModelScope.launch {
-            flowRepository.getAllMovesByGame(game)
-                .map { it }
-                .collect { gameMoves ->
-                    gameMoveEntryList.update { MoveEntryListUiState(gameMoves) }
-                }
-        }
-    }
+//    fun getGameMoveEntryList(game: String) {
+//        viewModelScope.launch {
+//            val moveList = if (!character.mutable) {
+//                dataProcessor.getMoveListForCharacter(character)
+//            } else {
+//                flowRepository.getAllMovesByGame(game)
+//                    .map { it }
+//                    .collect { gameMoves ->
+//                        gameMoveEntryList.update { MoveEntryListUiState(gameMoves) }
+//                    }
+//            }
+//        }
+//    }
 }
 
 sealed class ComboResult {

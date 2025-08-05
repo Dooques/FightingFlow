@@ -24,9 +24,9 @@ import com.example.fightingflow.model.SF6ControlType
 import com.example.fightingflow.model.UserDataForCombos
 import com.example.fightingflow.ui.comboCreationScreen.ComboAsText
 import com.example.fightingflow.ui.comboDisplayScreen.inputConverter.convertInputsToConsole
-import com.example.fightingflow.util.CharacterEntryListUiState
 import com.example.fightingflow.ui.viewmodels.ComboDisplayViewModel
 import com.example.fightingflow.ui.viewmodels.UserDetailsState
+import com.example.fightingflow.util.CharacterEntryUiState
 import dev.shreyaspatil.capturable.capturable
 import dev.shreyaspatil.capturable.controller.CaptureController
 import kotlinx.coroutines.CoroutineScope
@@ -41,7 +41,7 @@ fun ComboItemDisplay(
     toShare: Boolean,
     display: Boolean,
     comboDisplayViewModel: ComboDisplayViewModel,
-    characterEntryListUiState: CharacterEntryListUiState,
+    characterEntryUiState: CharacterEntryUiState,
     currentUser: GoogleAuthService.SignInState,
     userData: UserDataForCombos,
     userDetails: UserDetailsState,
@@ -60,9 +60,7 @@ fun ComboItemDisplay(
     Box(modifier.fillMaxWidth().capturable(captureController)) {
         if (toShare) {
             Image(
-                painterResource(
-                    characterEntryListUiState.characterList.first { it.name == combo.character }
-                        .imageId),
+                painterResource(characterEntryUiState.character.imageId),
                 null,
                 modifier.size(50.dp).align(Alignment.BottomEnd)
             )

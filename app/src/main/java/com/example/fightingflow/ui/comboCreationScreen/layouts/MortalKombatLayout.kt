@@ -39,8 +39,6 @@ fun MortalKombatLayout(
     console: Console?,
     updateComboData: (ComboDisplayUiState) -> Unit,
     moveList: MoveEntryListUiState,
-    characterMoveList: MoveEntryListUiState,
-    gameMoveList: MoveEntryListUiState,
     modifier: Modifier = Modifier
 ) {
     Timber.d("Loading Input Selector")
@@ -63,7 +61,7 @@ fun MortalKombatLayout(
                 "Input" -> if (console == Console.STANDARD) IconMoves(
                     comboCreationViewModel = comboCreationViewModel,
                     moveType = moveType,
-                    moveList = gameMoveList,
+                    moveList = moveList,
                     maxItems = 5,
                     context = context,
                     console = console
@@ -72,7 +70,7 @@ fun MortalKombatLayout(
                 "Movement", "Console" -> IconMoves(
                     comboCreationViewModel = comboCreationViewModel,
                     moveType = moveType,
-                    moveList = gameMoveList,
+                    moveList = moveList,
                     maxItems = 5,
                     context = context,
                     console = console
@@ -89,7 +87,7 @@ fun MortalKombatLayout(
 
                 "Special", "Fatal Blow" -> CharacterMoves(
                     comboCreationViewModel = comboCreationViewModel,
-                    characterMoveList = characterMoveList,
+                    characterMoveList = moveList,
                     character = character,
                     moveType = moveType,
                 )
@@ -110,7 +108,7 @@ fun MortalKombatLayout(
                 "MK Input" -> TextMoves(
                     comboCreationViewModel = comboCreationViewModel,
                     moveType = moveType,
-                    moveList = gameMoveList,
+                    moveList = moveList,
                     console = console,
                     maxItems = 4
                 )
