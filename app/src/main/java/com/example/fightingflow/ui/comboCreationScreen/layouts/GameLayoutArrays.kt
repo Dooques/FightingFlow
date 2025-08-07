@@ -10,9 +10,9 @@ val customGameLayout = listOf(
 
 val mortalKombatLayout = listOf(
     "Text Combo", "Description", "Damage", "Buttons", "Divider", "Misc Inputs", "Misc", "Divider",
-    "Movements", "Movement", "Divider", "Inputs", "Console", "Console Text", "Input", "Text Input",
-    "Divider", "Block and Stance", "Text Mechanic", "Divider", "Special Moves", "Special", "Divider",
-    "Fatal Blow Title", "Fatal Blow",
+    "Movements", "Movement", "Divider", "Inputs", "Console", "Console Text", "Input", "Divider",
+    "Block and Stance", "Text Input", "Divider", "Mechanics", "Mechanic", "Divider",
+    "Special Moves", "Special", "Divider", "Fatal Blow Title", "Fatal Blow",
 )
 
 val streetFighterLayoutClassic = listOf(

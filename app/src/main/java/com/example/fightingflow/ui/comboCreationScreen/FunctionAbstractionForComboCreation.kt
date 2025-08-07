@@ -1,5 +1,6 @@
 package com.example.fightingflow.ui.comboCreationScreen
 
+import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.Console
 import com.example.fightingflow.model.Game
@@ -40,11 +41,14 @@ fun updateMoveListAbstract(
     Timber.d("-- Adding move to Combo --")
     var moveToAdd = moveList.first { it.moveName == moveName}
 
-    Timber.d("MoveToAdd: %s \n Game: %s \n MoveName: %s", moveToAdd, game, moveName)
-    val gameSelected = if (game.contains("Tekken")) { Game.T8 }
-    else if (game.contains("Mortal Kombat")) { Game.MK1 }
-    else if (game.contains("Street Fighter")) { Game.SF6 }
-    else { Game.CUSTOM }
+    Timber.d("MoveToAdd: %s\n Game: %s\n MoveName: %s\n %s",
+        moveToAdd, game, moveName, moveList)
+    val gameSelected =
+        if (game.contains("Tekken")) { Game.T8 }
+        else if (game.contains("Mortal Kombat")) { Game.MK1 }
+        else if (game.contains("Street Fighter")) { Game.SF6 }
+        else { Game.CUSTOM }
+
     if (moveToAdd.moveName in consoleInputs) {
         Timber.d("Converting console input to standard...")
         moveToAdd = convertInputToStandard(
@@ -57,24 +61,26 @@ fun updateMoveListAbstract(
         moveToAdd.moveType == "Break" ||
         moveToAdd.moveType == "Misc" ||
         moveToAdd.moveType == "Movement"
-        ) {
+    ) {
         Timber.d("Adding Break to Combo")
         moveToAdd = moveList.first { it.moveName == moveName}
     } else {
         Timber.d("Adding $moveName to Combo")
-        if (moveToAdd.moveType == "Unique Move") {
-            moveToAdd = moveList.first {
-                it.moveName == moveName && it.game == game
+        moveToAdd =
+            if (moveToAdd.moveType == "Unique Move") {
+                moveList.first {
+                    it.moveName == moveName
+                }
+            } else {
+                moveList.first {
+                    it.moveName == moveName
+                }
             }
-        } else {
-            moveToAdd = moveList.first {
-                it.moveName == moveName && it.game == gameSelected.title
-            }
-        }
     }
 
     Timber.d("$moveToAdd found.")
     val updatedList = comboDisplayState.comboDisplay.moves.toMutableList()
+
     Timber.d("Index: $itemIndexState")
     val index = if (itemIndexState == comboDisplayState.comboDisplay.moves.size)
         itemIndexState else itemIndexState + 1

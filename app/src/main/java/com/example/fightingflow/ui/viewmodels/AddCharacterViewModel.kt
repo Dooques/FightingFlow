@@ -68,22 +68,31 @@ class AddCharacterViewModel(
     fun getCharacterToEdit() { viewModelScope.launch {
         Timber.d("-- Getting character from DB --")
         flowRepository.getCharacterByNameAndGame(characterNameState.value, gameSelectedState.value)
-            .map { character -> CharacterEntryUiState(character ?: emptyCharacter) }
-            .collect { existingCharacter -> characterUiState.update { existingCharacter } }
+            .map { character ->
+                CharacterEntryUiState(character ?: emptyCharacter)
+            }
+            .collect { existingCharacter ->
+                characterUiState.update { existingCharacter }
+            }
         }
     }
     fun clearCharacterState() {
         characterUiState.update { CharacterEntryUiState() }
     }
 
-    private fun getExistingCharacterEntry(character: CharacterEntry) { viewModelScope.launch {
-        Timber.d("Name: ${character.name} \n Game: ${character.game}")
+    private fun getExistingCharacterEntry(character: CharacterEntry) {
+        viewModelScope.launch {
+            Timber.d("Name: ${character.name} \n Game: ${character.game}")
 
-        flowRepository.getCharacterByNameAndGame(character.name, character.game)
-            .mapNotNull { CharacterEntryUiState(it ?: emptyCharacter) }
-            .collect { characterState -> existingCharacterState.update { characterState } }
-
-        Timber.d("Character: ${existingCharacterState.value.character}") }
+            flowRepository.getCharacterByNameAndGame(character.name, character.game)
+                .mapNotNull { character ->
+                    CharacterEntryUiState(character ?: emptyCharacter)
+                }
+                .collect { characterState ->
+                    existingCharacterState.update { characterState }
+                }
+            Timber.d("Character: ${existingCharacterState.value.character}")
+        }
     }
 
     suspend fun updateCustomGameList(customGame: String) {
@@ -94,8 +103,12 @@ class AddCharacterViewModel(
             else {
                 if (!customGameList.value.lowercase().contains(customGame.lowercase())) {
                     "${customGameList.value}, $customGame"
-                } else { customGameList.value }
-            }) }
+                } else {
+                    customGameList.value
+                }
+            }
+        )
+    }
 
     private suspend fun cleanupCustomGames(character: CharacterEntry) {
         Timber.d("Checking for other characters in changed game...")
@@ -119,22 +132,27 @@ class AddCharacterViewModel(
 
     private suspend fun addUniqueMovesToDb(character: CharacterEntry) {
         Timber.d("-- Converting Unique Moves --")
-        val uniqueMoves = character.uniqueMoves?.split(", ")?.map {
+        Timber.d("Move String: ${character.uniqueMoves}")
+        val uniqueMoves = character.uniqueMoves?.split(", ")?.map { move ->
             MoveEntry(
-                moveName = it,
-                notation = it.lowercase(),
+                moveName = move,
+                notation = move.lowercase(),
                 moveType = "Unique Move",
                 character = character.name,
                 game = character.game,
-            ) }
+            )
+        }
+        Timber.d("Unique Moves List: $uniqueMoves")
 
         val movesToAdd = mutableListOf<MoveEntry>()
 
         uniqueMoves?.forEach {
             val existingMove = getExistingMove(it.moveName)
-            if (existingMove.moveName != it.moveName && existingMove.game != it.game)
-              movesToAdd.add(it)
+            if (existingMove.moveName != it.moveName && existingMove.game != it.game) {
+                Timber.d("Move does not exist, adding to list of moves")
+                movesToAdd.add(it)
             }
+        }
 
         if (movesToAdd.isNotEmpty()) {
             try {
@@ -157,7 +175,9 @@ class AddCharacterViewModel(
         if (result is CharacterDbResult.Error) {
             Timber.e(result.e, "Character Error, returning.")
             return result
-        } else { Timber.d("No errors found, preparing to save/update") }
+        } else {
+            Timber.d("No errors found, preparing to save/update")
+        }
 
         Timber.d("Character found, preparing to save/update character...")
         result = if (editState) {
@@ -202,14 +222,18 @@ class AddCharacterViewModel(
 
     private suspend fun updateCharacter(character: CharacterEntry): CharacterDbResult {
         Timber.d("Updating existing character in database")
-        Timber.d("Character: $character" +
-                "\n Existing Character: ${existingCharacterState.value}")
+        Timber.d("Character: $character\n Existing Character: ${existingCharacterState.value}")
         try {
             if (existingCharacterState.value != CharacterEntryUiState()) {
                 Timber.d("Copying id of existing character to update database value.")
-                characterUiState.update { CharacterEntryUiState(characterUiState.value.character.copy(
-                    id = existingCharacterState.value.character.id)) } }
+                characterUiState.update {
+                    CharacterEntryUiState(characterUiState.value.character.copy(
+                        id = existingCharacterState.value.character.id)
+                    )
+                }
+            }
 
+            Timber.d("Updating character in database...")
             flowRepository.updateCharacter(character)
             addUniqueMovesToDb(character)
             Timber.d("Character saved: $character")

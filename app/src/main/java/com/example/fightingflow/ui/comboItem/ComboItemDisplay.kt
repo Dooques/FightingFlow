@@ -58,13 +58,7 @@ fun ComboItemDisplay(
 ) {
     Timber.d("-- Loading Combo Moves Composable... --")
     Box(modifier.fillMaxWidth().capturable(captureController)) {
-        if (toShare) {
-            Image(
-                painterResource(characterEntryUiState.character.imageId),
-                null,
-                modifier.size(50.dp).align(Alignment.BottomEnd)
-            )
-        }
+
         Column(
             modifier.padding(horizontal = (4 * uiScale).dp, vertical = (4 * uiScale).dp)
         ) {
@@ -168,9 +162,11 @@ fun ComboItemDisplay(
                 comboDisplayViewModel = comboDisplayViewModel,
                 comboCreationState = comboCreationState,
                 combo = combo,
+                characterEntry = characterEntryUiState,
                 currentUser = currentUser,
                 userData = userData,
                 userDetails = userDetails,
+                toShare = toShare,
                 fontColor = fontColor
             )
         }

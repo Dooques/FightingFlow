@@ -36,6 +36,9 @@ import com.example.fightingflow.ui.viewmodels.ComboCreationViewModel
 import com.example.fightingflow.ui.viewmodels.ComboDisplayViewModel
 import com.example.fightingflow.ui.viewmodels.ProfanityViewModel
 import com.example.fightingflow.ui.viewmodels.UserDetailsState
+import com.example.fightingflow.util.CharacterEntryUiState
+import com.example.fightingflow.util.characterAndMoveData.characterMap
+import com.example.fightingflow.util.emptyCharacter
 import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
 import kotlin.reflect.KFunction0
@@ -99,9 +102,13 @@ fun ComboForm(
                             comboDisplayViewModel = comboDisplayViewModel,
                             comboCreationState = comboCreationState,
                             combo = comboDisplay,
+                            characterEntry = CharacterEntryUiState(
+                                characterMap[game.title]?.first { characterName == it.name} ?: emptyCharacter
+                            ),
                             currentUser = currentUser,
                             userData = userData,
                             userDetails = userDetails,
+                            toShare = false,
                             fontColor = Color.White
                         )
                     }
@@ -113,9 +120,13 @@ fun ComboForm(
                             comboDisplayViewModel = comboDisplayViewModel,
                             comboCreationState = comboCreationState,
                             combo = comboDisplay,
+                            characterEntry = CharacterEntryUiState(
+                                characterMap[game.title]?.first { characterName == it.name} ?: emptyCharacter
+                            ),
                             currentUser = currentUser,
                             userData = userData,
                             userDetails = userDetails,
+                            toShare = false,
                             fontColor = Color.White
                         )
                     }
@@ -163,7 +174,6 @@ fun ComboForm(
         )
     }
 
-    Timber.d("MoveList Combo Form: ${moveList.moveList}")
     if (moveList.moveList.isNotEmpty()) {
         Timber.d("Move Entry List exists, populating Input Selector Column...")
         game.let { innerGame ->

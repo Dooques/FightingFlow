@@ -52,6 +52,7 @@ fun GameSelectedMenu(
             GameSelectedHeader(
                 gameSelected = game,
                 onClick = { gameMenuExpanded = !gameMenuExpanded },
+                modernSelected = sf6Option?.name == SF6ControlType.Modern.name,
                 modifier = modifier.align(Alignment.CenterStart)
             )
         }
@@ -132,7 +133,12 @@ fun GameSelectedMenu(
 }
 
 @Composable
-fun GameSelectedHeader(gameSelected: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun GameSelectedHeader(
+    gameSelected: String,
+    modernSelected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth()
@@ -152,7 +158,8 @@ fun GameSelectedHeader(gameSelected: String, onClick: () -> Unit, modifier: Modi
 
         Box {
             Text(
-                text = gameSelected,
+                text =
+                    "$gameSelected ${if (gameSelected == "Street Fighter VI") { if (modernSelected) "Modern" else "Classic" } else { "" }}",
                 style = MaterialTheme.typography.bodyLarge
                     .copy(
                         shadow = Shadow(

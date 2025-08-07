@@ -171,7 +171,6 @@ fun moveListStringToMoveEntryList(moveList: String, moveListEntries: MoveEntryLi
         .split(",")
         .map { move -> move.trimIndent() }
         .forEach { move ->
-            Timber.d("Move: $move")
             moveEntryList.add(
                 moveListEntries.moveList.first {
                     it.notation == move
@@ -201,9 +200,7 @@ fun getMoveEntryDataForComboDisplay(
     val updatedCombo = combo.copy(
         moves = ImmutableList(
             combo.moves.map { move ->
-                Timber.d("Move: $move")
                 val updateData = moveEntryList.moveList.first { it.moveName == move.moveName }
-                Timber.d("MoveToAdd: ${moveEntryList.moveList.first { it.moveName == move.moveName }}")
                 MoveEntry(
                     id = updateData.id,
                     moveName = updateData.moveName,

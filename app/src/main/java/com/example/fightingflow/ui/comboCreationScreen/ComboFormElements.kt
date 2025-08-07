@@ -441,8 +441,8 @@ fun DamageAndDifficulty(
         // Damage Input
         OutlinedTextField(
             value = damageValue.toString(),
-            onValueChange = {
-                damageValue = it.toIntOrNull() ?: damageValue
+            onValueChange = { newValue ->
+                damageValue = newValue.toIntOrNull() ?: if (newValue.isBlank()) 0 else damageValue
                 updateComboData(ComboDisplayUiState(comboDisplay.copy(damage = damageValue)))
                 Timber.d("damage: $damageValue")
             },
@@ -649,7 +649,7 @@ suspend fun saveLogic(
         onNavigateToComboDisplay()
     } else {
         if (result is ComboResult.Error) {
-            Timber.e(result.e, "An error occured while trying to save the combo: ")
+            Timber.e(result.e, "An error occurred while trying to save the combo: ")
         }
     }
 }

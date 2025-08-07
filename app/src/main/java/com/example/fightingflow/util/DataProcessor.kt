@@ -9,7 +9,7 @@ import timber.log.Timber
 
 class DataProcessor {
     fun getMoveListForCharacter(character: CharacterEntry): MoveEntryListUiState {
-        Timber.d("--Processing Move Data for $character")
+        Timber.d("--Processing Move Data for ${character.name}")
         val moveList = mutableListOf<MoveEntry>()
 
         moveList.addAll(commonMoves)

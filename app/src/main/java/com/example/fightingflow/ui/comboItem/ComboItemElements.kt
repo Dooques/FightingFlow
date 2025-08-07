@@ -35,11 +35,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.fightingflow.data.firebase.GoogleAuthService
+import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.MoveEntry
 import com.example.fightingflow.model.UserDataForCombos
 import com.example.fightingflow.ui.viewmodels.ComboDisplayViewModel
 import com.example.fightingflow.ui.viewmodels.UserDetailsState
+import com.example.fightingflow.util.CharacterEntryUiState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -99,10 +101,12 @@ fun ComboInfoBottom(
     scope: CoroutineScope,
     comboDisplayViewModel: ComboDisplayViewModel,
     combo: ComboDisplay,
+    characterEntry: CharacterEntryUiState,
     comboCreationState: Boolean,
     currentUser: GoogleAuthService.SignInState,
     userData: UserDataForCombos,
     userDetails: UserDetailsState,
+    toShare: Boolean,
     fontColor: Color,
     modifier: Modifier = Modifier
 ) {
@@ -147,63 +151,72 @@ fun ComboInfoBottom(
                 )
             }
         }
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(
-                onClick = {
-                    scope.launch {
-                    Timber.d("Updating like value of combo and adding combo ID to User Likes")
-                    when (userDetails) {
-                        is UserDetailsState.Loaded -> {
-                            Timber.d("User Details available: $userDetails")
-                            val comboList = userDetails.user.likedCombos.toMutableList()
-                            comboList.map { it.replace(" ", "") }
-                            if (comboList.size == 1 && comboList.contains("")) {
-                                comboList.remove("")
-                            }
-                            Timber.d("Checking if user has liked the combo...")
-                            Timber.d("Combo List: $comboList")
-                            Timber.d("UserData contains combo: ${comboList.contains(combo.id)}")
-                            Timber.d("Combo ID: ${combo.id}")
-                            if (!comboList.contains(combo.id)) {
-                                Timber.d("User has not liked the combo, adding a like.")
-                                comboList.add(combo.id)
-                                Timber.d("Combo List after adding ID: $comboList")
-                                comboDisplayViewModel.updateCombo(
-                                    combo = combo.copy(likes = combo.likes + 1),
-                                    user = userDetails.user.copy(likedCombos = comboList)
-                                )
-                            } else {
-                                Timber.d("User has liked the combo, removing like.")
-                                comboList.remove(combo.id)
-                                Timber.d("Combo List after removing ID: $comboList")
-                                comboDisplayViewModel.updateCombo(
-                                    combo = combo.copy(likes = combo.likes - 1),
-                                    user = userDetails.user.copy(likedCombos = comboList)
-                                )
-                            }
-                        }
-
-                        else -> {
-                            Timber.d("User details not loaded")
-                        }
-                    }
-                    }
+        if (!comboCreationState) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (toShare) {
+                    Image(
+                        painterResource(characterEntry.character.imageId),
+                        null,
+                        modifier.size(40.dp)
+                    )
                 }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.ThumbUp,
-                    contentDescription = null,
-                    tint = if (
-                        userDetails is UserDetailsState.Loaded &&
-                        userDetails.user.likedCombos.contains(combo.id)
-                    ) Color.Blue else Color.White
+                IconButton(
+                    onClick = {
+                        scope.launch {
+                            Timber.d("Updating like value of combo and adding combo ID to User Likes")
+                            when (userDetails) {
+                                is UserDetailsState.Loaded -> {
+                                    Timber.d("User Details available: $userDetails")
+                                    val comboList = userDetails.user.likedCombos.toMutableList()
+                                    comboList.map { it.replace(" ", "") }
+                                    if (comboList.size == 1 && comboList.contains("")) {
+                                        comboList.remove("")
+                                    }
+                                    Timber.d("Checking if user has liked the combo...")
+                                    Timber.d("Combo List: $comboList")
+                                    Timber.d("UserData contains combo: ${comboList.contains(combo.id)}")
+                                    Timber.d("Combo ID: ${combo.id}")
+                                    if (!comboList.contains(combo.id)) {
+                                        Timber.d("User has not liked the combo, adding a like.")
+                                        comboList.add(combo.id)
+                                        Timber.d("Combo List after adding ID: $comboList")
+                                        comboDisplayViewModel.updateCombo(
+                                            combo = combo.copy(likes = combo.likes + 1),
+                                            user = userDetails.user.copy(likedCombos = comboList)
+                                        )
+                                    } else {
+                                        Timber.d("User has liked the combo, removing like.")
+                                        comboList.remove(combo.id)
+                                        Timber.d("Combo List after removing ID: $comboList")
+                                        comboDisplayViewModel.updateCombo(
+                                            combo = combo.copy(likes = combo.likes - 1),
+                                            user = userDetails.user.copy(likedCombos = comboList)
+                                        )
+                                    }
+                                }
+
+                                else -> {
+                                    Timber.d("User details not loaded")
+                                }
+                            }
+                        }
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ThumbUp,
+                        contentDescription = null,
+                        tint = if (
+                            userDetails is UserDetailsState.Loaded &&
+                            userDetails.user.likedCombos.contains(combo.id)
+                        ) Color.Blue else Color.White
+                    )
+                }
+                Text(
+                    text = "${combo.likes} Likes",
+                    color = fontColor,
+                    style = font
                 )
             }
-            Text(
-                text = "${combo.likes} Likes",
-                color = fontColor,
-                style = font
-            )
         }
     }
 }

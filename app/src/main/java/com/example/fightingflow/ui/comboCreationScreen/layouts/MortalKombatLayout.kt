@@ -105,18 +105,25 @@ fun MortalKombatLayout(
                     maxItems = 6
                 )
 
-                "MK Input" -> TextMoves(
+                "Text Input" -> TextMoves(
                     comboCreationViewModel = comboCreationViewModel,
                     moveType = moveType,
                     moveList = moveList,
                     console = console,
-                    maxItems = 4
+                )
+
+                "Mechanic" -> TextMoves(
+                    comboCreationViewModel = comboCreationViewModel,
+                    moveType = moveType,
+                    moveList = moveList,
+                    console = console,
+                    maxItems = 3
                 )
 
                 "Divider" ->
                     InputDivider()
 
-                "Special Moves", "Block and Stance", "Fatal Blow Title", "Inputs", "Movements",
+                "Special Moves", "Block and Stance", "Mechanics", "Fatal Blow Title", "Inputs", "Movements",
                 "Misc Inputs" -> SectionTitle(moveType)
             }
             Timber.d("$moveType loaded.")

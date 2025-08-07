@@ -380,7 +380,6 @@ val tekken8CharacterMoves = ImmutableList(
 
         //Asuka
         MoveEntry(moveName = "Naniwa Gusto", notation = "Naniwa Gusto", moveType = "Character", character = "Asuka", game = "Tekken 8"),
-        MoveEntry(moveName = "Leg Cutter", notation = "Leg Cutter", moveType = "Character", character = "Asuka", game = "Tekken 8"),
 
         // Azucena
         MoveEntry(moveName = "Libertador", notation = "Libertador", moveType = "Character", character = "Azucena", game = "Tekken 8"),

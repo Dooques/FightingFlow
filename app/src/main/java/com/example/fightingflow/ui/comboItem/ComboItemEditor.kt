@@ -24,8 +24,12 @@ import com.example.fightingflow.ui.comboCreationScreen.ComboAsText
 import com.example.fightingflow.ui.comboDisplayScreen.inputConverter.convertInputsToConsole
 import com.example.fightingflow.ui.viewmodels.ComboDisplayViewModel
 import com.example.fightingflow.ui.viewmodels.UserDetailsState
+import com.example.fightingflow.util.CharacterEntryUiState
+import com.example.fightingflow.util.characterAndMoveData.characterMap
+import com.example.fightingflow.util.emptyCharacter
 import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
+import kotlin.collections.first
 
 
 @Composable
@@ -334,8 +338,12 @@ fun ComboItemEditor(
                 currentUser = currentUser,
                 comboCreationState = comboCreationState,
                 combo = combo,
+                characterEntry = CharacterEntryUiState(
+                    characterMap[combo.game]?.first { combo.character == it.name} ?: emptyCharacter
+                ),
                 userData = userData,
                 userDetails = userDetails,
+                toShare = false,
                 fontColor = fontColor
             )
         }

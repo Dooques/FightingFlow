@@ -239,10 +239,10 @@ val streetFighter6Moves = ImmutableList(
         MoveEntry(moveName = "hk", notation = "hk", moveType = "SF Classic", character = "Generic", game = "Street Fighter VI", controlTypeSF = SF6ControlType.Classic),
 
         // Modern Inputs
-        MoveEntry(moveName = "l", notation = "light", moveType = "SF Modern", character = "Generic", game = "Street Fighter VI", controlTypeSF = SF6ControlType.Modern),
-        MoveEntry(moveName = "m", notation = "medium", moveType = "SF Modern", character = "Generic", game = "Street Fighter VI", controlTypeSF = SF6ControlType.Modern),
-        MoveEntry(moveName = "h", notation = "heavy", moveType = "SF Modern", character = "Generic", game = "Street Fighter VI", controlTypeSF = SF6ControlType.Modern),
-        MoveEntry(moveName = "s", notation = "special", moveType = "SF Modern", character = "Generic", game = "Street Fighter VI", controlTypeSF = SF6ControlType.Modern),
+        MoveEntry(moveName = "light", notation = "light", moveType = "SF Modern", character = "Generic", game = "Street Fighter VI", controlTypeSF = SF6ControlType.Modern),
+        MoveEntry(moveName = "medium", notation = "medium", moveType = "SF Modern", character = "Generic", game = "Street Fighter VI", controlTypeSF = SF6ControlType.Modern),
+        MoveEntry(moveName = "heavy", notation = "heavy", moveType = "SF Modern", character = "Generic", game = "Street Fighter VI", controlTypeSF = SF6ControlType.Modern),
+        MoveEntry(moveName = "special", notation = "special", moveType = "SF Modern", character = "Generic", game = "Street Fighter VI", controlTypeSF = SF6ControlType.Modern),
 
 
         // Mechanics

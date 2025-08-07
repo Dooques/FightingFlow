@@ -39,14 +39,16 @@ import com.example.fightingflow.ui.viewmodels.ComboDisplayViewModel
 import com.example.fightingflow.ui.components.ActionIcon
 import com.example.fightingflow.ui.components.ProfileAndConsoleInputMenu
 import com.example.fightingflow.ui.viewmodels.UserViewModel
-import com.example.fightingflow.util.emptyCharacter
 import com.example.fightingflow.util.emptyComboDisplay
 import com.example.fightingflow.ui.viewmodels.AuthViewModel
 import com.example.fightingflow.ui.viewmodels.ComboCreationViewModel
 import com.example.fightingflow.ui.viewmodels.ProfanityViewModel
+import com.example.fightingflow.util.ComboDisplayUiState
+import com.example.fightingflow.util.characterAndMoveData.characterMap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.update
 import timber.log.Timber
+import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("SourceLockedOrientationActivity")
@@ -69,27 +71,22 @@ fun ComboCreationScreen(
     val context = LocalContext.current
     (context as? Activity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
-    var settingsMenuExpanded by remember { mutableStateOf(false) }
-
     // ComboViewModel
-    val characterState by comboDisplayViewModel.characterState.collectAsStateWithLifecycle()
-    val characterListState by comboDisplayViewModel.characterEntryListState.collectAsStateWithLifecycle()
-    val moveListState by comboDisplayViewModel.moveEntryListUiState.collectAsStateWithLifecycle()
+    val characterStateDisplay by comboDisplayViewModel.characterState.collectAsStateWithLifecycle()
 
     // ComboCreationViewModel
-    val comboDisplay by comboCreationViewModel.comboDisplayState.collectAsStateWithLifecycle()
-    val originalCombo by comboCreationViewModel.originalCombo.collectAsStateWithLifecycle()
+    val characterStateCreation by comboCreationViewModel.characterState.collectAsStateWithLifecycle()
+    val comboDisplayState by comboCreationViewModel.comboDisplayState.collectAsStateWithLifecycle()
+    val originalComboState by comboCreationViewModel.originalComboState.collectAsStateWithLifecycle()
     val comboAsString by comboCreationViewModel.comboAsStringState.collectAsStateWithLifecycle()
-    val characterMoveListState by comboCreationViewModel.characterMoveEntryList.collectAsStateWithLifecycle()
-    val gameMoveListState by comboCreationViewModel.gameMoveEntryList.collectAsStateWithLifecycle()
+    val moveListState by comboCreationViewModel.moveEntryList.collectAsStateWithLifecycle()
     val textComboState by comboDisplayViewModel.textComboState.collectAsStateWithLifecycle()
     val game by comboCreationViewModel.gameTypeState.collectAsStateWithLifecycle()
     val selectedItem by comboCreationViewModel.itemIndexState.collectAsStateWithLifecycle()
 
     // Datastore Flows
-    val username by userViewModel.username.collectAsStateWithLifecycle()
     val characterNameState by comboDisplayViewModel.characterNameState.collectAsStateWithLifecycle()
-    val comboIdState by comboCreationViewModel.comboIdState
+    val comboIdState by comboCreationViewModel.comboIdState.collectAsStateWithLifecycle()
     val editingState by comboCreationViewModel.editingState
     val iconDisplayState by comboDisplayViewModel.showIconState.collectAsStateWithLifecycle()
     val textComboDisplayState by comboDisplayViewModel.textComboState.collectAsStateWithLifecycle()
@@ -103,45 +100,93 @@ fun ComboCreationScreen(
     val currentUser by authViewModel.signInState.collectAsStateWithLifecycle()
     val userDetails by userViewModel.userDetailsState.collectAsStateWithLifecycle()
 
-    if (characterState.character != emptyCharacter) {
-        Timber.d("Getting move list for ${characterState.character.name}")
-        comboCreationViewModel.getCharacterMoveEntryList(characterState.character)
-    }
+    var settingsMenuExpanded by remember { mutableStateOf(false) }
+    var characterUpdated by remember { mutableStateOf(false) }
+    var comboUpdated by remember { mutableStateOf(false) }
 
-    Timber.d("Flows Collected: \n Character Name: %s \n Game: %s \n ComboDisplayState: %s ",
-        characterNameState?.name, game, comboDisplay.comboDisplay)
+    val newCombo = emptyComboDisplay.copy(
+        id = if (!characterMap.keys.contains(game.title)) UUID.randomUUID().toString() else "",
+        character = characterStateDisplay.character.name,
+        controlType = characterStateDisplay.character.controlType,
+        game = characterStateDisplay.character.game
+    )
 
-    Timber.d("\n ComboString: %s \n ComboId from DS:%s \n Editing State: %s \n Character Move List: %s",
-        comboAsString, comboIdState, editingState, characterMoveListState)
+    Timber.d("--Flows Collected-- \n Character Name: %s \n CharacterState: %s\n CharacterStateCreation: %s \n" +
+            " Game: %s\n ComboDisplayState: %s\n ComboString: %s \n ComboId from DS:%s \n Editing State: %s \n Character Move List: %s",
+        characterNameState?.name, characterStateDisplay.character, characterStateCreation.character,
+        game, comboDisplayState.comboDisplay, comboAsString, comboIdState, editingState, moveListState)
 
     Timber.d("Updating Character State")
-    LaunchedEffect(characterListState, characterNameState) {
-        if (characterListState.characterList.isNotEmpty() && characterNameState?.name?.isNotEmpty() == true) {
-            comboCreationViewModel.characterState.update { characterState }
+    LaunchedEffect(characterStateDisplay) {
+        Timber.d("--Launched Effect triggered to update CharacterState Update--")
+        if (characterStateCreation != characterStateDisplay) {
+            Timber.d(" Character state is empty, updating ith display screen value")
+            comboCreationViewModel.characterState.update { characterStateDisplay }
+
+            Timber.d(" Creating move list for character in CreationViewModel")
+            comboCreationViewModel.getMoveEntryList(characterStateDisplay.character)
+            characterUpdated = true
+        } else {
+            if (moveListState.moveList.first().character != characterStateDisplay.character.name) {
+                Timber.d(" Move List does not match selected character, updating move list.")
+                comboCreationViewModel.getMoveEntryList(characterStateDisplay.character)
+                characterUpdated = true
+            }
+            characterUpdated = false
         }
-        Timber.d("%s is loaded.", characterState.character.name)
+        Timber.d(" %s is loaded.", characterStateCreation.character.name)
     }
 
-    Timber.d("Checking if in editing state & existing combo list contains data...")
-    LaunchedEffect(editingState, comboIdState) {
-        if (editingState) {
-            if (comboIdState.isNotEmpty()) {
-                Timber.d("Combo ID found, getting Combo from firestore...")
-                try {
-                    comboCreationViewModel.getExistingComboFromFirestore()
-                    Timber.d("Combo collected from firestore.")
-                } catch (e: Exception) {
-                    Timber.e(e, "An error occurred collecting combo from firestore, " +
-                            "\n Checking internal database for combo...")
-                    try {
-                        comboCreationViewModel.getExistingComboFromDb()
-                        Timber.d("Combo collected from internal database.")
-                    } catch (e: Exception) {
-                        Timber.e(e, "An error occurred collecting combo from internal database.")
-                    }
-                }
-            } else { Timber.d("No combo ID found.") }
-        } else { Timber.d("Not in editing state.") }
+    LaunchedEffect(comboDisplayState) {
+        Timber.d("--Launch Effect triggered by combo state change--")
+        if (!editingState) {
+            if (!comboUpdated) {
+                Timber.d(" Adding character to combo details")
+                comboCreationViewModel.updateComboDetails(ComboDisplayUiState(newCombo))
+                comboUpdated = true
+                Timber.d("Combo updated: $comboDisplayState")
+            } else {
+                Timber.d(" No Changes detected.")
+            }
+        } else {
+            Timber.d(" In editing state closing launched effect.")
+            comboUpdated = false
+        }
+    }
+
+    LaunchedEffect(comboIdState) {
+        Timber.d("--Launched Effect triggered by comboIdState change--")
+        Timber.d(" ComboID: $comboIdState")
+        if (comboIdState.isEmpty()) {
+            Timber.d(" No combo ID found.")
+            return@LaunchedEffect
+        }
+
+        if (!editingState) {
+            Timber.d(" Not in editing state.")
+            return@LaunchedEffect
+        }
+
+        if (characterStateCreation.character.mutable) {
+            Timber.d(" Combo ID found, getting Combo from firestore...")
+            try {
+                comboCreationViewModel.getExistingComboFromFirestore()
+                Timber.d(" Combo collected from firestore.")
+            } catch (e: Exception) {
+                Timber.e(
+                    e, " An error occurred collecting combo from firestore, " +
+                            "\n Checking internal database for combo..."
+                )
+            }
+        } else {
+            Timber.d(" No combo found in firestore.")
+            try {
+                comboCreationViewModel.getExistingComboFromDb()
+                Timber.d(" Combo collected from internal database.")
+            } catch (e: Exception) {
+                Timber.e(e, " An error occurred collecting combo from internal database.")
+            }
+        }
     }
 
     Scaffold(
@@ -149,21 +194,21 @@ fun ComboCreationScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = characterState.character.name,
+                        text = characterStateDisplay.character.name,
                         style = MaterialTheme.typography.displayMedium,
                         modifier = modifier.padding(start = 16.dp)
                     )
                 },
                 actions = {
-                    if (characterState.character.mutable) {
+                    if (characterStateDisplay.character.mutable) {
                         AsyncImage(
-                            model = characterState.character.imageUri,
+                            model = characterStateDisplay.character.imageUri,
                             contentDescription = null,
                             modifier.size(60.dp)
                         )
                     } else {
                         Image(
-                            painter = painterResource(characterState.character.imageId),
+                            painter = painterResource(characterStateDisplay.character.imageId),
                             contentDescription = "",
                             modifier = modifier.size(60.dp)
                         )
@@ -212,8 +257,7 @@ fun ComboCreationScreen(
                 .padding(contentPadding)
         ) {
             Timber.d("Loading Header...")
-            if (comboDisplay.comboDisplay != emptyComboDisplay || !editingState) {
-                Timber.d("CharacterMove List: ${characterMoveListState.moveList}\nGameMoveList: $gameMoveListState")
+            if (comboDisplayState.comboDisplay != emptyComboDisplay || !editingState) {
                 ComboForm(
                     scope = scope,
                     snackbarHostState = snackbarHostState,
@@ -232,12 +276,12 @@ fun ComboCreationScreen(
                     userData = userData,
                     userDetails = userDetails,
                     selectedItem = selectedItem,
-                    character = characterState.character,
+                    character = characterStateDisplay.character,
                     characterName = characterNameState?.name,
-                    comboDisplay = comboDisplay.comboDisplay,
-                    originalCombo = originalCombo.comboDisplay,
+                    comboDisplay = comboDisplayState.comboDisplay,
+                    originalCombo = originalComboState.comboDisplay,
                     comboAsString = comboAsString,
-                    moveList = characterMoveListState,
+                    moveList = moveListState,
                     iconDisplayState = iconDisplayState,
                     textComboDisplay = textComboDisplayState,
                     deleteMove = comboCreationViewModel::deleteMove,

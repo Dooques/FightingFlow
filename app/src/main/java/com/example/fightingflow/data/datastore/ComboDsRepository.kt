@@ -42,7 +42,7 @@ class ComboDatastoreRepository(private val dataStore: DataStore<Preferences>): C
 
     override suspend fun updateEditingState(editingStateValue: Boolean) {
         Timber.d("Setting editing state to datastore...")
-        Timber.d("Editing state: $editingState")
+        Timber.d("Editing state: $editingStateValue")
         dataStore.edit { preference ->
             preference[editingState] = editingStateValue
         }

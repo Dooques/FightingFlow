@@ -68,6 +68,7 @@ import com.example.fightingflow.util.featureColor
 import com.example.fightingflow.ui.viewmodels.AddCharacterViewModel
 import com.example.fightingflow.ui.viewmodels.CharacterDbResult
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import timber.log.Timber
@@ -88,16 +89,20 @@ fun AddCharacterScreen(
     Timber.d("-- Loading Custom Character Screen --")
     val mediaStoreUtil = koinInject<MediaStoreUtil>()
 
-    var character by remember { mutableStateOf(CharacterEntry(
-        name = "",
-        fightingStyle = "",
-        imageId = R.drawable.mokujin,
-        game = "Custom",
-        controlType = "Tekken",
-        numpadNotation = false,
-        uniqueMoves = "",
-        mutable = true
-    )) }
+    var character by remember {
+        mutableStateOf(
+            CharacterEntry(
+                name = "",
+                fightingStyle = "",
+                imageId = R.drawable.mokujin,
+                game = "Custom",
+                controlType = "Tekken",
+                numpadNotation = false,
+                uniqueMoves = "",
+                mutable = true
+            )
+        )
+    }
 
     val customGameList by addCharacterViewModel.customGameList.collectAsStateWithLifecycle()
     val characterUiStateVM by addCharacterViewModel.characterUiState.collectAsStateWithLifecycle()
@@ -106,6 +111,7 @@ fun AddCharacterScreen(
 
     val editState = addCharacterViewModel.editState
     var controlTypeDropdownExpanded by remember { mutableStateOf(false) }
+    var imagePicked by remember { mutableStateOf(false) }
 
     Timber.d("Loading Launched effect to update character state...")
     LaunchedEffect(editState, characterUiStateVM) {
@@ -141,11 +147,11 @@ fun AddCharacterScreen(
 
     Timber.d(
         "\n Existing Character: %s \n Name: %s \n Fighting Style: %s \n Control Type: %s" +
-                "\n Game: %s \n Unique Moves: %s \n Image URI: %s \n ",
-        characterUiStateVM.character, characterUiStateVM.character.fightingStyle,
-        characterUiStateVM.character.controlType, characterUiStateVM.character.game,
-        characterUiStateVM.character.uniqueMoves, characterUiStateVM.character.imageUri,
-        characterUiStateVM.character.mutable)
+                "\n Game: %s \n Unique Moves: %s \n Image URI: %s \n Mutable: %s",
+        characterUiStateVM.character, characterUiStateVM.character.name,
+        characterUiStateVM.character.fightingStyle, characterUiStateVM.character.controlType,
+        characterUiStateVM.character.game, characterUiStateVM.character.uniqueMoves,
+        characterUiStateVM.character.imageUri, characterUiStateVM.character.mutable)
 
     Scaffold(
         topBar = {
@@ -295,9 +301,11 @@ fun AddCharacterScreen(
                     }
 
                     CharacterImagePicker(
+                        scope = scope,
                         mediaStoreUtil = mediaStoreUtil,
                         imageUri = character.imageUri?.toUri() ?: Uri.EMPTY,
                         character = character,
+                        imagePicked = {imagePicked = true},
                         updateImageId = {
                             character = character.copy(imageUri = it.toString())
                         }
@@ -311,6 +319,7 @@ fun AddCharacterScreen(
                         snackbarHostState = snackbarHostState,
                         editState = editState,
                         character = character,
+                        imagePicked = imagePicked,
                         navigateBack = navigateBack
                     )
                 }
@@ -321,10 +330,12 @@ fun AddCharacterScreen(
 
 @Composable
 fun CharacterImagePicker(
+    scope: CoroutineScope,
     mediaStoreUtil: MediaStoreUtil,
     imageUri: Uri?,
     character: CharacterEntry,
     updateImageId: (Uri?) -> Unit,
+    imagePicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var setBuffer by remember { mutableStateOf(false) }
@@ -391,20 +402,24 @@ fun CharacterImagePicker(
                     )
                 }
             }
-            OutlinedButton(
-                onClick = {
-                    setBuffer = true
-                    pickMedia.launch(PickVisualMediaRequest(PickVisualMedia.ImageOnly))
-                    setBuffer = false
-                          },
-                modifier = modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = "Pick a Photo",
-                    color = MaterialTheme.colorScheme.onBackground,
+            if (setBuffer) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
+            } else {
+                OutlinedButton(
+                    onClick = {
+                        pickMedia.launch(PickVisualMediaRequest(PickVisualMedia.ImageOnly))
+                    },
+                    modifier = modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Pick a Photo",
+                        color = MaterialTheme.colorScheme.onBackground,
+                    )
+                }
             }
-
         }
     }
 }
@@ -416,6 +431,7 @@ fun ConfirmButton(
     snackbarHostState: SnackbarHostState,
     editState: Boolean,
     character: CharacterEntry,
+    imagePicked: Boolean,
     navigateBack: () -> Unit
 ) {
     var setBuffer by remember { mutableStateOf(false) }
@@ -428,21 +444,27 @@ fun ConfirmButton(
             Timber.d("-- Updating Database with Character values --")
             Timber.d("Checking if ImageURI value is empty...")
             Timber.d("URI: ${character.imageUri}")
-            if (!character.imageUri.isNullOrBlank()) {
+            if (!character.imageUri.isNullOrBlank() && imagePicked) {
                 Timber.d("Image URI string is valid, converting to File")
                 imageFile =
-                    character.imageUri.let { mediaStoreUtil.getFileFromUri(uri = it.toUri()) }
+                    character.imageUri.let { imageUri ->
+                        mediaStoreUtil.getFileFromUri(uri = imageUri.toUri())
+                    }
                 Timber.d("imageFile: $imageFile")
-
-                    imageUri = imageFile?.let { mediaStoreUtil.finalizeImage(it, character.name) }
-                    Timber.d("ImageURI: $imageUri")
+                imageUri = imageFile?.let { imageUri ->
+                    mediaStoreUtil.finalizeImage(imageUri, character.name)
+                }
+                Timber.d("ImageURI: $imageUri")
             }
 
             Timber.d("Checking if imageURI is null...")
-            if (character.imageUri != null ) {
-                Timber.d("Image URI not null, ")
-                val updatedCharacter = character.copy(imageUri = imageUri.toString())
-
+            if (character.imageUri != null) {
+                var updatedCharacter = character
+                if (imagePicked) {
+                    Timber.d("Image URI not null")
+                    updatedCharacter = character.copy(imageUri = imageUri.toString())
+                }
+                Timber.d("Updated Character with URI: $updatedCharacter")
                 scope.launch {
                     val result = addCharacterViewModel.saveCharacter(updatedCharacter)
                     setBuffer = true
@@ -450,34 +472,34 @@ fun ConfirmButton(
                     if (result is CharacterDbResult.Success) {
                         if (!editState) {
                             addCharacterViewModel.updateCustomGameList(character.game)
-                            snackbarHostState.showSnackbar(
-                                message = "Successfully added character to database.",
-                                withDismissAction = true
-                            )
+//                            snackbarHostState.showSnackbar(
+//                                message = "Successfully added character to database.",
+//                                withDismissAction = true
+//                            )
                             setBuffer = false
                             navigateBack()
                         } else {
-                            snackbarHostState.showSnackbar(
-                                message = "Successfully updated character in database.",
-                                withDismissAction = true,
-                            )
+//                            snackbarHostState.showSnackbar(
+//                                message = "Successfully updated character in database.",
+//                                withDismissAction = true,
+//                            )
                             setBuffer = false
                             navigateBack()
                         }
                     } else if (result is CharacterDbResult.Error) {
-                            snackbarHostState.showSnackbar(
-                                message = result.e.toString(),
-                                withDismissAction = true
-                            )
+                        snackbarHostState.showSnackbar(
+                            message = result.e.toString(),
+                            withDismissAction = true
+                        )
                         setBuffer = false
-                        }
                     }
-                } else {
-                    scope.launch {
-                        snackbarHostState.showSnackbar("Please add an image for your character.")
-                    }
-                    Timber.d("Image URI is null")
                 }
+            } else {
+                scope.launch {
+                    snackbarHostState.showSnackbar("Please add an image for your character.")
+                }
+                Timber.d("Image URI is null")
+            }
         },
         enabled = character.game.isNotEmpty() ||
                 character.name.isNotEmpty() ||
@@ -494,8 +516,7 @@ fun ConfirmButton(
                 modifier = Modifier.size(24.dp),
                 color = MaterialTheme.colorScheme.onPrimary
             )
-        }
-        if (!setBuffer) {
+        } else {
             Text(
                 text = "Save Character",
                 style = MaterialTheme.typography.bodyLarge.copy(

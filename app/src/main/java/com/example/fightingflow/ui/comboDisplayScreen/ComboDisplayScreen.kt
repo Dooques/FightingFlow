@@ -105,8 +105,6 @@ fun ComboDisplayScreen(
     var showDialog by remember { mutableStateOf(false) }
     var capturedImage by remember { mutableStateOf<Uri?>(null) }
     var capturedImageFile by remember { mutableStateOf<File?>(null) }
-    var shareDataOn by remember { mutableStateOf(false) }
-    var combosCollected by remember { mutableStateOf(true) }
 
     // Room Flows
     val comboDisplayListRoom by comboDisplayViewModel.comboDisplayListRoom.collectAsStateWithLifecycle()
@@ -157,12 +155,12 @@ fun ComboDisplayScreen(
 
     Timber.d("Updating character data")
     LaunchedEffect(currentUser) {
-        Timber.d("Launched Effect triggered by User State Change\nCurrent User: %s",
+        Timber.d("--Launched Effect triggered by User State Change--\n Current User: %s",
         when (currentUser) {
             is GoogleAuthService.SignInState.Success -> {"User is signed in: " +
                 (currentUser as GoogleAuthService.SignInState.Success).user
             }
-            else -> { "User is not signed in yet: $currentUser"}
+            else -> { " User is not signed in yet: $currentUser"}
         })
         when (currentUser) {
             is GoogleAuthService.SignInState.Success -> { comboDisplayViewModel.updateUserState(currentUser) }
@@ -171,26 +169,26 @@ fun ComboDisplayScreen(
     }
 
     LaunchedEffect(characterNameState, gameSelectedState) {
-        Timber.d("Launched Effect triggered by character change")
+        Timber.d("--Launched Effect triggered by character change--")
         if (characterNameState?.name != null && characterNameState?.name?.isNotBlank() == true) {
             try {
-                Timber.d("Getting ${characterNameState!!.name} from database...")
+                Timber.d(" Getting ${characterNameState!!.name} from database...")
                 comboDisplayViewModel.updateCharacterState(
-                    characterNameState!!.name,
+                    characterState.character.name,
                     gameSelectedState
                 )
-                Timber.d("Character returned: $characterState")
+                Timber.d(" Character returned: $characterState")
             } catch (e: NoSuchElementException) {
-                Timber.e(e, "Character Error, no element found in character list.")
+                Timber.e(e, " Character Error, no element found in character list.")
             }
         }
     }
 
     Timber.d(
-        "Character Details\nName: %s\nImage: %s\nCharacterState: %s\nCombo List: %s",
+        "--Character Details--\n Name: %s\n Image: %s\n CharacterState: %s\n Combo List: %s",
         characterNameState?.name, characterImageState.image, characterState.character, comboDisplayList
     )
-    Timber.d("Checking details valid...")
+    Timber.d(" Checking details valid...")
 
     Scaffold(
         topBar = {
@@ -281,11 +279,11 @@ fun ComboDisplayScreen(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
                         ) {
-                            Text("Nothing to see here, press the plus icon to create a combo!", textAlign = TextAlign.Center)
+                            Text(" Nothing to see here, press the plus icon to create a combo!", textAlign = TextAlign.Center)
                         }
                     }
                 }
-                Timber.d("Getting display combos as lazy column with swipeable actions.")
+                Timber.d(" Getting display combos as lazy column with swipeable actions.")
                 itemsIndexed(
                     items = comboDisplayList,
                     key = {index, item -> item.id}
@@ -293,6 +291,7 @@ fun ComboDisplayScreen(
                     Timber.d("Combo: ${combo.id}\nIndex: $index")
                     val captureController = rememberCaptureController()
                     val isOptionRevealed by remember { mutableStateOf(false) }
+                    var shareDataOn by remember { mutableStateOf(false) }
 
                     SwipeableItem(
                         isRevealed = isOptionRevealed,
@@ -308,9 +307,9 @@ fun ComboDisplayScreen(
                             // Share Combo
                             ActionIcon(
                                 onclick = {
-                                    Timber.d("Sharing Combo")
+                                    Timber.d("--Sharing Combo--")
                                     scope.launch {
-                                        Timber.d("Creating bitmap of composable...")
+                                        Timber.d(" Creating bitmap of composable...")
                                         val bitmapAsync = captureController.captureAsync()
                                         try {
                                             val bitmap = bitmapAsync.await().asAndroidBitmap()
@@ -340,7 +339,7 @@ fun ComboDisplayScreen(
                                         // Edit Combo
                                         ActionIcon(
                                             onclick = {
-                                                Timber.d("Preparing to edit combo")
+                                                Timber.d("--Preparing to edit combo--")
                                                 scope.launch {
                                                     comboDisplayViewModel.updateComboStateInDs(combo)
                                                     comboDisplayViewModel.updateEditingState(true)
@@ -359,11 +358,12 @@ fun ComboDisplayScreen(
                                                     comboDisplayViewModel.deleteCombo(
                                                         combo,
                                                     )
-                                                    Timber.d("UI deleted: $combo")
+                                                    shareDataOn = false
+                                                    Timber.d(" UI $combo deleted.")
                                                 }
                                                 Toast.makeText(
                                                     context,
-                                                    "Combo ${combo.id} was deleted.",
+                                                    "Combo deleted.",
                                                     Toast.LENGTH_SHORT
                                                 ).show()
                                             },
@@ -378,7 +378,7 @@ fun ComboDisplayScreen(
                             var settingsMenuExpanded by remember { mutableStateOf(false) }
                             ActionIcon(
                                 onclick = {
-                                    Timber.d("Configuring Layout")
+                                    Timber.d("--Configuring Layout--")
                                     settingsMenuExpanded = true
                                 },
                                 tint = Color.White,

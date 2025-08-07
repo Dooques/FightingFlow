@@ -374,23 +374,11 @@ class ComboDisplayViewModel(
 
     // Database Functions
     private fun getAllMoveEntries() = viewModelScope.launch {
+
         flowRepository.getAllMoves()
             .map { MoveEntryListUiState(it) }
             .collect { moveList ->
                 _moveEntryListState.update { moveList }
-            }
-    }
-
-    fun getCharacterEntryListByGame(game: String) = viewModelScope.launch {
-        Timber.Forest.d("Updating character entry list state")
-        Timber.Forest.d("Game selected: $game")
-        flowRepository.getCharactersByGame(game)
-            .map { characterList ->
-                Timber.Forest.d("CharacterList: $characterList")
-                CharacterEntryListUiState(characterList)
-            }
-            .collect { characterList ->
-                _characterEntryListState.update { characterList }
             }
     }
 
@@ -408,7 +396,7 @@ class ComboDisplayViewModel(
         Timber.Forest.d("Deleting: $combo...")
         if (!characterState.value.character.mutable) {
             try {
-                flowRepository.deleteCombo(combo.toEntry(characterEntryListState.value.characterList.first { it.name == combo.character }))
+                flowRepository.deleteCombo(combo.toEntry(characterState.value.character))
                 Timber.Forest.d("Combo deleted from database.")
                 firebaseRepository.deleteCombo(combo.character, combo.id)
                 Timber.Forest.d("Combo deleted from firestore.")
@@ -424,6 +412,10 @@ class ComboDisplayViewModel(
                 Timber.e(e, "Error deleting combo.")
             }
         }
+    }
+
+    fun deleteFromRoom() {
+
     }
 
 
