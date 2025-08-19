@@ -1,5 +1,6 @@
 package com.example.fightingflow.ui.comboCreationScreen
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -81,56 +82,41 @@ fun ComboForm(
 
     Column {
         Timber.d("-- Loading Combo Form --")
+        Spacer(modifier.height(20.dp))
         /* Placeholder composable for creating a new combo */
         if (comboDisplay.moves.isEmpty()) {
-            Column {
-                Row(
-                    modifier = modifier
-                        .fillMaxWidth()
-                        .height(77.dp)
-                        .padding(horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(text = "Add some moves!", modifier = modifier.padding(4.dp))
-
-                }
-                if (textComboDisplay) {
-                    ComboAsText("", modifier.padding(horizontal = 4.dp))
-                    Box(modifier.padding(horizontal = 4.dp)) {
-                        ComboInfoBottom(
-                            scope = scope,
-                            comboDisplayViewModel = comboDisplayViewModel,
-                            comboCreationState = comboCreationState,
-                            combo = comboDisplay,
-                            characterEntry = CharacterEntryUiState(
-                                characterMap[game.title]?.first { characterName == it.name} ?: emptyCharacter
-                            ),
-                            currentUser = currentUser,
-                            userData = userData,
-                            userDetails = userDetails,
-                            toShare = false,
-                            fontColor = Color.White
+            Box (modifier = modifier.fillMaxWidth()) {
+                Column(modifier.padding(horizontal = 4.dp)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Start,
+                        modifier = modifier
+                            .fillMaxWidth()
+                            .height(40.dp)
+                    ) {
+                        Text(
+                            text = "Add some moves!",
+                            modifier = modifier.padding(horizontal = 4.dp)
                         )
                     }
-                    Spacer(modifier.height(12.dp))
-                } else {
-                    Box(modifier.padding(horizontal = 4.dp)) {
-                        ComboInfoBottom(
-                            scope = scope,
-                            comboDisplayViewModel = comboDisplayViewModel,
-                            comboCreationState = comboCreationState,
-                            combo = comboDisplay,
-                            characterEntry = CharacterEntryUiState(
-                                characterMap[game.title]?.first { characterName == it.name} ?: emptyCharacter
-                            ),
-                            currentUser = currentUser,
-                            userData = userData,
-                            userDetails = userDetails,
-                            toShare = false,
-                            fontColor = Color.White
-                        )
+                    if (textComboDisplay) {
+                        ComboAsText("")
                     }
-                    Spacer(modifier.height(12.dp))
+                    ComboInfoBottom(
+                        scope = scope,
+                        comboDisplayViewModel = comboDisplayViewModel,
+                        comboCreationState = comboCreationState,
+                        combo = comboDisplay,
+                        characterEntry = CharacterEntryUiState(
+                            characterMap[game.title]?.first { characterName == it.name }
+                                ?: emptyCharacter
+                        ),
+                        currentUser = currentUser,
+                        userData = userData,
+                        userDetails = userDetails,
+                        toShare = false,
+                        fontColor = Color.White,
+                    )
                 }
             }
         } else {
@@ -154,9 +140,9 @@ fun ComboForm(
                 uiScale = 1f,
                 setSelectedItem = setSelectedItem,
                 selectedItem = selectedItem,
-                modifier = modifier.padding(vertical = 4.dp),
             )
         }
+        Spacer(modifier.height(10.dp))
         /* The buttons used to edit the moves in the combo */
         EditingButtons(
             comboCreationViewModel = comboCreationViewModel,
