@@ -98,7 +98,7 @@ class ComboCreationViewModel(
     ) {
         Timber.d("Adding $moveName to combo...")
         Timber.d("Move List: ${moveListUiState.moveList.size} moves")
-        Timber.d("Game: ${gameTypeState.value}, Console: ${controlTypeState.value}")
+        Timber.d("Game: ${gameTypeState.value}, Console: $console")
 
         val updatedCombo = updateMoveListAbstract(
             moveName = moveName,

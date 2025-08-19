@@ -1,12 +1,11 @@
 package com.example.fightingflow.util.characterAndMoveData
 
-import androidx.compose.runtime.Immutable
 import com.example.fightingflow.R
 import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.MoveEntry
 import com.example.fightingflow.util.ImmutableList
 
-val tekken8Characters: ImmutableList<CharacterEntry> = ImmutableList(
+val characterEntriesT8: ImmutableList<CharacterEntry> = ImmutableList(
     listOf(
         CharacterEntry(
             name = "Alisa",
@@ -315,7 +314,7 @@ val tekken8Characters: ImmutableList<CharacterEntry> = ImmutableList(
     )
 )
 
-val tekken8Moves = ImmutableList(
+val moveEntriesT8 = ImmutableList(
     listOf(
 
         // Inputs
@@ -367,7 +366,7 @@ val tekken8Moves = ImmutableList(
         MoveEntry(moveName = "Balcony Break", notation = "b/break", moveType = "Stage", character = "Generic", game = "Tekken 8"),
     )
 )
-val tekken8CharacterMoves = ImmutableList(
+val characterMoveEntriesT8 = ImmutableList(
     listOf(
         // Alisa
         MoveEntry(moveName = "Destructive Form", notation = "Destructive Form", moveType = "Character", character = "Alisa", game = "Tekken 8"),

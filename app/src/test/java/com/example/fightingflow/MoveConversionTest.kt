@@ -2,10 +2,10 @@ package com.example.fightingflow
 
 import com.example.fightingflow.model.Console
 import com.example.fightingflow.model.Game
-import com.example.fightingflow.ui.comboDisplayScreen.inputConverter.convertInputsToConsole
-import com.example.fightingflow.ui.comboDisplayScreen.inputConverter.convertInputToStandard
+import com.example.fightingflow.util.inputConverter.convertInputsToConsole
+import com.example.fightingflow.util.inputConverter.convertInputToStandard
 import com.example.fightingflow.util.characterAndMoveData.playstationInputs
-import com.example.fightingflow.util.characterAndMoveData.tekken8CharacterMoves
+import com.example.fightingflow.util.characterAndMoveData.characterMoveEntriesT8
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -15,7 +15,7 @@ import kotlin.test.assertEquals
 @RunWith(JUnit4::class)
 class MoveConversionTest {
     private val consoleInputs = playstationInputs
-    private val gameInputs = tekken8CharacterMoves
+    private val gameInputs = characterMoveEntriesT8
 
     @Test
     @Throws(IOException::class)

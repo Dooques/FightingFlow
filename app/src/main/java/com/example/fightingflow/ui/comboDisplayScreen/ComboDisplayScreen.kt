@@ -197,7 +197,7 @@ fun ComboDisplayScreen(
                     Text(
                         text = characterState.character.name,
                         style =
-                            if (characterState.character.name.length > 12)
+                            if (characterState.character.name.length > 9)
                                 MaterialTheme.typography.displaySmall
                             else
                                 MaterialTheme.typography.displayMedium,

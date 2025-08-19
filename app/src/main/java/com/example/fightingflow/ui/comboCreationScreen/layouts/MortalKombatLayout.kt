@@ -41,7 +41,7 @@ fun MortalKombatLayout(
     moveList: MoveEntryListUiState,
     modifier: Modifier = Modifier
 ) {
-    Timber.d("Loading Input Selector")
+    Timber.d("--Loading Input Selector--\n MoveList: $moveList")
     LazyColumn {
         items(items = mortalKombatLayout) { moveType ->
             when (moveType) {

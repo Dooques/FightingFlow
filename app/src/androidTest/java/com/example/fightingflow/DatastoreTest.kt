@@ -80,6 +80,7 @@ class DatastoreTest {
         fightingStyle = "Mishima",
         combosById = "",
         controlType = "",
+        numpadNotation = false,
         game = "Tekken",
     )
 

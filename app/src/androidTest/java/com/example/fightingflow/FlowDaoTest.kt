@@ -36,6 +36,7 @@ class FlowDaoTest {
         fightingStyle = "Kazama",
         combosById = "",
         controlType = "",
+        numpadNotation = false,
         game = "Tekken",
     )
 
@@ -46,6 +47,7 @@ class FlowDaoTest {
         fightingStyle = "Mishima",
         combosById = "",
         controlType = "",
+        numpadNotation = false,
         game = "Tekken",
     )
 

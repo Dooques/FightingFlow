@@ -1,6 +1,7 @@
 package com.example.fightingflow.ui.comboItem
 
 import android.content.Context
+import android.graphics.Paint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,7 +22,7 @@ import com.example.fightingflow.model.Game
 import com.example.fightingflow.model.SF6ControlType
 import com.example.fightingflow.model.UserDataForCombos
 import com.example.fightingflow.ui.comboCreationScreen.ComboAsText
-import com.example.fightingflow.ui.comboDisplayScreen.inputConverter.convertInputsToConsole
+import com.example.fightingflow.util.inputConverter.convertInputsToConsole
 import com.example.fightingflow.ui.viewmodels.ComboDisplayViewModel
 import com.example.fightingflow.ui.viewmodels.UserDetailsState
 import com.example.fightingflow.util.CharacterEntryUiState
@@ -56,26 +57,25 @@ fun ComboItemEditor(
     val highlightColor = Color.Gray
     var selectedIndex = selectedItem
 
-    Timber.d("Loading combo editor...")
+    Timber.d("--Loading combo editor--")
     Box(modifier.fillMaxWidth()) {
         Column(
-            modifier.padding(horizontal = (4 * uiScale).dp, vertical = (4 * uiScale).dp)
+            modifier.padding(horizontal = 4.dp)
         ) {
-            Timber.d("Loading flow row...")
-            Timber.d("Move List: ${combo.moves}")
+            Timber.d(" Loading flow row\n Move List: ${combo.moves}")
             if (iconDisplayState) {
                 FlowRow(
-                    verticalArrangement = Arrangement.Center,
-                    horizontalArrangement = Arrangement.Start,
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
                     itemVerticalAlignment = Alignment.CenterVertically,
                     modifier = modifier.fillMaxWidth()
                 ) {
-                    Timber.d("Loading moves from combo...")
+                    Timber.d(" Loading moves from combo...")
 
                     val mutableMoveList = combo.moves.toMutableList()
 
                     mutableMoveList.forEachIndexed { index, it ->
-                        Timber.d("$it from ${it.game}")
+                        Timber.d(" $it from ${it.game}")
                         val move = convertInputsToConsole(
                             move = it,
                             game = when (it.game) {
@@ -101,13 +101,9 @@ fun ComboItemEditor(
                                             selectedIndex = mutableMoveList.size
                                             setSelectedItem(mutableMoveList.size)
                                         }
-                                    }
+                                    },
                                 ) {
-                                    MoveBreak(
-                                        uiScale,
-                                        modifier
-                                            .align(Alignment.CenterVertically)
-                                    )
+                                    MoveBreak()
                                 }
                             }
 
@@ -122,7 +118,7 @@ fun ComboItemEditor(
                                             selectedIndex = mutableMoveList.size
                                             setSelectedItem(mutableMoveList.size)
                                         }
-                                    }
+                                    },
                                 ) {
                                     MiscInput(move)
                                 }
@@ -139,50 +135,14 @@ fun ComboItemEditor(
                                             selectedIndex = mutableMoveList.size
                                             setSelectedItem(mutableMoveList.size)
                                         }
-                                    }
+                                    },
                                 ) {
                                     InputMove(
                                         context = context,
                                         input = move,
-                                        uiScale = uiScale,
-                                        modifier = modifier
-                                            .align(Alignment.CenterVertically)
-                                            .padding(4.dp)
                                     )
                                 }
                             }
-
-//                            -> {
-//                                SelectableItem(
-//                                    color = if (index == selectedIndex) Color.Gray else Color.Transparent,
-//                                    changeColor = {
-//                                        if (index != selectedIndex) {
-//                                        selectedIndex = index
-//                                        setSelectedItem(index)
-//                                        } else {
-//                                        selectedIndex = mutableMoveList.size
-//                                        setSelectedItem(mutableMoveList.size)
-//                                        }
-//                                    }
-//                                ) {
-//                                    TextMove(
-//                                        move = move,
-//                                        color = if (move.moveName.contains("L")) {
-//                                            Color(0xFFf0c027)
-//                                        } else if (move.moveName.contains("M")) {
-//                                            Color(0xFFe23a10)
-//                                        } else if (move.moveName.contains("H")) {
-//                                            Color(0xFFff0000)
-//                                        } else {
-//                                            Color(0xFF7ed957)
-//                                        },
-//                                        uiScale = uiScale,
-//                                        modifier = modifier
-//                                            .align(Alignment.CenterVertically)
-//                                            .padding(4.dp)
-//                                    )
-//                                }
-//                            }
 
                             "Common", "Console Text"  -> SelectableItem(
                                 color = if (index == selectedIndex) Color.Gray else Color.Transparent,
@@ -194,15 +154,11 @@ fun ComboItemEditor(
                                         selectedIndex = mutableMoveList.size
                                         setSelectedItem(mutableMoveList.size)
                                     }
-                                }
+                                },
                             ) {
                                 TextMove(
                                     move = move,
-                                    color = Color(0xFF444444),
-                                    uiScale = uiScale,
-                                    modifier = modifier
-                                        .align(Alignment.CenterVertically)
-                                        .padding(4.dp)
+                                    bgColor = Color(0xFF444444),
                                 )
                             }
 
@@ -217,15 +173,11 @@ fun ComboItemEditor(
                                             selectedIndex = mutableMoveList.size
                                             setSelectedItem(mutableMoveList.size)
                                         }
-                                    }
+                                    },
                                 ) {
                                     TextMove(
                                         move = move,
-                                        color = Color(0xFF0067B3),
-                                        uiScale = uiScale,
-                                        modifier = modifier
-                                            .align(Alignment.CenterVertically)
-                                            .padding(4.dp)
+                                        bgColor = Color(0xFF0067B3),
                                     )
                                 }
                             }
@@ -241,15 +193,11 @@ fun ComboItemEditor(
                                             selectedIndex = mutableMoveList.size
                                             setSelectedItem(mutableMoveList.size)
                                         }
-                                    }
+                                    },
                                 ) {
                                     TextMove(
                                         move = move,
-                                        color = Color(0xFF2f5233),
-                                        uiScale = uiScale,
-                                        modifier = modifier
-                                            .align(Alignment.CenterVertically)
-                                            .padding(4.dp)
+                                        bgColor = Color(0xFF2f5233),
                                     )
                                 }
                             }
@@ -265,15 +213,11 @@ fun ComboItemEditor(
                                             selectedIndex = mutableMoveList.size
                                             setSelectedItem(mutableMoveList.size)
                                         }
-                                    }
+                                    },
                                 ) {
                                     TextMove(
                                         move = move,
-                                        color = Color(0xFF8155BA),
-                                        uiScale = uiScale,
-                                        modifier = modifier
-                                            .align(Alignment.CenterVertically)
-                                            .padding(4.dp)
+                                        bgColor = Color(0xFF8155BA),
                                     )
                                 }
                             }
@@ -289,15 +233,11 @@ fun ComboItemEditor(
                                             selectedIndex = mutableMoveList.size
                                             setSelectedItem(mutableMoveList.size)
                                         }
-                                    }
+                                    },
                                 ) {
                                     TextMove(
                                         move = move,
-                                        color = Color(0xFFDC143C),
-                                        uiScale = uiScale,
-                                        modifier = modifier
-                                            .align(Alignment.CenterVertically)
-                                            .padding(4.dp)
+                                        bgColor = Color(0xFFDC143C),
                                     )
                                 }
                             }
@@ -313,15 +253,11 @@ fun ComboItemEditor(
                                             selectedIndex = mutableMoveList.size
                                             setSelectedItem(mutableMoveList.size)
                                         }
-                                    }
+                                    },
                                 ) {
                                     TextMove(
                                         move = move,
-                                        color = Color.White,
-                                        uiScale = uiScale,
-                                        modifier = modifier
-                                            .align(Alignment.CenterVertically)
-                                            .padding(4.dp)
+                                        bgColor = Color.White,
                                     )
                                 }
                             }
@@ -360,11 +296,9 @@ fun SelectableItem(
     Box(
         modifier =
             modifier
-                .padding(2.dp)
                 .background(color)
-                .clickable {
-                    changeColor(true)
-        }
+                .clickable { changeColor(true) }
+                .padding(horizontal = 2.dp)
     ) {
         content()
     }

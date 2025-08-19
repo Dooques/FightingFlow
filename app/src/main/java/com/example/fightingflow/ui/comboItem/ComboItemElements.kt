@@ -5,12 +5,14 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -32,10 +34,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.fightingflow.data.firebase.GoogleAuthService
-import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.MoveEntry
 import com.example.fightingflow.model.UserDataForCombos
@@ -116,7 +118,7 @@ fun ComboInfoBottom(
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth().padding(4.dp)
     ) {
         Column {
             Row {
@@ -225,43 +227,37 @@ fun ComboInfoBottom(
 fun InputMove(
     context: Context,
     input: MoveEntry,
-    uiScale: Float,
     modifier: Modifier = Modifier
 ) {
-    Row(modifier = modifier) {
-        MoveImage(input.moveName, uiScale = uiScale,  context = context)
-    }
+    Row(modifier = modifier) { MoveImage(input.moveName, context = context) }
 }
 
 @Composable
 fun MoveImage(
     move: String,
     context: Context,
-    uiScale: Float,
     modifier: Modifier = Modifier
 ) {
     val moveId = remember(move) { context.resources.getIdentifier(move, "drawable", context.packageName) }
-    val size = 35.dp
 
     Image(
         painter = painterResource(id = moveId),
         contentDescription = move,
-        modifier = modifier
-            .size(size * uiScale)
+        modifier = modifier.size(40.dp)
     )
 }
 
 @Composable
 fun TextMove(
     move: MoveEntry,
-    color: Color,
-    uiScale: Float,
+    bgColor: Color,
     modifier: Modifier = Modifier
 ) {
     Box(
         modifier
-            .clip(RoundedCornerShape(100.dp))
-            .background(color)
+            .clip(RoundedCornerShape(size = 10.dp))
+            .background(bgColor)
+            .height(40.dp)
             .padding(4.dp)
     ) {
         Text(
@@ -280,31 +276,27 @@ fun TextMove(
                 else -> move.moveName },
 
             style = MaterialTheme.typography.bodyLarge.copy(
-                fontSize = (14 * uiScale).sp,
-                lineHeight = 15.sp,
                 fontWeight = FontWeight.ExtraBold,
-                color = if (color == Color.White || color == Color.Green) Color.Black else Color.White,
-                shadow = if (color != Color.White)
-                    Shadow(color = Color.Black.copy(alpha = 0.5f), offset = Offset(2f, 2f), blurRadius = 4f)
-                else
-                    Shadow()
+                color = if (bgColor == Color.White || bgColor == Color.Green) Color.Black else Color.White,
+                shadow = Shadow(color = Color.Black.copy(alpha = 0.5f), offset = Offset(2f, 2f), blurRadius = 4f)
             ),
-            modifier = modifier
+            modifier = modifier.padding(1.dp).align(Alignment.Center)
         )
     }
 }
 
 @Composable
 fun MoveBreak(
-    uiScale: Float,
     modifier: Modifier = Modifier
 ) {
-    Box(modifier.padding(4.dp)) {
+    Box(modifier.height(40.dp)) {
         Icon(
             imageVector = Icons.Filled.PlayArrow,
             contentDescription = "",
             tint = Color.Cyan,
-            modifier = modifier.size((15 * uiScale).dp)
+            modifier = modifier
+                .size(15.dp)
+                .align(Alignment.Center)
         )
     }
 }
@@ -316,8 +308,7 @@ fun MiscInput(
 ) {
     Text(
         text = move.notation,
-        fontSize = 20.sp,
+        style = MaterialTheme.typography.bodySmall.copy(fontSize = 40.sp, textAlign = TextAlign.Center),
         color = MaterialTheme.colorScheme.onBackground,
-
         )
 }

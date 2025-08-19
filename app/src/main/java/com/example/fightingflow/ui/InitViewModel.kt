@@ -2,7 +2,6 @@ package com.example.fightingflow.ui
 
 import androidx.lifecycle.ViewModel
 import com.example.fightingflow.data.database.FlowRepository
-import com.example.fightingflow.util.characterAndMoveData.CharacterAndMoveData
 import com.example.fightingflow.util.emptyCharacter
 import kotlinx.coroutines.flow.first
 import timber.log.Timber
@@ -10,7 +9,6 @@ import timber.log.Timber
 class InitViewModel(
     private val tekkenDataRepository: FlowRepository
 ): ViewModel() {
-    private val dataFile = CharacterAndMoveData()
 
     suspend fun addDataToDb(): Boolean {
         Timber.d("Launching coroutine to check database...")
@@ -25,8 +23,6 @@ class InitViewModel(
         Timber.d("Checking existing data...")
         if (existingCharacterData == emptyCharacter && existingMoveList.isEmpty()) {
             Timber.d("Data not found, adding moves & characters to Db")
-            dataFile.characterEntries.forEach { tekkenDataRepository.insertAllCharacters(it) }
-            dataFile.moveEntries.forEach{ tekkenDataRepository.insertMoves(it) }
         } else {
             Timber.d("Database exists, starting app...")
         }

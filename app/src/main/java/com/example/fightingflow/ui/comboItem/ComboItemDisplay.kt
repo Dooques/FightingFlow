@@ -1,20 +1,17 @@
 package com.example.fightingflow.ui.comboItem
 
 import android.content.Context
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.fightingflow.data.firebase.GoogleAuthService
 import com.example.fightingflow.model.ComboDisplay
@@ -23,7 +20,7 @@ import com.example.fightingflow.model.Game
 import com.example.fightingflow.model.SF6ControlType
 import com.example.fightingflow.model.UserDataForCombos
 import com.example.fightingflow.ui.comboCreationScreen.ComboAsText
-import com.example.fightingflow.ui.comboDisplayScreen.inputConverter.convertInputsToConsole
+import com.example.fightingflow.util.inputConverter.convertInputsToConsole
 import com.example.fightingflow.ui.viewmodels.ComboDisplayViewModel
 import com.example.fightingflow.ui.viewmodels.UserDetailsState
 import com.example.fightingflow.util.CharacterEntryUiState
@@ -60,7 +57,7 @@ fun ComboItemDisplay(
     Box(modifier.fillMaxWidth().capturable(captureController)) {
 
         Column(
-            modifier.padding(horizontal = (4 * uiScale).dp, vertical = (4 * uiScale).dp)
+            modifier.padding(4.dp)
         ) {
 //            Timber.d("Loading flow row... \n Move List: %s", combo.moves)
             if (display) {
@@ -94,9 +91,7 @@ fun ComboItemDisplay(
 
                         Timber.d("Move: $move")
                         when (move.moveType) {
-                            "Break" -> MoveBreak(
-                                uiScale,
-                            )
+                            "Break" -> MoveBreak()
 
                             "Misc" -> MiscInput(move, modifier)
 
@@ -104,7 +99,6 @@ fun ComboItemDisplay(
                                 InputMove(
                                     context = context,
                                     input = move,
-                                    uiScale = uiScale,
                                     modifier = modifier
                                         .align(Alignment.CenterVertically)
                                 )
@@ -112,43 +106,37 @@ fun ComboItemDisplay(
                             "Common", "Console Text" ->
                                 TextMove(
                                     move = move,
-                                    color = Color(0xFF444444),
-                                    uiScale = uiScale,
+                                    bgColor = Color(0xFF444444),
                                 )
 
                             "Special", "Unique Move" ->
                                 TextMove(
                                     move = move,
-                                    color = Color(0xFF0067B3),
-                                    uiScale = uiScale,
+                                    bgColor = Color(0xFF0067B3),
                                 )
 
                             "Stage" ->
                                 TextMove(
                                     move = move,
-                                    color = Color(0xFF2f5233),
-                                    uiScale = uiScale,
+                                    bgColor = Color(0xFF2f5233),
                                 )
 
                             "Mishima", "Mechanic" ->
                                 TextMove(
                                     move = move,
-                                    color = Color(0xFF8155BA),
-                                    uiScale = uiScale,
+                                    bgColor = Color(0xFF8155BA),
                                 )
 
                             "Character", "Fatal Blow", "Drive", "Super Art"->
                                 TextMove(
                                     move = move,
-                                    color = Color(0xFFDC143C),
-                                    uiScale = uiScale,
+                                    bgColor = Color(0xFFDC143C),
                                 )
 
                             "Modifier", "MK Input", "Text Input" ->
                                 TextMove(
                                     move = move,
-                                    color = Color.White,
-                                    uiScale = uiScale,
+                                    bgColor = Color.White,
                                 )
                         }
                     }

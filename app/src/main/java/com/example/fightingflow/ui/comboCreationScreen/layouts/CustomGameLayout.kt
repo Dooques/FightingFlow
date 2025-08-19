@@ -27,9 +27,9 @@ import com.example.fightingflow.util.characterAndMoveData.customInputLayouts.mov
 import com.example.fightingflow.util.characterAndMoveData.customInputLayouts.numpadNotationMoves
 import com.example.fightingflow.util.characterAndMoveData.customInputLayouts.tagFighterMoves
 import com.example.fightingflow.util.characterAndMoveData.customInputLayouts.virtuaFighterMoves
-import com.example.fightingflow.util.characterAndMoveData.mk1Moves
-import com.example.fightingflow.util.characterAndMoveData.streetFighter6Moves
-import com.example.fightingflow.util.characterAndMoveData.tekken8Moves
+import com.example.fightingflow.util.characterAndMoveData.moveEntriesMK1
+import com.example.fightingflow.util.characterAndMoveData.moveEntriesSF6
+import com.example.fightingflow.util.characterAndMoveData.moveEntriesT8
 import com.example.fightingflow.ui.viewmodels.ProfanityViewModel
 import timber.log.Timber
 
@@ -49,11 +49,11 @@ fun CustomGameLayout(
     val moveSet = MoveEntryListUiState(
         when (character.controlType) {
             ControlType.ArcSys.type -> arcSysMoves
-            ControlType.MortalKombat.type -> mk1Moves
+            ControlType.MortalKombat.type -> moveEntriesMK1
             ControlType.NumpadNotation.type -> numpadNotationMoves
-            ControlType.StreetFighter.type -> streetFighter6Moves
+            ControlType.StreetFighter.type -> moveEntriesSF6
             ControlType.TagFighter.type -> tagFighterMoves
-            ControlType.Tekken.type -> tekken8Moves
+            ControlType.Tekken.type -> moveEntriesT8
             ControlType.VirtuaFighter.type -> virtuaFighterMoves
             else -> emptyList()
         }
@@ -65,7 +65,7 @@ fun CustomGameLayout(
         layoutFilter = layoutFilter.filter {category -> category != "Unique Moves" && category != "Unique Move"}
     }
 
-    if (moveSet.moveList != tekken8Moves || moveSet.moveList != streetFighter6Moves || moveSet.moveList != mk1Moves) {
+    if (moveSet.moveList != moveEntriesT8 || moveSet.moveList != moveEntriesSF6 || moveSet.moveList != moveEntriesMK1) {
         layoutFilter =
             layoutFilter.filter { category -> category != "Mechanics" && category != "Mechanic" && category != "Mechanic Divider" }
     }

@@ -6,7 +6,7 @@ import com.example.fightingflow.model.MoveEntry
 import com.example.fightingflow.model.SF6ControlType
 import com.example.fightingflow.util.ImmutableList
 
-val streetFighter6Characters = ImmutableList(
+val characterEntriesSF6 = ImmutableList(
     listOf(
         CharacterEntry(
             name = "A.K.I.",
@@ -228,15 +228,21 @@ val streetFighter6Characters = ImmutableList(
     )
 )
 
-val streetFighter6Moves = ImmutableList(
+val moveEntriesSF6 = ImmutableList(
     listOf(
         // Classic Inputs
         MoveEntry(moveName = "lp", notation = "lp", moveType = "SF Classic", character = "Generic", game = "Street Fighter VI", controlTypeSF = SF6ControlType.Classic),
-        MoveEntry(moveName = "mp", notation = "mp", moveType = "SF Classic", character = "Generic", game = "Street Fighter VI", controlTypeSF = SF6ControlType.Classic),
-        MoveEntry(moveName = "hp", notation = "hp", moveType = "SF Classic", character = "Generic", game = "Street Fighter VI", controlTypeSF = SF6ControlType.Classic),
         MoveEntry(moveName = "lk", notation = "lk", moveType = "SF Classic", character = "Generic", game = "Street Fighter VI", controlTypeSF = SF6ControlType.Classic),
+        MoveEntry(moveName = "p", notation = "p", moveType = "SF Classic", character = "Generic", game = "Street Fighter VI", controlTypeSF = SF6ControlType.Classic),
+        MoveEntry(moveName = "k", notation = "k", moveType = "SF Classic", character = "Generic", game = "Street Fighter VI", controlTypeSF = SF6ControlType.Classic),
+        MoveEntry(moveName = "mp", notation = "mp", moveType = "SF Classic", character = "Generic", game = "Street Fighter VI", controlTypeSF = SF6ControlType.Classic),
         MoveEntry(moveName = "mk", notation = "mk", moveType = "SF Classic", character = "Generic", game = "Street Fighter VI", controlTypeSF = SF6ControlType.Classic),
+        MoveEntry(moveName = "pp", notation = "pp", moveType = "SF Classic", character = "Generic", game = "Street Fighter VI", controlTypeSF = SF6ControlType.Classic),
+        MoveEntry(moveName = "kk", notation = "kk", moveType = "SF Classic", character = "Generic", game = "Street Fighter VI", controlTypeSF = SF6ControlType.Classic),
+        MoveEntry(moveName = "hp", notation = "hp", moveType = "SF Classic", character = "Generic", game = "Street Fighter VI", controlTypeSF = SF6ControlType.Classic),
         MoveEntry(moveName = "hk", notation = "hk", moveType = "SF Classic", character = "Generic", game = "Street Fighter VI", controlTypeSF = SF6ControlType.Classic),
+        MoveEntry(moveName = "ppp", notation = "ppp", moveType = "SF Classic", character = "Generic", game = "Street Fighter VI", controlTypeSF = SF6ControlType.Classic),
+        MoveEntry(moveName = "kkk", notation = "kkk", moveType = "SF Classic", character = "Generic", game = "Street Fighter VI", controlTypeSF = SF6ControlType.Classic),
 
         // Modern Inputs
         MoveEntry(moveName = "light", notation = "light", moveType = "SF Modern", character = "Generic", game = "Street Fighter VI", controlTypeSF = SF6ControlType.Modern),
@@ -266,7 +272,7 @@ val streetFighter6Moves = ImmutableList(
         MoveEntry(moveName = "dp", notation = "dp", moveType = "Movement", character = "Generic", game = "Street Fighter VI"),
     )
 )
-val streetFighter6CharacterMoves = ImmutableList(
+val characterMoveEntriesSF6 = ImmutableList(
     listOf(
         // A.K.I.
         MoveEntry(moveName = "Nightshade Pulse", notation = "Nightshade Pulse", moveType = "Special", character = "A.K.I.", game = "Street Fighter VI"),

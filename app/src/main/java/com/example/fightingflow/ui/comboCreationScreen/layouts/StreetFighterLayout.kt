@@ -88,6 +88,7 @@ fun StreetFighterLayout(
                     comboCreationViewModel = comboCreationViewModel,
                     moveType = moveType,
                     moveList = moveList,
+                    sF6ControlType = sF6ControlType,
                     context = context,
                     console = console,
                 )
@@ -109,7 +110,7 @@ fun StreetFighterLayout(
                         moveType = moveType,
                         moveList = moveList,
                         console = console,
-                        maxItems = if (moveType == "SF Modern") 4 else 3
+                        maxItems = 4
                     )
 
                 "Mechanic" -> TextMoves(

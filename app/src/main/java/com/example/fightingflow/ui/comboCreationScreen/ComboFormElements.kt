@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -50,8 +51,9 @@ import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.Console
 import com.example.fightingflow.model.Game
+import com.example.fightingflow.model.MoveEntry
 import com.example.fightingflow.model.SF6ControlType
-import com.example.fightingflow.ui.comboDisplayScreen.inputConverter.convertInputsToConsole
+import com.example.fightingflow.util.inputConverter.convertInputsToConsole
 import com.example.fightingflow.ui.comboItem.ComboItemViewModel
 import com.example.fightingflow.util.ComboDisplayUiState
 import com.example.fightingflow.util.MoveEntryListUiState
@@ -94,7 +96,7 @@ fun ComboAsText(
             readOnly = true,
             modifier = modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 8.dp)
+                .padding(horizontal = 4.dp, vertical = 8.dp)
         )
     }
 }
@@ -197,67 +199,86 @@ fun IconMoves(
         maxItemsInEachRow = maxItems,
         modifier = modifier.fillMaxWidth().padding(4.dp)
     ) {
-        Timber.d("Loading Input Icons " +
-                "\n MoveType: $moveType")
+        Timber.d("--Loading Input Icons--\n MoveType: $moveType\n Console: $console\n Control Type: $sF6ControlType")
 
-        moveList.moveList.forEach {
-            val game = when (it.game) {
+        val filteredMoveList: List<MoveEntry> = if (console != Console.STANDARD && moveType == "Console") {
+            when (sF6ControlType) {
+                SF6ControlType.Classic -> moveList.moveList.filter { it.moveType == "SF Classic" }
+                SF6ControlType.Modern -> moveList.moveList.filter { it.moveType == "SF Modern" }
+                else -> moveList.moveList.filter { it.moveType == "Input" }
+            }
+        } else moveList.moveList.filter { it.moveType == moveType }
+
+        Timber.d(" Filtered List: $filteredMoveList")
+        filteredMoveList.forEach { moveEntry ->
+            Timber.d(" Move: $moveEntry\n game: ${moveEntry.game}")
+            val game = when (moveEntry.game) {
                 "Tekken 8" -> Game.T8
                 "Street Fighter VI" -> Game.SF6
                 "Mortal Kombat 1" -> Game.MK1
                 else -> Game.CUSTOM
             }
 
-            var move = it
+            var move = moveEntry
 
-            if (console != Console.STANDARD) {
-                move = if (it.moveName in convertibleInputs && game != Game.CUSTOM) convertInputsToConsole(
-                    move = it,
-                    game = game,
-                    console = console,
-                    classic = sF6ControlType == SF6ControlType.Classic
-                ) else it
+            Timber.d(" Checking if Move valid for conversion: ${console != Console.STANDARD} ${move.moveName in convertibleInputs}")
+            if (console != Console.STANDARD && (moveEntry.moveType == "Input" || moveEntry.moveType == "SF Classic" || moveEntry.moveType == "SF Modern")) {
+                Timber.d(" moveName: %s\n Input type is not standard, converting input to %s\n Move is Convertible: %s\n consoleInput: %s",
+                    move.moveName, console?.name, moveEntry.moveName in convertibleInputs,
+                    convertInputsToConsole(move, game, console, sF6ControlType == SF6ControlType.Classic))
+                move =
+                    if (moveEntry.moveName in convertibleInputs && game != Game.CUSTOM) convertInputsToConsole(
+                        move = moveEntry,
+                        game = game,
+                        console = console,
+                        classic = sF6ControlType == SF6ControlType.Classic
+                    ) else moveEntry
+                Timber.d(" Console Move Found: $move")
             }
 
-            if (move.moveType == moveType) {
-                val moveId =
-                    remember(move) {
-                        context.resources.getIdentifier(
-                            move.moveName,
-                            "drawable",
-                            context.packageName
-                        )
-                    }
 
-                Box(modifier.padding(vertical = 4.dp).clip(RoundedCornerShape(10.dp))) {
+            if (move.moveType == moveType) {
+                val moveId = remember(move) {
+                    context.resources.getIdentifier(
+                        move.moveName,
+                        "drawable",
+                        context.packageName
+                    )
+                }
+
+                Box(
+                    modifier
+                        .padding(vertical = 4.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                ) {
                     Image(
                         painter = painterResource(moveId),
                         contentDescription = move.moveName,
                         modifier = modifier
                             .padding(horizontal = 16.dp)
-                            .size(30.dp)
+                            .size(35.dp)
                             .clickable(
                                 enabled = true,
                                 onClick = {
                                     Timber.d("${move.moveName} selected, preparing to add combo to list...")
                                     Timber.d("Move: $move")
-                                        if (moveType == "Misc") {
+                                    if (moveType == "Misc") {
+                                        comboCreationViewModel.updateMoveList(
+                                            move.moveName,
+                                            moveList
+                                        )
+                                    } else {
+                                        console?.let { outerConsole ->
+                                            Timber.d("Console: $outerConsole")
+                                            Timber.d("Game: $game")
                                             comboCreationViewModel.updateMoveList(
                                                 move.moveName,
-                                                moveList
+                                                moveList,
+                                                outerConsole,
                                             )
-                                        } else {
-                                            console?.let { outerConsole ->
-                                                Timber.d("Console: $outerConsole")
-                                                Timber.d("Game: $game")
-                                                comboCreationViewModel.updateMoveList(
-                                                    move.moveName,
-                                                    moveList,
-                                                    outerConsole,
-                                                )
-                                            }
-                                            Timber.d("Added ${move.moveName} to combo move list.")
                                         }
+                                        Timber.d("Added ${move.moveName} to combo move list.")
+                                    }
                                 }
                             )
                     )
@@ -328,6 +349,7 @@ fun TextMoves(
                         modifier
                             .clip(RoundedCornerShape(10.dp))
                             .background(color)
+                            .height(35.dp)
                             .padding(horizontal = 4.dp)
                     ) {
                         Text(
@@ -337,22 +359,26 @@ fun TextMoves(
                                 color = if (color == Color.White || color == Color.Green) Color.Black else Color.White,
                                 shadow = Shadow(color = Color.Black.copy(alpha = 0.5f), offset = Offset(2f, 2f), blurRadius = 4f)
                             ),
-                            modifier = modifier.padding(1.dp).clickable(
-                                enabled = true,
-                                onClick = {
-                                    Timber.d("$move selected, preparing to add combo to list..." +
-                                            "\n $console \n $game")
+                            modifier = modifier
+                                .padding(1.dp)
+                                .clickable(
+                                    enabled = true,
+                                    onClick = {
+                                        Timber.d("$move selected, preparing to add combo to list..." +
+                                                "\n $console \n $game")
 
-                                    console?.let { outerConsole ->
-                                        comboCreationViewModel.updateMoveList(
-                                            move.moveName,
-                                            moveList,
-                                            outerConsole
-                                        )
+                                        console?.let { outerConsole ->
+                                            Timber.d(" Console: $outerConsole")
+                                            comboCreationViewModel.updateMoveList(
+                                                move.moveName,
+                                                moveList,
+                                                outerConsole
+                                            )
+                                        }
+                                        Timber.d("Added ${move.moveName} to combo move list.")
                                     }
-                                    Timber.d("Added ${move.moveName} to combo move list.")
-                                }
-                            )
+                                )
+                                .align(Alignment.Center)
                         )
                     }
                 }
@@ -396,6 +422,7 @@ fun CharacterMoves(
                         modifier
                             .clip(RoundedCornerShape(10.dp))
                             .background(color)
+                            .height(40.dp)
                             .padding(horizontal = 4.dp)
                     ) {
                         Text(
@@ -405,14 +432,17 @@ fun CharacterMoves(
                                 color = if (color == Color.White || color == Color.Green) Color.Black else Color.White,
                                 shadow = Shadow(color = Color.Black, offset = Offset(2f, 2f), blurRadius = 2f)
                             ),
-                            modifier = modifier.padding(1.dp).clickable(
-                                enabled = true,
-                                onClick = {
-                                    Timber.d("${move.moveName} selected, preparing to add combo to list...")
-                                    comboCreationViewModel.updateMoveList(move.moveName, characterMoveList)
-                                    Timber.d("Added ${move.moveName} to combo move list.")
-                                }
-                            )
+                            modifier = modifier
+                                .padding(1.dp)
+                                .clickable(
+                                    enabled = true,
+                                    onClick = {
+                                        Timber.d("${move.moveName} selected, preparing to add combo to list...")
+                                        comboCreationViewModel.updateMoveList(move.moveName, characterMoveList)
+                                        Timber.d("Added ${move.moveName} to combo move list.")
+                                    }
+                                )
+                                .align(Alignment.Center)
                         )
                     }
                 }

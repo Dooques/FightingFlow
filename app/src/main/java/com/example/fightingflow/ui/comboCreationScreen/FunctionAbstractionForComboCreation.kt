@@ -1,15 +1,18 @@
 package com.example.fightingflow.ui.comboCreationScreen
 
-import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.Console
 import com.example.fightingflow.model.Game
 import com.example.fightingflow.model.MoveEntry
 import com.example.fightingflow.model.SF6ControlType
-import com.example.fightingflow.ui.comboDisplayScreen.inputConverter.convertInputToStandard
+import com.example.fightingflow.util.inputConverter.convertInputToStandard
 import com.example.fightingflow.util.ComboDisplayUiState
 import com.example.fightingflow.util.ImmutableList
 import com.example.fightingflow.util.characterAndMoveData.consoleInputs
+import com.example.fightingflow.util.characterAndMoveData.moveMap
+import com.example.fightingflow.util.characterAndMoveData.nintendoInputs
+import com.example.fightingflow.util.characterAndMoveData.playstationInputs
+import com.example.fightingflow.util.characterAndMoveData.xboxInputs
 import timber.log.Timber
 
 fun processComboAsStringAbstract(moveList: List<MoveEntry>): String {
@@ -38,19 +41,37 @@ fun updateMoveListAbstract(
     itemIndexState: Int,
     moveList: List<MoveEntry>
 ): ComboDisplay {
-    Timber.d("-- Adding move to Combo --")
-    var moveToAdd = moveList.first { it.moveName == moveName}
+    Timber.d("-- Adding move to Combo --\n MoveToAdd: %s\n Game: %s\n Console: %s",
+        moveName, game, console)
 
-    Timber.d("MoveToAdd: %s\n Game: %s\n MoveName: %s\n %s",
-        moveToAdd, game, moveName, moveList)
+    var moveToAdd =
+        if (console != null) {
+            when (console) {
+                Console.PLAYSTATION -> playstationInputs.first { it.moveName == moveName}
+
+                Console.XBOX -> xboxInputs.first { it.moveName == moveName}
+
+                Console.NINTENDO -> nintendoInputs.first { it.moveName == moveName}
+
+                Console.STANDARD -> moveList.first { it.moveName == moveName}
+            }
+        }
+        else moveList.first { it.moveName == moveName }
+    Timber.d(" Move: $moveToAdd")
+
     val gameSelected =
-        if (game.contains("Tekken")) { Game.T8 }
-        else if (game.contains("Mortal Kombat")) { Game.MK1 }
-        else if (game.contains("Street Fighter")) { Game.SF6 }
-        else { Game.CUSTOM }
+        if (game.contains("Tekken")) {
+            Game.T8
+        } else if (game.contains("Mortal Kombat")) {
+            Game.MK1
+        } else if (game.contains("Street Fighter")) {
+            Game.SF6
+        } else {
+            Game.CUSTOM
+        }
 
     if (moveToAdd.moveName in consoleInputs) {
-        Timber.d("Converting console input to standard...")
+        Timber.d(" Converting console input to standard...")
         moveToAdd = convertInputToStandard(
             move = moveToAdd,
             game = gameSelected,
@@ -63,7 +84,7 @@ fun updateMoveListAbstract(
         moveToAdd.moveType == "Movement"
     ) {
         Timber.d("Adding Break to Combo")
-        moveToAdd = moveList.first { it.moveName == moveName}
+        moveToAdd = moveList.first { it.moveName == moveName }
     } else {
         Timber.d("Adding $moveName to Combo")
         moveToAdd =
@@ -86,4 +107,5 @@ fun updateMoveListAbstract(
         itemIndexState else itemIndexState + 1
     updatedList.add(index, moveToAdd)
     return comboDisplayState.comboDisplay.copy(moves = ImmutableList(list = updatedList))
+    return comboDisplayState.comboDisplay
 }
