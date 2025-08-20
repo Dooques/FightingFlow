@@ -171,6 +171,7 @@ fun moveListStringToMoveEntryList(moveList: String, moveListEntries: MoveEntryLi
         .split(",")
         .map { move -> move.trimIndent() }
         .forEach { move ->
+            Timber.d(" Move: $move")
             moveEntryList.add(
                 moveListEntries.moveList.first {
                     it.notation == move

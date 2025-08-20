@@ -45,7 +45,7 @@ class UserViewModel(
         }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(30_000L),
+            started = SharingStarted.WhileSubscribed(TIME_MILLIS),
             initialValue = UserDataForCombos(emptyMap())
         )
 

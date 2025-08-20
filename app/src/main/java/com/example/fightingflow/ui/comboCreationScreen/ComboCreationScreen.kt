@@ -71,7 +71,7 @@ fun ComboCreationScreen(
     val context = LocalContext.current
     (context as? Activity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
-    // ComboViewModel
+    // ComboDisplayViewModel
     val characterStateDisplay by comboDisplayViewModel.characterState.collectAsStateWithLifecycle()
 
     // ComboCreationViewModel
@@ -86,6 +86,7 @@ fun ComboCreationScreen(
 
     // Datastore Flows
     val characterNameState by comboDisplayViewModel.characterNameState.collectAsStateWithLifecycle()
+    val gameSelectedState by comboDisplayViewModel.gameSelectedState.collectAsStateWithLifecycle()
     val comboIdState by comboCreationViewModel.comboIdState.collectAsStateWithLifecycle()
     val editingState by comboCreationViewModel.editingState
     val iconDisplayState by comboDisplayViewModel.showIconState.collectAsStateWithLifecycle()
@@ -116,25 +117,45 @@ fun ComboCreationScreen(
         characterNameState?.name, characterStateDisplay.character, characterStateCreation.character,
         game, comboDisplayState.comboDisplay, comboAsString, comboIdState, editingState, moveListState)
 
+    LaunchedEffect(characterNameState, gameSelectedState) {
+        Timber.d("--Launched Effect triggered by character change--")
+        if (characterNameState != null && characterNameState?.name?.isNotBlank() == true) {
+            try {
+                Timber.d(" Getting ${characterNameState!!.name} from database...")
+                comboDisplayViewModel.updateCharacterState(
+                    characterNameState!!.name,
+                    gameSelectedState
+                )
+                Timber.d(" Character returned: $characterStateDisplay")
+            } catch (e: NoSuchElementException) {
+                Timber.e(e, " Character Error, no element found in character list.")
+            }
+        }
+    }
+
     Timber.d("Updating Character State")
     LaunchedEffect(characterStateDisplay) {
         Timber.d("--Launched Effect triggered to update CharacterState Update--")
-        if (characterStateCreation != characterStateDisplay) {
-            Timber.d(" Character state is empty, updating ith display screen value")
-            comboCreationViewModel.characterState.update { characterStateDisplay }
+        try {
+            if (characterStateCreation != characterStateDisplay) {
+                Timber.d(" Character state is empty, updating ith display screen value")
+                comboCreationViewModel.characterState.update { characterStateDisplay }
 
-            Timber.d(" Creating move list for character in CreationViewModel")
-            comboCreationViewModel.getMoveEntryList(characterStateDisplay.character)
-            characterUpdated = true
-        } else {
-            if (moveListState.moveList.first().character != characterStateDisplay.character.name) {
-                Timber.d(" Move List does not match selected character, updating move list.")
+                Timber.d(" Creating move list for character in CreationViewModel")
                 comboCreationViewModel.getMoveEntryList(characterStateDisplay.character)
                 characterUpdated = true
+            } else {
+                if (moveListState.moveList.first().character != characterStateDisplay.character.name) {
+                    Timber.d(" Move List does not match selected character, updating move list.")
+                    comboCreationViewModel.getMoveEntryList(characterStateDisplay.character)
+                    characterUpdated = true
+                }
+                characterUpdated = false
             }
-            characterUpdated = false
+            Timber.d(" %s is loaded.", characterStateCreation.character.name)
+        } catch (e: Exception) {
+            Timber.e(e)
         }
-        Timber.d(" %s is loaded.", characterStateCreation.character.name)
     }
 
     LaunchedEffect(comboDisplayState) {
@@ -167,7 +188,7 @@ fun ComboCreationScreen(
             return@LaunchedEffect
         }
 
-        if (characterStateCreation.character.mutable) {
+        if (!characterStateCreation.character.mutable) {
             Timber.d(" Combo ID found, getting Combo from firestore...")
             try {
                 comboCreationViewModel.getExistingComboFromFirestore()
@@ -179,7 +200,7 @@ fun ComboCreationScreen(
                 )
             }
         } else {
-            Timber.d(" No combo found in firestore.")
+            Timber.d(" Character is not mutable, checking database for combo.")
             try {
                 comboCreationViewModel.getExistingComboFromDb()
                 Timber.d(" Combo collected from internal database.")

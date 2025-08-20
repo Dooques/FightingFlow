@@ -17,9 +17,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.credentials.exceptions.GetCredentialCancellationException
+import androidx.credentials.exceptions.NoCredentialException
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.fightingflow.data.firebase.GoogleAuthService
 import com.example.fightingflow.ui.viewmodels.AuthViewModel
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -87,7 +90,12 @@ fun UserCreationForm(
                     modifier = modifier.fillMaxWidth().padding(32.dp)
                 ) {
                     Text(
-                        "${state.message} ${state.exception?.message}.",
+                        when (state.exception ) {
+                            is NoCredentialException ->  "Make sure you are signed in to Google on your device."
+                            is GetCredentialCancellationException -> "User has cancelled the sign-in process."
+                            is FirebaseAuthInvalidCredentialsException -> "Invalid email/password."
+                            else -> "${state.exception?.message}"
+                                                },
                         color = MaterialTheme.colorScheme.error,
                         textAlign = TextAlign.Center
                     )

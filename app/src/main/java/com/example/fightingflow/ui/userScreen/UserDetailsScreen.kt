@@ -60,6 +60,7 @@ fun UserDetailsScreen(
     authViewModel: AuthViewModel,
     profanityViewModel: ProfanityViewModel,
     navigateBack: () -> Unit,
+    navigateHome: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Timber.d("--Loading user details--")
@@ -74,6 +75,11 @@ fun UserDetailsScreen(
 
     Timber.d("Flows Collected: \nCurrent User: %s\nUser Details: %s",
         currentUser, userDetails)
+
+    when (currentUser) {
+        is GoogleAuthService.SignInState.Idle -> navigateBack()
+        else -> null
+    }
 
     Scaffold(
         topBar = {

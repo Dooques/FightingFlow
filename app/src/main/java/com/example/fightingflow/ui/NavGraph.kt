@@ -136,6 +136,7 @@ fun NavGraph(
                     authViewModel = authViewModel,
                     profanityViewModel = profanityViewModel,
                     navigateBack =  navController::navigateUp,
+                    navigateHome = { navController.navigate(FlowScreen.Start.name) }
                 )
             }
 

@@ -203,16 +203,13 @@ fun ComboInfoBottom(
                             }
                         }
                     }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ThumbUp,
-                        contentDescription = null,
-                        tint = if (
-                            userDetails is UserDetailsState.Loaded &&
-                            userDetails.user.likedCombos.contains(combo.id)
-                        ) Color.Blue else Color.White
-                    )
-                }
+                ) { Icon(
+                    imageVector = Icons.Default.ThumbUp,
+                    contentDescription = null,
+                    tint = if (
+                        userDetails is UserDetailsState.Loaded &&
+                        userDetails.user.likedCombos.contains(combo.id)
+                    ) Color.Blue else Color.White) }
                 Text(
                     text = "${combo.likes} Likes",
                     color = fontColor,

@@ -545,7 +545,7 @@ val characterMoveEntriesMK1 = ImmutableList(
         MoveEntry(moveName = "Psycho Skull", notation = "Psycho Skull", moveType = "Special", character = "Quan Chi", game = "Mortal Kombat 1"),
         MoveEntry(moveName = "Psycho Skull Volley", notation = "Psycho Skull Volley", moveType = "Special", character = "Quan Chi", game = "Mortal Kombat 1"),
         MoveEntry(moveName = "Field of Bones", notation = "Field of Bones", moveType = "Special", character = "Quan Chi", game = "Mortal Kombat 1"),
-        MoveEntry(moveName = "Zone of Power", notation = "d, b, 3", moveType = "Special", character = "Quan Chi", game = "Mortal Kombat 1"),
+        MoveEntry(moveName = "Zone of Power", notation = "Zone of Power", moveType = "Special", character = "Quan Chi", game = "Mortal Kombat 1"),
         MoveEntry(moveName = "Zone of Fear", notation = "Zone of Fear", moveType = "Special", character = "Quan Chi", game = "Mortal Kombat 1"),
         MoveEntry(moveName = "Falling Death", notation = "Falling Death", moveType = "Special", character = "Quan Chi", game = "Mortal Kombat 1"),
         MoveEntry(moveName = "From The Fog", notation = "From The Fog", moveType = "Special", character = "Quan Chi", game = "Mortal Kombat 1"),
@@ -611,7 +611,7 @@ val characterMoveEntriesMK1 = ImmutableList(
 
         // Shang Tsung
         MoveEntry(moveName = "Morph", notation = "Morph", moveType = "Special", character = "Shang Tsung", game = "Mortal Kombat 1"),
-        MoveEntry(moveName = "Form Stealer", notation = "d, stance", moveType = "Special", character = "Shang Tsung", game = "Mortal Kombat 1"),
+        MoveEntry(moveName = "Form Stealer", notation = "Form Stealer", moveType = "Special", character = "Shang Tsung", game = "Mortal Kombat 1"),
         MoveEntry(moveName = "Perfect Form", notation = "Perfect Form", moveType = "Special", character = "Shang Tsung", game = "Mortal Kombat 1"),
         MoveEntry(moveName = "Straight Skull", notation = "Straight Skull", moveType = "Special", character = "Shang Tsung", game = "Mortal Kombat 1"),
         MoveEntry(moveName = "Double Skull", notation = "Double Skull", moveType = "Special", character = "Shang Tsung", game = "Mortal Kombat 1"),

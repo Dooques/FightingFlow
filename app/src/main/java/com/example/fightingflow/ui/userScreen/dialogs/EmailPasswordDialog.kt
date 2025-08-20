@@ -191,7 +191,7 @@ fun EmailAndPasswordDialog(
                             showPasswordError= false
                         } },
                     label = { Text(
-                        if (showPasswordError) "Please enter a valid password"
+                        if (showPasswordError) "Please enter a password"
                         else if (showShortPasswordError) "Password is less than 6 characters"
                         else "Password") },
                     supportingText = { Text("Minimum 6 characters") },

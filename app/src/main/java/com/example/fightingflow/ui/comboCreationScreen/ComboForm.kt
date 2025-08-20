@@ -85,8 +85,8 @@ fun ComboForm(
         Spacer(modifier.height(20.dp))
         /* Placeholder composable for creating a new combo */
         if (comboDisplay.moves.isEmpty()) {
-            Box (modifier = modifier.fillMaxWidth()) {
-                Column(modifier.padding(horizontal = 4.dp)) {
+            Box (modifier = modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
+                Column {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Start,

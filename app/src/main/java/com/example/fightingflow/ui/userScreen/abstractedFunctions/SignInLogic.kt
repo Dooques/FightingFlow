@@ -89,7 +89,6 @@ suspend fun signInByEmail(
             }
             .onFailure { result ->
                 Timber.e(result, "Error trying to sign in.")
-
             }
 
     } else {

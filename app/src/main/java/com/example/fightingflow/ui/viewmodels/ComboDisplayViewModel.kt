@@ -138,6 +138,7 @@ class ComboDisplayViewModel(
                                         comboDisplayListFb.update {
                                             ComboDisplayListUiState(
                                                 entryList.map { entry ->
+                                                    Timber.d("Mapping ${entry.comboId} list")
                                                     entry.toDisplay(moveList)
                                                 }
                                             )

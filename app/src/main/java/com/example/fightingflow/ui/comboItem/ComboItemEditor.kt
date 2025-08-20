@@ -58,10 +58,8 @@ fun ComboItemEditor(
     var selectedIndex = selectedItem
 
     Timber.d("--Loading combo editor--")
-    Box(modifier.fillMaxWidth()) {
-        Column(
-            modifier.padding(horizontal = 4.dp)
-        ) {
+    Box(modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
+        Column {
             Timber.d(" Loading flow row\n Move List: ${combo.moves}")
             if (iconDisplayState) {
                 FlowRow(

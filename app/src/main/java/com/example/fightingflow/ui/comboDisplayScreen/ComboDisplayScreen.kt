@@ -170,11 +170,11 @@ fun ComboDisplayScreen(
 
     LaunchedEffect(characterNameState, gameSelectedState) {
         Timber.d("--Launched Effect triggered by character change--")
-        if (characterNameState?.name != null && characterNameState?.name?.isNotBlank() == true) {
+        if (characterNameState != null && characterNameState?.name?.isNotBlank() == true) {
             try {
                 Timber.d(" Getting ${characterNameState!!.name} from database...")
                 comboDisplayViewModel.updateCharacterState(
-                    characterState.character.name,
+                    characterNameState!!.name,
                     gameSelectedState
                 )
                 Timber.d(" Character returned: $characterState")
