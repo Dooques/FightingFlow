@@ -14,10 +14,11 @@ fun ConsoleInputsSubMenu(
     optionSelected: (Console) -> Unit,
     onDismiss: () -> Unit,
     onDismissParent: () -> Unit,
-    offset: DpOffset = DpOffset(160.dp, 25.dp)
+    offset: DpOffset,
+    expanded: Boolean
 ) {
     DropdownMenu(
-        expanded = true,
+        expanded = expanded,
         onDismissRequest = { onDismiss(); onDismissParent() },
         offset = offset
     ) {
