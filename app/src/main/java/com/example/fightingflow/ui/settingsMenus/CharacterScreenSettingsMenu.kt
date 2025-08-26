@@ -15,12 +15,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import com.example.fightingflow.model.Console
 
 @Composable
-fun ProfileAndConsoleInputMenu(
+fun CharacterScreenSettingsMenu(
     navigate: () -> Unit,
-    updateConsoleInput: (Console) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
@@ -34,20 +32,9 @@ fun ProfileAndConsoleInputMenu(
                 onDismissRequest = { menuExpanded = false }
             ) {
                 DropdownMenuItem(
-                    text = { Text("Profiles") },
+                    text = { Text("User Details") },
                     onClick = navigate
                 )
-                DropdownMenuItem(
-                    text = { Text("Console Inputs") },
-                    onClick = { submenuExpanded = !submenuExpanded }
-                )
-                if (submenuExpanded) {
-                    ConsoleInputsMenu(
-                        optionSelected = { updateConsoleInput(it) },
-                        onDismiss = { submenuExpanded = false },
-                        onDismissParent = { menuExpanded = false }
-                    )
-                }
             }
         }
     }

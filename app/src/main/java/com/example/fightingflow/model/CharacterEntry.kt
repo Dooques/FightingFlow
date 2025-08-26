@@ -32,14 +32,17 @@ enum class Game(val title: String) {
 }
 
 enum class SF6ControlType(val type: Int) {
-    Modern(type = 0), Classic(type = 1), Invalid(type = 2)
+    Modern(type = 0),
+    Classic(type = 1),
+    Invalid(type = 2)
 }
 
 enum class ControlType(val type: String) {
     ArcSys("ArcSys"),
     MortalKombat("Mortal Kombat"),
     NumpadNotation("Numpad Notation"),
-    StreetFighter("Street Fighter"),
+    StreetFighterC("Street Fighter Classic"),
+    StreetFighterM("Street Fighter Modern"),
     TagFighter("Tag Fighter"),
     Tekken("Tekken"),
     VirtuaFighter("Virtua Fighter"),

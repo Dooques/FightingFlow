@@ -15,14 +15,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.example.fightingflow.model.Console
 
 @Composable
-fun ShowPublicCombosMenu(
+fun ComboDisplayScreenSettingsMenu(
     updatePublicComboState: () -> Unit,
     showPublicComboState: Boolean,
+    updateConsoleInput: (Console) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
+    var submenuExpanded by remember { mutableStateOf(false) }
     IconButton(onClick = {menuExpanded = !menuExpanded}) {
         Icon(
             imageVector = Icons.Default.Settings,
@@ -42,7 +45,21 @@ fun ShowPublicCombosMenu(
                         menuExpanded = !menuExpanded
                         updatePublicComboState()
                     }
-
+                )
+                DropdownMenuItem(
+                    text = { Text("Console Inputs") },
+                    onClick = { submenuExpanded = !submenuExpanded }
+                )
+                if (submenuExpanded) {
+                    ConsoleInputsSubMenu(
+                        optionSelected = { updateConsoleInput(it) },
+                        onDismiss = { submenuExpanded = false },
+                        onDismissParent = { menuExpanded = false }
+                    )
+                }
+                DropdownMenuItem(
+                    text = { Text("Swipe right on a combo\nfor more options") },
+                    onClick = {}
                 )
             }
         }

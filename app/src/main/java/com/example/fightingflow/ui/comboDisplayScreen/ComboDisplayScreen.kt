@@ -56,21 +56,19 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.fightingflow.data.firebase.GoogleAuthService
 import com.example.fightingflow.data.mediastore.MediaStoreUtil
-import com.example.fightingflow.model.ComboDisplay
 import com.example.fightingflow.model.ComboEntry
 import com.example.fightingflow.model.ComboEntryFb
+import com.example.fightingflow.model.SF6ControlType
 import com.example.fightingflow.ui.viewmodels.ComboCreationViewModel
 import com.example.fightingflow.ui.comboItem.ComboItemDisplay
 import com.example.fightingflow.ui.components.ProfileAndConsoleInputMenu
 import com.example.fightingflow.ui.viewmodels.UserViewModel
 import com.example.fightingflow.ui.components.ActionIcon
 import com.example.fightingflow.ui.components.SwipeableItem
-import com.example.fightingflow.ui.settingsMenus.ShowPublicCombosMenu
+import com.example.fightingflow.ui.settingsMenus.ComboDisplayScreenSettingsMenu
 import com.example.fightingflow.ui.viewmodels.AuthViewModel
 import com.example.fightingflow.ui.viewmodels.ComboDisplayViewModel
 import com.example.fightingflow.ui.viewmodels.UserDetailsState
-import com.example.fightingflow.util.CharacterEntryUiState
-import com.example.fightingflow.util.characterAndMoveData.characterMap
 import dev.shreyaspatil.capturable.controller.rememberCaptureController
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -123,7 +121,7 @@ fun ComboDisplayScreen(
     val sF6ControlType by comboDisplayViewModel.modernOrClassicState.collectAsStateWithLifecycle()
 
     // Firebase Flows
-    val comboDisplayListFirebase by comboDisplayViewModel.comboDisplayListFb.collectAsStateWithLifecycle()
+    val comboDisplayListFirestore by comboDisplayViewModel.comboDisplayListFb.collectAsStateWithLifecycle()
     val comboEntryListFirestore by comboDisplayViewModel.comboEntryListFb.collectAsStateWithLifecycle()
     val userData by userViewModel.userDataMap.collectAsStateWithLifecycle()
 
@@ -134,24 +132,37 @@ fun ComboDisplayScreen(
     val comboEntryList by remember(characterState) {
         derivedStateOf {
             if (!characterState.character.mutable) {
-                comboEntryListFirestore.comboEntryFbList.toMutableList()
+                when (sF6ControlType) {
+                    SF6ControlType.Classic -> comboEntryListFirestore.comboEntryFbList.filter { it.controlType == "Street Fighter Classic"}.toMutableList()
+                    SF6ControlType.Modern -> comboEntryListFirestore.comboEntryFbList.filter { it.controlType == "Street Fighter Modern"}.toMutableList()
+                    else -> comboDisplayListFirestore.comboDisplayList.toMutableList()
+                }
             } else {
-                comboEntryListRoom.comboEntryList.toMutableList()
+                when (sF6ControlType) {
+                    SF6ControlType.Classic -> comboEntryListRoom.comboEntryList.filter { it.controlType == "Street Fighter Classic"}.toMutableList()
+                    SF6ControlType.Modern -> comboEntryListRoom.comboEntryList.filter { it.controlType == "Street Fighter Modern"}.toMutableList()
+                    else -> comboEntryListRoom.comboEntryList.toMutableList()
+                }
             }
         }
     }
     val comboDisplayList by remember(characterState) {
         derivedStateOf {
             if (!characterState.character.mutable) {
-                comboDisplayListFirebase.comboDisplayList.toMutableList()
+                when (sF6ControlType) {
+                    SF6ControlType.Classic -> comboDisplayListFirestore.comboDisplayList.filter { it.controlType == "Street Fighter Classic"}.toMutableList()
+                    SF6ControlType.Modern -> comboDisplayListFirestore.comboDisplayList.filter { it.controlType == "Street Fighter Modern"}.toMutableList()
+                    else -> comboDisplayListFirestore.comboDisplayList.toMutableList()
+                }
             } else {
-                comboDisplayListRoom.comboDisplayList.toMutableList()
+                when (sF6ControlType) {
+                    SF6ControlType.Classic -> comboDisplayListRoom.comboDisplayList.filter { it.controlType == "Street Fighter Classic"}.toMutableList()
+                    SF6ControlType.Modern -> comboDisplayListRoom.comboDisplayList.filter { it.controlType == "Street Fighter Modern"}.toMutableList()
+                    else -> comboDisplayListRoom.comboDisplayList.toMutableList()
+                }
             }
         }
     }
-
-//    Timber.d("--Flow Values--\n Console: %s\n Combo List: %s\n Collected: %s\n GameSelectedState: %s",
-//        consoleTypeState, comboDisplayListFirebase.comboDisplayList, combosCollected, gameSelectedState)
 
     Timber.d("Updating character data")
     LaunchedEffect(currentUser) {
@@ -239,13 +250,14 @@ fun ComboDisplayScreen(
                             modifier = modifier.size(80.dp)
                         )
                     }
-                    ShowPublicCombosMenu(
+                    ComboDisplayScreenSettingsMenu(
                         showPublicComboState = showPublicCombos,
                         updatePublicComboState = {
                             scope.launch {
                                 comboDisplayViewModel.updateShowComboDisplayState(!showPublicCombos)
                             }
-                        }
+                        },
+                        updateConsoleInput = { comboDisplayViewModel.updateConsoleType(it) }
                     )
                 },
                 windowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp)

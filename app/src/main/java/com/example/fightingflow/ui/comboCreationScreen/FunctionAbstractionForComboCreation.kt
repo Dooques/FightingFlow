@@ -107,5 +107,4 @@ fun updateMoveListAbstract(
         itemIndexState else itemIndexState + 1
     updatedList.add(index, moveToAdd)
     return comboDisplayState.comboDisplay.copy(moves = ImmutableList(list = updatedList))
-    return comboDisplayState.comboDisplay
 }

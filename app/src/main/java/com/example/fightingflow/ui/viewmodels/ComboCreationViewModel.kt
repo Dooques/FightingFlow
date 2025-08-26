@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fightingflow.data.database.FlowRepository
 import com.example.fightingflow.data.datastore.ComboDsRepository
-import com.example.fightingflow.data.datastore.UserDsRepository
 import com.example.fightingflow.data.datastore.SettingsDsRepository
+import com.example.fightingflow.data.datastore.UserDsRepository
 import com.example.fightingflow.data.firebase.FirebaseRepository
 import com.example.fightingflow.data.firebase.GoogleAuthService
 import com.example.fightingflow.model.CharacterEntry
@@ -31,10 +31,7 @@ import com.example.fightingflow.util.emptyComboEntry
 import com.example.fightingflow.util.emptyComboEntryFb
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -78,7 +75,7 @@ class ComboCreationViewModel(
     val itemIndexState = MutableStateFlow(comboDisplayState.value.comboDisplay.moves.size)
     val gameTypeState = getGameState()
 
-    private val controlTypeState = getControlTypeState()
+    private val controlTypeState = getConsoleTypeState()
     private val sf6ControlTypeState = getSF6ControlTypeState()
 
     // State Flow Lists
@@ -360,7 +357,7 @@ class ComboCreationViewModel(
             initialValue = Game.CUSTOM
         )
 
-    private fun getControlTypeState() = settingsDsRepository.getConsoleType()
+    private fun getConsoleTypeState() = settingsDsRepository.getConsoleType()
         .map { when (it) {
             1 -> Console.STANDARD
             2 -> Console.PLAYSTATION

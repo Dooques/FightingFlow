@@ -49,8 +49,8 @@ import com.example.fightingflow.model.CharacterEntry
 import com.example.fightingflow.ui.viewmodels.AddCharacterViewModel
 import com.example.fightingflow.ui.viewmodels.ComboDisplayViewModel
 import com.example.fightingflow.ui.settingsMenus.CharacterOptionsMenu
-import com.example.fightingflow.ui.settingsMenus.GameSelectedMenu
-import com.example.fightingflow.ui.settingsMenus.ProfileAndConsoleInputMenu
+import com.example.fightingflow.ui.settingsMenus.GameSelectMenu
+import com.example.fightingflow.ui.settingsMenus.CharacterScreenSettingsMenu
 import com.example.fightingflow.util.CharacterEntryUiState
 import com.example.fightingflow.util.emptyCharacter
 import com.example.fightingflow.ui.viewmodels.CharacterViewModel
@@ -125,9 +125,8 @@ fun CharacterScreen(
                             modifier = modifier.size(80.dp)
                         )
                     }
-                    ProfileAndConsoleInputMenu(
+                    CharacterScreenSettingsMenu(
                         navigate = navigateToProfiles,
-                        updateConsoleInput = { comboDisplayViewModel.updateConsoleType(it) }
                     )
                 },
                 navigationIcon = {
@@ -157,7 +156,7 @@ fun CharacterScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Start
             ) {
-                GameSelectedMenu(
+                GameSelectMenu(
                     scope = scope,
                     characterScreenViewModel = characterScreenViewModel,
                     gameSelected = gameSelected,

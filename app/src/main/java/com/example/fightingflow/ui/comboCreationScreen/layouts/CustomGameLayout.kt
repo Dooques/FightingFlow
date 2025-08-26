@@ -51,7 +51,8 @@ fun CustomGameLayout(
             ControlType.ArcSys.type -> arcSysMoves
             ControlType.MortalKombat.type -> moveEntriesMK1
             ControlType.NumpadNotation.type -> numpadNotationMoves
-            ControlType.StreetFighter.type -> moveEntriesSF6
+            ControlType.StreetFighterC.type -> moveEntriesSF6
+            ControlType.StreetFighterM.type -> moveEntriesSF6
             ControlType.TagFighter.type -> tagFighterMoves
             ControlType.Tekken.type -> moveEntriesT8
             ControlType.VirtuaFighter.type -> virtuaFighterMoves

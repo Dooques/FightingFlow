@@ -54,7 +54,7 @@ fun NavGraph(
     navController: NavHostController = rememberNavController(),
     deviceType: WindowSizeClass
 ) {
-    Timber.d("--Initializing NavController-- \n Initializing ViewModels...")
+    Timber.d("--Initializing NavController--\n Initializing ViewModels...")
     val comboDisplayViewModel = koinInject<ComboDisplayViewModel>()
     val comboCreationViewModel = koinInject<ComboCreationViewModel>()
     val userViewModel = koinInject<UserViewModel>()

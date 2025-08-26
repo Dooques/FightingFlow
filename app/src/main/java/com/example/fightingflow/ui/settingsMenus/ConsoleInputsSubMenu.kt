@@ -10,7 +10,7 @@ import com.example.fightingflow.model.Console
 import timber.log.Timber
 
 @Composable
-fun ConsoleInputsMenu(
+fun ConsoleInputsSubMenu(
     optionSelected: (Console) -> Unit,
     onDismiss: () -> Unit,
     onDismissParent: () -> Unit,

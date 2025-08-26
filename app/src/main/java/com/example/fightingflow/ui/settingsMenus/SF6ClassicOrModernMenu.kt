@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @Composable
-fun SF6ModernOrClassicMenu(
+fun ModernOrClassicSubMenu(
     scope: CoroutineScope,
     characterScreenViewModel: CharacterViewModel,
     option: SF6ControlType?,

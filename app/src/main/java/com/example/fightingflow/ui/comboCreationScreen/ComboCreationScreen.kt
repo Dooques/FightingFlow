@@ -35,6 +35,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.example.fightingflow.model.ControlType
+import com.example.fightingflow.model.SF6ControlType
 import com.example.fightingflow.ui.viewmodels.ComboDisplayViewModel
 import com.example.fightingflow.ui.components.ActionIcon
 import com.example.fightingflow.ui.components.ProfileAndConsoleInputMenu
@@ -108,7 +110,11 @@ fun ComboCreationScreen(
     val newCombo = emptyComboDisplay.copy(
         id = if (!characterMap.keys.contains(game.title)) UUID.randomUUID().toString() else "",
         character = characterStateDisplay.character.name,
-        controlType = characterStateDisplay.character.controlType,
+        controlType = when (sf6ControlType) {
+            SF6ControlType.Classic -> ControlType.StreetFighterC.type
+            SF6ControlType.Modern -> ControlType.StreetFighterM.type
+            else -> characterStateDisplay.character.controlType
+                                            },
         game = characterStateDisplay.character.game
     )
 

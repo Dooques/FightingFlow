@@ -31,7 +31,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun GameSelectedMenu(
+fun GameSelectMenu(
     scope: CoroutineScope,
     characterScreenViewModel: CharacterViewModel,
     gameSelected: String?,
@@ -107,7 +107,7 @@ fun GameSelectedMenu(
                 )
 
                 if (sf6OptionsExpanded) {
-                    SF6ModernOrClassicMenu(
+                    ModernOrClassicSubMenu(
                         scope = scope,
                         characterScreenViewModel = characterScreenViewModel,
                         option = sf6Option,
