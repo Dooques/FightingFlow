@@ -10,11 +10,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.fightingflow"
+    namespace = "com.dooques.fightingflow"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.fightingflow"
+        applicationId = "com.dooques.fightingflow"
         minSdk = 26
         targetSdk = 36
         versionCode = 1

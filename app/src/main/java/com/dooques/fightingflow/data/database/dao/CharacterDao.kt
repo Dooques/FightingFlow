@@ -1,0 +1,22 @@
+package com.dooques.fightingflow.data.database.dao
+
+import androidx.room.Dao
+import androidx.room.Query
+import com.dooques.fightingflow.model.CharacterEntry
+import kotlinx.coroutines.flow.Flow
+
+@Dao
+interface CharacterDao: BaseDao<CharacterEntry> {
+
+    @Query("select * from character_table where name = :name")
+    fun getCharacter(name: String): Flow<CharacterEntry?>
+
+    @Query("select * from character_table where game = :game")
+    fun getCharactersFromGame(game: String): Flow<List<CharacterEntry>>
+
+    @Query("select * from character_table where game = :game and name = :name")
+    fun getCharacterByGameAndName(name: String, game: String?): Flow<CharacterEntry?>
+
+    @Query("select * from character_table where mutable == 1")
+    fun getAllCustomCharacters(): Flow<List<CharacterEntry>?>
+}
