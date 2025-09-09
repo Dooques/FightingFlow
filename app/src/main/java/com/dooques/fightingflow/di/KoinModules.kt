@@ -33,6 +33,7 @@ import com.dooques.fightingflow.ui.viewmodels.ComboDisplayViewModel
 import com.dooques.fightingflow.ui.comboItem.ComboItemViewModel
 import com.dooques.fightingflow.ui.viewmodels.AuthViewModel
 import com.dooques.fightingflow.ui.viewmodels.ProfanityViewModel
+import com.dooques.fightingflow.ui.viewmodels.SearchFilterViewModel
 import com.dooques.fightingflow.ui.viewmodels.UserViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.singleOf
@@ -90,5 +91,6 @@ val viewModelModule = module {
     viewModelOf(::ComboItemViewModel)
     viewModelOf(::AddCharacterViewModel)
     viewModelOf(::AuthViewModel)
+    viewModelOf(::SearchFilterViewModel)
     viewModelOf(::ProfanityViewModel)
 }

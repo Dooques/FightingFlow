@@ -53,7 +53,7 @@ fun ComboItemDisplay(
     fontColor: Color,
     modifier: Modifier = Modifier,
 ) {
-    Timber.d("-- Loading Combo Moves Composable... --")
+    Timber.d("--Loading Combo Moves Composable...--")
     Box(modifier.fillMaxWidth().capturable(captureController)) {
 
         Column(
@@ -72,7 +72,7 @@ fun ComboItemDisplay(
                         .fillMaxWidth()
                         .padding(4.dp)
                 ) {
-                    Timber.d("Loading moves from combo...")
+                    Timber.d(" Loading moves from combo...")
                     combo.moves.forEach {
 //                        Timber.d("$it from ${it.game}")
 //                        Timber.d("Console Type: $console")

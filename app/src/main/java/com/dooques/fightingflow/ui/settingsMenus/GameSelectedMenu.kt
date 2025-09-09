@@ -74,6 +74,7 @@ fun GameSelectMenu(
                         changeSelectedGame(Game.MK1.title)
                         scope.launch {
                             characterScreenViewModel.updateGameInDs(Game.MK1.title)
+                            characterScreenViewModel.updateSF6ControlType(SF6ControlType.Invalid)
                         }
                     }
                 )
@@ -94,6 +95,8 @@ fun GameSelectMenu(
                         changeSelectedGame(Game.T8.title)
                         scope.launch {
                             characterScreenViewModel.updateGameInDs(Game.T8.title)
+                            characterScreenViewModel.updateSF6ControlType(SF6ControlType.Invalid)
+
                         }
                     }
                 )
@@ -103,6 +106,9 @@ fun GameSelectMenu(
                     text = { Text("Custom") },
                     onClick = {
                         customGameListExpanded = true
+                        scope.launch {
+                            characterScreenViewModel.updateSF6ControlType(SF6ControlType.Invalid)
+                        }
                     }
                 )
 

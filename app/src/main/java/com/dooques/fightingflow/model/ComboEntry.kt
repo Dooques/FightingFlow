@@ -197,7 +197,7 @@ fun getMoveEntryDataForComboDisplay(
     combo: ComboDisplay,
     moveEntryList: MoveEntryListUiState,
 ): ComboDisplay {
-    Timber.d("Processing moveList for ${combo.id}")
+    Timber.d(" Processing moveList for ${combo.id}")
     val updatedCombo = combo.copy(
         moves = ImmutableList(
             combo.moves.map { move ->
@@ -213,7 +213,7 @@ fun getMoveEntryDataForComboDisplay(
             }
         )
     )
-    Timber.d("Move List completed for ${combo.id} and returning to UI")
+    Timber.d(" Move List completed for ${combo.id} and returning to UI")
     return updatedCombo
 }
 

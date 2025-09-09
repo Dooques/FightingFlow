@@ -55,43 +55,43 @@ class CharacterViewModel(
         )
 
     suspend fun updateGameInDs(selectedGame: String) {
-            Timber.Forest.d("Updating game in DS...")
-            Timber.Forest.d("GameSelected: $selectedGame")
+            Timber.Forest.d(" Updating game in DS...")
+            Timber.Forest.d(" GameSelected: $selectedGame")
             settingsDsRepository.updateGameSelected(selectedGame)
     }
 
     suspend fun updateSF6ControlType(controlType: SF6ControlType) {
-        Timber.Forest.d("Updating SF6 Control Type...")
-        Timber.Forest.d("Type: ${controlType.name}")
+        Timber.Forest.d(" Updating SF6 Control Type...")
+        Timber.Forest.d(" Type: ${controlType.name}")
         settingsDsRepository.updateSf6ControlType(controlType.type)
     }
     private suspend fun cleanupCustomGames(characterEntry: CharacterEntry) {
-        Timber.Forest.d("Checking for other characters in changed game...")
+        Timber.Forest.d(" Checking for other characters in changed game...")
         val charactersByGame = flowRepository.getCharactersByGame(characterEntry.game)
             .map { it }
             .first()
-        Timber.Forest.d("Characters in related game: $charactersByGame")
+        Timber.Forest.d(" Characters in related game: $charactersByGame")
         if (charactersByGame.isEmpty()) {
-            Timber.Forest.d("No characters found for ${characterEntry.game}, deleting game from DS")
+            Timber.Forest.d(" No characters found for ${characterEntry.game}, deleting game from DS")
             val currentGameList = customGameList.value.toMutableList()
-            Timber.Forest.d("Current List: $currentGameList")
+            Timber.Forest.d(" Current List: $currentGameList")
             currentGameList.remove(characterEntry.game)
             val currentGameListString = if (currentGameList.isNotEmpty()) currentGameList.toList().joinToString() else ""
-            Timber.Forest.d("Current List as String: $currentGameListString")
+            Timber.Forest.d(" Current List as String: $currentGameListString")
             characterDsRepository.updateCustomGameList(currentGameListString)
         }
     }
 
     suspend fun deleteCustomCharacter(characterEntry: CharacterEntry) {
-        Timber.Forest.d("-- Deleting character Entry --")
+        Timber.Forest.d("--Deleting character Entry--")
         var moveEntryList = listOf<MoveEntry>()
         try {
             moveEntryList = flowRepository.getAllMovesByCharacter(characterEntry.name).first()
         } catch (e: Exception) {
-            Timber.Forest.e(e, message = "Error accessing Moves for ${characterEntry.name}")
+            Timber.Forest.e(e, message = " Error accessing Moves for ${characterEntry.name}")
         }
         if (characterEntry.mutable) {
-            Timber.Forest.d("Attempting to delete character...")
+            Timber.Forest.d(" Attempting to delete character...")
             try {
                 flowRepository.deleteCharacter(characterEntry)
                 if (moveEntryList.isNotEmpty()) {
@@ -99,20 +99,20 @@ class CharacterViewModel(
                         flowRepository.deleteMove(move)
                     }
                 }
-                Timber.Forest.d("Character deleted, cleaning up related data...")
+                Timber.Forest.d(" Character deleted, cleaning up related data...")
                 val charactersByGame = flowRepository.getCharactersByGame(characterEntry.game)
                     .map { it }
                     .first()
-                Timber.Forest.d("Characters in related game: $charactersByGame")
+                Timber.Forest.d(" Characters in related game: $charactersByGame")
                 if (charactersByGame.isEmpty()) {
                     cleanupCustomGames(characterEntry)
                     settingsDsRepository.updateGameSelected("Tekken 8")
                 }
             } catch (e: Exception) {
-                Timber.Forest.e(e,"Error deleting character from database.")
+                Timber.Forest.e(e," Error deleting character from database.")
             }
         } else {
-            Timber.Forest.d("This character cannot be deleted.")
+            Timber.Forest.d(" This character cannot be deleted.")
         }
     }
 }

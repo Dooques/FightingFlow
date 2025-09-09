@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,6 +22,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Settings
@@ -29,6 +31,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -50,14 +54,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.dooques.fightingflow.data.firebase.GoogleAuthService
 import com.dooques.fightingflow.data.mediastore.MediaStoreUtil
+import com.dooques.fightingflow.model.ComboDisplay
 import com.dooques.fightingflow.model.ComboEntry
 import com.dooques.fightingflow.model.ComboEntryFb
+import com.dooques.fightingflow.model.Game
 import com.dooques.fightingflow.model.SF6ControlType
 import com.dooques.fightingflow.ui.viewmodels.ComboCreationViewModel
 import com.dooques.fightingflow.ui.comboItem.ComboItemDisplay
@@ -66,8 +74,11 @@ import com.dooques.fightingflow.ui.viewmodels.UserViewModel
 import com.dooques.fightingflow.ui.components.ActionIcon
 import com.dooques.fightingflow.ui.components.SwipeableItem
 import com.dooques.fightingflow.ui.settingsMenus.ComboDisplayScreenSettingsMenu
+import com.dooques.fightingflow.ui.settingsMenus.FilterOptionsMenu
 import com.dooques.fightingflow.ui.viewmodels.AuthViewModel
 import com.dooques.fightingflow.ui.viewmodels.ComboDisplayViewModel
+import com.dooques.fightingflow.ui.viewmodels.ComboFilterObject
+import com.dooques.fightingflow.ui.viewmodels.SearchFilterViewModel
 import com.dooques.fightingflow.ui.viewmodels.UserDetailsState
 import dev.shreyaspatil.capturable.controller.rememberCaptureController
 import kotlinx.coroutines.launch
@@ -89,12 +100,13 @@ fun ComboDisplayScreen(
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Timber.d("-- Opening Combo Screen --")
+    Timber.d("--Opening Combo Screen--")
 
     val context = LocalContext.current
     (context as? Activity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
 
     val mediaStoreUtil = koinInject<MediaStoreUtil>()
+    val searchFilterViewModel = koinInject<SearchFilterViewModel>()
 
     val fontColor = MaterialTheme.colorScheme.onBackground
     val scope = rememberCoroutineScope()
@@ -129,18 +141,30 @@ fun ComboDisplayScreen(
     val currentUser by authViewModel.signInState.collectAsStateWithLifecycle()
     val userDetails by userViewModel.userDetailsState.collectAsStateWithLifecycle()
 
+    // Filter
+    var showFilter by remember { mutableStateOf(false) }
+    var applyFilter by remember { mutableStateOf(false) }
+    var filterApplied by remember { mutableStateOf(false) }
+
+    var searchByDescription by remember { mutableStateOf("") }
+    var searchByUser by remember { mutableStateOf("") }
+    var comboFilterObject by remember { mutableStateOf(ComboFilterObject()) }
+    var comboDisplayListFiltered by remember { mutableStateOf(emptyList<ComboDisplay>())}
+
     val comboEntryList by remember(characterState) {
         derivedStateOf {
             if (!characterState.character.mutable) {
+                Timber.d(" Character is not mutable")
                 when (sF6ControlType) {
-                    SF6ControlType.Classic -> comboEntryListFirestore.comboEntryFbList.filter { it.controlType == "Street Fighter Classic"}.toMutableList()
-                    SF6ControlType.Modern -> comboEntryListFirestore.comboEntryFbList.filter { it.controlType == "Street Fighter Modern"}.toMutableList()
+                    SF6ControlType.Classic -> comboEntryListFirestore.comboEntryFbList.filter { it.controlType == "Street Fighter Classic" }.toMutableList()
+                    SF6ControlType.Modern -> comboEntryListFirestore.comboEntryFbList.filter { it.controlType == "Street Fighter Modern" }.toMutableList()
                     else -> comboDisplayListFirestore.comboDisplayList.toMutableList()
                 }
             } else {
+                Timber.d(" Character is mutable")
                 when (sF6ControlType) {
-                    SF6ControlType.Classic -> comboEntryListRoom.comboEntryList.filter { it.controlType == "Street Fighter Classic"}.toMutableList()
-                    SF6ControlType.Modern -> comboEntryListRoom.comboEntryList.filter { it.controlType == "Street Fighter Modern"}.toMutableList()
+                    SF6ControlType.Classic -> comboEntryListRoom.comboEntryList.filter { it.controlType == "Street Fighter Classic" }.toMutableList()
+                    SF6ControlType.Modern -> comboEntryListRoom.comboEntryList.filter { it.controlType == "Street Fighter Modern" }.toMutableList()
                     else -> comboEntryListRoom.comboEntryList.toMutableList()
                 }
             }
@@ -150,18 +174,54 @@ fun ComboDisplayScreen(
     val comboDisplayList by remember(characterState) {
         derivedStateOf {
             if (!characterState.character.mutable) {
+                Timber.d(" Character is not mutable")
                 when (sF6ControlType) {
-                    SF6ControlType.Classic -> comboDisplayListFirestore.comboDisplayList.filter { it.controlType == "Street Fighter Classic"}.toMutableList()
-                    SF6ControlType.Modern -> comboDisplayListFirestore.comboDisplayList.filter { it.controlType == "Street Fighter Modern"}.toMutableList()
-                    else -> comboDisplayListFirestore.comboDisplayList.toMutableList()
+                    SF6ControlType.Classic -> comboDisplayListFirestore.comboDisplayList.filter { it.controlType == "Street Fighter Classic" }.toMutableList()
+                    SF6ControlType.Modern -> {
+                        comboDisplayListFirestore.comboDisplayList.filter { it.controlType == "Street Fighter Modern"}.toMutableList()
+                    }
+                    else -> {
+                        comboDisplayListFirestore.comboDisplayList.toMutableList()
+                    }
                 }
             } else {
+                Timber.d(" Character is mutable")
                 when (sF6ControlType) {
                     SF6ControlType.Classic -> comboDisplayListRoom.comboDisplayList.filter { it.controlType == "Street Fighter Classic"}.toMutableList()
                     SF6ControlType.Modern -> comboDisplayListRoom.comboDisplayList.filter { it.controlType == "Street Fighter Modern"}.toMutableList()
                     else -> comboDisplayListRoom.comboDisplayList.toMutableList()
                 }
             }
+        }
+    }
+
+    LaunchedEffect(applyFilter, searchByUser, searchByDescription) {
+        Timber.d("--Launched Effect triggered by applying filter--")
+        if (
+            comboFilterObject.moves.isNotEmpty() ||
+            comboFilterObject.user.isNotEmpty() ||
+            comboFilterObject.description.isNotEmpty()
+            ) {
+            comboDisplayListFiltered = comboDisplayList.filter { combo ->
+                if (comboFilterObject.moves.isNotEmpty()) {
+                    combo.moves.containsAll(comboFilterObject.moves)
+                } else { true }
+            }.filter { combo ->
+                if (comboFilterObject.user.isNotEmpty()) {
+                    val username = searchFilterViewModel.getKeyByValue(userData.userMap, comboFilterObject.user)
+                    combo.createdBy.lowercase().contains(username?.lowercase() ?: "")
+                } else { true }
+            }.filter { combo ->
+                if (comboFilterObject.description.isNotEmpty()) {
+                    combo.title.contains(comboFilterObject.description)
+                } else { true }
+            }.toMutableList()
+            filterApplied = true
+            applyFilter = false
+        } else {
+            Timber.d("No filters found, returning normal list")
+            filterApplied = false
+            applyFilter = false
         }
     }
 
@@ -199,6 +259,10 @@ fun ComboDisplayScreen(
     Timber.d(
         "--Character Details--\n Name: %s\n Image: %s\n CharacterState: %s\n Combo List: %s",
         characterNameState?.name, characterImageState.image, characterState.character, comboDisplayList
+    )
+    Timber.d("--Filter Details--\n Apply Filter: %s\n Filter Applied: %s\n Filtered Combo List: %s" +
+            "\n User Filter: %s \n Description Filter: %s \n Move Filter: %s",
+        applyFilter, filterApplied, comboDisplayListFiltered, comboFilterObject.user, comboFilterObject.description, comboFilterObject.moves
     )
     Timber.d(" Checking details valid...")
 
@@ -253,10 +317,9 @@ fun ComboDisplayScreen(
                     }
                     ComboDisplayScreenSettingsMenu(
                         showPublicComboState = showPublicCombos,
+                        updateFilterOptions = { showFilter = !showFilter },
                         updatePublicComboState = {
-                            scope.launch {
-                                comboDisplayViewModel.updateShowComboDisplayState(!showPublicCombos)
-                            }
+                            scope.launch { comboDisplayViewModel.updateShowComboDisplayState(!showPublicCombos) }
                         },
                         updateConsoleInput = { comboDisplayViewModel.updateConsoleType(it) }
                     )
@@ -266,6 +329,93 @@ fun ComboDisplayScreen(
         }
     ) { contentPadding ->
         Column(Modifier.padding(contentPadding)) {
+
+            if (showFilter) {
+                Timber.d("--Loading Filter Composable--")
+                Timber.d(" Filter Object: $comboFilterObject")
+                Column(modifier = modifier.padding(horizontal = 16.dp, vertical = 2.dp)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        modifier = modifier.fillMaxWidth()
+                    ) {
+                        OutlinedTextField(
+                            value = searchByDescription,
+                            onValueChange = { search ->
+                                if (search.length <= 15) {
+                                    searchByDescription = search
+                                    comboFilterObject.description = search
+                                    applyFilter = true
+                                }
+                            },
+                            textStyle = TextStyle.Default.copy(fontSize = 12.sp),
+                            label = { Text("Description", fontSize = 10.sp) },
+                            trailingIcon = {
+                                IconButton(onClick = {
+                                    searchByDescription = ""
+                                    comboFilterObject.description = ""
+                                    applyFilter = true
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Close,
+                                        contentDescription = "Clear text"
+                                    )
+                                }
+                            },
+                            singleLine = true,
+                            modifier = modifier.defaultMinSize(1.dp)
+                        )
+                        OutlinedTextField(
+                            value = searchByUser,
+                            onValueChange = { search ->
+                                if (search.length <= 15) {
+                                    searchByUser = search
+                                    comboFilterObject.user = search
+                                    applyFilter = true
+                                }
+                            },
+                            textStyle = TextStyle.Default.copy(fontSize = 12.sp),
+                            label = { Text("User", fontSize = 10.sp) },
+                            trailingIcon = {
+                                IconButton(onClick = {
+                                    searchByUser = ""
+                                    comboFilterObject.user = ""
+                                    applyFilter = true
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Close,
+                                        contentDescription = "Clear text"
+                                    )
+                                }
+                            },
+                            singleLine = true,
+                            modifier = modifier.padding(horizontal = 8.dp).defaultMinSize(1.dp),
+                        )
+                        FilterOptionsMenu(
+                            game = Game.entries.first { it.title == gameSelectedState },
+                            character = characterNameState?.name ?: "",
+                            addMoveToFilter =
+                                {
+                                    Timber.d("Adding ${it.moveName} to combo filter")
+                                    if (!comboFilterObject.moves.contains(it)) {
+                                        comboFilterObject.moves.add(it)
+                                        applyFilter = true
+                                    }
+                                    Timber.d("Current List: ${comboFilterObject.moves}")
+                                },
+                            removeMoveFromFilter = {
+                                if (comboFilterObject.moves.contains(it)) {
+                                    comboFilterObject.moves.remove(it)
+                                    applyFilter = true
+                                }
+                            },
+                            currentFilterList = comboFilterObject.moves,
+                        )
+                    }
+                }
+            }
+
+            Timber.d(" Showing public combos: $showPublicCombos")
             if (!showPublicCombos) {
                 Row(modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)) {
                     Text("Your Combos", style = MaterialTheme.typography.bodyLarge)
@@ -298,7 +448,7 @@ fun ComboDisplayScreen(
                 }
                 Timber.d(" Getting display combos as lazy column with swipeable actions.")
                 itemsIndexed(
-                    items = comboDisplayList,
+                    items = if (filterApplied) comboDisplayListFiltered else comboDisplayList,
                     key = {index, item -> item.id}
                 ) { index, combo ->
                     Timber.d("Combo: ${combo.id}\nIndex: $index")

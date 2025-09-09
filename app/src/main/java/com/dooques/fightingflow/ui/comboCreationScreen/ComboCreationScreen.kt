@@ -104,7 +104,6 @@ fun ComboCreationScreen(
     val userDetails by userViewModel.userDetailsState.collectAsStateWithLifecycle()
 
     var settingsMenuExpanded by remember { mutableStateOf(false) }
-    var characterUpdated by remember { mutableStateOf(false) }
     var comboUpdated by remember { mutableStateOf(false) }
 
     val newCombo = emptyComboDisplay.copy(
@@ -113,8 +112,7 @@ fun ComboCreationScreen(
         controlType = when (sf6ControlType) {
             SF6ControlType.Classic -> ControlType.StreetFighterC.type
             SF6ControlType.Modern -> ControlType.StreetFighterM.type
-            else -> characterStateDisplay.character.controlType
-                                            },
+            else -> characterStateDisplay.character.controlType },
         game = characterStateDisplay.character.game
     )
 
@@ -122,6 +120,7 @@ fun ComboCreationScreen(
             " Game: %s\n ComboDisplayState: %s\n ComboString: %s \n ComboId from DS:%s \n Editing State: %s \n Character Move List: %s",
         characterNameState?.name, characterStateDisplay.character, characterStateCreation.character,
         game, comboDisplayState.comboDisplay, comboAsString, comboIdState, editingState, moveListState)
+    Timber.d(" New Combo: $newCombo \n SF6ControlType: $sf6ControlType")
 
     LaunchedEffect(characterNameState, gameSelectedState) {
         Timber.d("--Launched Effect triggered by character change--")
@@ -149,14 +148,11 @@ fun ComboCreationScreen(
 
                 Timber.d(" Creating move list for character in CreationViewModel")
                 comboCreationViewModel.getMoveEntryList(characterStateDisplay.character)
-                characterUpdated = true
             } else {
                 if (moveListState.moveList.first().character != characterStateDisplay.character.name) {
                     Timber.d(" Move List does not match selected character, updating move list.")
                     comboCreationViewModel.getMoveEntryList(characterStateDisplay.character)
-                    characterUpdated = true
                 }
-                characterUpdated = false
             }
             Timber.d(" %s is loaded.", characterStateCreation.character.name)
         } catch (e: Exception) {
@@ -171,7 +167,7 @@ fun ComboCreationScreen(
                 Timber.d(" Adding character to combo details")
                 comboCreationViewModel.updateComboDetails(ComboDisplayUiState(newCombo))
                 comboUpdated = true
-                Timber.d("Combo updated: $comboDisplayState")
+                Timber.d(" Combo updated: $comboDisplayState")
             } else {
                 Timber.d(" No Changes detected.")
             }

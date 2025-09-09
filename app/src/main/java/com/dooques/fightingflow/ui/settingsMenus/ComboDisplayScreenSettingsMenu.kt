@@ -1,8 +1,11 @@
 package com.dooques.fightingflow.ui.settingsMenus
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -17,6 +20,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.DpOffset
@@ -27,6 +31,7 @@ import com.dooques.fightingflow.model.Console
 @Composable
 fun ComboDisplayScreenSettingsMenu(
     updatePublicComboState: () -> Unit,
+    updateFilterOptions: () -> Unit,
     showPublicComboState: Boolean,
     updateConsoleInput: (Console) -> Unit,
     modifier: Modifier = Modifier
@@ -41,7 +46,7 @@ fun ComboDisplayScreenSettingsMenu(
     IconButton(onClick = { menuExpanded = !menuExpanded }) {
         Icon(
             imageVector = Icons.Default.Settings,
-            contentDescription = "Settings"
+            contentDescription = "Settings",
         )
     }
     Box(
@@ -49,7 +54,8 @@ fun ComboDisplayScreenSettingsMenu(
     ) {
         DropdownMenu(
             expanded = menuExpanded,
-            onDismissRequest = { menuExpanded = false }
+            onDismissRequest = { menuExpanded = false },
+            offset = DpOffset(y = 20.dp, x = 0.dp)
         ) {
             DropdownMenuItem(
                 text = {
@@ -63,6 +69,13 @@ fun ComboDisplayScreenSettingsMenu(
                     updatePublicComboState()
                 }
             )
+            DropdownMenuItem(
+                text = { Text("Filter Combos") },
+                onClick = {
+                    menuExpanded = !menuExpanded
+                    updateFilterOptions()
+                }
+            )
             Box(
                 modifier = Modifier.onGloballyPositioned { coordinates ->
                     parentMenuItemSize = coordinates.size
@@ -73,7 +86,7 @@ fun ComboDisplayScreenSettingsMenu(
                     onClick = {
                         val parentWidthDp = with(density) { parentMenuItemSize.width.toDp() }
                         val horizontalOffset = (-parentWidthDp.value - 116).dp
-                        subMenuOffset = DpOffset(horizontalOffset, 52.dp)
+                        subMenuOffset = DpOffset(horizontalOffset, 72.dp)
                         submenuExpanded = !submenuExpanded
                     }
                 )

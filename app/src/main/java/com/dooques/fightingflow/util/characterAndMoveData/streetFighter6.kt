@@ -264,6 +264,9 @@ val moveEntriesSF6 = ImmutableList(
         MoveEntry(moveName = "Air", notation = "Air", moveType = "Mechanic", character = "Generic", game = "Street Fighter 6"),
         MoveEntry(moveName = "Wall Bounce", notation = "WB", moveType = "Mechanic", character = "Generic", game = "Street Fighter 6"),
 
+        // Stage
+        MoveEntry(moveName = "Wall Bounce", notation = "w/bounce", moveType = "Stage", character = "Generic", game = "Street Fighter 6"),
+
         // Movements
         MoveEntry(moveName = "qcf", notation = "qcf", moveType = "Movement", character = "Generic", game = "Street Fighter 6"),
         MoveEntry(moveName = "qcb", notation = "qcb", moveType = "Movement", character = "Generic", game = "Street Fighter 6"),
