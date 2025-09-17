@@ -1,4 +1,4 @@
-package com.dooques.fightingflow.ui.userScreen
+package com.dooques.fightingflow.ui.titleScreen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dooques.fightingflow.R
 import com.dooques.fightingflow.data.firebase.GoogleAuthService
+import com.dooques.fightingflow.ui.userScreen.UserCreationForm
 import com.dooques.fightingflow.ui.userScreen.dialogs.EmailAndPasswordDialog
 import com.dooques.fightingflow.ui.userScreen.dialogs.UserDetailsDialog
 import com.dooques.fightingflow.ui.viewmodels.AuthViewModel

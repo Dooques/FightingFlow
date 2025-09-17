@@ -26,7 +26,7 @@ import com.dooques.fightingflow.ui.addCharacterScreen.ControlSchemeDemoScreen
 import com.dooques.fightingflow.ui.characterScreen.CharacterScreen
 import com.dooques.fightingflow.ui.comboCreationScreen.ComboCreationScreen
 import com.dooques.fightingflow.ui.comboDisplayScreen.ComboDisplayScreen
-import com.dooques.fightingflow.ui.userScreen.TitleScreen
+import com.dooques.fightingflow.ui.titleScreen.TitleScreen
 import com.dooques.fightingflow.ui.userScreen.UserDetailsScreen
 import com.dooques.fightingflow.ui.viewmodels.AddCharacterViewModel
 import com.dooques.fightingflow.ui.viewmodels.AuthViewModel

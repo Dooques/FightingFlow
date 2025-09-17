@@ -68,6 +68,7 @@ fun UserDetailsDialog(
     val dob = rememberDatePickerState()
     val selectedDob = dob.selectedDateMillis?.let { convertMillisToDate(it) } ?: ""
     var showUserTooYoung by remember { mutableStateOf(false) }
+    var showDatePickerError by remember { (mutableStateOf(false)) }
     var showDatePicker by remember { mutableStateOf(false) }
     var usernameErrorMessage by remember { mutableStateOf("") }
     var showUsernameError by remember { mutableStateOf(false) }
@@ -120,7 +121,7 @@ fun UserDetailsDialog(
                     onValueChange = { selectedDob; if (checkUserAge(selectedDob)) { showUserTooYoung = false } },
                     label = { Text("DOB") },
                     readOnly = true,
-                    isError = showUserTooYoung,
+                    isError = showUserTooYoung || showDatePickerError,
                     supportingText = { Text("You must be at least 16 years old")},
                     trailingIcon = {
                         IconButton(onClick = { showDatePicker = !showDatePicker }) {
@@ -134,38 +135,47 @@ fun UserDetailsDialog(
                 Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = modifier.fillMaxWidth().padding(16.dp)) {
                     OutlinedButton(
                         onClick = {
-                            if (!checkUserAge(selectedDob)) {
-                                showUserTooYoung = true
+                            Timber.d(" Checking User Age\n Selected Dob: $selectedDob")
+                            if (selectedDob.isEmpty()) {
+                                Timber.d(" User age has no value")
+                                showDatePickerError = true
                                 return@OutlinedButton
-                            }
-                            onDismissDialog()
-                            scope.launch {
-                                when (userDetailsState) {
-                                    is UserDetailsState.NotFound -> {
-                                        val currentUserState = (currentUser as GoogleAuthService.SignInState.Success)
-                                        userViewModel.updateNewUserState(
-                                            UserEntry(
-                                                userId = currentUserState.user.userId,
-                                                username = username,
-                                                name = currentUserState.user.displayName ?: "Invalid Name",
-                                                email = currentUserState.user.email ?: "Invalid Email",
-                                                profilePic = currentUserState.user.photo.toString(),
-                                                dob = selectedDob,
-                                                dateCreated = LocalDate.now().toString(),
+                            } else if (!checkUserAge(selectedDob)) {
+                                showUserTooYoung = true
+                                Timber.d( "User is too young")
+                                return@OutlinedButton
+                            } else {
+                                onDismissDialog()
+                                scope.launch {
+                                    when (userDetailsState) {
+                                        is UserDetailsState.NotFound -> {
+                                            val currentUserState = (currentUser as GoogleAuthService.SignInState.Success)
+                                            userViewModel.updateNewUserState(
+                                                UserEntry(
+                                                    userId = currentUserState.user.userId,
+                                                    username = username,
+                                                    name = currentUserState.user.displayName
+                                                        ?: "Invalid Name",
+                                                    email = currentUserState.user.email
+                                                        ?: "Invalid Email",
+                                                    profilePic = currentUserState.user.photo.toString(),
+                                                    dob = selectedDob,
+                                                    dateCreated = LocalDate.now().toString(),
+                                                )
                                             )
-                                        )
-                                        val result = userViewModel.createUser()
-                                        when (result) {
-                                            is UserSaveResult.Success -> {
-                                                onDismissDialog()
-                                            }
+                                            val result = userViewModel.createUser()
+                                            when (result) {
+                                                is UserSaveResult.Success -> {
+                                                    onDismissDialog()
+                                                }
 
-                                            is UserSaveResult.Error -> {
-                                                Timber.e(result.e, "Error saving user")
+                                                is UserSaveResult.Error -> {
+                                                    Timber.e(result.e, "Error saving user")
+                                                }
                                             }
                                         }
+                                        else -> null
                                     }
-                                    else -> null
                                 }
                             }
                         }
