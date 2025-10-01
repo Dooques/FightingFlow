@@ -49,6 +49,7 @@ fun ComboDisplayScreenSettingsMenu(
             contentDescription = "Settings",
         )
     }
+
     Box(
         modifier.wrapContentSize()
     ) {
@@ -57,6 +58,7 @@ fun ComboDisplayScreenSettingsMenu(
             onDismissRequest = { menuExpanded = false },
             offset = DpOffset(y = 20.dp, x = 0.dp)
         ) {
+
             DropdownMenuItem(
                 text = {
                     Text(
@@ -69,13 +71,15 @@ fun ComboDisplayScreenSettingsMenu(
                     updatePublicComboState()
                 }
             )
-            DropdownMenuItem(
-                text = { Text("Filter Combos") },
-                onClick = {
-                    menuExpanded = !menuExpanded
-                    updateFilterOptions()
-                }
-            )
+
+//            DropdownMenuItem(
+//                text = { Text("Filter Combos") },
+//                onClick = {
+//                    menuExpanded = !menuExpanded
+//                    updateFilterOptions()
+//                }
+//            )
+
             Box(
                 modifier = Modifier.onGloballyPositioned { coordinates ->
                     parentMenuItemSize = coordinates.size
@@ -91,6 +95,7 @@ fun ComboDisplayScreenSettingsMenu(
                     }
                 )
             }
+
             DropdownMenuItem(
                 text = { Text("Swipe right on a combo\nfor more options") },
                 onClick = {},
@@ -99,6 +104,7 @@ fun ComboDisplayScreenSettingsMenu(
                     .copy(textColor = MaterialTheme.colorScheme.onBackground)
             )
         }
+
         ConsoleInputsSubMenu(
             optionSelected = { updateConsoleInput(it) },
             onDismiss = { submenuExpanded = false },

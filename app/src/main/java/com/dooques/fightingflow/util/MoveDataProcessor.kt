@@ -7,9 +7,10 @@ import com.dooques.fightingflow.util.characterAndMoveData.commonMoves
 import com.dooques.fightingflow.util.characterAndMoveData.moveMap
 import timber.log.Timber
 
-class DataProcessor {
+class MoveDataProcessor {
     fun getMoveListForCharacter(character: CharacterEntry): MoveEntryListUiState {
-        Timber.d("--Processing Move Data for ${character.name}")
+
+        Timber.d("--Processing Move Data for ${character.name}--")
         val moveList = mutableListOf<MoveEntry>()
 
         moveList.addAll(commonMoves)

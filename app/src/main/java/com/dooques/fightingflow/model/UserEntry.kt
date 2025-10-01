@@ -16,7 +16,10 @@ data class UserEntry(
     var name: String = "",
     @get: PropertyName("liked_combos")
     @set: PropertyName("liked_combos")
-    var likedCombos: List<String> = emptyList()
+    var likedCombos: List<String> = emptyList(),
+    @get: PropertyName("character_list")
+    @set: PropertyName("character_list")
+    var characterList: List<String> = emptyList()
 )
 
 data class UserDataForCombos(
@@ -32,5 +35,6 @@ fun UserEntry.toHashMap(): HashMap<String, Any?> =
         "profile_pic" to profilePic,
         "date_created" to dateCreated,
         "dob" to dob,
-        "liked_combos" to likedCombos
+        "liked_combos" to likedCombos,
+        "character_list" to characterList
     )

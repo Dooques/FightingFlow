@@ -154,10 +154,8 @@ fun UserDetailsDialog(
                                                 UserEntry(
                                                     userId = currentUserState.user.userId,
                                                     username = username,
-                                                    name = currentUserState.user.displayName
-                                                        ?: "Invalid Name",
-                                                    email = currentUserState.user.email
-                                                        ?: "Invalid Email",
+                                                    name = currentUserState.user.displayName ?: "Invalid Name",
+                                                    email = currentUserState.user.email ?: "Invalid Email",
                                                     profilePic = currentUserState.user.photo.toString(),
                                                     dob = selectedDob,
                                                     dateCreated = LocalDate.now().toString(),

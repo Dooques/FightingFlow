@@ -104,7 +104,7 @@ class SettingsDatastoreRepository(private val dataStore: DataStore<Preferences>)
 
     override fun getSF6ControlType(): Flow<Int> = dataStore.data
         .map { preference ->
-            preference[modernOrClassicState] ?: 0
+            preference[modernOrClassicState] ?: 2
         }
 
     override fun getPublicComboDisplayState(): Flow<Boolean> =

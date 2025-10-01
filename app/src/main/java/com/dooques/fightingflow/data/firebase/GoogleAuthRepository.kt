@@ -38,6 +38,8 @@ interface GoogleAuthService {
         data class Error(val message: String, val exception: Exception? = null): SignInState()
     }
 
+    val auth: FirebaseAuth
+
     fun getCurrentUser(): GoogleSignInResult?
     suspend fun signInWithGoogle(): SignInState
     suspend fun signOut(): Result<Unit>
@@ -52,7 +54,7 @@ class GoogleAuthRepository(
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ): GoogleAuthService {
 
-    var auth: FirebaseAuth = Firebase.auth
+    override var auth: FirebaseAuth = Firebase.auth
     private val credentialManager: CredentialManager by lazy { CredentialManager.create(context) }
 
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)

@@ -94,7 +94,7 @@ fun ComboCreationScreen(
     val iconDisplayState by comboDisplayViewModel.showIconState.collectAsStateWithLifecycle()
     val textComboDisplayState by comboDisplayViewModel.textComboState.collectAsStateWithLifecycle()
     val consoleTypeState by comboDisplayViewModel.consoleTypeState.collectAsStateWithLifecycle()
-    val sf6ControlType by comboDisplayViewModel.modernOrClassicState.collectAsStateWithLifecycle()
+    val sf6ControlType by comboDisplayViewModel.sf6ControlState.collectAsStateWithLifecycle()
 
     // Firebase Flows
     val userData by userViewModel.userDataMap.collectAsStateWithLifecycle()

@@ -84,7 +84,7 @@ fun CharacterScreen(
     val modernOrClassicState by characterScreenViewModel.modernOrClassicState.collectAsStateWithLifecycle()
     val customGameList by characterScreenViewModel.customGameList.collectAsStateWithLifecycle()
 
-    Timber.d("-- Flows Collected --\nCharacter List: %s\nGame Selected From DS: %s\nCustom Game List: %s",
+    Timber.d("-- Flows Collected --\n Character List: %s\n Game Selected From DS: %s\n Custom Game List: %s",
         characterListState.characterList, gameSelectedState, customGameList)
 
     var gameSelected by remember { mutableStateOf<String?>(null) }
@@ -145,7 +145,7 @@ fun CharacterScreen(
         modifier = modifier
     ) { contentPadding ->
         Column(
-            modifier = Modifier
+            modifier = modifier
                 .padding(
                     start = contentPadding.calculateStartPadding(LayoutDirection.Ltr),
                     top = contentPadding.calculateTopPadding(),
@@ -154,7 +154,7 @@ fun CharacterScreen(
                 .fillMaxSize()
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Start
             ) {
                 GameSelectMenu(
@@ -166,21 +166,21 @@ fun CharacterScreen(
                     customGameList = customGameList
                 )
             }
-            Timber.d("-- Loading Character Grid --")
+            Timber.d("--Loading Character Grid--")
             LazyVerticalGrid(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 columns = GridCells.Fixed(3),
-                modifier = Modifier
+                modifier = modifier
                     .weight(1f)
                     .fillMaxWidth()
             ) {
-                Timber.d("Loading Character Grid...")
+                Timber.d(" Loading Character Grid...")
                 items(items = characterList.characterList.sortedBy { character -> character.name }) { character ->
                     CharacterCard(
                         scope = scope,
                         snackbarHostState = snackbarHostState,
-                        characterScreenViewModel = characterScreenViewModel,
+                        characterViewModel = characterScreenViewModel,
                         addCharacterViewModel = addCharacterViewModel,
                         updateCharacterState = comboDisplayViewModel::updateCharacterState,
                         setCharacterToDS = comboDisplayViewModel::updateCharacterInDS,
@@ -190,7 +190,6 @@ fun CharacterScreen(
                         modifier = Modifier
                     )
                 }
-                Timber.d("Character Grid Finished.")
             }
         }
     }
@@ -198,33 +197,33 @@ fun CharacterScreen(
 
 @Composable
 fun CharacterCard(
+    modifier: Modifier = Modifier,
     scope: CoroutineScope,
     snackbarHostState: SnackbarHostState,
-    characterScreenViewModel: CharacterViewModel,
-    addCharacterViewModel: AddCharacterViewModel,
+    characterViewModel: CharacterViewModel,
+    addCharacterViewModel: AddCharacterViewModel? = null,
     updateCharacterState: KFunction2<String, String, Unit>,
     setCharacterToDS: KSuspendFunction1<CharacterEntry, Unit>,
     navigateToComboDisplayScreen: () -> Unit,
-    navigateToAddCharacterScreen: () -> Unit,
+    navigateToAddCharacterScreen: (() -> Unit)? = null,
     characterState: CharacterEntryUiState,
-    modifier: Modifier = Modifier
 ) {
     var characterOptionsMenuExpanded by remember { mutableStateOf(false) }
-    Timber.d("Loading Card: ${characterState.character.name}")
+    Timber.d(" Loading Card: ${characterState.character.name}")
     Box(
         modifier = modifier
             .combinedClickable(
                 onClick = {
                     scope.launch {
-                        Timber.d("Preparing to open Combo Screen...")
+                        Timber.d(" Preparing to open Combo Screen...")
                         updateCharacterState(
                             characterState.character.name,
                             characterState.character.game
                         )
-                        Timber.d("Updated Character State in Combo View Model")
-                        Timber.d("Preparing to add ${characterState.character.name} to datastore")
+                        Timber.d(" Updated Character State in Combo View Model")
+                        Timber.d(" Preparing to add ${characterState.character.name} to datastore")
                         setCharacterToDS(characterState.character)
-                        Timber.d("Opening Combo Screen")
+                        Timber.d(" Opening Combo Screen")
                         navigateToComboDisplayScreen()
                     }
                 },
@@ -238,15 +237,15 @@ fun CharacterCard(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = modifier.fillMaxWidth()
         ) {
-            Timber.d("Checking if custom character and if imageUri is not null")
-            Timber.d("Character: $characterState")
+            Timber.d(" Checking if custom character and if imageUri is not null")
+            Timber.d(" Character: $characterState")
             val currentCharacter = characterState.character
-            Timber.d("Current character: $currentCharacter")
+            Timber.d(" Current character: $currentCharacter")
 
             if (characterState.character.mutable) {
                 val currentImageUri = currentCharacter.imageUri
                 if (!currentImageUri.isNullOrBlank()) {
-                    Timber.d("Character is Custom and URI is not null " +
+                    Timber.d(" Character is Custom and URI is not null " +
                             "\n Loading image from files... \n Uri: %s",
                         currentImageUri)
                     AsyncImage(
@@ -256,7 +255,7 @@ fun CharacterCard(
                         modifier = modifier.size(150.dp)
                     )
                 } else {
-                    Timber.d("Character mutable, but URI is null")
+                    Timber.d(" Character mutable, but URI is null")
                     Image(
                         painter = painterResource(characterState.character.imageId),
                         contentDescription = characterState.character.name,
@@ -265,7 +264,7 @@ fun CharacterCard(
                     )
                 }
             } else {
-                Timber.d("Character is not custom.")
+                Timber.d(" Character is not custom.")
                 Image(
                     painter = painterResource(characterState.character.imageId),
                     contentDescription = characterState.character.name,
@@ -282,22 +281,20 @@ fun CharacterCard(
                 CharacterOptionsMenu(
                     scope = scope,
                     snackbarHostState = snackbarHostState,
-                    characterScreenViewModel = characterScreenViewModel,
+                    characterScreenViewModel = characterViewModel,
                     characterOptionsMenuExpanded = characterOptionsMenuExpanded,
                     characterEntry = characterState.character,
                     navigateToAddCharacter = {
                         scope.launch {
-                            Timber.d(
-                                "-- Preparing to launch Add Character Screen --" +
-                                        "\n Updating character state to: ${characterState.character.name}"
-                            )
+                            Timber.d("-- Preparing to launch Add Character Screen --" +
+                                        "\n Updating character state to: ${characterState.character.name}")
                             setCharacterToDS(characterState.character)
-                            Timber.d("Updating selected game to: ${characterState.character.game}")
-                            characterScreenViewModel.updateGameInDs(characterState.character.game)
-                            Timber.d("Setting edit state to True")
-                            addCharacterViewModel.editState = true
-                            Timber.d("Navigating to Add Character Screen")
-                            navigateToAddCharacterScreen()
+                            Timber.d(" Updating selected game to: ${characterState.character.game}")
+                            characterViewModel.updateGameInDs(characterState.character.game)
+                            Timber.d(" Setting edit state to True")
+                            addCharacterViewModel?.editState = true
+                            Timber.d(" Navigating to Add Character Screen")
+                            navigateToAddCharacterScreen?.invoke()
                         }
                     },
                     onDismiss = { characterOptionsMenuExpanded = false }

@@ -31,7 +31,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
@@ -130,7 +129,7 @@ fun ComboDisplayScreen(
 
     val textComboState by comboDisplayViewModel.textComboState.collectAsStateWithLifecycle()
     val consoleTypeState by comboDisplayViewModel.consoleTypeState.collectAsStateWithLifecycle()
-    val sF6ControlType by comboDisplayViewModel.modernOrClassicState.collectAsStateWithLifecycle()
+    val sF6ControlType by comboDisplayViewModel.sf6ControlState.collectAsStateWithLifecycle()
 
     // Firebase Flows
     val comboDisplayListFirestore by comboDisplayViewModel.comboDisplayListFb.collectAsStateWithLifecycle()
@@ -176,20 +175,34 @@ fun ComboDisplayScreen(
             if (!characterState.character.mutable) {
                 Timber.d(" Character is not mutable")
                 when (sF6ControlType) {
-                    SF6ControlType.Classic -> comboDisplayListFirestore.comboDisplayList.filter { it.controlType == "Street Fighter Classic" }.toMutableList()
+                    SF6ControlType.Classic -> {
+                        Timber.d(" Control Type: $sF6ControlType")
+                        comboDisplayListFirestore.comboDisplayList.filter { it.controlType == "Street Fighter Classic" }.toMutableList()
+                    }
                     SF6ControlType.Modern -> {
+                        Timber.d(" Control Type: $sF6ControlType")
                         comboDisplayListFirestore.comboDisplayList.filter { it.controlType == "Street Fighter Modern"}.toMutableList()
                     }
                     else -> {
+                        Timber.d(" Control Type: $sF6ControlType")
                         comboDisplayListFirestore.comboDisplayList.toMutableList()
                     }
                 }
             } else {
-                Timber.d(" Character is mutable")
+                Timber.d(" Character is mutable\n Checking control type...")
                 when (sF6ControlType) {
-                    SF6ControlType.Classic -> comboDisplayListRoom.comboDisplayList.filter { it.controlType == "Street Fighter Classic"}.toMutableList()
-                    SF6ControlType.Modern -> comboDisplayListRoom.comboDisplayList.filter { it.controlType == "Street Fighter Modern"}.toMutableList()
-                    else -> comboDisplayListRoom.comboDisplayList.toMutableList()
+                    SF6ControlType.Classic -> {
+                        Timber.d(" Control Type: $sF6ControlType")
+                        comboDisplayListRoom.comboDisplayList.filter { it.controlType == "Street Fighter Classic"}.toMutableList()
+                    }
+                    SF6ControlType.Modern -> {
+                        Timber.d(" Control Type: $sF6ControlType")
+                        comboDisplayListRoom.comboDisplayList.filter { it.controlType == "Street Fighter Modern"}.toMutableList()
+                    }
+                    else -> {
+                        Timber.d(" Control Type: $sF6ControlType")
+                        comboDisplayListRoom.comboDisplayList.toMutableList()
+                    }
                 }
             }
         }
@@ -219,13 +232,12 @@ fun ComboDisplayScreen(
             filterApplied = true
             applyFilter = false
         } else {
-            Timber.d("No filters found, returning normal list")
+            Timber.d(" No filters found, returning normal list")
             filterApplied = false
             applyFilter = false
         }
     }
 
-    Timber.d("Updating character data")
     LaunchedEffect(currentUser) {
         Timber.d("--Launched Effect triggered by User State Change--\n Current User: %s",
         when (currentUser) {
@@ -256,14 +268,15 @@ fun ComboDisplayScreen(
         }
     }
 
-    Timber.d(
-        "--Character Details--\n Name: %s\n Image: %s\n CharacterState: %s\n Combo List: %s",
-        characterNameState?.name, characterImageState.image, characterState.character, comboDisplayList
+    Timber.d("--Character Details--\n Name: %s\n Image: %s\n CharacterState: %s\n Combo List: %s\n Control Type: %s",
+        characterNameState?.name, characterImageState.image, characterState.character, comboDisplayList, sF6ControlType
     )
+
     Timber.d("--Filter Details--\n Apply Filter: %s\n Filter Applied: %s\n Filtered Combo List: %s" +
             "\n User Filter: %s \n Description Filter: %s \n Move Filter: %s",
         applyFilter, filterApplied, comboDisplayListFiltered, comboFilterObject.user, comboFilterObject.description, comboFilterObject.moves
     )
+
     Timber.d(" Checking details valid...")
 
     Scaffold(

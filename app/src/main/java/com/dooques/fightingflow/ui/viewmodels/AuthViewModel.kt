@@ -3,7 +3,7 @@ package com.dooques.fightingflow.ui.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dooques.fightingflow.data.datastore.UserDsRepository
-import com.dooques.fightingflow.data.firebase.FirebaseRepository
+import com.dooques.fightingflow.data.firebase.FirebaseUserRepository
 import com.dooques.fightingflow.data.firebase.GoogleAuthService
 import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,7 +14,7 @@ import timber.log.Timber
 class AuthViewModel(
     private val authRepository: GoogleAuthService,
     private val profileDsRepository: UserDsRepository,
-    private val firebaseRepository: FirebaseRepository
+    private val firebaseUserRepository: FirebaseUserRepository
 ): ViewModel() {
     val signInState = MutableStateFlow<GoogleAuthService.SignInState>(GoogleAuthService.SignInState.Idle)
 
@@ -124,7 +124,7 @@ class AuthViewModel(
                 result.isSuccess -> {
                     try {
                         Timber.d("Deleting user account.")
-                        firebaseRepository.deleteUser(currentUser.user.userId)
+                        firebaseUserRepository.deleteUser(currentUser.user.userId)
                     } catch (e: Exception) {
                         Timber.e(e, "An error occurred while deleting user account")
                         return Result.failure(e)

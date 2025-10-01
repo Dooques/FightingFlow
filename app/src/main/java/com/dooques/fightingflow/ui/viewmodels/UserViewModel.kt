@@ -3,11 +3,13 @@ package com.dooques.fightingflow.ui.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dooques.fightingflow.data.datastore.UserDsRepository
-import com.dooques.fightingflow.data.firebase.FirebaseRepository
+import com.dooques.fightingflow.data.firebase.FirebaseComboRepository
+import com.dooques.fightingflow.data.firebase.FirebaseUserRepository
 import com.dooques.fightingflow.data.firebase.GoogleAuthService
 import com.dooques.fightingflow.data.firebase.UserFbResult
 import com.dooques.fightingflow.model.UserDataForCombos
 import com.dooques.fightingflow.model.UserEntry
+import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +25,8 @@ import timber.log.Timber
 
 class UserViewModel(
     private val userDsRepository: UserDsRepository,
-    private val firebaseRepository: FirebaseRepository,
+    private val firebaseUserRepository: FirebaseUserRepository,
+    private val authViewModel: AuthViewModel
 ): ViewModel() {
 
     companion object {
@@ -38,7 +41,7 @@ class UserViewModel(
             initialValue = ""
         )
 
-    val userDataMap = firebaseRepository.getUserMap()
+    val userDataMap = firebaseUserRepository.getUserMap()
         .mapNotNull { userData ->
             Timber.d("UserData: $userData")
             userData
@@ -66,7 +69,7 @@ class UserViewModel(
                 userIdState.flatMapLatest { userId ->
                     Timber.d("Valid User ID detected, creating User Details flow.")
                     try {
-                        firebaseRepository.getUserDetailsById(userIdState.value)
+                        this@UserViewModel.firebaseUserRepository.getUserDetailsById(userIdState.value)
                             .map { userEntry ->
                                 if (userEntry != null) {
                                     Timber.d("User Entry: $userEntry")
@@ -119,7 +122,7 @@ class UserViewModel(
         try {
             Timber.d("Creating profile in firestore")
             Timber.d("User Details: ${newUserState.value}")
-            firebaseRepository.addUserToStore(newUserState.value!!)
+            firebaseUserRepository.addUserToStore(newUserState.value!!)
 
             Timber.d("Updating data in datastore from ViewModel...\nUserState: %s", newUserState.value)
 
@@ -137,7 +140,7 @@ class UserViewModel(
     fun deleteUser(userId: String): UserFbResult {
         Timber.d("--Preparing to delete user details--")
         try {
-            return firebaseRepository.deleteUser(userId)
+            return firebaseUserRepository.deleteUser(userId)
         } catch (e: Exception) {
             Timber.e(e, "Error deleting user details.")
             return UserFbResult.Error(e)
@@ -146,6 +149,41 @@ class UserViewModel(
 
     // Datastore Functions
     suspend fun updateUsernameInDs(username: String?) { userDsRepository.updateUsername(username) }
+
+    suspend fun checkUserAuthenticated(
+        result: Result<Unit>?,
+        currentUser: GoogleAuthService.SignInState,
+        navigateBack: () -> Unit,
+        showReauthDialog: () -> Unit,
+        ) {
+        if (result != null) {
+            when {
+                result.isSuccess -> { navigateBack() }
+
+                result.isFailure -> {
+                    val exception = result.exceptionOrNull()
+                    if (exception is FirebaseAuthRecentLoginRequiredException) {
+                        showReauthDialog() /* set to true */
+                        val resultReauth = authViewModel.deleteUser()
+                        if (resultReauth != null) {
+                            when {
+                                resultReauth.isSuccess -> {
+                                    deleteUser((currentUser as GoogleAuthService.SignInState.Success).user.userId)
+                                    authViewModel.signOut()
+                                    navigateBack()
+                                }
+
+                                resultReauth.isFailure -> Timber.e(
+                                    resultReauth.exceptionOrNull(),
+                                    "Error deleting user"
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 sealed class UserSaveResult {

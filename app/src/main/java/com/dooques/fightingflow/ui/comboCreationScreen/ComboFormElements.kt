@@ -143,7 +143,7 @@ fun MoveModifiers(modifier: Modifier = Modifier) {
     var hold by remember { mutableStateOf(false) }
     var justFrame by remember { mutableStateOf(false) }
     Column(modifier.padding(horizontal = 16.dp)) {
-        Timber.d("Loading Radio Buttons")
+        Timber.d(" Loading Radio Buttons")
         Text("Move Modifiers")
         Row(
             horizontalArrangement = Arrangement.SpaceEvenly,
@@ -155,7 +155,7 @@ fun MoveModifiers(modifier: Modifier = Modifier) {
                     selected = counterHit,
                     onClick = {
                         counterHit = !counterHit
-                        Timber.d("Setting counter hit to $counterHit")
+                        Timber.d(" Setting counter hit to $counterHit")
                     },
                 )
             }
@@ -165,7 +165,7 @@ fun MoveModifiers(modifier: Modifier = Modifier) {
                     selected = hold,
                     onClick = {
                         hold = !hold
-                        Timber.d("Setting hold to $hold")
+                        Timber.d(" Setting hold to $hold")
                     },
                 )
             }
@@ -175,7 +175,7 @@ fun MoveModifiers(modifier: Modifier = Modifier) {
                     selected = justFrame,
                     onClick = {
                         justFrame = !justFrame
-                        Timber.d("Setting just frame to $justFrame")
+                        Timber.d(" Setting just frame to $justFrame")
                     },
                 )
             }
@@ -260,8 +260,8 @@ fun IconMoves(
                             .clickable(
                                 enabled = true,
                                 onClick = {
-                                    Timber.d("${move.moveName} selected, preparing to add combo to list...")
-                                    Timber.d("Move: $move")
+                                    Timber.d(" ${move.moveName} selected, preparing to add combo to list...")
+                                    Timber.d(" Move: $move")
                                     if (moveType == "Misc") {
                                         comboCreationViewModel.updateMoveList(
                                             move.moveName,
@@ -269,15 +269,15 @@ fun IconMoves(
                                         )
                                     } else {
                                         console?.let { outerConsole ->
-                                            Timber.d("Console: $outerConsole")
-                                            Timber.d("Game: $game")
+                                            Timber.d(" Console: $outerConsole")
+                                            Timber.d(" Game: $game")
                                             comboCreationViewModel.updateMoveList(
                                                 move.moveName,
                                                 moveList,
                                                 outerConsole,
                                             )
                                         }
-                                        Timber.d("Added ${move.moveName} to combo move list.")
+                                        Timber.d(" Added ${move.moveName} to combo move list.")
                                     }
                                 }
                             )
@@ -302,11 +302,11 @@ fun TextMoves(
         maxItemsInEachRow = maxItems,
         modifier = modifier.fillMaxWidth().padding(vertical = 4.dp, horizontal = 4.dp)
     ) {
-        Timber.d("Loading $moveType text moves" +
+        Timber.d(" Loading $moveType text moves" +
                 " \n Console: $console")
         moveList.moveList.forEach { move ->
 
-            if (move.moveType == moveType) Timber.d("Move: $move")
+            if (move.moveType == moveType) Timber.d(" Move: $move")
 
             val game = when (move.game) {
                 "Tekken 8" -> Game.T8
@@ -364,7 +364,7 @@ fun TextMoves(
                                 .clickable(
                                     enabled = true,
                                     onClick = {
-                                        Timber.d("$move selected, preparing to add combo to list..." +
+                                        Timber.d(" $move selected, preparing to add combo to list..." +
                                                 "\n $console \n $game")
 
                                         console?.let { outerConsole ->
@@ -396,23 +396,16 @@ fun CharacterMoves(
     moveType: String,
     maxItems: Int = 5,
 ) {
-    Timber.d("Moves: $characterMoveList")
+    Timber.d(" Moves: $characterMoveList")
     FlowRow(
         horizontalArrangement = Arrangement.SpaceEvenly,
         maxItemsInEachRow = maxItems,
         modifier = modifier.fillMaxWidth().padding(vertical = 4.dp, horizontal = 4.dp)
     ) {
-        Timber.d("Loading character moves...")
+        Timber.d(" Loading character moves...")
         val color =
             if (moveType == "Special") Color(0xFF0067B3)
             else Color(0xFFDC143C)
-
-        val game = when (character.game) {
-            Game.T8.title -> Game.T8
-            Game.SF6.title -> Game.SF6
-            Game.MK1.title -> Game.MK1
-            else -> Game.CUSTOM
-        }
 
         characterMoveList.moveList.forEach { move ->
 
@@ -437,9 +430,9 @@ fun CharacterMoves(
                                 .clickable(
                                     enabled = true,
                                     onClick = {
-                                        Timber.d("${move.moveName} selected, preparing to add combo to list...")
+                                        Timber.d(" ${move.moveName} selected, preparing to add combo to list...")
                                         comboCreationViewModel.updateMoveList(move.moveName, characterMoveList)
-                                        Timber.d("Added ${move.moveName} to combo move list.")
+                                        Timber.d(" Added ${move.moveName} to combo move list.")
                                     }
                                 )
                                 .align(Alignment.Center)
@@ -466,7 +459,7 @@ fun DamageAndDifficulty(
             .fillMaxWidth()
             .padding(vertical = 8.dp, horizontal = 8.dp)
     ) {
-        Timber.d("Loading Damage and Break Row")
+        Timber.d("--Loading Damage and Break Row--")
 
         // Damage Input
         OutlinedTextField(
@@ -474,7 +467,7 @@ fun DamageAndDifficulty(
             onValueChange = { newValue ->
                 damageValue = newValue.toIntOrNull() ?: if (newValue.isBlank()) 0 else damageValue
                 updateComboData(ComboDisplayUiState(comboDisplay.copy(damage = damageValue)))
-                Timber.d("damage: $damageValue")
+                Timber.d(" damage: $damageValue")
             },
             maxLines = 1,
             label = { Text("Damage") },
@@ -514,8 +507,8 @@ fun ConfirmButton(
     // Confirm
     Button(
         onClick = {
-            Timber.d("Preparing to Save Combo...")
-            Timber.d("Checking if changes have been made to combo...")
+            Timber.d("--Preparing to Save Combo...--")
+            Timber.d(" Checking if changes have been made to combo...")
             scope.launch {
                 if (editingState) {
                     if (comboDisplay.moves.isEmpty()) {
@@ -533,7 +526,7 @@ fun ConfirmButton(
                                 actionLabel = "Save",
                                 withDismissAction = true
                             ).run { when (this) {
-                                SnackbarResult.Dismissed -> Timber.d("Snackbar Dismissed")
+                                SnackbarResult.Dismissed -> Timber.d(" Snackbar Dismissed")
                                 SnackbarResult.ActionPerformed -> {
                                     saveLogic(
                                         comboCreationViewModel = comboCreationViewModel,
@@ -565,9 +558,9 @@ fun ConfirmButton(
                                 actionLabel = "Save",
                                 withDismissAction = true
                             ).run { when (this) {
-                                SnackbarResult.Dismissed -> Timber.d("Snackbar Dismissed")
+                                SnackbarResult.Dismissed -> Timber.d(" Snackbar Dismissed")
                                 SnackbarResult.ActionPerformed -> {
-                                    Timber.d("Saving Combo")
+                                    Timber.d(" Saving Combo")
                                     saveLogic(
                                         comboCreationViewModel = comboCreationViewModel,
                                         currentUser = authViewModel.signInState.value,
@@ -579,7 +572,7 @@ fun ConfirmButton(
                         }
                     } else {
                         scope.launch {
-                            Timber.d("Saving combo")
+                            Timber.d(" Saving combo")
                             saveLogic(
                                 comboCreationViewModel = comboCreationViewModel,
                                 currentUser = authViewModel.signInState.value,
@@ -619,7 +612,7 @@ fun EditingButtons(
     clearMoveList: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Timber.d("Loading confirm and clear buttons")
+    Timber.d(" Loading confirm and clear buttons")
     Row(
         horizontalArrangement = Arrangement.SpaceEvenly,
         modifier = modifier.fillMaxWidth().padding(vertical = 4.dp).padding(bottom = 8.dp)
@@ -628,7 +621,7 @@ fun EditingButtons(
         OutlinedButton(
             onClick = {
                 comboCreationViewModel.updateMoveList("break", moveList)
-                Timber.d("Adding break to combo move list.")
+                Timber.d(" Adding break to combo move list.")
             },
             colors = ButtonDefaults.buttonColors().copy(
                 containerColor = MaterialTheme.colorScheme.background,
@@ -640,9 +633,9 @@ fun EditingButtons(
         // Delete Last
         OutlinedButton(
             onClick = {
-                Timber.d("Deleting last move...")
+                Timber.d(" Deleting last move...")
                 deleteMove()
-                Timber.d("Last move deleted.")
+                Timber.d(" Last move deleted.")
             },
             content = {
                 Text("Delete", color = MaterialTheme.colorScheme.onBackground) }
@@ -650,9 +643,9 @@ fun EditingButtons(
         // Clear Move List
         OutlinedButton(
             onClick = {
-                Timber.d("Clearing move list...")
+                Timber.d(" Clearing move list...")
                 clearMoveList()
-                Timber.d("Combo move list cleared.")
+                Timber.d(" Combo move list cleared.")
             },
             content = { Text("Clear", color = MaterialTheme.colorScheme.onBackground) }
         )
@@ -679,7 +672,7 @@ suspend fun saveLogic(
         onNavigateToComboDisplay()
     } else {
         if (result is ComboResult.Error) {
-            Timber.e(result.e, "An error occurred while trying to save the combo: ")
+            Timber.e(result.e, " An error occurred while trying to save the combo: ")
         }
     }
 }

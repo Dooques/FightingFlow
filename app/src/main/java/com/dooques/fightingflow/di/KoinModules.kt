@@ -21,7 +21,8 @@ import com.dooques.fightingflow.data.datastore.ProfileDatastoreRepository
 import com.dooques.fightingflow.data.datastore.UserDsRepository
 import com.dooques.fightingflow.data.datastore.SettingsDatastoreRepository
 import com.dooques.fightingflow.data.datastore.SettingsDsRepository
-import com.dooques.fightingflow.data.firebase.FirebaseRepository
+import com.dooques.fightingflow.data.firebase.FirebaseComboRepository
+import com.dooques.fightingflow.data.firebase.FirebaseUserRepository
 import com.dooques.fightingflow.data.firebase.GoogleAuthRepository
 import com.dooques.fightingflow.data.firebase.GoogleAuthService
 import com.dooques.fightingflow.data.mediastore.MediaStoreUtil
@@ -77,7 +78,8 @@ val repositoryModule = module {
     singleOf(::MediaStoreUtil)
 
     // Firebase
-    singleOf(::FirebaseRepository)
+    singleOf(::FirebaseComboRepository)
+    singleOf(::FirebaseUserRepository)
     single<GoogleAuthService> { GoogleAuthRepository(get()) }
 
 }

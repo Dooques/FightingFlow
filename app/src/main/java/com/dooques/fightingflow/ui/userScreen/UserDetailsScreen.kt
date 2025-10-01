@@ -7,10 +7,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -20,7 +25,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -35,20 +39,28 @@ import androidx.compose.ui.Alignment.Companion.CenterEnd
 import androidx.compose.ui.Alignment.Companion.CenterStart
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.room.util.TableInfo
 import coil.compose.AsyncImage
 import com.dooques.fightingflow.data.firebase.GoogleAuthService
+import com.dooques.fightingflow.model.CharacterEntry
+import com.dooques.fightingflow.model.UserEntry
+import com.dooques.fightingflow.ui.characterScreen.CharacterCard
+import com.dooques.fightingflow.ui.settingsMenus.UserDetailsSettingsMenu
 import com.dooques.fightingflow.ui.userScreen.dialogs.EmailAndPasswordDialog
 import com.dooques.fightingflow.ui.userScreen.dialogs.ReauthDialog
 import com.dooques.fightingflow.ui.viewmodels.AuthViewModel
+import com.dooques.fightingflow.ui.viewmodels.CharacterViewModel
+import com.dooques.fightingflow.ui.viewmodels.ComboDisplayViewModel
 import com.dooques.fightingflow.ui.viewmodels.ProfanityViewModel
 import com.dooques.fightingflow.ui.viewmodels.UserDetailsState
 import com.dooques.fightingflow.ui.viewmodels.UserViewModel
-import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
+import com.dooques.fightingflow.util.CharacterEntryListUiState
+import com.dooques.fightingflow.util.CharacterEntryUiState
+import com.dooques.fightingflow.util.characterAndMoveData.characterMap
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -59,8 +71,10 @@ fun UserDetailsScreen(
     userViewModel: UserViewModel,
     authViewModel: AuthViewModel,
     profanityViewModel: ProfanityViewModel,
+    characterViewModel: CharacterViewModel,
+    comboDisplayViewModel: ComboDisplayViewModel,
+    navigateToComboDisplayScreen: () -> Unit,
     navigateBack: () -> Unit,
-    navigateHome: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Timber.d("--Loading user details--")
@@ -70,10 +84,29 @@ fun UserDetailsScreen(
 
     val currentUser by authViewModel.signInState.collectAsStateWithLifecycle()
     val userDetails by userViewModel.userDetailsState.collectAsStateWithLifecycle()
+    val userCharacters = if (userDetails is UserDetailsState.Loaded) {
+        val processedList = mutableListOf<CharacterEntry>()
+        (userDetails as UserDetailsState.Loaded).user.characterList.forEach { characterName ->
+            var character: CharacterEntry? = null
+
+            characterMap.entries.forEach { game ->
+                game.value.forEach { gameCharacter ->
+                    if (gameCharacter.name == characterName) {
+                        character = gameCharacter
+                    }
+                }
+            }
+
+            if (character != null) { processedList.add(character) }
+        }
+        CharacterEntryListUiState(processedList.toList())
+    } else {
+        CharacterEntryListUiState()
+    }
 
     var menuExpanded by remember { mutableStateOf(false) }
 
-    Timber.d("Flows Collected: \nCurrent User: %s\nUser Details: %s",
+    Timber.d(" Flows Collected: \n Current User: %s\n User Details: %s",
         currentUser, userDetails)
 
     when (currentUser) {
@@ -90,6 +123,8 @@ fun UserDetailsScreen(
                         style = MaterialTheme.typography.displayMedium,
                         modifier = modifier.padding(start = 16.dp)
                     ) },
+                windowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp),
+
                 navigationIcon = {
                     IconButton(
                         onClick = { navigateBack() }
@@ -98,8 +133,19 @@ fun UserDetailsScreen(
                             imageVector = Icons.AutoMirrored.Default.ArrowBack,
                             contentDescription = "Return to Character Select",
                             modifier = modifier.size(50.dp)
-                        )
-                    } },) },
+                        ) } },
+
+                actions = {
+                    UserDetailsSettingsMenu(
+                        scope = scope,
+                        userViewModel = userViewModel,
+                        authViewModel = authViewModel,
+                        currentUser = currentUser,
+                        navigateBack = navigateBack,
+                        showReauthDialog = { showReauthDialog = true },
+                    )
+                }
+            ) },
         contentWindowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp)
     ) { contentPadding ->
 
@@ -107,180 +153,36 @@ fun UserDetailsScreen(
             modifier
                 .fillMaxSize()
                 .padding(contentPadding)
+                .padding(horizontal = 32.dp)
         ) {
+
+            UserDetails(
+                currentUser = currentUser,
+                userDetails = userDetails,
+                menuExpanded = menuExpanded,
+                showProfilePhotoOptions = { menuExpanded = !menuExpanded},
+            )
+
             Spacer(modifier.size(20.dp))
-            when (currentUser) {
-                is GoogleAuthService.SignInState.Success -> {
-                        when (userDetails) {
-                            is UserDetailsState.Loaded -> {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceEvenly,
-                                    modifier = modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 8.dp)
-                                ) {
-                                    Box(Modifier.fillMaxWidth().padding(horizontal = 32.dp)) {
-                                        if (userDetails is UserDetailsState.Loaded) {
-                                            Text(
-                                                text = (userDetails as UserDetailsState.Loaded).user.username.toString(),
-                                                style = MaterialTheme.typography.displayMedium,
-                                                modifier = modifier.align(CenterStart)
-                                            )
-                                        }
-                                        Box(
-                                            modifier = modifier.align(CenterEnd)
-                                        ) {
-                                            AsyncImage(
-                                                model = (currentUser as GoogleAuthService.SignInState.Success).user.photo,
-                                                contentDescription = "User Image",
-                                                modifier = modifier
-                                                    .size(80.dp)
-                                                    .clip(CircleShape)
-                                                    .clickable(onClick = { menuExpanded = true })
-                                            )
-                                            ChangeProfileImage(
-                                                menuExpanded,
-                                                onDismissRequest = { menuExpanded = false })
-                                        }
-                                    }
-                                }
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.Start,
-                                    modifier = modifier.fillMaxWidth().padding(vertical = 8.dp)
-                                ) {
-                                    Text(
-                                        "Name: ${(userDetails as UserDetailsState.Loaded).user.name}",
-                                        modifier = modifier.padding(horizontal = 32.dp)
-                                    )
-                                }
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.Start,
-                                    modifier = modifier.fillMaxWidth().padding(vertical = 8.dp)
-                                ) {
-                                    Text(
-                                        "Email: ${(currentUser as GoogleAuthService.SignInState.Success).user.email.toString()}",
-                                        modifier = modifier.padding(horizontal = 32.dp)
-                                    )
-                                }
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.Start,
-                                    modifier = modifier.fillMaxWidth().padding(vertical = 8.dp)
-                                ) {
-                                    Text(
-                                        "Date of Birth: ${(userDetails as UserDetailsState.Loaded).user.dob}",
-                                        modifier = modifier.padding(horizontal = 32.dp)
-                                    )
-                                }
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.Start,
-                                    modifier = modifier.fillMaxWidth().padding(vertical = 8.dp)
-                                ) {
-                                    Text(
-                                        "Date Created: ${(userDetails as UserDetailsState.Loaded).user.dateCreated}",
-                                        modifier = modifier.padding(horizontal = 32.dp)
-                                    )
-                                }
-                                Spacer(modifier.size(20.dp))
-                            }
 
-                            else -> {
-                                val currentUserState =
-                                    currentUser as GoogleAuthService.SignInState.Success
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.Start,
-                                    modifier = modifier.fillMaxWidth().padding(vertical = 8.dp)
-                                ) {
-                                    Text(
-                                        "Name: ${currentUserState.user.displayName}",
-                                        modifier = modifier.padding(horizontal = 32.dp)
-                                    )
-                                }
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.Start,
-                                    modifier = modifier.fillMaxWidth().padding(vertical = 8.dp)
-                                ) {
-                                    Text(
-                                        "Email: ${currentUserState.user.email.toString()}",
-                                        modifier = modifier.padding(horizontal = 32.dp)
-                                    )
-                                }
-                            }
-                        }
-
-                    OutlinedButton(
-                        onClick = {
-                            Timber.d("Logging out %s", (currentUser as GoogleAuthService.SignInState.Success).user.displayName)
-                            scope.launch {
-                                authViewModel.signOut()
-
-                                navigateBack()
-                            }
-                        },
-                        modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 40.dp, vertical = 8.dp)
-                    ) {
-                        Text("Log Out", color = Color.White)
-                    }
-                    OutlinedButton(
-                        onClick = {
-                            Timber.d("Deleting current User...")
-                            scope.launch {
-                                userViewModel.deleteUser((currentUser as GoogleAuthService.SignInState.Success).user.userId)
-                                val result = authViewModel.deleteUser()
-                                if (result != null) {
-                                    when {
-                                        result.isSuccess -> {
-                                            navigateBack()
-                                        }
-
-                                        result.isFailure -> {
-                                            val exception = result.exceptionOrNull()
-                                            if (exception is FirebaseAuthRecentLoginRequiredException) {
-                                                showReauthDialog = true
-                                                val resultReauth = authViewModel.deleteUser()
-                                                if (resultReauth != null) {
-                                                    when {
-                                                        resultReauth.isSuccess -> {
-                                                            userViewModel.deleteUser((currentUser as GoogleAuthService.SignInState.Success).user.userId)
-                                                            authViewModel.signOut()
-                                                            navigateBack()
-                                                        }
-
-                                                        resultReauth.isFailure -> Timber.e(
-                                                            resultReauth.exceptionOrNull(),
-                                                            "Error deleting user"
-                                                        )
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 40.dp, vertical = 8.dp)
-                    ) {
-                        Text("Delete Account", color = Color.White)
-                    }
-                }
-
-                else -> {
-                    Row(Modifier.padding(horizontal = 16.dp)) {
-                        Text("Not currently logged in")
-                    }
-                }
+            Text(
+                text = "Your Characters",
+                style = MaterialTheme.typography.displayMedium,
+            )
+            if (userCharacters.characterList.isNotEmpty()) {
+                UserCharacterList(
+                    scope = scope,
+                    snackbarHostState = snackBarHostState,
+                    characterViewModel = characterViewModel,
+                    comboDisplayViewModel = comboDisplayViewModel,
+                    characterList = userCharacters,
+                    navigateToComboDisplayScreen = navigateToComboDisplayScreen
+                )
+            } else {
+                Text("No combos created yet...", modifier.padding(top = 8.dp))
             }
         }
+
         if (showReauthDialog) {
             ReauthDialog(
                 scope = scope,
@@ -290,6 +192,7 @@ fun UserDetailsScreen(
                 onDismissRequest = { showReauthDialog = false },
             )
         }
+
         if (showEmailPasswordDialog) {
             EmailAndPasswordDialog(
                 userViewModel = userViewModel,
@@ -310,5 +213,157 @@ fun ChangeProfileImage(menuExpanded: Boolean, onDismissRequest: () -> Unit) {
             text = { Text("Change Profile Photo") },
             onClick = {}
         )
+    }
+}
+
+@Composable
+fun UserDetails(
+    currentUser: GoogleAuthService.SignInState,
+    userDetails: UserDetailsState,
+    menuExpanded: Boolean,
+    showProfilePhotoOptions: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Timber.d(" User Details\n currentUser: $currentUser\n userDetails: $userDetails")
+    Timber.d(" Checking user is authenticated")
+
+    when (currentUser) {
+        is GoogleAuthService.SignInState.Success -> {
+            Timber.d(" User is authenticated")
+            when (userDetails) {
+                is UserDetailsState.Loaded -> {
+                    Timber.d(" User details are loaded")
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        modifier = modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                    ) {
+                        Box(Modifier.fillMaxWidth()) {
+                            Text(
+                                text = userDetails.user.username,
+                                style = MaterialTheme.typography.displayMedium,
+                                modifier = modifier.align(CenterStart)
+                            )
+                            Box(
+                                modifier = modifier.align(CenterEnd)
+                            ) {
+                                AsyncImage(
+                                    model = currentUser.user.photo,
+                                    contentDescription = "User Image",
+                                    modifier = modifier
+                                        .size(80.dp)
+                                        .clip(CircleShape)
+                                        .clickable(onClick = showProfilePhotoOptions)
+                                )
+                                ChangeProfileImage(
+                                    menuExpanded = menuExpanded,
+                                    onDismissRequest = showProfilePhotoOptions
+                                )
+                            }
+                        }
+                    }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Start,
+                        modifier = modifier.fillMaxWidth().padding(vertical = 8.dp)
+                    ) {
+                        Text(
+                            "Name: ${userDetails.user.name}",
+                        )
+                    }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Start,
+                        modifier = modifier.fillMaxWidth().padding(vertical = 8.dp)
+                    ) {
+                        Text(
+                            "Email: ${currentUser.user.email.toString()}",
+                        )
+                    }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Start,
+                        modifier = modifier.fillMaxWidth().padding(vertical = 8.dp)
+                    ) {
+                        Text(
+                            "Date of Birth: ${userDetails.user.dob}",
+                        )
+                    }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Start,
+                        modifier = modifier.fillMaxWidth().padding(vertical = 8.dp)
+                    ) {
+                        Text(
+                            "Date Created: ${userDetails.user.dateCreated}",
+                        )
+                    }
+                    Spacer(modifier.size(20.dp))
+                }
+
+                else -> {
+                    Timber.d(" User is not authenticated")
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Start,
+                        modifier = modifier.fillMaxWidth().padding(vertical = 8.dp)
+                    ) {
+                        Text(
+                            "Name: ${currentUser.user.displayName}",
+                        )
+                    }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Start,
+                        modifier = modifier.fillMaxWidth().padding(vertical = 8.dp)
+                    ) {
+                        Text(
+                            "Email: ${currentUser.user.email.toString()}",
+                        )
+                    }
+                }
+            }
+        }
+        else -> {
+            Timber.d(" User is not authenticated")
+            Row(Modifier.padding(horizontal = 16.dp)) {
+                Text("Not currently logged in")
+            }
+        }
+    }
+}
+
+@Composable
+fun UserCharacterList(
+    modifier: Modifier = Modifier,
+    scope: CoroutineScope,
+    snackbarHostState: SnackbarHostState,
+    characterViewModel: CharacterViewModel,
+    comboDisplayViewModel: ComboDisplayViewModel,
+    characterList: CharacterEntryListUiState,
+    navigateToComboDisplayScreen: () -> Unit
+) {
+
+    LazyVerticalGrid(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        columns = GridCells.Fixed(3),
+        modifier = modifier.fillMaxWidth()
+    ) {
+        Timber.d("Loading Character Grid...")
+        items(items = characterList.characterList.sortedBy { character -> character.name }) { character ->
+            CharacterCard(
+                scope = scope,
+                snackbarHostState = snackbarHostState,
+                characterViewModel = characterViewModel,
+                updateCharacterState = comboDisplayViewModel::updateCharacterState,
+                setCharacterToDS = comboDisplayViewModel::updateCharacterInDS,
+                navigateToComboDisplayScreen = navigateToComboDisplayScreen,
+                characterState = CharacterEntryUiState(character),
+            )
+        }
+        Timber.d("Character Grid Finished.")
     }
 }

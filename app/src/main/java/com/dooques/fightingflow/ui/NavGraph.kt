@@ -80,41 +80,21 @@ fun NavGraph(
         userViewModel.updateCurrentUser(signInState)
     }
 
-    Timber.d("SignInState: $signInState")
-//    LaunchedEffect(signInState) {
-//        Timber.d("Sign In State detected, triggering launched effect")
-//        when (signInState) {
-//            is GoogleAuthService.SignInState.Success -> {
-//                userViewModel.updateUserId((signInState as GoogleAuthService.SignInState.Success).user.userId)
-//                userDetailsState = userViewModel.userDetailsState(signInState).value
-//
-//                Timber.d("Sign in successful, returning userDetails Value and updating user state")
-//                Timber.d("User Details State: %s",
-//                    when (userDetailsState) {
-//                        is UserDetailsState.Loaded -> { (userDetailsState as UserDetailsState.Loaded).user }
-//                        is UserDetailsState.Error -> { (userDetailsState as UserDetailsState.Error).e }
-//                        else -> { "No user details found" }
-//                    })
-//            }
-//            else -> null
-//        }
-//    }
-
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
     ) { innerPadding ->
-        Timber.d("Loading NavHost...")
+        Timber.d(" Loading NavHost...")
         NavHost(
             navController = navController,
             startDestination = FlowScreen.Start.name,
             modifier = Modifier
                 .padding(innerPadding)
         ) {
-            Timber.d("Getting Composable Routes...")
+            Timber.d(" Getting Composable Routes...")
 
             // Title Screen
             composable(route = FlowScreen.Start.name) {
-                Timber.d("Loading Title Screen...")
+                Timber.d(" Loading Title Screen...")
                 TitleScreen(
                     authViewModel = authViewModel,
                     userViewModel = userViewModel,
@@ -128,21 +108,23 @@ fun NavGraph(
 
             // Profiles
             composable(route = FlowScreen.ProfileList.name) {
-                Timber.d("Loading Profile List Screen...")
+                Timber.d(" Loading Profile List Screen...")
                 UserDetailsScreen(
                     scope = scope,
                     snackBarHostState = snackBarHostState,
                     userViewModel = userViewModel,
                     authViewModel = authViewModel,
                     profanityViewModel = profanityViewModel,
-                    navigateBack =  navController::navigateUp,
-                    navigateHome = { navController.navigate(FlowScreen.Start.name) }
+                    navigateToComboDisplayScreen = { navController.navigate(FlowScreen.Combos.name) },
+                    navigateBack = navController::navigateUp,
+                    characterViewModel = characterViewModel,
+                    comboDisplayViewModel = comboDisplayViewModel,
                 )
             }
 
             // Character Screen
             composable(route = FlowScreen.CharSelect.name) {
-                Timber.d("Loading Character Screen...")
+                Timber.d(" Loading Character Screen...")
                 CharacterScreen(
                     scope = scope,
                     snackbarHostState = snackBarHostState,
@@ -158,21 +140,21 @@ fun NavGraph(
 
             // Add Character Screen
             composable(route = FlowScreen.AddCharacter.name) {
-                Timber.d("Loading Add Character Screen...")
+                Timber.d(" Loading Add Character Screen...")
                 AddCharacterScreen(
+                    scope = scope,
+                    snackbarHostState = snackBarHostState,
                     addCharacterViewModel = addCharacterViewModel,
                     characterViewModel = characterViewModel,
                     comboDisplayViewModel = comboDisplayViewModel,
                     navigateBack =  navController::navigateUp,
-                    scope = scope,
-                    snackbarHostState = snackBarHostState,
                     navigateToSchemeInfo = { navController.navigate(FlowScreen.ControlSchemeDemo.name) }
                 )
             }
 
             // Control Scheme Demo
             composable(route = FlowScreen.ControlSchemeDemo.name) {
-                Timber.d("-- Loading Control Scheme Demo Screen --")
+                Timber.d("--Loading Control Scheme Demo Screen--")
                 ControlSchemeDemoScreen(
                     comboCreationViewModel = comboCreationViewModel,
                     comboDisplayViewModel = comboDisplayViewModel,
@@ -182,7 +164,7 @@ fun NavGraph(
 
             // Combo Display Screen
             composable(route = FlowScreen.Combos.name) {
-                Timber.d("Loading Combo Display Screen...")
+                Timber.d(" Loading Combo Display Screen...")
                 ComboDisplayScreen(
                     deviceType = deviceType,
                     comboDisplayViewModel = comboDisplayViewModel,
@@ -197,7 +179,7 @@ fun NavGraph(
 
             // Combo Creation Screen
             composable(route = FlowScreen.ComboCreation.name) {
-                Timber.d("Loading Combo Creation Screen...")
+                Timber.d(" Loading Combo Creation Screen...")
                 ComboCreationScreen(
                     authViewModel = authViewModel,
                     comboDisplayViewModel = comboDisplayViewModel,

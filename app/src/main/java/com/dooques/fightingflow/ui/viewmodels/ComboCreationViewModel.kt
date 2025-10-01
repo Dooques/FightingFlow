@@ -7,8 +7,10 @@ import com.dooques.fightingflow.data.database.FlowRepository
 import com.dooques.fightingflow.data.datastore.ComboDsRepository
 import com.dooques.fightingflow.data.datastore.SettingsDsRepository
 import com.dooques.fightingflow.data.datastore.UserDsRepository
-import com.dooques.fightingflow.data.firebase.FirebaseRepository
+import com.dooques.fightingflow.data.firebase.FirebaseComboRepository
+import com.dooques.fightingflow.data.firebase.FirebaseUserRepository
 import com.dooques.fightingflow.data.firebase.GoogleAuthService
+import com.dooques.fightingflow.data.firebase.UserFbResult
 import com.dooques.fightingflow.model.CharacterEntry
 import com.dooques.fightingflow.model.Console
 import com.dooques.fightingflow.model.Game
@@ -23,7 +25,7 @@ import com.dooques.fightingflow.ui.comboCreationScreen.updateMoveListAbstract
 import com.dooques.fightingflow.util.CharacterEntryUiState
 import com.dooques.fightingflow.util.ComboDisplayUiState
 import com.dooques.fightingflow.util.ComboEntryUiState
-import com.dooques.fightingflow.util.DataProcessor
+import com.dooques.fightingflow.util.MoveDataProcessor
 import com.dooques.fightingflow.util.ImmutableList
 import com.dooques.fightingflow.util.MoveEntryListUiState
 import com.dooques.fightingflow.util.emptyComboDisplay
@@ -41,17 +43,18 @@ import java.time.LocalDate
 
 class ComboCreationViewModel(
     private val flowRepository: FlowRepository,
+    private val comboFirebaseRepository: FirebaseComboRepository,
+    private val userFirebaseRepository: FirebaseUserRepository,
     private val comboDsRepository: ComboDsRepository,
     private val profileDsRepository: UserDsRepository,
     private val settingsDsRepository: SettingsDsRepository,
-    private val firebaseRepository: FirebaseRepository,
 ): ViewModel() {
 
     companion object {
         const val TIME_MILLIS = 5_000L
     }
 
-    val dataProcessor = DataProcessor()
+    val dataProcessor = MoveDataProcessor()
 
     // Mutable State
     val editingState = mutableStateOf(false)
@@ -59,11 +62,7 @@ class ComboCreationViewModel(
 
     // State Flow
     val comboDisplayState = MutableStateFlow(
-        ComboDisplayUiState(
-            emptyComboDisplay.copy(
-            dateCreated = LocalDate.now().toString()
-            )
-        )
+        ComboDisplayUiState(emptyComboDisplay.copy(dateCreated = LocalDate.now().toString()))
     )
 
     val characterState = MutableStateFlow(CharacterEntryUiState())
@@ -166,7 +165,7 @@ class ComboCreationViewModel(
     }
 
     fun clearMoveList() {
-        Timber.d(" Clearing move list...")
+        Timber.d("--Clearing move list...--")
         comboDisplayState.update { ComboDisplayUiState(comboDisplayState.value.comboDisplay.copy(moves = emptyList())) }
         comboAsStringState.update { "" }
         Timber.d(" Cleared move list: ${comboAsStringState.value}")
@@ -176,9 +175,13 @@ class ComboCreationViewModel(
     suspend fun saveCombo(
         currentUser: GoogleAuthService.SignInState
     ): ComboResult {
+        Timber.d("--Save Combo Function--")
         Timber.d(" Checking if combo details valid")
         Timber.d(" ComboDisplay Character: ${comboDisplayState.value.comboDisplay.character}")
         Timber.d(" ComboDisplay Moves: ${comboDisplayState.value.comboDisplay.moves}")
+
+        val characterToAdd = comboDisplayState.value.comboDisplay.character
+
         if (comboDisplayState.value.comboDisplay.character.isNotEmpty() &&
             comboDisplayState.value.comboDisplay.moves.isNotEmpty()) {
             Timber.d(" Preparing to add combo to Db, checking if edit mode...")
@@ -188,7 +191,28 @@ class ComboCreationViewModel(
                     return updateCombo()
                 } else {
                     Timber.d(" Edit mode false, adding new combo...")
-                    return insertCombo(currentUser as GoogleAuthService.SignInState.Success)
+                    val result = insertCombo(currentUser as GoogleAuthService.SignInState.Success)
+
+                    if (result is ComboResult.Success) {
+                        val userDetails = userFirebaseRepository
+                            .getUserDetailsById(currentUser.user.userId)
+                            .map { it }
+                            .first()
+                        Timber.d(" User Details: $userDetails")
+                        if (userDetails != null) {
+                            val characterList = userDetails.characterList.toMutableList()
+                            characterList.add(characterToAdd)
+                            val characterListImmutable = characterList.toList()
+                            Timber.d(" Character List: $characterList")
+
+                            val userUpdateResult = userFirebaseRepository.updateUser(
+                                user = userDetails.copy(characterList = characterListImmutable)
+                            )
+
+                            if (userUpdateResult is UserFbResult.Error) { Timber.e(userUpdateResult.error) }
+                        }
+                    }
+                    return result
                 }
             } catch (e: Exception) {
                 return ComboResult.Error(e = e)
@@ -237,10 +261,11 @@ class ComboCreationViewModel(
                 .copy(createdBy = userId)
 
         if (!characterState.value.character.mutable) {
+            Timber.d("Character is not mutable, adding 44")
             try {
                 var comboIdResult = ""
                 val firestoreRequest = viewModelScope.launch {
-                    comboIdResult = firebaseRepository.addCombo(
+                    comboIdResult = comboFirebaseRepository.addCombo(
                         comboEntry
                             .toDisplay(moveEntryList.value)
                             .toFbEntry(characterState.value.character)
@@ -285,7 +310,7 @@ class ComboCreationViewModel(
         Timber.d(" Move List: ${updatedCombo.moves}")
         if (!characterState.value.character.mutable) {
             try {
-                firebaseRepository.updateCombo(
+                comboFirebaseRepository.updateCombo(
                     updatedCombo
                         .toDisplay(moveEntryList.value)
                         .toFbEntry(characterState.value.character)
@@ -429,7 +454,7 @@ class ComboCreationViewModel(
     fun getExistingComboFromFirestore() {
         viewModelScope.launch {
             if (characterState.value != CharacterEntryUiState() && comboIdState.value.isNotBlank()) {
-                firebaseRepository.getCombo(characterState.value.character.name, comboIdState.value)
+                comboFirebaseRepository.getCombo(characterState.value.character.name, comboIdState.value)
                     .map { combo -> (combo ?: emptyComboEntryFb) }
                     .collect { combo ->
                         val existingCombo = ComboDisplayUiState(

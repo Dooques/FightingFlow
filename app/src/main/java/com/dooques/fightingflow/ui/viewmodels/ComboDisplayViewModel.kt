@@ -7,7 +7,9 @@ import com.dooques.fightingflow.data.datastore.CharacterDsRepository
 import com.dooques.fightingflow.data.datastore.ComboDsRepository
 import com.dooques.fightingflow.data.datastore.SettingsDsRepository
 import com.dooques.fightingflow.data.datastore.UserDsRepository
-import com.dooques.fightingflow.data.firebase.FirebaseRepository
+import com.dooques.fightingflow.data.firebase.FirebaseComboRepository
+import com.dooques.fightingflow.data.firebase.FirebaseUserRepository
+import com.dooques.fightingflow.data.firebase.GoogleAuthRepository
 import com.dooques.fightingflow.data.firebase.GoogleAuthService
 import com.dooques.fightingflow.model.CharacterEntry
 import com.dooques.fightingflow.model.ComboDisplay
@@ -25,7 +27,7 @@ import com.dooques.fightingflow.util.CharacterEntryUiState
 import com.dooques.fightingflow.util.ComboDisplayListUiState
 import com.dooques.fightingflow.util.ComboEntryFbListUiState
 import com.dooques.fightingflow.util.ComboEntryListUiState
-import com.dooques.fightingflow.util.DataProcessor
+import com.dooques.fightingflow.util.MoveDataProcessor
 import com.dooques.fightingflow.util.MoveEntryListUiState
 import com.dooques.fightingflow.util.characterAndMoveData.characterMap
 import com.dooques.fightingflow.util.emptyCharacter
@@ -34,6 +36,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -48,7 +51,9 @@ class ComboDisplayViewModel(
     private val characterDsRepository: CharacterDsRepository,
     private val comboDsRepository: ComboDsRepository,
     private val settingsDsRepository: SettingsDsRepository,
-    private val firebaseRepository: FirebaseRepository,
+    private val comboFirebaseRepository: FirebaseComboRepository,
+    private val userFirebaseRepository: FirebaseUserRepository,
+    private val authRepository: GoogleAuthService,
     profileDsRepository: UserDsRepository,
 ): ViewModel() {
 
@@ -68,13 +73,13 @@ class ComboDisplayViewModel(
 
     val comboDisplayListFb = MutableStateFlow(ComboDisplayListUiState())
 
-    val dataProcessor = DataProcessor()
+    val dataProcessor = MoveDataProcessor()
 
     init {
-        Timber.Forest.d("Initializing Combo Display View Model...")
-        Timber.Forest.d("Getting move entry list...")
+        Timber.d(" Initializing Combo Display View Model...")
+        Timber.d(" Getting move entry list...")
         getAllMoveEntries()
-        Timber.Forest.d("Getting Combo Display List")
+        Timber.d(" Getting Combo Display List")
     }
 
     val characterNameState = characterDsRepository.getName()
@@ -90,25 +95,25 @@ class ComboDisplayViewModel(
     val currentUserState: StateFlow<GoogleAuthService.SignInState> = _currentUserState
 
     fun updateUserState(userState: GoogleAuthService.SignInState) {
-        Timber.d("Updating User ID to $userState")
+        Timber.d(" Updating User ID to $userState")
         _currentUserState.update { userState }
-        Timber.d("Updated ID: ${currentUserState.value}")
+        Timber.d(" Updated ID: ${currentUserState.value}")
     }
 
     fun processMoveList(character: CharacterEntryUiState): MoveEntryListUiState {
-        Timber.d("Processing character move data")
+        Timber.d(" Processing character move data")
         var moveList = dataProcessor.getMoveListForCharacter(character.character)
-        Timber.d("MoveList: $moveList")
+        Timber.d(" MoveList: $moveList")
         val customMoveList = moveEntryListUiState.value.moveList.filter {
             it.character == character.character.name
         } as MutableList<MoveEntry>
         if (character.character.mutable) {
-            Timber.d("Custom moves: $customMoveList")
+            Timber.d(" Custom moves: $customMoveList")
             customMoveList.addAll(moveList.moveList)
             moveList = MoveEntryListUiState(customMoveList)
         }
 
-        Timber.d("Processed MoveList: $moveList")
+        Timber.d(" Processed MoveList: $moveList")
 
         return moveList
     }
@@ -118,27 +123,26 @@ class ComboDisplayViewModel(
         characterState.flatMapLatest { character ->
             publicCombosDisplayState.flatMapLatest { publicCombosDisplayState ->
                 currentUserState.flatMapLatest { currentUser ->
-                    Timber.d(
-                        "--Getting Combo Display List from Firestore--\nCharacter: %s\nUser: %s\nShow Public Combos: %s",
-                        character, currentUserState, publicCombosDisplayState
-                    )
+                    Timber.d("--Getting Combo Display List from Firestore--" +
+                            "\n Character: %s\n User: %s\n Show Public Combos: %s",
+                        character, currentUserState, publicCombosDisplayState)
 
                     val moveList = processMoveList(character)
 
                     if (moveList.moveList.isNotEmpty()) {
                         when (currentUser) {
                             is GoogleAuthService.SignInState.Success -> {
-                                firebaseRepository.getComboList(
+                                comboFirebaseRepository.getComboList(
                                     character = character.character.name,
                                     publicComboDisplayState = publicCombosDisplayState,
                                     user = (currentUserState.value as GoogleAuthService.SignInState.Success).user.userId
                                 )
                                     .map { entryList ->
-                                        Timber.d("ComboList Found: ${entryList}\nCreating Display List")
+                                        Timber.d(" ComboList Found: ${entryList}\n Creating Display List")
                                         comboDisplayListFb.update {
                                             ComboDisplayListUiState(
                                                 entryList.map { entry ->
-                                                    Timber.d("Mapping ${entry.comboId} list")
+                                                    Timber.d(" Mapping ${entry.comboId} list")
                                                     entry.toDisplay(moveList)
                                                 }
                                             )
@@ -147,21 +151,18 @@ class ComboDisplayViewModel(
                                         ComboEntryFbListUiState(entryList)
                                     }
                                     .catch { e ->
-                                        Timber.Forest.e(
-                                            e,
-                                            "Error collecting firestore combo flow: "
-                                        )
+                                        Timber.e(e, "Error collecting firestore combo flow: ")
                                         emit(ComboEntryFbListUiState())
                                     }
                             }
 
                             else -> {
-                                Timber.d("User not signed in, emitting empty list.")
+                                Timber.d(" User not signed in, emitting empty list.")
                                 flowOf(ComboEntryFbListUiState())
                             }
                         }
                     } else {
-                        Timber.d("No moves found, emitting empty list.")
+                        Timber.d(" No moves found, emitting empty list.")
                         flowOf(ComboEntryFbListUiState())
                     }
                 }
@@ -173,14 +174,16 @@ class ComboDisplayViewModel(
                 initialValue = ComboEntryFbListUiState()
             )
 
-    fun updateCombo(combo: ComboDisplay, user: UserEntry) {
-        Timber.d("Updating combo ${combo.id} in firestore database")
-        firebaseRepository.updateCombo(
-            combo.toFbEntry(characterEntryListState.value.characterList.first { it.name == combo.character })
+    suspend fun updateCombo(combo: ComboDisplay, user: UserEntry) {
+        Timber.d(" Updating combo ${combo.id} in firestore database")
+        comboFirebaseRepository.updateCombo(
+            combo.toFbEntry(
+                characterEntryListState.value.characterList.first { it.name == combo.character }
+            )
         )
-        Timber.d("Updating user details to add/remove combo from likes")
-        Timber.d("User Details: $user")
-        firebaseRepository.updateUser(user)
+        Timber.d(" Updating user details to add/remove combo from likes")
+        Timber.d(" User Details: $user")
+        userFirebaseRepository.updateUser(user)
     }
 
     //Database Flows
@@ -190,15 +193,15 @@ class ComboDisplayViewModel(
     val comboEntryListRoom = characterNameState
         .flatMapLatest { characterName ->
             if (characterState.value.character.name == characterName?.name && characterState.value.character.mutable) {
-                Timber.d("--Getting Combos from Room Database--\nCharacter: $characterName")
+                Timber.d("--Getting Combos from Room Database--\n Character: $characterName")
                 if (characterName.name.isNotBlank()) {
-                    Timber.d("Character name is not blank, getting combo list")
+                    Timber.d(" Character name is not blank, getting combo list")
 
                     val moveList = processMoveList(characterState.value)
 
                     flowRepository.getAllCombosByCharacter(characterName.name)
                         .mapNotNull { entryList ->
-                            Timber.d("List: $entryList")
+                            Timber.d(" List: $entryList")
                             comboDisplayListRoom.update {
                                 ComboDisplayListUiState(
                                     entryList?.map { comboEntry ->
@@ -208,20 +211,16 @@ class ComboDisplayViewModel(
                             }
                             ComboEntryListUiState(entryList ?: emptyList())
                         }
-                        .catch { exception ->
-                            Timber.Forest.e(
-                                exception,
-                                "Error collecting combo entry list from database."
-                            )
+                        .catch { e ->
+                            Timber.e(e, " Error collecting combo entry list from database.")
                             emit(ComboEntryListUiState())
                         }
                 } else {
-                    Timber.Forest.d("Character name is blank, emitting empty list.")
+                    Timber.d(" Character name is blank, emitting empty list.")
                     flowOf(ComboEntryListUiState())
                 }
-            }
-            else {
-                Timber.d("")
+            } else {
+                Timber.d(" Character name does not match and character is not Mutable.")
                 flowOf(ComboEntryListUiState())
             }
         }
@@ -286,7 +285,7 @@ class ComboDisplayViewModel(
             initialValue = Console.STANDARD
         )
 
-    val modernOrClassicState = settingsDsRepository.getSF6ControlType()
+    val sf6ControlState = settingsDsRepository.getSF6ControlType()
         .map { type ->
             when (type) {
                 0 -> SF6ControlType.Classic
@@ -320,14 +319,13 @@ class ComboDisplayViewModel(
             } else {
                 Timber.d(" Character not in map, getting custom character.")
                 viewModelScope.launch {
-                    Timber.Forest.d(
-                        "-- Getting character from Database --\n Character: %s\n Game: %s",
-                        name, game
-                    )
+                    Timber.d("-- Getting character from Database --" +
+                            "\n Character: %s\n Game: %s",
+                        name, game)
                     flowRepository.getCharacterByNameAndGame(name, game)
                         .map { it ?: emptyCharacter }
                         .collect { characterEntry ->
-                            Timber.Forest.d(" Character: $characterEntry")
+                            Timber.d(" Character: $characterEntry")
                             _characterState.update { CharacterEntryUiState(characterEntry) }
                         }
                 }
@@ -336,17 +334,17 @@ class ComboDisplayViewModel(
     }
 
     suspend fun updateCharacterInDS(character: CharacterEntry) {
-            Timber.Forest.d("Setting ${character.name} to Character Datastore")
+            Timber.d(" Setting ${character.name} to Character Datastore")
             characterDsRepository.updateCharacter(character)
     }
 
     fun updateShowIconDisplayState(iconState: Boolean) = viewModelScope.launch {
-        Timber.Forest.d("Updating Icon Display State...")
+        Timber.d(" Updating Icon Display State...")
         settingsDsRepository.updateIconDisplayState(iconState)
     }
 
     fun updateShowComboTextState(textCombo: Boolean) = viewModelScope.launch {
-        Timber.Forest.d("Updating Combo Text State...")
+        Timber.d(" Updating Combo Text State...")
         settingsDsRepository.updateShowComboTextState(textCombo)
     }
 
@@ -367,6 +365,10 @@ class ComboDisplayViewModel(
                 Console.NINTENDO -> 3
             }
         )
+    }
+
+    fun updateSF6ControlState(controlType: Int) = viewModelScope.launch {
+        settingsDsRepository.updateSf6ControlType(controlType)
     }
 
     suspend fun updateShowComboDisplayState(boolean: Boolean) {
@@ -394,23 +396,43 @@ class ComboDisplayViewModel(
     }
 
     suspend fun deleteCombo(combo: ComboDisplay) {
-        Timber.Forest.d("Deleting: $combo...")
+        Timber.d("--Deleting: $combo...--")
         if (!characterState.value.character.mutable) {
             try {
                 flowRepository.deleteCombo(combo.toEntry(characterState.value.character))
-                Timber.Forest.d("Combo deleted from database.")
-                firebaseRepository.deleteCombo(combo.character, combo.id)
-                Timber.Forest.d("Combo deleted from firestore.")
-                Timber.Forest.d("Combo Deleted.")
+                Timber.d(" Combo deleted from database.")
+                val deleteResult = comboFirebaseRepository.deleteCombo(combo.character, combo.id)
+                when (deleteResult) {
+                    is ComboResult.Success -> {
+                        Timber.d(" Combo deleted from firestore.")
+                        Timber.d(" Checking Combo List for more combos by ${user.value}")
+                        val comboList = comboFirebaseRepository.getComboList(characterState.value.character.name, false, user.value).first()
+                        if (comboList.isEmpty()) {
+                            Timber.d(" Combo List is empty for ${characterState.value.character.name}, deleting from User's character list.")
+                            val authUserId = authRepository.auth.currentUser?.uid ?: ""
+                            val userDetails = userFirebaseRepository.getUserDetailsById(authUserId).first() ?: UserEntry()
+                            val currentCharacterList = userDetails.characterList.toMutableList()
+                            currentCharacterList.remove(characterState.value.character.name)
+                            val updatedList = currentCharacterList.toList()
+                            userFirebaseRepository.updateUser(userDetails.copy(characterList = updatedList))
+                        } else {
+                            Timber.d(" Combo List contains values, ending delete function")
+                        }
+                    }
+
+                    is ComboResult.Error-> {
+                        Timber.e(deleteResult.e, " Error deleting combo: ")
+                    }
+                }
             } catch (e: Exception) {
-                Timber.e(e, "Error deleting combo.")
+                Timber.e(e, " Error deleting combo: ")
             }
         } else {
             try {
                 flowRepository.deleteCombo(combo.toEntry(characterEntryListState.value.characterList.first { it.name == combo.character }))
-                Timber.Forest.d("Combo deleted from database.")
+                Timber.d(" Combo deleted from database.")
             } catch (e: Exception) {
-                Timber.e(e, "Error deleting combo.")
+                Timber.e(e, " Error deleting combo.")
             }
         }
     }
