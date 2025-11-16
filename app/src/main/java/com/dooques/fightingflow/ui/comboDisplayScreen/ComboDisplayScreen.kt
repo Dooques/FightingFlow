@@ -222,7 +222,7 @@ fun ComboDisplayScreen(
             }.filter { combo ->
                 if (comboFilterObject.user.isNotEmpty()) {
                     val username = searchFilterViewModel.getKeyByValue(userData.userMap, comboFilterObject.user)
-                    combo.createdBy.lowercase().contains(username?.lowercase() ?: "")
+                    combo.createdBy.lowercase().contains(username.lowercase())
                 } else { true }
             }.filter { combo ->
                 if (comboFilterObject.description.isNotEmpty()) {
@@ -405,7 +405,7 @@ fun ComboDisplayScreen(
                             modifier = modifier.padding(horizontal = 8.dp).defaultMinSize(1.dp),
                         )
                         FilterOptionsMenu(
-                            game = Game.entries.first { it.title == gameSelectedState },
+                            game = Game.entries.firstOrNull { it.title == gameSelectedState } ?: Game.T8,
                             character = characterNameState?.name ?: "",
                             addMoveToFilter =
                                 {

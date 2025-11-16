@@ -14,9 +14,9 @@ import timber.log.Timber
 class AuthViewModel(
     private val authRepository: GoogleAuthService,
     private val profileDsRepository: UserDsRepository,
-    private val firebaseUserRepository: FirebaseUserRepository
 ): ViewModel() {
-    val signInState = MutableStateFlow<GoogleAuthService.SignInState>(GoogleAuthService.SignInState.Idle)
+    val signInState =
+        MutableStateFlow<GoogleAuthService.SignInState>(GoogleAuthService.SignInState.Idle)
 
     init {
         Timber.d("--Checking if user logged in--")
@@ -35,14 +35,32 @@ class AuthViewModel(
         }
     }
 
-    suspend fun initiateGoogleSignIn() {
+    suspend fun initiateGoogleSignIn(): Result<Unit> {
         signInState.update { GoogleAuthService.SignInState.Loading }
         val resultState = authRepository.signInWithGoogle()
         signInState.update { resultState }
-        if (resultState is GoogleAuthService.SignInState.Success) {
-            Timber.i("Google Sign-In Successful: ${resultState.user.displayName} is signed in.")
-        } else if (resultState is GoogleAuthService.SignInState.Error) {
-            Timber.w(resultState.exception, "Google Sign-In Failed. Message: ${resultState.message}")
+        return when (resultState) {
+
+            is GoogleAuthService.SignInState.Success -> {
+                Timber.i(" Google Sign-In Successful: ${resultState.user.displayName} is signed in.")
+                Result.success(Unit)
+            }
+
+            is GoogleAuthService.SignInState.Error -> {
+                if (resultState.exception != null) {
+                    Timber.w(
+                        resultState.exception,
+                        " Google Sign-In Failed. Message: ${resultState.message}"
+                    )
+                    Result.failure(resultState.exception)
+                } else {
+                    Result.failure(Exception("Exception state is null"))
+                }
+            }
+
+            else -> {
+                Result.failure(Exception("Unknown Error occurred"))
+            }
         }
     }
 
@@ -50,13 +68,19 @@ class AuthViewModel(
         signInState.update { GoogleAuthService.SignInState.Loading }
         return authRepository.createAccountWithEmailAndPassword(email, password)
             .onSuccess {
+                Timber.d(" User creation successful, updating SignInState to success")
                 signInState.update { GoogleAuthService.SignInState.Success(authRepository.getCurrentUser() as GoogleAuthService.GoogleSignInResult) }
                 Result.success(Unit)
                 return@onSuccess
             }
             .onFailure { result ->
-                Timber.e(result, "An error occurred during account creation.")
-                signInState.update { GoogleAuthService.SignInState.Error(result.message.toString(), result as Exception) }
+                Timber.e(result, " An error occurred during account creation.")
+                signInState.update {
+                    GoogleAuthService.SignInState.Error(
+                        result.message.toString(),
+                        result as Exception
+                    )
+                }
                 Result.failure<Exception>(result)
                 return@onFailure
             }
@@ -66,16 +90,16 @@ class AuthViewModel(
         Timber.d("--Signing in user with Email--")
         signInState.update { GoogleAuthService.SignInState.Loading }
         return authRepository.signInWithEmailAndPassword(email, password)
-            .onSuccess { result ->
-                Timber.d("Sign in successful")
+            .onSuccess {
+                Timber.d(" Sign in successful")
                 signInState.update {
-                    Timber.d("Updating sign-in state")
+                    Timber.d(" Updating sign-in state")
                     val currentUser = authRepository.getCurrentUser()
-                    Timber.d("Current User: $currentUser")
+                    Timber.d(" Current User: $currentUser")
                     if (currentUser != null) {
-                        Timber.d("User is not null")
+                        Timber.d(" User is not null")
                         GoogleAuthService.SignInState.Success(currentUser)
-                    } else  {
+                    } else {
                         GoogleAuthService.SignInState.Error("User does not exist.")
                     }
                 }
@@ -83,10 +107,12 @@ class AuthViewModel(
                 return@onSuccess
             }
             .onFailure { result ->
-                Timber.e(result, "An error occurred during sign in.")
+                Timber.e(result, " An error occurred during sign in.")
                 signInState.update {
-                    GoogleAuthService.SignInState.Error("Error signing in:", result as Exception
-                    ) }
+                    GoogleAuthService.SignInState.Error(
+                        "Error signing in:", result as Exception
+                    )
+                }
                 Result.failure<Exception>(result)
                 return@onFailure
             }
@@ -97,8 +123,8 @@ class AuthViewModel(
         return authRepository.signOut()
             .onSuccess {
                 signInState.update { GoogleAuthService.SignInState.Idle }
-                Timber.Forest.i("Sign out successful.")
-                 Result.success(Unit)
+                Timber.i(" Sign out successful.")
+                Result.success(Unit)
                 return@onSuccess
             }
             .onFailure { error ->
@@ -108,63 +134,57 @@ class AuthViewModel(
                         error as? Exception
                     )
                 }
-                Timber.e(error, "Sign out failed.")
+                Timber.e(error, " Sign out failed.")
                 Result.failure<Exception>(error as Exception)
                 return@onFailure
             }
     }
 
-    suspend fun deleteUser(): Result<Unit>? {
-        if (signInState.value is GoogleAuthService.SignInState.Success) {
-            val currentUser = signInState.value as GoogleAuthService.SignInState.Success
-            val result = authRepository.deleteCurrentUser()
-            Timber.d("Attempting to delete: ${currentUser.user}")
-
-            when {
-                result.isSuccess -> {
-                    try {
-                        Timber.d("Deleting user account.")
-                        firebaseUserRepository.deleteUser(currentUser.user.userId)
-                    } catch (e: Exception) {
-                        Timber.e(e, "An error occurred while deleting user account")
-                        return Result.failure(e)
-                    }
-                    try {
-                        Timber.d("Deleting local user information")
-                        profileDsRepository.updateUsername("")
-                        profileDsRepository.updateLoggedInState(false)
-                    } catch (e: Exception) {
-                        return Result.failure(e)
-                    }
-                    try {
-                        Timber.d("Signing out user.")
-                        signOut()
-                            .onSuccess {
-                                Timber.d("User is signed out.")
-                                return Result.success(Unit)
+    suspend fun deleteAuthUser(): Result<Unit> {
+        when (signInState.value) {
+            is GoogleAuthService.SignInState.Success -> {
+                val currentUser = signInState.value as GoogleAuthService.SignInState.Success
+                Timber.d("--Attempting to delete: ${currentUser.user}--")
+                Timber.d("User is signed in")
+                try {
+                    val authDeleteResult = authRepository.deleteCurrentUser()
+                    authDeleteResult
+                        .onSuccess {
+                            Timber.d("Successfully deleted auth User, signing out.")
+                            val signOutResult = signOut()
+                            signOutResult
+                                .onSuccess {
+                                    Timber.d("Successfully signed out, removing user details from user datastore")
+                                    profileDsRepository.updateUsername("")
+                                    profileDsRepository.updateLoggedInState(false)
+                                    return Result.success(Unit)
+                                }
+                                .onFailure {
+                                    throw signOutResult.exceptionOrNull()
+                                        ?: Exception("Sign out result is null")
+                                }
+                        }
+                        .onFailure {
+                            val exception = authDeleteResult.exceptionOrNull()
+                                ?: Exception("Auth deletion result is null")
+                            if (exception is FirebaseAuthRecentLoginRequiredException) {
+                                Timber.e(" User needs to re-authenticate.")
+                                throw exception
+                            } else {
+                                Timber.e(exception, " Error deleting account.")
+                                throw exception
                             }
-                            .onFailure { e ->
-                                Timber.d(e, "Error signing out.")
-                                return Result.failure(e)
-                            }
-                    } catch (e: Exception) {
-                        Timber.e(e, "Error signing out user")
-                        return Result.failure(e)
-                    }
-                }
-
-                result.isFailure -> {
-                    val e = result.exceptionOrNull()
-                    return if (e is FirebaseAuthRecentLoginRequiredException) {
-                        Timber.e("User needs to re-authenticate.")
-                        result
-                    } else {
-                        Timber.e(e, "Error deleting account.")
-                        result
-                    }
+                        }
+                } catch (e: Exception) {
+                    Timber.e(" Error occurred during auth deletion process")
+                    return Result.failure(e)
                 }
             }
+
+            else -> {
+                return Result.failure(Exception("User is not signed in."))
+            }
         }
-        return null
+        return Result.failure(Exception("Unknown error occurred during auth deletion"))
     }
 }

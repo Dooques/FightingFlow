@@ -1,4 +1,4 @@
-package com.example.fightingflow.ui
+package com.dooques.fightingflow.ui
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -40,7 +40,7 @@ import timber.log.Timber
 
 enum class FlowScreen(@StringRes val title: Int) {
     Start(title = R.string.app_name),
-    ProfileList(title = R.string.your_details),
+    UserDetails(title = R.string.your_details),
     CharSelect(title = R.string.char_select),
     Combos(title = R.string.combos),
     ComboCreation(title = R.string.combo_creation),
@@ -102,19 +102,18 @@ fun NavGraph(
                     snackbarHostState = snackBarHostState,
                     deviceType = deviceType,
                     onCharSelect = { navController.navigate(FlowScreen.CharSelect.name) },
-                    onProfileSelect = { navController.navigate(FlowScreen.ProfileList.name) },
+                    onProfileSelect = { navController.navigate(FlowScreen.UserDetails.name) },
                 )
             }
 
             // Profiles
-            composable(route = FlowScreen.ProfileList.name) {
+            composable(route = FlowScreen.UserDetails.name) {
                 Timber.d(" Loading Profile List Screen...")
                 UserDetailsScreen(
                     scope = scope,
                     snackBarHostState = snackBarHostState,
                     userViewModel = userViewModel,
                     authViewModel = authViewModel,
-                    profanityViewModel = profanityViewModel,
                     navigateToComboDisplayScreen = { navController.navigate(FlowScreen.Combos.name) },
                     navigateBack = navController::navigateUp,
                     characterViewModel = characterViewModel,
@@ -132,7 +131,7 @@ fun NavGraph(
                     characterScreenViewModel = characterViewModel,
                     addCharacterViewModel = addCharacterViewModel,
                     navigateToComboDisplayScreen = { navController.navigate(FlowScreen.Combos.name) },
-                    navigateToProfiles = { navController.navigate(FlowScreen.ProfileList.name) },
+                    navigateToProfiles = { navController.navigate(FlowScreen.UserDetails.name) },
                     navigateToAddCharacter = { navController.navigate(FlowScreen.AddCharacter.name) },
                     navigateToHome = { navController.navigate(FlowScreen.Start.name) }
                 )

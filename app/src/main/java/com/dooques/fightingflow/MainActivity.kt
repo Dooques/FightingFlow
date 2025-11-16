@@ -10,7 +10,7 @@ import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSiz
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
-import com.example.fightingflow.ui.NavGraph
+import com.dooques.fightingflow.ui.NavGraph
 import com.dooques.fightingflow.ui.theme.FightingFlowTheme
 import org.koin.core.annotation.KoinExperimentalAPI
 import timber.log.Timber

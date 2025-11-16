@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -39,17 +37,15 @@ import androidx.compose.ui.Alignment.Companion.CenterEnd
 import androidx.compose.ui.Alignment.Companion.CenterStart
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.room.util.TableInfo
 import coil.compose.AsyncImage
 import com.dooques.fightingflow.data.firebase.GoogleAuthService
 import com.dooques.fightingflow.model.CharacterEntry
-import com.dooques.fightingflow.model.UserEntry
 import com.dooques.fightingflow.ui.characterScreen.CharacterCard
 import com.dooques.fightingflow.ui.settingsMenus.UserDetailsSettingsMenu
-import com.dooques.fightingflow.ui.userScreen.dialogs.EmailAndPasswordDialog
+import com.dooques.fightingflow.ui.userScreen.dialogs.ConfirmDeleteDialog
+import com.dooques.fightingflow.ui.userScreen.dialogs.EmailSignInDialog
 import com.dooques.fightingflow.ui.userScreen.dialogs.ReauthDialog
 import com.dooques.fightingflow.ui.viewmodels.AuthViewModel
 import com.dooques.fightingflow.ui.viewmodels.CharacterViewModel
@@ -70,7 +66,6 @@ fun UserDetailsScreen(
     snackBarHostState: SnackbarHostState,
     userViewModel: UserViewModel,
     authViewModel: AuthViewModel,
-    profanityViewModel: ProfanityViewModel,
     characterViewModel: CharacterViewModel,
     comboDisplayViewModel: ComboDisplayViewModel,
     navigateToComboDisplayScreen: () -> Unit,
@@ -81,9 +76,13 @@ fun UserDetailsScreen(
 
     var showReauthDialog by remember { mutableStateOf(false) }
     var showEmailPasswordDialog by remember { mutableStateOf(false) }
+    var showConfirmDeleteDialog by remember { mutableStateOf(false) }
+    var usernamesConfirmed by remember { mutableStateOf(false) }
 
     val currentUser by authViewModel.signInState.collectAsStateWithLifecycle()
     val userDetails by userViewModel.userDetailsState.collectAsStateWithLifecycle()
+
+
     val userCharacters = if (userDetails is UserDetailsState.Loaded) {
         val processedList = mutableListOf<CharacterEntry>()
         (userDetails as UserDetailsState.Loaded).user.characterList.forEach { characterName ->
@@ -138,11 +137,9 @@ fun UserDetailsScreen(
                 actions = {
                     UserDetailsSettingsMenu(
                         scope = scope,
-                        userViewModel = userViewModel,
                         authViewModel = authViewModel,
-                        currentUser = currentUser,
                         navigateBack = navigateBack,
-                        showReauthDialog = { showReauthDialog = true },
+                        showConfirmDialog = { showConfirmDeleteDialog = true },
                     )
                 }
             ) },
@@ -156,7 +153,7 @@ fun UserDetailsScreen(
                 .padding(horizontal = 32.dp)
         ) {
 
-            UserDetails(
+            UserDetailsForm(
                 currentUser = currentUser,
                 userDetails = userDetails,
                 menuExpanded = menuExpanded,
@@ -187,19 +184,33 @@ fun UserDetailsScreen(
             ReauthDialog(
                 scope = scope,
                 authViewModel = authViewModel,
-                userViewModel = userViewModel,
+                showConfirmDialog = { showConfirmDeleteDialog = true },
                 showEmailPasswordDialog = { showEmailPasswordDialog = true },
                 onDismissRequest = { showReauthDialog = false },
             )
         }
 
-        if (showEmailPasswordDialog) {
-            EmailAndPasswordDialog(
+        if (showConfirmDeleteDialog) {
+            ConfirmDeleteDialog(
+                scope = scope,
+                snackbarHostState = snackBarHostState,
+                userDetailsState = userDetails,
                 userViewModel = userViewModel,
                 authViewModel = authViewModel,
-                profanityViewModel = profanityViewModel,
+                currentUser = currentUser,
+                showReauthDialog = { showReauthDialog = true },
+                navigateBack = navigateBack,
+                onDismissRequest = { showConfirmDeleteDialog = false },
+                modifier = modifier
+            )
+        }
+
+        if (showEmailPasswordDialog) {
+            EmailSignInDialog(
+                userViewModel = userViewModel,
+                authViewModel = authViewModel,
                 createAccount = false,
-                snackbarHostState = snackBarHostState,
+                showConfirmDialog = {showConfirmDeleteDialog = true },
                 onDismissRequest = { showEmailPasswordDialog = false },
             )
         }
@@ -217,7 +228,7 @@ fun ChangeProfileImage(menuExpanded: Boolean, onDismissRequest: () -> Unit) {
 }
 
 @Composable
-fun UserDetails(
+fun UserDetailsForm(
     currentUser: GoogleAuthService.SignInState,
     userDetails: UserDetailsState,
     menuExpanded: Boolean,

@@ -29,19 +29,18 @@ interface ComboDsRepository {
 }
 
 class ComboDatastoreRepository(private val dataStore: DataStore<Preferences>): ComboDsRepository {
-    val Context.dataStore: DataStore<Preferences> by preferencesDataStore("combo_data")
 
     override suspend fun updateComboIdState(comboDisplay: ComboDisplay) {
-        Timber.d("Setting combo to datastore...")
-        Timber.d("ComboId: ${comboDisplay.id}")
+        Timber.d(" Setting combo to datastore...")
+        Timber.d(" ComboId: ${comboDisplay.id}")
         dataStore.edit { preference ->
             preference[comboId] = comboDisplay.id
         }
     }
 
     override suspend fun updateEditingState(editingStateValue: Boolean) {
-        Timber.d("Setting editing state to datastore...")
-        Timber.d("Editing state: $editingStateValue")
+        Timber.d(" Setting editing state to datastore...")
+        Timber.d(" Editing state: $editingStateValue")
         dataStore.edit { preference ->
             preference[editingState] = editingStateValue
         }

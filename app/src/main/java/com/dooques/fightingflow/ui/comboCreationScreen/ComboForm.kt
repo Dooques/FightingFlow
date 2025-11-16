@@ -108,7 +108,7 @@ fun ComboForm(
                         comboCreationState = comboCreationState,
                         combo = comboDisplay,
                         characterEntry = CharacterEntryUiState(
-                            characterMap[game.title]?.first { characterName == it.name }
+                            characterMap[game.title]?.firstOrNull { characterName == it.name }
                                 ?: emptyCharacter
                         ),
                         currentUser = currentUser,

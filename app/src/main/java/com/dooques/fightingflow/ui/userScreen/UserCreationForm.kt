@@ -22,6 +22,7 @@ import androidx.credentials.exceptions.NoCredentialException
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dooques.fightingflow.data.firebase.GoogleAuthService
 import com.dooques.fightingflow.ui.viewmodels.AuthViewModel
+import com.dooques.fightingflow.ui.viewmodels.UserViewModel
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -31,11 +32,15 @@ import timber.log.Timber
 fun UserCreationForm(
     scope: CoroutineScope,
     authViewModel: AuthViewModel,
-    showEmailPasswordDialog: () -> Unit,
-    createAccountDialog: () -> Unit,
+    userViewModel: UserViewModel,
+    showEmailSignInDialog: () -> Unit,
+    showEmailCreateUserDialog: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val currentUser by authViewModel.signInState.collectAsStateWithLifecycle()
+    val googleSignInError by userViewModel.googleSignInErrorState.collectAsStateWithLifecycle()
+    val emailSignInError by userViewModel.emailSignInErrorState.collectAsStateWithLifecycle()
+
     Timber.d("Loading profile creation form...")
 
     Column(modifier.fillMaxHeight()) {
@@ -57,7 +62,7 @@ fun UserCreationForm(
 
                 // Sign In With Email
                 OutlinedButton(
-                    onClick = { showEmailPasswordDialog() },
+                    onClick = { showEmailSignInDialog() },
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp)
                 ) {
                     Text("Sign In With Email", color = MaterialTheme.colorScheme.onBackground)
@@ -65,7 +70,7 @@ fun UserCreationForm(
 
                 // Create with Email
                 OutlinedButton(
-                    onClick = { createAccountDialog() },
+                    onClick = { showEmailCreateUserDialog() },
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp)
                 ) {
                     Text("Create An Account With Email", color = MaterialTheme.colorScheme.onBackground)
@@ -99,17 +104,35 @@ fun UserCreationForm(
                         color = MaterialTheme.colorScheme.error,
                         textAlign = TextAlign.Center
                     )
+
                     Spacer(modifier = Modifier.height(16.dp))
+
                     OutlinedButton(
-                        onClick = { scope.launch { authViewModel.initiateGoogleSignIn() } },
+                        onClick = { scope.launch {
+                            val googleResult = authViewModel.initiateGoogleSignIn()
+                            if (googleResult.isFailure) { userViewModel.updateGoogleErrorState(true) }
+                        } },
                         modifier = modifier.fillMaxWidth()
-                    ) { Text("Retry Google Sign-In", color = MaterialTheme.colorScheme.onBackground) }
+                    ) { Text(
+                        if (googleSignInError) "Retry Google Sign-In" else "Sign In With Google",
+                        color = MaterialTheme.colorScheme.onBackground
+                    ) }
+
                     OutlinedButton(
-                        onClick = { showEmailPasswordDialog() },
+                        onClick = {
+                            scope.launch {
+                                userViewModel.updateEmailErrorState(false)
+                                userViewModel.updateGoogleErrorState(false)
+                                showEmailSignInDialog()
+                            } },
                         modifier = modifier.fillMaxWidth()
-                    ) { Text("Retry Email Sign-In", color = MaterialTheme.colorScheme.onBackground) }
+                    ) { Text(
+                        if (emailSignInError) "Retry Email Sign-In" else "Sign In With Email",
+                        color = MaterialTheme.colorScheme.onBackground
+                    ) }
+
                     OutlinedButton(
-                        onClick = { createAccountDialog() },
+                        onClick = { showEmailCreateUserDialog() },
                         modifier = modifier.fillMaxWidth()
                     ) { Text("Create an Account", color = MaterialTheme.colorScheme.onBackground) }
                 }
@@ -117,7 +140,5 @@ fun UserCreationForm(
         }
 
         Spacer(modifier.size(height = 50.dp, width = 0.dp))
-
-        Timber.d("Form Loaded.")
     }
 }

@@ -3,10 +3,8 @@ package com.dooques.fightingflow.ui.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dooques.fightingflow.data.datastore.UserDsRepository
-import com.dooques.fightingflow.data.firebase.FirebaseComboRepository
 import com.dooques.fightingflow.data.firebase.FirebaseUserRepository
 import com.dooques.fightingflow.data.firebase.GoogleAuthService
-import com.dooques.fightingflow.data.firebase.UserFbResult
 import com.dooques.fightingflow.model.UserDataForCombos
 import com.dooques.fightingflow.model.UserEntry
 import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
@@ -26,7 +24,6 @@ import timber.log.Timber
 class UserViewModel(
     private val userDsRepository: UserDsRepository,
     private val firebaseUserRepository: FirebaseUserRepository,
-    private val authViewModel: AuthViewModel
 ): ViewModel() {
 
     companion object {
@@ -43,7 +40,7 @@ class UserViewModel(
 
     val userDataMap = firebaseUserRepository.getUserMap()
         .mapNotNull { userData ->
-            Timber.d("UserData: $userData")
+            Timber.d(" UserData: $userData")
             userData
         }
         .stateIn(
@@ -52,42 +49,58 @@ class UserViewModel(
             initialValue = UserDataForCombos(emptyMap())
         )
 
+    val emailSignInErrorState = getEmailErrorState()
+        .map { it }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(TIME_MILLIS),
+            initialValue = false
+        )
+
+    val googleSignInErrorState = getGoogleErrorState()
+        .map { it }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(TIME_MILLIS),
+            initialValue = false
+        )
+
     // Update Profile State
     var userIdState = MutableStateFlow("")
-    val newUserState = MutableStateFlow<UserEntry?>(null)
+    val newUserDetailsState = MutableStateFlow<UserEntry?>(null)
     val currentUserState = MutableStateFlow<GoogleAuthService.SignInState>(GoogleAuthService.SignInState.Idle)
 
-    fun updateNewUserState(user: UserEntry?) { newUserState.update { user } }
+    fun updateNewUserState(user: UserEntry?) { newUserDetailsState.update { user } }
     fun updateCurrentUser(user: GoogleAuthService.SignInState) { currentUserState.update { user } }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val userDetailsState = currentUserState.flatMapLatest { currentUser ->
-        Timber.d("--Getting User Details from Firestore Database")
-        Timber.d("Current User: $currentUser")
+        Timber.d("--Getting User Details from Firestore Database--")
+        Timber.d(" Current User: $currentUser")
         when (currentUser) {
             is GoogleAuthService.SignInState.Success -> {
-                userIdState.flatMapLatest { userId ->
-                    Timber.d("Valid User ID detected, creating User Details flow.")
+                userIdState.flatMapLatest {
+                    Timber.d(" Valid User ID detected, creating User Details flow.")
                     try {
                         this@UserViewModel.firebaseUserRepository.getUserDetailsById(userIdState.value)
                             .map { userEntry ->
                                 if (userEntry != null) {
-                                    Timber.d("User Entry: $userEntry")
+                                    Timber.d(" User Entry: $userEntry")
                                     updateUsernameInDs(userEntry.username)
                                     UserDetailsState.Loaded(userEntry)
                                 } else {
-                                    Timber.d("Mapping null entry to Not Found State")
+                                    Timber.d(" Mapping null entry to Not Found State")
                                     UserDetailsState.NotFound
                                 }
                             }
                             .onStart {
-                                Timber.d("Flow initiated, mapping Loading State"); emit(
+                                Timber.d(" Flow initiated, mapping Loading State"); emit(
                                 UserDetailsState.Loading
                             )
                             }
                     } catch (e: Exception) {
                         if (e is CancellationException) {
-                            Timber.w("User Details flow cancelled for ${userIdState.value}")
+                            Timber.w(" User Details flow cancelled for ${userIdState.value}")
                             throw e
                         }
                         flowOf(UserDetailsState.Error(e))
@@ -95,7 +108,7 @@ class UserViewModel(
                 }
             }
             else -> {
-                Timber.d("User not signed in, returning Idle state")
+                Timber.d(" User not signed in, returning Idle state")
                 flowOf(UserDetailsState.Idle)
             }
         }
@@ -109,81 +122,57 @@ class UserViewModel(
     fun updateUserId(userId: String) {
         Timber.d("--Updating user ID--")
         userIdState.update { userId }
-        Timber.d("UserId: ${userIdState.value}")
+        Timber.d(" UserId: ${userIdState.value}")
     }
 
-    suspend fun createUser(): UserSaveResult {
-        Timber.d("-- Preparing to save profile to database --")
-        Timber.d("User Entry: $newUserState")
-        if (newUserState.value?.username?.isBlank() == true) {
-            return UserSaveResult.Error(Exception("No username entered."))
+    suspend fun createUser(userDataToSave: UserEntry?): Result<Unit> {
+        Timber.d("--Preparing to save profile to database--")
+        Timber.d(" User Entry: $userDataToSave")
+
+        if (userDataToSave != null && userDataToSave.username.isBlank()) {
+            return Result.failure(Exception("No username entered."))
         }
 
-        try {
-            Timber.d("Creating profile in firestore")
-            Timber.d("User Details: ${newUserState.value}")
-            firebaseUserRepository.addUserToStore(newUserState.value!!)
+        return try {
+            Timber.d(" Creating profile in firestore")
+            if (userDataToSave != null) {
+                firebaseUserRepository.addUserToStore(userDataToSave)
 
-            Timber.d("Updating data in datastore from ViewModel...\nUserState: %s", newUserState.value)
+                Timber.d(" Updating data in datastore from ViewModel...\n UserState: %s", userDataToSave)
 
-            updateUsernameInDs(newUserState.value!!.username)
-            Timber.d("Profile added to datastore.")
+                updateUsernameInDs(userDataToSave.username)
+                Timber.d(" Profile added to datastore.")
 
-            newUserState.update { UserEntry() }
-
-            return UserSaveResult.Success
+               Result.success(Unit)
+            } else {
+                throw Exception("User Details State is null")
+            }
         } catch (e: Exception) {
-            return UserSaveResult.Error(e)
+            Result.failure(e)
         }
     }
 
-    fun deleteUser(userId: String): UserFbResult {
+    suspend fun deleteUser(userId: String): Result<Unit> {
         Timber.d("--Preparing to delete user details--")
         try {
             return firebaseUserRepository.deleteUser(userId)
         } catch (e: Exception) {
-            Timber.e(e, "Error deleting user details.")
-            return UserFbResult.Error(e)
+            Timber.e(e, " Error deleting user details.")
+            return Result.failure(e)
         }
     }
 
     // Datastore Functions
     suspend fun updateUsernameInDs(username: String?) { userDsRepository.updateUsername(username) }
 
-    suspend fun checkUserAuthenticated(
-        result: Result<Unit>?,
-        currentUser: GoogleAuthService.SignInState,
-        navigateBack: () -> Unit,
-        showReauthDialog: () -> Unit,
-        ) {
-        if (result != null) {
-            when {
-                result.isSuccess -> { navigateBack() }
+    suspend fun updateGoogleErrorState(boolean: Boolean) { userDsRepository.updateGoogleErrorState(boolean) }
 
-                result.isFailure -> {
-                    val exception = result.exceptionOrNull()
-                    if (exception is FirebaseAuthRecentLoginRequiredException) {
-                        showReauthDialog() /* set to true */
-                        val resultReauth = authViewModel.deleteUser()
-                        if (resultReauth != null) {
-                            when {
-                                resultReauth.isSuccess -> {
-                                    deleteUser((currentUser as GoogleAuthService.SignInState.Success).user.userId)
-                                    authViewModel.signOut()
-                                    navigateBack()
-                                }
+    suspend fun updateEmailErrorState(boolean: Boolean) { userDsRepository.updateEmailErrorState(boolean) }
 
-                                resultReauth.isFailure -> Timber.e(
-                                    resultReauth.exceptionOrNull(),
-                                    "Error deleting user"
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+    fun getEmailErrorState() = userDsRepository.getEmailErrorState().map { it }
+
+    fun getGoogleErrorState() = userDsRepository.getGoogleErrorState().map { it }
+
 }
 
 sealed class UserSaveResult {

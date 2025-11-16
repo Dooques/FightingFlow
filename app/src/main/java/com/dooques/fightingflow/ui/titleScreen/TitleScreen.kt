@@ -38,7 +38,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dooques.fightingflow.R
 import com.dooques.fightingflow.data.firebase.GoogleAuthService
 import com.dooques.fightingflow.ui.userScreen.UserCreationForm
-import com.dooques.fightingflow.ui.userScreen.dialogs.EmailAndPasswordDialog
+import com.dooques.fightingflow.ui.userScreen.dialogs.EmailCreateUserDialog
+import com.dooques.fightingflow.ui.userScreen.dialogs.EmailSignInDialog
 import com.dooques.fightingflow.ui.userScreen.dialogs.UserDetailsDialog
 import com.dooques.fightingflow.ui.viewmodels.AuthViewModel
 import com.dooques.fightingflow.ui.viewmodels.ProfanityViewModel
@@ -62,17 +63,19 @@ fun TitleScreen(
     val currentUser by authViewModel.signInState.collectAsStateWithLifecycle()
     val userDetails by userViewModel.userDetailsState.collectAsStateWithLifecycle()
 
-    Timber.d("Current User: %s\nUser Details: %s", currentUser, userDetails)
+    Timber.d(" Current User: %s\n User Details: %s", currentUser, userDetails)
 
     val uiScale = if (deviceType.heightSizeClass == WindowHeightSizeClass.Compact) 2 else 1
     val scope = rememberCoroutineScope()
 
     var showUserDetailsDialog by remember { mutableStateOf(false) }
-    var showEmailPasswordDialog by remember { mutableStateOf(false) }
+    var showEmailSignInDialog by remember { mutableStateOf(false) }
+    var showEmailCreationDialog by remember { mutableStateOf(false) }
     var createAccountState by remember { mutableStateOf(false) }
 
-    Timber.d("Flows Collected:\nshowUserDetailsDialog: %s\nshowEmailDialog: %s\ncreateAccountState: %s",
-        showUserDetailsDialog, showEmailPasswordDialog, createAccountState)
+    Timber.d(" Flows Collected:\n ShowUserDetailsDialog: %s\n ShowEmailCreationDialog: %s" +
+            "\n ShowEmailSignInDialog: %s\n CreateAccountState: %s",
+        showUserDetailsDialog, showEmailCreationDialog, showEmailSignInDialog, createAccountState)
 
     Column(
         verticalArrangement = Arrangement.Center,
@@ -93,7 +96,9 @@ fun TitleScreen(
             val username = (userDetails as UserDetailsState.Loaded).user.username.replaceFirstChar { it.uppercase() }
             Row (
                 horizontalArrangement = Arrangement.Center,
-                modifier = modifier.fillMaxWidth().padding(16.dp)
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
             ) {
                 Text(
                     text = "Welcome $username",
@@ -179,12 +184,13 @@ fun TitleScreen(
                         UserCreationForm(
                             scope = scope,
                             authViewModel = authViewModel,
-                            showEmailPasswordDialog = {
-                                showEmailPasswordDialog = true; createAccountState = false
+                            showEmailSignInDialog = {
+                                showEmailSignInDialog = true
                             },
-                            createAccountDialog = {
-                                showEmailPasswordDialog = true; createAccountState = true
+                            showEmailCreateUserDialog = {
+                                showEmailCreationDialog = true
                             },
+                            userViewModel = userViewModel
                         )
                     }
                 }
@@ -201,17 +207,25 @@ fun TitleScreen(
             onDismissDialog = { showUserDetailsDialog = false }
         )
     }
-    if (showEmailPasswordDialog) {
-        EmailAndPasswordDialog(
+
+    if (showEmailSignInDialog) {
+        EmailSignInDialog(
+            userViewModel = userViewModel,
+            authViewModel = authViewModel,
+            createAccount = createAccountState,
+            showConfirmDialog = {},
+            onDismissRequest = { showEmailSignInDialog = false },
+        )
+    }
+
+    if (showEmailCreationDialog) {
+        EmailCreateUserDialog(
             userViewModel = userViewModel,
             authViewModel = authViewModel,
             profanityViewModel = profanityViewModel,
             createAccount = createAccountState,
             snackbarHostState = snackbarHostState,
-            onDismissRequest = {
-                showEmailPasswordDialog = false
-                createAccountState = false
-            }
+            onDismissRequest = { showEmailCreationDialog = false }
         )
     }
 }

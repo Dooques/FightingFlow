@@ -9,7 +9,6 @@ import com.dooques.fightingflow.data.datastore.SettingsDsRepository
 import com.dooques.fightingflow.data.datastore.UserDsRepository
 import com.dooques.fightingflow.data.firebase.FirebaseComboRepository
 import com.dooques.fightingflow.data.firebase.FirebaseUserRepository
-import com.dooques.fightingflow.data.firebase.GoogleAuthRepository
 import com.dooques.fightingflow.data.firebase.GoogleAuthService
 import com.dooques.fightingflow.model.CharacterEntry
 import com.dooques.fightingflow.model.ComboDisplay
@@ -86,7 +85,7 @@ class ComboDisplayViewModel(
         .map { CharNameUiState(it) }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.Companion.WhileSubscribed(TIME_MILLIS),
+            started = SharingStarted.WhileSubscribed(TIME_MILLIS),
             initialValue = null
         )
 
@@ -178,7 +177,7 @@ class ComboDisplayViewModel(
         Timber.d(" Updating combo ${combo.id} in firestore database")
         comboFirebaseRepository.updateCombo(
             combo.toFbEntry(
-                characterEntryListState.value.characterList.first { it.name == combo.character }
+                characterEntryListState.value.characterList.firstOrNull { it.name == combo.character } ?: emptyCharacter
             )
         )
         Timber.d(" Updating user details to add/remove combo from likes")
@@ -365,10 +364,6 @@ class ComboDisplayViewModel(
                 Console.NINTENDO -> 3
             }
         )
-    }
-
-    fun updateSF6ControlState(controlType: Int) = viewModelScope.launch {
-        settingsDsRepository.updateSf6ControlType(controlType)
     }
 
     suspend fun updateShowComboDisplayState(boolean: Boolean) {

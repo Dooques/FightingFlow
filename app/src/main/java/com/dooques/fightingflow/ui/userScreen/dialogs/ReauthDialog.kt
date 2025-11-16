@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.dooques.fightingflow.data.firebase.GoogleAuthService
 import com.dooques.fightingflow.ui.viewmodels.AuthViewModel
 import com.dooques.fightingflow.ui.viewmodels.UserViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -26,7 +27,7 @@ import kotlinx.coroutines.launch
 fun ReauthDialog(
     scope: CoroutineScope,
     authViewModel: AuthViewModel,
-    userViewModel: UserViewModel,
+    showConfirmDialog: () -> Unit,
     showEmailPasswordDialog: () -> Unit,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier
@@ -46,7 +47,10 @@ fun ReauthDialog(
                 OutlinedButton(
                     onClick = {
                         scope.launch {
-                            authViewModel.initiateGoogleSignIn()
+                            val result = authViewModel.initiateGoogleSignIn()
+                            if (result.isSuccess) {
+                                showConfirmDialog()
+                            }
                             onDismissRequest()
                         }
                     },

@@ -28,7 +28,7 @@ class FirebaseUserRepository() {
         val userHash = user.toHashMap()
 
         try {
-            Timber.d("Initiating the transaction")
+            Timber.d(" Initiating the transaction")
             val newDocument = firestore.runTransaction { transaction ->
                 val query = userCollection.document(user.userId)
                 val snapshot = transaction.get(query)
@@ -36,31 +36,31 @@ class FirebaseUserRepository() {
                 if (snapshot.exists()) {
                     // User exists
                     val existingDocument = snapshot.get("username")
-                    Timber.w("$existingDocument already exists.")
+                    Timber.w(" $existingDocument already exists.")
                     UserFbResult.Error(Exception("User Exists"))
                 } else {
-                    Timber.d("User Details: $userHash")
+                    Timber.d(" User Details: $userHash")
                     transaction.set(query, userHash)
-                    Timber.d("Transaction: Adding ${user.username} as a new user to db.")
+                    Timber.d(" Transaction: Adding ${user.username} as a new user to db.")
                     UserFbResult.Success
                 }
             }.await()
             return newDocument
         } catch (e: Exception) {
-            Timber.e(e, "Error processing transaction to add ${user.username} to db.")
+            Timber.e(e, " Error processing transaction to add ${user.username} to db.")
             return UserFbResult.Error(error = e)
         }
     }
 
     fun getUserDetailsById(userId: String): Flow<UserEntry?> {
         if (userId.isBlank()) {
-            Timber.d("User ID is blank")
+            Timber.d( "User ID is blank")
             return flowOf(emptyUser)
         }
         try {
             return callbackFlow {
                 Timber.d("--Repo: Getting user details from the firestore.--")
-                Timber.d("UserID: $userId")
+                Timber.d(" UserID: $userId")
 
                 val userDocumentReference = userCollection.document(userId)
                 Timber.d("UserDocumentRef: $userDocumentReference")
@@ -68,7 +68,7 @@ class FirebaseUserRepository() {
                 val listenerRegistration = userDocumentReference
                     .addSnapshotListener { documentSnapshot: DocumentSnapshot?, e: FirebaseFirestoreException? ->
                         if (e != null) {
-                            Timber.e(e, "Error listening for combo document.")
+                            Timber.e(e, " Error listening for combo document.")
                             close(e)
                             return@addSnapshotListener
                         }
@@ -76,26 +76,26 @@ class FirebaseUserRepository() {
                         if (documentSnapshot != null && documentSnapshot.exists()) {
                             val user =
                                 try {
-                                    Timber.d("Document: %s", documentSnapshot)
+                                    Timber.d(" Document: %s", documentSnapshot)
                                     documentSnapshot.toObject(UserEntry::class.java)
                                 } catch (e: Exception) {
-                                    Timber.e(e, "Error converting user to User: $userId")
+                                    Timber.e(e, " Error converting user to User: $userId")
                                     null
                                 }
                             trySend(user)
                         } else {
-                            Timber.d("User $userId does not exist or is null: $documentSnapshot")
+                            Timber.d(" User $userId does not exist or is null: $documentSnapshot")
                             trySend(null)
                         }
                     }
                 awaitClose {
-                    Timber.d("Closing firestore listener for User document: $userId")
+                    Timber.d(" Closing firestore listener for User document: $userId")
                     listenerRegistration.remove()
                 }
 
             }
         } catch (e: Exception) {
-            Timber.e(e, "An Error occurred during listenerRegistration")
+            Timber.e(e, " An Error occurred during listenerRegistration")
             return flowOf(emptyUser)
         }
     }
@@ -105,9 +105,9 @@ class FirebaseUserRepository() {
         val userMap = mutableMapOf<String, String>()
         val listenerRegistration = userCollection
             .addSnapshotListener { querySnapshot: QuerySnapshot?, e: FirebaseFirestoreException? ->
-                Timber.d("User Snapshot: ${querySnapshot?.query.toString()}")
+                Timber.d(" User Snapshot: ${querySnapshot?.query.toString()}")
                 if (e != null) {
-                    Timber.e(e, "Error listening for user document.")
+                    Timber.e(e, " Error listening for user document.")
                     close(e)
                 }
                 if (querySnapshot != null && !querySnapshot.isEmpty) {
@@ -116,46 +116,46 @@ class FirebaseUserRepository() {
                             userMap[user.id] = user.data["username"] as String
                         }
                     } catch (e: Exception) {
-                        Timber.e(e, "Error getting data from user collection")
+                        Timber.e(e, " Error getting data from user collection")
                         close(e)
                     }
-                    Timber.d("UserMap: $userMap")
+                    Timber.d(" UserMap: $userMap")
                     trySend(UserDataForCombos(userMap))
                 }
             }
         awaitClose {
-            Timber.d("Closing firestore listener for User Collection")
+            Timber.d(" Closing firestore listener for User Collection")
             listenerRegistration.remove()
         }
     }
 
     suspend fun updateUser(user: UserEntry): UserFbResult {
         val userHash = user.toHashMap()
-        Timber.d("User Details: $userHash")
+        Timber.d(" User Details: $userHash")
 
         return try {
-            Timber.d("Attempting to update firestore database user")
+            Timber.d(" Attempting to update firestore database user")
             userCollection.document(user.userId)
                 .update(userHash)
                 .await()
             UserFbResult.Success
         } catch (e: Exception) {
-            Timber.e(e, "Error updating ${user.username}'s details \n User: $user\n Hash: $userHash")
+            Timber.e(e, " Error updating ${user.username}'s details \n User: $user\n Hash: $userHash")
             UserFbResult.Error(e)
         }
     }
 
-    fun deleteUser(userId: String): UserFbResult {
+    suspend fun deleteUser(userId: String): Result<Unit> {
         Timber.d("--Deleting user profile from firestore--")
         val documentReference = userCollection.document(userId)
 
         try {
-            documentReference.delete()
-            Timber.d("Successfully deleted $userId from firestore.")
-            return UserFbResult.Success
+            documentReference.delete().await()
+            Timber.d(" Successfully deleted $userId from firestore.")
+            return Result.success(Unit)
         } catch (e: Exception) {
-            Timber.e(e, "Error deleting user profile from datastore")
-            return UserFbResult.Error(e)
+            Timber.e(e, " Error deleting user profile from datastore")
+            return Result.failure(e)
         }
     }
 }
