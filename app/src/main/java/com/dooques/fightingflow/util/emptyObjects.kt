@@ -1,6 +1,6 @@
 package com.dooques.fightingflow.util
 
-import com.dooques.fightingflow.R
+import android.R
 import com.dooques.fightingflow.model.CharacterEntry
 import com.dooques.fightingflow.model.ComboDisplay
 import com.dooques.fightingflow.model.ComboEntry
@@ -11,7 +11,7 @@ import com.dooques.fightingflow.model.UserEntry
 val emptyCharacter = CharacterEntry(
     id = 0,
     name = "",
-    imageId = R.drawable.mokujin,
+    imageId = R.drawable,
     fightingStyle = "",
     combosById = "",
     game = "Custom",

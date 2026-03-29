@@ -18,8 +18,7 @@ import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 import kotlin.collections.forEach
 
-class FirebaseUserRepository() {
-
+class FirebaseUserRepository {
     val firestore = Firebase.firestore
     val userCollection: CollectionReference = firestore.collection("users")
 

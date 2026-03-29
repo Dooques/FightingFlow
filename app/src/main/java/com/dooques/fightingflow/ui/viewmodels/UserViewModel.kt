@@ -7,7 +7,6 @@ import com.dooques.fightingflow.data.firebase.FirebaseUserRepository
 import com.dooques.fightingflow.data.firebase.GoogleAuthService
 import com.dooques.fightingflow.model.UserDataForCombos
 import com.dooques.fightingflow.model.UserEntry
-import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow

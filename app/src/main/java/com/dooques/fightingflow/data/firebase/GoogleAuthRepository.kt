@@ -57,6 +57,20 @@ class GoogleAuthRepository(
     override var auth: FirebaseAuth = Firebase.auth
     private val credentialManager: CredentialManager by lazy { CredentialManager.create(context) }
 
+    override fun getCurrentUser(): GoogleAuthService.GoogleSignInResult? {
+        Timber.d("--Getting current User--")
+        val firebaseUser = auth.currentUser
+        Timber.d(" User: ${firebaseUser?.email}")
+        return firebaseUser?.let {
+            GoogleAuthService.GoogleSignInResult(
+                userId = it.uid,
+                displayName = it.displayName,
+                email = it.email,
+                photo = it.photoUrl?.toString()
+            )
+        }
+    }
+
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     override suspend fun signInWithGoogle(): GoogleAuthService.SignInState {
         Timber.d(" ClientId: ${BuildConfig.WEB_CLIENT_ID}")
@@ -139,9 +153,9 @@ class GoogleAuthRepository(
 
     override suspend fun createAccountWithEmailAndPassword(email: String, password: String): Result<Unit> {
         Timber.d(" Creating account for $email")
-        if (email.isEmpty()|| password.isEmpty()) {
+        return if (email.isEmpty()|| password.isEmpty()) {
             Timber.e(" Email is empty.")
-            return Result.failure(Exception("Missing Info"))
+            Result.failure(Exception("Missing Info"))
         } else {
             try {
                 Timber.d(" Details are valid, creating account.")
@@ -154,14 +168,15 @@ class GoogleAuthRepository(
                 } else {
                     if (result.exception != null) {
                         Timber.e(result.exception, " An error occurred during account creation.")
-                        return Result.failure(result.exception as Exception)
+                        Result.failure(result.exception as Exception)
+                    } else {
+                        Result.failure(Exception("An unknown error occurred."))
                     }
                 }
             } catch (e: Exception) {
-                return Result.failure(e)
+                Result.failure(e)
             }
         }
-        return Result.failure(Exception("An unknown error occurred."))
     }
 
     override suspend fun signInWithEmailAndPassword(email: String, password: String):Result<Unit> {
@@ -190,20 +205,6 @@ class GoogleAuthRepository(
                 Timber.e(e, " Error attempting to sign in.")
                 Result.failure(e)
             }
-        }
-    }
-
-    override fun getCurrentUser(): GoogleAuthService.GoogleSignInResult? {
-        Timber.d("--Getting current User--")
-        val firebaseUser = auth.currentUser
-        Timber.d(" User: ${firebaseUser?.email}")
-        return firebaseUser?.let {
-            GoogleAuthService.GoogleSignInResult(
-                userId = it.uid,
-                displayName = it.displayName,
-                email = it.email,
-                photo = it.photoUrl?.toString()
-            )
         }
     }
 
