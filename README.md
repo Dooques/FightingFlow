@@ -5,9 +5,16 @@
 <p>
   This is a app for the beginner, intermediate and veteran FGC players to document combos in a comprehensive library spanning multiple fighting game franchises.
 </p>
+<hr>
+
+<h3>Native Android</h3>
 
 <p>
-  This repository is for the native android version of the app, I am currently working on a KMP (Kotlin Multiplatform) version which will run as a web app and an iOS app. <a href="https://github.com/Dooques/FightingFlowMP">Check out the Multiplatform version here!</a>
+  This repository is for the native android version of the app, I am currently working on a KMP (Kotlin Multiplatform) version which will run as a web app and an iOS app. 
+</p>
+
+<p>
+  <a href="https://github.com/Dooques/FightingFlowMP">Check out the Multiplatform version here!</a>
 </p>
 
 <h3>Features</h3>
