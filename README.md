@@ -1,13 +1,51 @@
-<h1>Welcome to the repository for Fighting Flow! </h1>
+<h1>
+  Welcome to the repository for Fighting Flow
+</h1>
 
-This is a passion project to create an app for beginner Tekken players who want to learn the combos and display them on their phone while playing the game.
+<p>
+  This is a app for the beginner, intermediate and veteran FGC players to document combos in a comprehensive library spanning multiple fighting game franchises.
+</p>
 
-I'm currently working on a stable version of this app which will allow users to create, edit and delete combos. This will be the basic version of the app, later on in development I am hoping to add a way to
-create playlists with your combos with a timer that allows you to practice one combo for 5 minutes, then the next one for 5 minutes and so on, potentially with adjustable timers for each combo if one is more
-difficult to execute than others.
-<hr>
-<h4>Try out the app</h4>
+<p>
+  This repository is for the native android version of the app, I am currently working on a KMP (Kotlin Multiplatform) version which will run as a web app and an iOS app. <a href="https://github.com/Dooques/FightingFlowMP">Check out the Multiplatform version here!</a>
+</p>
 
-To try out the app for yourself, download the zip file using the green code button at the top of this page and extract the fighting-flow-debug.apk. You can then add this file to your android device or emulator. I've tested it using Bluestack on PC and it works well. 
+<h3>Features</h3>
 
-If you've tried the app and are enjoying it or want to give me some feedback do not hesitate to get in contact. 
+<ul>
+  <li>
+    Create combos for Tekken 8, Mortal Kombat 1 and Street Fighter 6
+  </li>
+  <li>
+    Use in game notation for your combos
+  </li>
+  <li>
+    See other user's combos, updated in real time through Firestore Database
+  </li>
+  <li>
+    Share your combos online or with your friends with downloadable JPGs
+  </li>
+  <li>
+    A simple and intuitive UI for navigatiion
+  </li>
+</ul>
+
+<h3>Planned Features</h3>
+<ul>
+  <li>
+    Practice playlists will allow you to practice a set of combos for set amounts of time
+  </li>
+  <li>
+    Comprehensive guides for characters and game mechanics
+  </li>
+  <li>
+    Controller support for practicing input timing
+  </li>
+</ul>
+  <hr>
+  
+<h3>Try out the app!</h3>
+
+<p>
+  The app is currently in a Play Store Beta and I am working on porting it to the web using Kotlin Multiplatform. If you're interested in trying the app send me an email and I can add you to the list of Play Store testers!
+</p>
